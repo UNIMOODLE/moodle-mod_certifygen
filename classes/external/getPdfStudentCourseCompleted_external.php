@@ -1,0 +1,59 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+
+namespace mod_certifygen\external;
+
+
+use external_api;
+use external_function_parameters;
+use external_single_structure;
+use external_value;
+
+class getPdfStudentCourseCompleted_external extends external_api {
+    public static function getPdfStudentCourseCompleted_parameters(): external_function_parameters {
+        return new external_function_parameters(
+            [
+                'id' => new external_value(PARAM_INT, 'model id'),
+                'dni' => new external_value(PARAM_RAW, 'user dni'),
+                'courseid' => new external_value(PARAM_INT, 'course id'),
+            ]
+        );
+    }
+    public static function getPdfStudentCourseCompleted(int $modelid, string $dni, int $courseid): array {
+        /**
+         * Devuelve el PDF del certificado de que el alumno ha cursado y superado el curso
+         * indicado en el parámetro. Este servicio web llamará a getJsonStudentCourseCompleted
+         * para obtener la información a maquetar.
+         * final.
+         */
+        return ['file' => 'The file'];
+    }
+    public static function getPdfStudentCourseCompleted_returns(): external_single_structure {
+        return new external_single_structure(array(
+                'file' => new external_value(PARAM_RAW, 'File content on base64'),
+            )
+        );
+    }
+}
