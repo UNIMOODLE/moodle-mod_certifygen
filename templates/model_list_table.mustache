@@ -22,7 +22,7 @@
     Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos
 }}
 {{!
-    @template mod_certifygen/model_list
+    @template mod_certifygen/model_list_table
 
     Student
 
@@ -42,3 +42,6 @@
 <div data-region="model-list-table">
     {{{ table }}}
 </div>
+{{#js}}
+    require(['mod_certifygen/modelmanagement'], (module) => module.init());
+{{/js}}

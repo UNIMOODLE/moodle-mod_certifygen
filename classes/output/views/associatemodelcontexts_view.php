@@ -47,16 +47,10 @@ class associatemodelcontexts_view implements renderable, templatable {
      * @return stdClass
      */
     public function export_for_template(renderer_base $output): stdClass {
-        $modelcontexttable = new modelcontext_table();
-        $modelcontexttable->baseurl = new moodle_url('/mod/certifygen/associatemodels.php');
-        ob_start();
 
-        $modelcontexttable->out($this->pagesize, $this->useinitialsbar);
-
-        $out1 = ob_get_contents();
-        ob_end_clean();
+        $moodleform = new associatecontextform();
         $data = new stdClass();
-        $data->table = $out1;
+        $data->form = $moodleform->display();
         return $data;
     }
 }

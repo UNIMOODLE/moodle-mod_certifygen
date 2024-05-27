@@ -13,33 +13,39 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
+// Produced by the UNIMOODLE University Group: Universities of
+// Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
+// Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos..
 /**
- *
- * @package     XXXX
- * @author      202X Elena Barrios Galán <elena@tresipunt.com>
- * @copyright   3iPunt <https://www.tresipunt.com/>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 
 namespace mod_certifygen\tables;
 
 require "$CFG->libdir/tablelib.php";
+
+use coding_exception;
+use dml_exception;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\template;
 use table_sql;
 class modellist_table extends table_sql {
 
     /**
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     function __construct() {
 
         $uniqueid = 'certifygen-model-list-view';
         parent::__construct($uniqueid);
         // Define the list of columns to show.
-        $columns = array('modelname', 'template', 'lastupdate', 'editmodel', 'deletemodel');
+        $columns = array('modelname', 'template', 'lastupdate', 'editmodel', 'deletemodel', 'associatecontexts');
         $this->define_columns($columns);
 
         // Define the titles of columns to show in header.
@@ -47,7 +53,7 @@ class modellist_table extends table_sql {
             get_string('modelname', 'mod_certifygen'),
             get_string('template', 'mod_certifygen'),
             get_string('lastupdate', 'mod_certifygen'),
-            '', '');
+            '', '', '');
         $this->define_headers($headers);
 
     }
@@ -56,7 +62,7 @@ class modellist_table extends table_sql {
      * @param $pagesize
      * @param $useinitialsbar
      * @return void
-     * @throws \dml_exception
+     * @throws dml_exception
      */
     public final function query_db($pagesize, $useinitialsbar = true) {
 
@@ -99,7 +105,7 @@ class modellist_table extends table_sql {
     /**
      * @param $values
      * @return string
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     final function col_deletemodel($values) : string {
         return '<span class="likelink" data-id="'. $values->id . '" data-name="'. $values->name . '" data-action="delete-model">'
@@ -109,9 +115,25 @@ class modellist_table extends table_sql {
     /**
      * @param $values
      * @return string
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     final function col_editmodel($values) : string {
         return '<span class="likelink" data-action="edit-model" data-id="'. $values->id . '">'.get_string('edit', 'mod_certifygen').'</span>';
+    }
+
+    /**
+     * @param $values
+     * @return string
+     * @throws coding_exception
+     * @throws dml_exception
+     */
+    final function col_associatecontexts($values) : string {
+        global $DB;
+        $contextid = $DB->get_field('certifygen_context', 'id', ['modelid' => $values->id]);
+
+        if (empty($contextid)) {
+            $contextid = 0;
+        }
+        return '<span class="likelink" data-action="assign-context" data-id="' . $contextid . '" data-modelid="'. $values->id . '" data-name="'. $values->name . '">'.get_string('assigncontext', 'mod_certifygen').'</span>';
     }
 }

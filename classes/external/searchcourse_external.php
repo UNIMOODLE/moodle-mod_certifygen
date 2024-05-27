@@ -20,12 +20,16 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 namespace mod_certifygen\external;
 
+use coding_exception;
+use dml_exception;
 use external_api;
 use external_description;
 use external_function_parameters;
 use external_multiple_structure;
 use external_single_structure;
 use external_value;
+use invalid_parameter_exception;
+use restricted_context_exception;
 
 /**
  * @package    mod_certifygen
@@ -34,14 +38,14 @@ use external_value;
  * * @author     3IPUNT <contacte@tresipunt.com>
  * * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class searchcategory_external extends external_api {
+class searchcourse_external extends external_api {
 
     /**
      * Describes the external function parameters.
      *
      * @return external_function_parameters
      */
-    public static function searchcategory_parameters(): external_function_parameters {
+    public static function searchcourse_parameters(): external_function_parameters {
         return new external_function_parameters([
             'query' => new external_value(PARAM_RAW, 'The search query', VALUE_REQUIRED),
         ]);
@@ -50,15 +54,15 @@ class searchcategory_external extends external_api {
     /**
      * @param string $query
      * @return array
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \invalid_parameter_exception
-     * @throws \restricted_context_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws restricted_context_exception
      */
-    public static function searchcategory(string $query): array {
+    public static function searchcourse(string $query): array {
         global $DB, $CFG;
 
-        $params = external_api::validate_parameters(self::searchcategory_parameters(), [
+        $params = external_api::validate_parameters(self::searchcourse_parameters(), [
             'query' => $query,
         ]);
         $query = clean_param($params['query'], PARAM_TEXT);
@@ -66,25 +70,25 @@ class searchcategory_external extends external_api {
         $context = \context_system::instance();
         self::validate_context($context);
 
-        $likename = $DB->sql_like('name', ':name');
-        $sql = "SELECT id, name
-              FROM {course_categories} c
+        $likename = $DB->sql_like('c.fullname', ':fullname');
+        $sql = "SELECT id, fullname
+              FROM {course} c
              WHERE $likename";
 
-        $rs = $DB->get_recordset_sql($sql, ['name' => '%' . $query . '%']);
+        $rs = $DB->get_recordset_sql($sql, ['fullname' => '%' . $query . '%']);
         $count = 0;
         $list = [];
 
         foreach ($rs as $record) {
-            $category = (object)[
+            $course = (object)[
                 'id' => $record->id,
-                'name' => $record->name,
+                'name' => $record->fullname,
             ];
 
             $count++;
 
             if ($count <= $CFG->maxusersperpage) {
-                $list[$record->id] = $category;
+                $list[$record->id] = $course;
             }
         }
 
@@ -102,13 +106,13 @@ class searchcategory_external extends external_api {
      *
      * @return external_description
      */
-    public static function searchcategory_returns(): external_description {
+    public static function searchcourse_returns(): external_description {
 
         return new external_single_structure([
             'list' => new external_multiple_structure(
                 new external_single_structure([
-                    'id' => new external_value(PARAM_INT, 'Category ID'),
-                    'name' => new external_value(PARAM_RAW, 'Category name'),
+                    'id' => new external_value(PARAM_INT, 'Course ID'),
+                    'name' => new external_value(PARAM_RAW, 'Course name'),
                 ])
             ),
             'maxusersperpage' => new external_value(PARAM_INT, 'Configured maximum categories per page.'),

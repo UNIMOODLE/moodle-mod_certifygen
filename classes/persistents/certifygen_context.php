@@ -22,6 +22,8 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 namespace mod_certifygen\persistents;
+use coding_exception;
+use core\invalid_persistent_exception;
 use core\persistent;
 
 /**
@@ -50,8 +52,9 @@ class certifygen_context extends persistent {
             'modelid' => [
                 'type' => PARAM_INT,
             ],
-            'contextid' => [
-                'type' => PARAM_INT,
+            'contextids' => [
+                'type' => PARAM_TEXT,
+                'default' => null
             ],
             'type' => [
                 'type' => PARAM_INT,
@@ -60,5 +63,30 @@ class certifygen_context extends persistent {
                 'type' => PARAM_INT,
             ],
         ];
+    }
+    /**
+     * @param object $data
+     * @return self
+     * @throws coding_exception
+     * @throws invalid_persistent_exception
+     */
+    public static function save_model_object( object $data) : self {
+        global $USER;
+        $modeldata = [
+            'modelid' => $data->modelid,
+            'contextids' => $data->contextids,
+            'type' => $data->type,
+            'usermodified' => $USER->id,
+            'timecreated' => time(),
+            'timemodified' => time(),
+        ];
+        $id = $data->id ?? 0;
+        $model = new self($id, (object)$modeldata);
+        if ($id > 0) {
+            $model->update();
+            return $model;
+        }
+
+        return $model->create();
     }
 }

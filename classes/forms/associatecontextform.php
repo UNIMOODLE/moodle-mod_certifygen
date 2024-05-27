@@ -13,21 +13,29 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU".
+//
+// Produced by the UNIMOODLE University Group: Universities of
+// Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
+// Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos..
 /**
- *
- * @package     XXXX
- * @author      202X Elena Barrios Galán <elena@tresipunt.com>
- * @copyright   3iPunt <https://www.tresipunt.com/>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 
 namespace mod_certifygen\forms;
 
 
+use coding_exception;
 use context;
 use context_system;
+use mod_certifygen\persistents\certifygen_context;
 use moodle_exception;
 use moodle_url;
 
@@ -44,6 +52,10 @@ class associatecontextform extends \core_form\dynamic_form {
         // Modelid.
         $mform->addElement('hidden', 'modelid', 0);
         $mform->setType('modelid', PARAM_INT);
+
+        // Id.
+        $mform->addElement('hidden', 'id', 0);
+        $mform->setType('id', PARAM_INT);
 
         // Context type: course or category.
         $mform->addElement('select', 'ctype', get_string('chooseacontexttype', 'mod_certifygen'),
@@ -62,24 +74,19 @@ class associatecontextform extends \core_form\dynamic_form {
                 return $category->name;
             }
         ];
-        $mform->addElement('autocomplete', 'categorycontext', get_string('user'), [], $options)->setHiddenLabel(true);
+        $mform->addElement('autocomplete', 'categorycontext', get_string('categorycontext', 'mod_certifygen'), [], $options)->setHiddenLabel(true);
         $mform->hideIf('categorycontext', 'ctype', 'eq', 'course');
-
-        // otor
-//        $displaylist = \core_course_category::make_categories_list('moodle/course:create');
-//        $mform->addElement('autocomplete', 'category', get_string('coursecategory'), $displaylist);
-
 
         // Select for courses.
         $options = [
-            'ajax' => 'core_user/form_user_selector',
+            'ajax' => 'mod_certifygen/form_course_selector',
             'multiple' => true,
-            'valuehtmlcallback' => function($userid) : string {
-                $user = \core_user::get_user($userid);
-                return $user->firstname;
+            'valuehtmlcallback' => function($courseid) : string {
+                $course = get_course($courseid);
+                return $course->fullname;
             }
         ];
-        $mform->addElement('autocomplete', 'coursecontext', get_string('user'), [], $options)->setHiddenLabel(true);
+        $mform->addElement('autocomplete', 'coursecontext', get_string('coursecontext', 'mod_certifygen'), [], $options)->setHiddenLabel(true);
         $mform->hideIf('coursecontext', 'ctype', 'eq', 'category');
     }
 
@@ -97,19 +104,46 @@ class associatecontextform extends \core_form\dynamic_form {
 
     public function process_dynamic_submission()
     {
-        // TODO: Implement process_dynamic_submission() method.
-        error_log(__FUNCTION__);
+
+        $formdata = $this->get_data();
+        $type = certifygen_context::CONTEXT_TYPE_CATEGORY;
+        $contextids = array_values($formdata->categorycontext);
+        if ($formdata->ctype == 'course') {
+            $type = certifygen_context::CONTEXT_TYPE_COURSE;
+            $contextids = array_values($formdata->coursecontext);
+        }
+        $data = [
+            'id' => $formdata->id ?? 0,
+            'modelid' => $formdata->modelid,
+            'type' => $type,
+            'contextids' => implode(',', $contextids),
+
+        ];
+        $id = certifygen_context::save_model_object((object) $data)->get('id');
+        return $id;
     }
 
+    /**
+     * @throws coding_exception
+     */
     public function set_data_for_dynamic_submission(): void
     {
-        // TODO: Implement set_data_for_dynamic_submission() method.
+        $modelid = $this->_ajaxformdata['modelid'];
+        $data = [
+            'modelid' => $modelid,
+        ];
         if (!empty($this->_ajaxformdata['id'])) {
-            $this->set_data([
-                    'modelid' => $this->_ajaxformdata['id'],
-                ]
-            );
+            $modelcontext = new certifygen_context($this->_ajaxformdata['id']);
+            $data['id'] = $this->_ajaxformdata['id'];
+            if ($modelcontext->get('type') == certifygen_context::CONTEXT_TYPE_CATEGORY) {
+                $data['ctype'] = 'category';
+                $data['categorycontext'] = explode(',', $modelcontext->get('contextids'));
+            } else {
+                $data['ctype'] = 'course';
+                $data['coursecontext'] = explode(',', $modelcontext->get('contextids'));
+            }
         }
+        $this->set_data($data);
     }
 
     protected function get_page_url_for_dynamic_submission(): moodle_url

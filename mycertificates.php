@@ -36,7 +36,7 @@ require_once('lib.php');
 global $PAGE, $OUTPUT;
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url(new moodle_url('/mod/certifygen/mycertificates.php'));
-$name = get_string('mycertificates', 'mod_unimoodlecertificate');
+$name = get_string('mycertificates', 'mod_certifygen');
 
 
 echo $OUTPUT->header();

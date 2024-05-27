@@ -48,13 +48,6 @@ $modelsmanagersettings = new admin_externalpage('certifygenmodelsmanager',
     '/mod/certifygen/modelmanager.php',  'moodle/site:config', $module->is_enabled() === false);
 $ADMIN->add('modsettingcertifygencat', $modelsmanagersettings);
 
-// Associate model to contexts page access.
-$associatemodelssettings = new admin_externalpage('certifygenassociatemodels',
-    get_string('associatemodels', 'mod_certifygen'),
-    '/mod/certifygen/associatemodels.php',  'moodle/site:config', $module->is_enabled() === false);
-$ADMIN->add('modsettingcertifygencat', $associatemodelssettings);
-
-
 $ADMIN->add('modsettingcertifygencat',
     new admin_category('certifygenvalidationplugins',
         get_string('managecertifygenvalidationplugins', 'mod_certifygen'),

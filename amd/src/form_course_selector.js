@@ -14,7 +14,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Provides the required functionality for an autocomplete element to select categories.
+ * Provides the required functionality for an autocomplete element to select courses.
  *
  * @module    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
@@ -28,7 +28,7 @@ import {render as renderTemplate} from 'core/templates';
 import {get_string as getString} from 'core/str';
 
 /**
- * Load the list of categories matching the query and render the selector labels for them.
+ * Load the list of courses matching the query and render the selector labels for them.
  *
  * @param {String} selector The selector of the auto complete element.
  * @param {String} query The query string.
@@ -37,7 +37,7 @@ import {get_string as getString} from 'core/str';
  */
 export async function transport(selector, query, callback, failure) {
 
-    if (query.length <4) {
+    if (query.length < 4) {
         try {
             const msg = await getString('writealmost3characters', 'mod_certifygen');
             callback(msg);
@@ -47,7 +47,7 @@ export async function transport(selector, query, callback, failure) {
 
     } else {
         const request = {
-            methodname: 'mod_certifygen_searchcategory',
+            methodname: 'mod_certifygen_searchcourse',
             args: {
                 query: query
             }
@@ -57,18 +57,18 @@ export async function transport(selector, query, callback, failure) {
             const response = await Ajax.call([request])[0];
 
             if (response.overflow) {
-                const msg = await getString('toomanycategoriestoshow', 'mod_certifygen', '>' + response.maxusersperpage);
+                const msg = await getString('toomanycoursestoshow', 'mod_certifygen', '>' + response.maxusersperpage);
                 callback(msg);
 
             } else {
                 let labels = [];
-                response.list.forEach(category => {
-                    labels.push(renderTemplate('mod_certifygen/form_category_selector_suggestion', category));
+                response.list.forEach(course => {
+                    labels.push(renderTemplate('mod_certifygen/form_category_selector_suggestion', course));
                 });
                 labels = await Promise.all(labels);
 
-                response.list.forEach((category, index) => {
-                    category.label = labels[index];
+                response.list.forEach((course, index) => {
+                    course.label = labels[index];
                 });
 
                 callback(response.list);

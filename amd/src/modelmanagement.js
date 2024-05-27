@@ -8,7 +8,7 @@
 "use strict";
 
 import jQuery from 'jquery';
-import {get_strings as getStrings, get_string as getString } from 'core/str';
+import {get_strings as getStrings, get_string as getString} from 'core/str';
 import Ajax from 'core/ajax';
 import Templates from 'core/templates';
 import ModalFactory from 'core/modal_factory';
@@ -25,6 +25,7 @@ let ACTION = {
     DELETE_MODEL: '[data-action="delete-model"]',
     CREATE_MODEL: '[data-action="create-model"]',
     EDIT_MODEL: '[data-action="edit-model"]',
+    ASSIGN_CONTEXTS: '[data-action="assign-context"]',
 };
 let REGION = {
     ROOT: '[data-region="model-list-view"]',
@@ -38,12 +39,41 @@ const ModelManagement = () => {
     jQuery(ACTION.DELETE_MODEL).on('click', DeleteModel);
     jQuery(ACTION.CREATE_MODEL).on('click', CreateModel);
     jQuery(ACTION.EDIT_MODEL).on('click', CreateModel);
+    jQuery(ACTION.ASSIGN_CONTEXTS).on('click', AssignContext.bind(this));
+};
+
+const AssignContext = (e) => {
+    e.preventDefault();
+    const element = e.target;
+    let mainElement = event.currentTarget;
+    let id = event.currentTarget.getAttribute('data-id');
+    let modelid = event.currentTarget.getAttribute('data-modelid');
+    let name = event.currentTarget.getAttribute('data-name');
+    const modalCForm = new ModalForm({
+        // Name of the class where form is defined (must extend \core_form\dynamic_form):
+        formClass: "mod_certifygen\\forms\\associatecontextform",
+        // Add as many arguments as you need, they will be passed to the form:
+        args: {id: id, modelid: modelid},
+        // Pass any configuration settings to the modal dialogue, for example, the title:
+        modalConfig: {title: getString('assigncontextto', 'mod_certifygen', name)},
+        // DOM element that should get the focus after the modal dialogue is closed:
+        returnFocus: element,
+    });
+    // Listen to events if you want to execute something on form submit. Event detail will contain everything the process()
+    // function returned:
+    modalCForm.addEventListener(modalCForm.events.FORM_SUBMITTED, (result) => {
+        if (id === '0') {
+            mainElement.setAttribute('data-id', result.detail);
+        }
+    });
+    // Show the form.
+    modalCForm.show();
 };
 const CreateModel = (e) => {
     e.preventDefault();
     const element = e.target;
     let id = 0;
-    if (event.currentTarget.getAttribute('data-action') == 'edit-model') {
+    if (event.currentTarget.getAttribute('data-action') === 'edit-model') {
         id = event.currentTarget.getAttribute('data-id');
     }
     const modalForm = new ModalForm({
@@ -59,9 +89,9 @@ const CreateModel = (e) => {
     // Listen to events if you want to execute something on form submit. Event detail will contain everything the process()
     // function returned:
     modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, () => {
-
         // Recargar la tabla.
         reloadModelListTable();
+
     });
     // Show the form.
     modalForm.show();
@@ -85,8 +115,6 @@ const reloadModelListTable = () => {
 const DeleteModel = (event) => {
     let name = event.currentTarget.getAttribute('data-name');
     let modelId = event.currentTarget.getAttribute('data-id');
-    // Estas seguro de borrar?
-    // Borrar.
     const stringkeys = [
         {key: 'deletemodeltitle', component: 'mod_certifygen'},
         {key: 'deletemodelbody', component: 'mod_certifygen', param: name},

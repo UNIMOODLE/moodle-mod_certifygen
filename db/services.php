@@ -31,7 +31,15 @@
 
 // This line protects the file from being accessed by a URL directly.
 use mod_certifygen\external\deletemodel_external;
+use mod_certifygen\external\getCoursesAsStudent_external;
+use mod_certifygen\external\getCoursesAsTeacher_external;
+use mod_certifygen\external\getJsonStudentCourseCompleted_external;
+use mod_certifygen\external\getJsonTeaching_external;
 use mod_certifygen\external\getmodellisttable_external;
+use mod_certifygen\external\getPdfStudentCourseCompleted_external;
+use mod_certifygen\external\getPdfTeaching_external;
+use mod_certifygen\external\searchcategory_external;
+use mod_certifygen\external\searchcourse_external;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -54,43 +62,61 @@ $functions = [
         'ajax' => true,
         'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
+    'mod_certifygen_searchcategory' => [
+        'classname' => searchcategory_external::class,
+        'methodname' => 'searchcategory',
+        'description' => 'Search category',
+        'type' => 'read',
+        'capabilities' => 'mod/certifygen:manage',
+        'ajax' => true,
+        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
+    'mod_certifygen_searchcourse' => [
+        'classname' => searchcourse_external::class,
+        'methodname' => 'searchcourse',
+        'description' => 'Search course',
+        'type' => 'read',
+        'capabilities' => 'mod/certifygen:manage',
+        'ajax' => true,
+        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
     'mod_certifygen_getPdfTeaching' => [
-        'classname' => \mod_certifygen\external\getPdfTeaching_external::class,
+        'classname' => getPdfTeaching_external::class,
         'methodname' => 'getPdfTeaching',
         'description' => 'get Pdf Teaching',
         'type' => 'read',
         'capabilities' => 'mod/certifygen:manage',
     ],
     'mod_certifygen_getJsonTeaching' => [
-        'classname' => \mod_certifygen\external\getJsonTeaching_external::class,
+        'classname' => getJsonTeaching_external::class,
         'methodname' => 'getJsonTeaching',
         'description' => 'get Json Teaching',
         'type' => 'read',
         'capabilities' => 'mod/certifygen:manage',
     ],
     'mod_certifygen_getPdfStudentCourseCompleted' => [
-        'classname' => \mod_certifygen\external\getPdfStudentCourseCompleted_external::class,
+        'classname' => getPdfStudentCourseCompleted_external::class,
         'methodname' => 'getPdfStudentCourseCompleted',
         'description' => 'get Pdf Student Course Completed',
         'type' => 'read',
         'capabilities' => 'mod/certifygen:manage',
     ],
     'mod_certifygen_getJsonStudentCourseCompleted' => [
-        'classname' => \mod_certifygen\external\getJsonStudentCourseCompleted_external::class,
+        'classname' => getJsonStudentCourseCompleted_external::class,
         'methodname' => 'getJsonStudentCourseCompleted',
         'description' => 'get Json Student Course Completed',
         'type' => 'read',
         'capabilities' => 'mod/certifygen:manage',
     ],
     'mod_certifygen_getCoursesAsStudent' => [
-        'classname' => \mod_certifygen\external\getCoursesAsStudent_external::class,
+        'classname' => getCoursesAsStudent_external::class,
         'methodname' => 'getCoursesAsStudent',
         'description' => 'get Courses As Student',
         'type' => 'read',
         'capabilities' => 'mod/certifygen:manage',
     ],
     'mod_certifygen_getCoursesAsTeacher' => [
-        'classname' => \mod_certifygen\external\getCoursesAsTeacher_external::class,
+        'classname' => getCoursesAsTeacher_external::class,
         'methodname' => 'getCoursesAsTeacher',
         'description' => 'get Courses As Teacher',
         'type' => 'read',
