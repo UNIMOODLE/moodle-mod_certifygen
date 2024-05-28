@@ -25,6 +25,10 @@ namespace mod_certifygen\persistents;
 use coding_exception;
 use core\invalid_persistent_exception;
 use core\persistent;
+use core_course_category;
+use dml_exception;
+use moodle_exception;
+use stdClass;
 
 /**
  * @package    mod_certifygen
@@ -88,5 +92,68 @@ class certifygen_context extends persistent {
         }
 
         return $model->create();
+    }
+
+    /**
+     * @throws moodle_exception
+     * @throws dml_exception
+     */
+    public static function has_course_context(int $courseid) : bool {
+        global $DB;
+        $hascontext = false;
+        $contexts = $DB->get_records(self::TABLE);
+        foreach ($contexts as $context) {
+            if ($context->type == self::CONTEXT_TYPE_COURSE) {
+                $hascontext = self::has_course_course_context($courseid, $context);
+            } else if ($context->type == self::CONTEXT_TYPE_CATEGORY) {
+                $hascontext = self::has_course_category_context($courseid, $context);
+            }
+            if ($hascontext) {
+                break;
+            }
+        }
+        return $hascontext;
+    }
+
+    /**
+     * @param int $courseid
+     * @param stdClass $context
+     * @return bool
+     */
+    protected static function has_course_course_context(int $courseid, stdClass $context) : bool {
+        $hascontext = false;
+        if ($context->type != self::CONTEXT_TYPE_COURSE) {
+            return $hascontext;
+        }
+        $courseids = explode(',', $context->contextids);
+        if (in_array($courseid, $courseids)) {
+            $hascontext = true;
+        }
+        return $hascontext;
+    }
+
+    /**
+     * @param int $courseid
+     * @param stdClass $context
+     * @return bool
+     * @throws dml_exception
+     * @throws moodle_exception
+     */
+    protected static function has_course_category_context(int $courseid, stdClass $context) : bool {
+        $hascontext = false;
+        if ($context->type != self::CONTEXT_TYPE_CATEGORY) {
+            return $hascontext;
+        }
+        $contextids = explode(',', $context->contextids);
+        $course = get_course($courseid);
+        $category = core_course_category::get($course->category);
+        $categoryids = array_merge([$course->category], $category->get_parents());
+        foreach ($categoryids as $categoryid) {
+            if (in_array($categoryid, $contextids)) {
+                $hascontext = true;
+                break;
+            }
+        }
+        return $hascontext;
     }
 }

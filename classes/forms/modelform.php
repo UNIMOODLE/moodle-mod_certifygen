@@ -33,6 +33,8 @@
 namespace mod_certifygen\forms;
 
 require_once("$CFG->dirroot/mod/certifygen/lib.php");
+
+use coding_exception;
 use context;
 use context_system;
 use core\output\language_menu;
@@ -139,22 +141,27 @@ class modelform extends \core_form\dynamic_form {
         $mform->setType('langs', PARAM_INT);
         $mform->addRule('langs', get_string('required'), 'required');
 
-        // generationtype
-        $types = mod_certifygen_get_generationtype();
+        // Validation.
+        $types = mod_certifygen_get_validation();
         if (!empty($types)) {
-            $mform->addElement('select', 'generationtype', get_string('generationtype', 'mod_certifygen'), $types);
-            $mform->setType('generationtype', PARAM_INT);
+            $mform->addElement('select', 'validation', get_string('validation', 'mod_certifygen'), $types);
+            $mform->setType('validation', PARAM_RAW);
         }
 
         return $mform;
     }
-    public function set_default_values( int $modelid, $mform) {
+
+    /**
+     * @throws coding_exception
+     */
+    public function set_default_values(int $modelid, $mform) {
         $certifygenmodel = new certifygen_model($modelid);
         $mform->setDefault('mode', $certifygenmodel->get('mode'));
         $mform->setDefault('templateid', $certifygenmodel->get('templateid'));
         $mform->setDefault('modelname', $certifygenmodel->get('name'));
         $mform->setDefault('timeondemmand', $certifygenmodel->get('timeondemmand'));
         $mform->setDefault('langs', $certifygenmodel->get('langs'));
+        $mform->setDefault('validation', $certifygenmodel->get('validation'));
         return $mform;
     }
 
@@ -177,6 +184,9 @@ class modelform extends \core_form\dynamic_form {
         certifygen_model::save_model_object($formdata);
     }
 
+    /**
+     * @throws coding_exception
+     */
     public function set_data_for_dynamic_submission(): void
     {
         if (!empty($this->_ajaxformdata['id'])) {
@@ -188,6 +198,7 @@ class modelform extends \core_form\dynamic_form {
                     'modelname' => $model->get('name'),
                     'timeondemmand' => $model->get('timeondemmand'),
                     'langs' => $model->get('langs'),
+                    'validation' => $model->get('validation'),
             ]
             );
         }

@@ -27,9 +27,12 @@
 
 namespace certifygenvalidation_cmd;
 
+use coding_exception;
+use core\invalid_persistent_exception;
 use mod_certifygen\interfaces\ICertificateValidation;
+use stdClass;
 
-class cmdValidation implements ICertificateValidation
+class certifygenvalidation_cmd implements ICertificateValidation
 {
 
     public function sendFile(): array
@@ -48,5 +51,26 @@ class cmdValidation implements ICertificateValidation
     {
         // TODO: Implement getFile() method.
         return [];
+    }
+
+    /**
+     * @throws coding_exception
+     * @throws invalid_persistent_exception
+     */
+    public function addRecord(stdClass $data): int {
+        $cmd = new persistent\cmd(0, $data);
+        $cmd->create();
+        return $cmd->get('id');
+
+    }
+
+    /**
+     * @param stdClass $data
+     * @return bool
+     * @throws coding_exception
+     */
+    public function deleteRecord(stdClass $data): bool {
+        $cmd = new persistent\cmd($data->modelid);
+        return $cmd->delete();
     }
 }

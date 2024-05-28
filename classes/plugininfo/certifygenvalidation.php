@@ -55,6 +55,7 @@ class certifygenvalidation extends base {
             $installed[] = 'certifygenvalidation_'.$plugin;
         }
 
+        // TODO: Revisar este codigo!
         list($installed, $params) = $DB->get_in_or_equal($installed, SQL_PARAMS_NAMED);
         $disabled = $DB->get_records_select('config_plugins', "plugin $installed AND name = 'disabled'", $params, 'plugin ASC');
         foreach ($disabled as $conf) {
@@ -79,23 +80,24 @@ class certifygenvalidation extends base {
      * @return bool
      * @throws \dml_exception
      */
-    public static function enable_plugin(string $pluginname, int $enabled): bool {
-        $haschanged = false;
-
-        $plugin = 'certifygenvalidation_' . $pluginname;
-        $oldvalue = get_config($plugin, 'disabled');
-        $disabled = !$enabled;
-        // Only set value if there is no config setting or if the value is different from the previous one.
-        if ($oldvalue === false || ((bool) $oldvalue != $disabled)) {
-            set_config('disabled', $disabled, $plugin);
-            $haschanged = true;
-
-            add_to_config_log('disabled', $oldvalue, $disabled, $plugin);
-            core_plugin_manager::reset_caches();
-        }
-
-        return $haschanged;
-    }
+//    public static function enable_plugin(string $pluginname, int $enabled): bool {
+//        $haschanged = false;
+//
+//        error_log(__FUNCTION__ . ' ' . __LINE__);
+//        $plugin = 'certifygenvalidation_' . $pluginname;
+//        $oldvalue = get_config($plugin, 'disabled');
+//        $disabled = !$enabled;
+//        // Only set value if there is no config setting or if the value is different from the previous one.
+//        if ($oldvalue === false || ((bool) $oldvalue != $disabled)) {
+//            set_config('disabled', $disabled, $plugin);
+//            $haschanged = true;
+//
+//            add_to_config_log('disabled', $oldvalue, $disabled, $plugin);
+//            core_plugin_manager::reset_caches();
+//        }
+//
+//        return $haschanged;
+//    }
 
     /**
      * Return URL used for management of plugins of this type.

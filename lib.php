@@ -165,18 +165,29 @@ function mod_certifygen_get_modes() : array {
 //        certifygen_model::SUBMIT_OPTION_3 => get_string('submit_option_3', 'mod_certifygen'),
 //    ];
 //}
+
 /**
- * Get certifygen model submitoptions
+ * Get certifygen model validation types
  * @return array
+ * @throws coding_exception
+ * @throws dml_exception
  */
-function mod_certifygen_get_generationtype() : array {
-    // TODO: crear subplugins y los que esten habilitados ponerlos en el array.
-    // cada subplugin debera tener una tabla de db en el que se relacione con el modelid.
-    return [
-        0 => 'Selecciona un tipo de generación',
-        1 => 'Código Seguro de Verificación',
-        2 => 'Comando del sistema operativo que transforme el documento PDF',
-    ];
+function mod_certifygen_get_validation() : array {
+
+    $all[0] = get_string('selectvalidation', 'mod_certifygen');
+    $enabled = [];
+    foreach (core_plugin_manager::instance()->get_plugins_of_type('certifygenvalidation') as $plugin) {
+        $enable = (int) get_config($plugin->component, 'enable');
+        if ($enable) {
+            $enabled[$plugin->component] = get_string('pluginname', $plugin->component);
+            $all[$plugin->component] = get_string('pluginname', $plugin->component);
+        }
+    }
+    if (empty($enabled)) {
+        return [];
+    }
+
+    return $all;
 }
 /**
  * Get certifygen templates available by tool_certificate
@@ -208,11 +219,21 @@ function mod_certifygen_get_templates(int $courseid = 0) : array {
  */
 function mod_certifygen_extend_navigation_course(navigation_node $navigation, stdClass $course, context_course $context) {
 
-    //TODO: controlar en qué cursos debe de aparecer esto.
-    $label = get_string('contextcertificatelink', 'mod_certifygen');
-    $url = new moodle_url('/mod/certifygen/courselink.php', array('id' => $course->id));
-    $icon = new pix_icon('t/edit', $label);
-    $navigation->add($label, $url, navigation_node::TYPE_COURSE, null, null, $icon);
+    global $USER;
+    // Only for teachers (capability managegroups).
+    $enrolledids = get_enrolled_users($context, 'moodle/course:managegroups', 0, 'u.id');
+    if (!empty($enrolledids)) {
+        $enrolledids = array_keys($enrolledids);
+    }
+    if (!in_array($USER->id, $enrolledids)) {
+        return;
+    }
+    if (\mod_certifygen\persistents\certifygen_context::has_course_context($course->id)) {
+        $label = get_string('contextcertificatelink', 'mod_certifygen');
+        $url = new moodle_url('/mod/certifygen/courselink.php', array('id' => $course->id));
+        $icon = new pix_icon('t/edit', $label);
+        $navigation->add($label, $url, navigation_node::TYPE_COURSE, null, null, $icon);
+    }
 }
 
 /**

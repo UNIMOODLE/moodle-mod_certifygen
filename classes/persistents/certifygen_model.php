@@ -23,6 +23,8 @@
 
 namespace mod_certifygen\persistents;
 use core\persistent;
+use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\plugininfo\certifygenvalidation;
 
 /**
  * @package    mod_certifygen
@@ -70,6 +72,11 @@ class certifygen_model extends persistent {
                 'default' => NULL,
                 'null' => NULL_ALLOWED,
             ],
+            'validation' => [
+                'type' => PARAM_TEXT,
+                'default' => NULL,
+                'null' => NULL_ALLOWED,
+            ],
             'usermodified' => [
                 'type' => PARAM_INT,
             ],
@@ -83,7 +90,7 @@ class certifygen_model extends persistent {
      * @throws \core\invalid_persistent_exception
      */
     public static function save_model_object( object $data) : self {
-        global $USER;
+        global $USER, $CFG;
         $modeldata = [
             'name' => $data->modelname,
             'type' => $data->type,
@@ -91,6 +98,7 @@ class certifygen_model extends persistent {
             'templateid' => $data->templateid,
             'timeondemmand' => $data->timeondemmand ?? 0,
             'langs' => empty($data->langs) ? NULL : $data->langs,
+            'validation' => empty($data->validation) ? NULL : $data->validation,
             'usermodified' => $USER->id,
             'timecreated' => time(),
             'timemodified' => time(),

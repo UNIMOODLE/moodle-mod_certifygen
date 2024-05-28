@@ -29,9 +29,11 @@
 namespace certifygenvalidation_csv;
 
 
+use core\invalid_persistent_exception;
 use mod_certifygen\interfaces\ICertificateValidation;
+use stdClass;
 
-class csvValidation implements ICertificateValidation
+class certifygenvalidation_csv implements ICertificateValidation
 {
 
     public function sendFile(): array
@@ -50,5 +52,26 @@ class csvValidation implements ICertificateValidation
     {
         // TODO: Implement getFile() method.
         return [];
+    }
+
+    /**
+     * @param stdClass $data
+     * @return bool
+     * @throws coding_exception
+     */
+    public function deleteRecord(stdClass $data): bool {
+        $csv = new persistent\csv($data->modelid);
+        return $csv->delete();
+    }
+
+    /**
+     * @throws coding_exception
+     * @throws invalid_persistent_exception
+     */
+    public function addRecord(stdClass $data): int {
+        $csv = new persistent\csv(0, $data);
+        $csv->create();
+        return $csv->get('id');
+
     }
 }
