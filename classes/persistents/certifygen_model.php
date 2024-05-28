@@ -97,7 +97,7 @@ class certifygen_model extends persistent {
             'mode' => $data->mode,
             'templateid' => $data->templateid,
             'timeondemmand' => $data->timeondemmand ?? 0,
-            'langs' => empty($data->langs) ? NULL : $data->langs,
+            'langs' => empty($data->langs) ? NULL : implode(',', $data->langs),
             'validation' => empty($data->validation) ? NULL : $data->validation,
             'usermodified' => $USER->id,
             'timecreated' => time(),

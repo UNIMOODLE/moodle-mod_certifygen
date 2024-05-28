@@ -138,7 +138,7 @@ class modelform extends \core_form\dynamic_form {
         $langs = get_string_manager()->get_list_of_translations();
         $mform->addElement('select', 'langs', get_string('langs', 'mod_certifygen'), $langs);
         $mform->getElement('langs')->setMultiple(true);
-        $mform->setType('langs', PARAM_INT);
+        $mform->setType('langs', PARAM_RAW);
         $mform->addRule('langs', get_string('required'), 'required');
 
         // Validation.
