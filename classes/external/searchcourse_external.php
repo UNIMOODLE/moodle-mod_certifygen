@@ -21,6 +21,7 @@
 namespace mod_certifygen\external;
 
 use coding_exception;
+use context_system;
 use dml_exception;
 use external_api;
 use external_description;
@@ -67,7 +68,7 @@ class searchcourse_external extends external_api {
         ]);
         $query = clean_param($params['query'], PARAM_TEXT);
         // Validate context.
-        $context = \context_system::instance();
+        $context = context_system::instance();
         self::validate_context($context);
 
         $likename = $DB->sql_like('c.fullname', ':fullname');

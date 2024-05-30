@@ -38,6 +38,11 @@ use external_single_structure;
 use external_value;
 
 class getPdfTeaching_external extends external_api {
+    /**
+     * Describes the external function parameters.
+     *
+     * @return external_function_parameters
+     */
     public static function getPdfTeaching_parameters(): external_function_parameters {
         return new external_function_parameters(
             [
@@ -56,6 +61,11 @@ class getPdfTeaching_external extends external_api {
          */
         return ['file' => 'The file'];
     }
+    /**
+     * Describes the data returned from the external function.
+     *
+     * @return external_single_structure
+     */
     public static function getPdfTeaching_returns(): external_single_structure {
         return new external_single_structure(array(
                 'file' => new external_value(PARAM_RAW, 'File content on base64'),

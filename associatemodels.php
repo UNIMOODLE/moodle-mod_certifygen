@@ -35,6 +35,9 @@ use mod_certifygen\output\views\associatemodelcontexts_view;
 require_once('../../config.php');
 require_once('lib.php');
 global $PAGE;
+
+require_login();
+
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url(new moodle_url('/mod/certifygen/associatemodels.php'));
 $name = get_string('associatemodels', 'mod_certifygen');

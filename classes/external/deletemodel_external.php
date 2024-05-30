@@ -29,17 +29,22 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 namespace mod_certifygen\external;
-
 
 use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
+use invalid_parameter_exception;
 use mod_certifygen\persistents\certifygen_model;
+use moodle_exception;
 
 class deletemodel_external extends external_api {
+    /**
+     * Describes the external function parameters.
+     *
+     * @return external_function_parameters
+     */
     public static function deletemodel_parameters(): external_function_parameters {
         return new external_function_parameters(
             [
@@ -47,6 +52,12 @@ class deletemodel_external extends external_api {
             ]
         );
     }
+
+    /**
+     * @param int $id
+     * @return array
+     * @throws invalid_parameter_exception
+     */
     public static function deletemodel(int $id): array {
 
         self::validate_parameters(
@@ -56,13 +67,18 @@ class deletemodel_external extends external_api {
         try {
             $model = new certifygen_model($id);
             $model->delete();
-        } catch (\moodle_exception $e) {
+        } catch (moodle_exception $e) {
             $result['result'] = false;
             $result['message'] = $e->getMessage();
         }
 
         return $result;
     }
+    /**
+     * Describes the data returned from the external function.
+     *
+     * @return external_single_structure
+     */
     public static function deletemodel_returns(): external_single_structure {
         return new external_single_structure(
             [

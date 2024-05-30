@@ -54,9 +54,10 @@ $PAGE->set_heading($course->fullname);
 $PAGE->set_title(get_string('modulename', 'certifygen'));
 
 if ($isteacher) {
-    $view = new teacher_view($course->id, $certifygenmodel->templateid, $id);
+    $view = new teacher_view($course->id, $certifygenmodel->templateid, $cm);
 } else {
-    $view = new student_view($course->id, $certifygenmodel->templateid, $id);
+
+    $view = new student_view($course->id, $certifygenmodel->templateid, $cm->instance);
 }
 
 $output = $PAGE->get_renderer('mod_certifygen');

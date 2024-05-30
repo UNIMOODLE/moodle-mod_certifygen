@@ -31,22 +31,29 @@
 
 
 namespace mod_certifygen\forms;
-
+global $CFG;
 require_once("$CFG->dirroot/mod/certifygen/lib.php");
 
 use coding_exception;
 use context;
 use context_system;
-use core\output\language_menu;
+use core\invalid_persistent_exception;
+use core_form\dynamic_form;
+use dml_exception;
 use html_writer;
 use mod_certifygen\persistents\certifygen_model;
+use moodle_exception;
 use moodle_url;
 
+use MoodleQuickForm;
 use tool_certificate\permission;
 use function get_string_manager;
 
-class modelform extends \core_form\dynamic_form {
+class modelform extends dynamic_form {
 
+    /**
+     * @throws coding_exception|dml_exception
+     */
     protected function definition()
     {
         $mform =& $this->_form;
@@ -66,7 +73,13 @@ class modelform extends \core_form\dynamic_form {
         $mform->setType('type', PARAM_INT);
 
     }
-    public function get_common_elements(\MoodleQuickForm $mform,  bool $hasissues, $templates) {
+
+    /**
+     * @throws coding_exception
+     * @throws dml_exception
+     */
+    public function get_common_elements(MoodleQuickForm $mform, bool $hasissues, $templates): MoodleQuickForm
+    {
         global $OUTPUT;
 
 
@@ -82,7 +95,7 @@ class modelform extends \core_form\dynamic_form {
         // Adding the template selector.
         $canmanagetemplates = permission::can_manage_anywhere();
         $templateoptions = ['' => get_string('chooseatemplate', 'coursecertificate')] + $templates;
-        $manageurl = new \moodle_url('/admin/tool/certificate/manage_templates.php');
+        $manageurl = new moodle_url('/admin/tool/certificate/manage_templates.php');
         $elements = [$mform->createElement('select', 'templateid', get_string('template', 'coursecertificate'), $templateoptions)];
         // Adding "Manage templates" link if user has capabilities to manage templates.
         if ($canmanagetemplates && !empty($templates)) {
@@ -91,8 +104,7 @@ class modelform extends \core_form\dynamic_form {
         }
         $mform->addGroup($elements, 'template_group', get_string('template', 'coursecertificate'),
             html_writer::div('', 'w-100'), false);
-//        print_object($mform->getElement('template_group'));
-//        die();
+
         //TODO: me da error esta regla con el debug activado
 //        $mform->addRule('template_group_templateid', get_string('required'), 'required');
 
@@ -119,13 +131,6 @@ class modelform extends \core_form\dynamic_form {
         $mform->addElement('hidden', 'hasissues', (int) $hasissues);
         $mform->setType('hasissues', PARAM_INT);
         $mform->disabledIf('templateid', 'hasissues', 'eq', 1);
-
-        // Submitoptions.
-//        $mform->addElement('select', 'submitoptions',
-//            get_string('submitoptions', 'mod_certifygen'), mod_certifygen_get_submitoptions());
-//        $mform->setType('submitoptions', PARAM_INT);
-//        $mform->addHelpButton('submitoptions', 'submitoptions', 'mod_certifygen');
-
 
         // Timeondemmand.
         $mform->addElement('text', 'timeondemmand',
@@ -165,21 +170,32 @@ class modelform extends \core_form\dynamic_form {
         return $mform;
     }
 
+    /**
+     * @throws dml_exception
+     */
     protected function get_context_for_dynamic_submission(): context
     {
         return context_system::instance();
     }
 
+    /**
+     * @throws coding_exception
+     * @throws moodle_exception
+     * @throws dml_exception
+     */
     protected function check_access_for_dynamic_submission(): void
     {
         if (!has_capability('mod/certifygen:manage', $this->get_context_for_dynamic_submission())) {
-            throw new \moodle_exception('nopermissions', 'error', '', 'manage models');
+            throw new moodle_exception('nopermissions', 'error', '', 'manage models');
         }
     }
 
+    /**
+     * @throws coding_exception
+     * @throws invalid_persistent_exception
+     */
     public function process_dynamic_submission()
     {
-        // TODO: Implement process_dynamic_submission() method.
         $formdata = $this->get_data();
         certifygen_model::save_model_object($formdata);
     }
@@ -204,6 +220,9 @@ class modelform extends \core_form\dynamic_form {
         }
     }
 
+    /**
+     * @return moodle_url
+     */
     protected function get_page_url_for_dynamic_submission(): moodle_url
     {
         return new moodle_url('/mod/certifygen/modelmanager.php');

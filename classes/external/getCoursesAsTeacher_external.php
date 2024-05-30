@@ -39,6 +39,11 @@ use external_multiple_structure;
 use external_value;
 
 class getCoursesAsTeacher_external extends external_api {
+    /**
+     * Describes the external function parameters.
+     *
+     * @return external_function_parameters
+     */
     public static function getCoursesAsTeacher_parameters(): external_function_parameters {
         return new external_function_parameters(
             [
@@ -69,6 +74,11 @@ class getCoursesAsTeacher_external extends external_api {
             ]
         ];
     }
+    /**
+     * Describes the data returned from the external function.
+     *
+     * @return external_single_structure
+     */
     public static function getCoursesAsTeacher_returns(): external_single_structure {
         return new external_single_structure(array(
                 'courses' => new external_multiple_structure( new external_single_structure(

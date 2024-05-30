@@ -22,9 +22,10 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 namespace mod_certifygen\persistents;
+use coding_exception;
+use core\invalid_persistent_exception;
 use core\persistent;
-use mod_certifygen\interfaces\ICertificateValidation;
-use mod_certifygen\plugininfo\certifygenvalidation;
+use dml_exception;
 
 /**
  * @package    mod_certifygen
@@ -86,11 +87,11 @@ class certifygen_model extends persistent {
     /**
      * @param object $data
      * @return self
-     * @throws \coding_exception
-     * @throws \core\invalid_persistent_exception
+     * @throws coding_exception
+     * @throws invalid_persistent_exception
      */
     public static function save_model_object( object $data) : self {
-        global $USER, $CFG;
+        global $USER;
         $modeldata = [
             'name' => $data->modelname,
             'type' => $data->type,
@@ -114,17 +115,15 @@ class certifygen_model extends persistent {
     }
 
     /**
-     * @param $limitfrom
-     * @param $limitnum
+     * @param int $limitfrom
+     * @param int $limitnum
      * @return int
-     * @throws \dml_exception
+     * @throws dml_exception
      */
-    public static function count_context_models($limitfrom = 0, $limitnum = 0) : int {
+    public static function count_context_models(int $limitfrom = 0, int $limitnum = 0) : int {
         global $DB;
 
-        $num = $DB->count_records('certifygen_model', ['type' => self::TYPE_TEACHER]);
-
-        return $num;
+        return $DB->count_records('certifygen_model', ['type' => self::TYPE_TEACHER]);
     }
 
     /**
@@ -132,6 +131,7 @@ class certifygen_model extends persistent {
      * @param int $limitnum
      * @param string $sort
      * @return array
+     * @throws dml_exception
      */
     public static function get_context_models(int $limitfrom = 0, int $limitnum = 0, string $sort = '') : array {
         global $DB;

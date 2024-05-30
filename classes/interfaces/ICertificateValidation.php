@@ -28,8 +28,10 @@
 
 namespace mod_certifygen\interfaces;
 
+use mod_certifygen\certifygen_file;
+
 interface ICertificateValidation {
-    public function sendFile(): array;
+    public function sendFile(certifygen_file $file): array;
     public function getState(): array;
     public function getFile(): array;
 }

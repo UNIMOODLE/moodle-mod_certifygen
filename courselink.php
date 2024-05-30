@@ -21,7 +21,18 @@
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
+/**
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
+use mod_certifygen\certifygen;
+use mod_certifygen\output\views\context_certificate_view;
+use mod_certifygen\persistents\certifygen_context;
+use mod_certifygen\persistents\certifygen_model;
 use tool_certificate\template;
 
 require_once('../../config.php');
@@ -30,16 +41,47 @@ require_once('lib.php');
 global $CFG, $PAGE, $DB, $COURSE, $USER;
 
 $courseid = required_param('id', PARAM_INT);    // Course ID.
-$course = $DB->get_record('course', ['id' => $courseid]);
-print_object("el curso es: ");
-print_object($courseid);
-print_object("El contexto de curso es: ");
-print_object(context_course::instance($courseid)->id);
-print_object("la categoria es: ");
-print_object($course->category);
-print_object("El contexto de categoria: ");
-print_object(context_coursecat::instance($course->category)->id);
+$course = get_course($courseid);
 
+// PASOS:
+/**
+ * 1- comprobar que existecontexto para este curso
+ * 2 - comprobar q el usuario es profesor de este curso.
+ * 3- comprobar que el modelo de este curso tenga validador chequeado
+ *      2-1 si no lo tiene, descargar certificado del tool_certificate
+ *      2-2 si lo tiene, mostrar tabla de estado
+ */
+require_login();
+$hascertifycontext = certifygen_context::has_course_context($courseid);
+if (!$hascertifycontext) {
+    throw new moodle_exception('nocontextcourse', 'mod_certifygen');
+}
+$coursecontext = context_course::instance($courseid);
+if (!has_capability('mod/certifygen:viewcontextcertificates', $coursecontext)) {
+    throw new moodle_exception('hasnocapabilityrequired', 'mod_certifygen');
+}
+$PAGE->set_context($coursecontext);
+$PAGE->set_url(new moodle_url('/mod/certifygen/courselink.php', ['id' => $courseid]));
+$modelid = certifygen_context::get_course_context_modelid($courseid);
+$certifygenmodel = new certifygen_model($modelid);
+//if (is_null($certifygenmodel->get('validation'))) {
+//    // TODO:
+////    mostrar tabla, una linea por cada idioma.
+//    $url = certifygen::get_user_certificate_file_url($certifygenmodel->get('templateid'), $USER->id, $course->id, $lang);
+//    if (!empty($url)) {
+//        redirect($url);
+//    } else {
+//        throw  new moodle_exception('certificatenotfound', 'certifygen');
+//    }
+//}
+
+$view = new context_certificate_view($certifygenmodel, $courseid);
+$output = $PAGE->get_renderer('mod_certifygen');
+
+echo $output->header();
+echo $output->heading(format_string($certifygenmodel->get('name')));
+echo $output->render($view);
+echo $output->footer();
 // Crear registros en bbdd.
 //$datamodel = [
 //    'type' => \mod_certifygen\persistents\certifygen_model::TYPE_COURSE_USED,
@@ -69,5 +111,3 @@ print_object(context_coursecat::instance($course->category)->id);
 //print_object("certificateid: ");
 //print_object($certificateid);
 
-// Ver certificado por pantalla.
-redirect(\tool_certificate\template::view_url('0075193541AU')->out(false));

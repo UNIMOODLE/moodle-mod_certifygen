@@ -14,12 +14,11 @@ import Templates from 'core/templates';
 import ModalFactory from 'core/modal_factory';
 import ModalEvents from 'core/modal_events';
 import Notification from 'core/notification';
-// import mEvent from 'core/event';
 import ModalForm from 'core_form/modalform';
 
 let SERVICES = {
-    DELETE_MODEL : 'mod_certifygen_deletemodel',
-    GET_LIST_TABLE : 'mod_certifygen_getmodellisttable',
+    DELETE_MODEL: 'mod_certifygen_deletemodel',
+    GET_LIST_TABLE: 'mod_certifygen_getmodellisttable',
 };
 let ACTION = {
     DELETE_MODEL: '[data-action="delete-model"]',
@@ -28,7 +27,7 @@ let ACTION = {
     ASSIGN_CONTEXTS: '[data-action="assign-context"]',
 };
 let REGION = {
-    ROOT: '[data-region="model-list-view"]',
+    ROOT: '[data-region="model-list-table"]',
     LIST_TABLE: '[data-region="model-list-table"]',
 };
 let TEMPLATES = {
@@ -37,8 +36,8 @@ let TEMPLATES = {
 };
 const ModelManagement = () => {
     jQuery(ACTION.DELETE_MODEL).on('click', DeleteModel);
-    jQuery(ACTION.CREATE_MODEL).on('click', CreateModel);
-    jQuery(ACTION.EDIT_MODEL).on('click', CreateModel);
+    // jQuery(ACTION.CREATE_MODEL).on('click', CreateModel);
+    jQuery(ACTION.EDIT_MODEL).on('click', EditModel);
     jQuery(ACTION.ASSIGN_CONTEXTS).on('click', AssignContext.bind(this));
 };
 
@@ -69,7 +68,7 @@ const AssignContext = (e) => {
     // Show the form.
     modalCForm.show();
 };
-const CreateModel = (e) => {
+const EditModel = (e) => {
     e.preventDefault();
     const element = e.target;
     let id = 0;

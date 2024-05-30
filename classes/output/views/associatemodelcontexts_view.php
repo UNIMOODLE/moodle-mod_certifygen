@@ -25,19 +25,20 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_certifygen\output\views;
-use mod_certifygen\tables\modelcontext_table;
-use moodle_url;
+use mod_certifygen\forms\associatecontextform;
 use renderable;
 use stdClass;
 use templatable;
 use renderer_base;
 class associatemodelcontexts_view implements renderable, templatable {
+    private int $pagesize;
+    private bool $useinitialsbar;
 
     /**
-     * @param $pagesize
-     * @param $useinitialsbar
+     * @param int $pagesize
+     * @param bool $useinitialsbar
      */
-    public function __construct($pagesize = 10, $useinitialsbar = true) {
+    public function __construct(int $pagesize = 10, bool $useinitialsbar = true) {
         $this->pagesize = $pagesize;
         $this->useinitialsbar = $useinitialsbar;
     }

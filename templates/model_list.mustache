@@ -46,9 +46,10 @@
         {{> mod_certifygen/model_list_table }}
 
 </div>
-
+{{#js}}
+    require(['mod_certifygen/modelcreate'], (module) => module.init());
+{{/js}}
 <style>
-
     [data-region="model-list-view"] .likelink {
         color: #0f6cbf;
         &:hover {

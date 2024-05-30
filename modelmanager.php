@@ -29,7 +29,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 use mod_certifygen\output\views\model_view;
 
 require_once('../../config.php');
@@ -37,6 +36,7 @@ require_once('lib.php');
 
 global $CFG, $PAGE, $DB, $COURSE, $USER, $OUTPUT;
 
+require_login();
 
 $PAGE->set_url('/mod/certifygen/modelmanager.php');
 $context = context_system::instance();

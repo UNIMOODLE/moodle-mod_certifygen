@@ -35,14 +35,19 @@ namespace mod_certifygen\forms;
 use coding_exception;
 use context;
 use context_system;
+use core\invalid_persistent_exception;
+use core_course_category;
+use core_form\dynamic_form;
+use dml_exception;
 use mod_certifygen\persistents\certifygen_context;
 use moodle_exception;
 use moodle_url;
 
-class associatecontextform extends \core_form\dynamic_form {
+class associatecontextform extends dynamic_form {
 
     /**
      * @inheritDoc
+     * @throws coding_exception
      */
     protected function definition()
     {
@@ -70,7 +75,7 @@ class associatecontextform extends \core_form\dynamic_form {
             'ajax' => 'mod_certifygen/form_category_selector',
             'multiple' => true,
             'valuehtmlcallback' => function($categoryid) : string {
-                $category = \core_course_category::get($categoryid);
+                $category = core_course_category::get($categoryid);
                 return $category->name;
             }
         ];
@@ -90,11 +95,19 @@ class associatecontextform extends \core_form\dynamic_form {
         $mform->hideIf('coursecontext', 'ctype', 'eq', 'category');
     }
 
+    /**
+     * @throws dml_exception
+     */
     protected function get_context_for_dynamic_submission(): context
     {
         return context_system::instance();
     }
 
+    /**
+     * @throws moodle_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     */
     protected function check_access_for_dynamic_submission(): void
     {
         if (!has_capability('mod/certifygen:manage', $this->get_context_for_dynamic_submission())) {
@@ -102,6 +115,10 @@ class associatecontextform extends \core_form\dynamic_form {
         }
     }
 
+    /**
+     * @throws coding_exception
+     * @throws invalid_persistent_exception
+     */
     public function process_dynamic_submission()
     {
 
@@ -119,8 +136,7 @@ class associatecontextform extends \core_form\dynamic_form {
             'contextids' => implode(',', $contextids),
 
         ];
-        $id = certifygen_context::save_model_object((object) $data)->get('id');
-        return $id;
+        return certifygen_context::save_model_object((object) $data)->get('id');
     }
 
     /**

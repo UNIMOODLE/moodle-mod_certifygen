@@ -29,13 +29,14 @@ namespace certifygenvalidation_cmd;
 
 use coding_exception;
 use core\invalid_persistent_exception;
+use mod_certifygen\certifygen_file;
 use mod_certifygen\interfaces\ICertificateValidation;
 use stdClass;
 
 class certifygenvalidation_cmd implements ICertificateValidation
 {
 
-    public function sendFile(): array
+    public function sendFile(certifygen_file $file): array
     {
         // TODO: Implement sendFile() method.
         return [];

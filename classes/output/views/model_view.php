@@ -33,26 +33,23 @@
 
 namespace mod_certifygen\output\views;
 
+use dml_exception;
+use invalid_parameter_exception;
 use mod_certifygen\external\getmodellisttable_external;
-use mod_certifygen\persistents\certifygen_model;
-use mod_certifygen\tables\modellist_table;
-use moodle_url;
 use renderable;
 use stdClass;
 use templatable;
 use renderer_base;
-use mod_certifygen\forms\modelform;
-use tool_certificate\template;
 
 class model_view implements renderable, templatable {
-    private $pagesize;
-    private $useinitialsbar;
+    private int $pagesize;
+    private bool $useinitialsbar;
 
     /**
-     * @param $pagesize
-     * @param $useinitialsbar
+     * @param int $pagesize
+     * @param bool $useinitialsbar
      */
-    public function __construct($pagesize = 10, $useinitialsbar = true) {
+    public function __construct(int $pagesize = 10, bool $useinitialsbar = true) {
         $this->pagesize = $pagesize;
         $this->useinitialsbar = $useinitialsbar;
     }
@@ -60,10 +57,11 @@ class model_view implements renderable, templatable {
     /**
      * @param renderer_base $output
      * @return stdClass
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
      */
     public function export_for_template(renderer_base $output): stdClass {
 
-        $data = (object) getmodellisttable_external::getmodellisttable();
-        return $data;
+        return (object) getmodellisttable_external::getmodellisttable();
     }
 }

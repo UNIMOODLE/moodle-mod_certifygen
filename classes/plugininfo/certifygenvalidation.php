@@ -31,19 +31,25 @@
 
 namespace mod_certifygen\plugininfo;
 use admin_settingpage;
+use coding_exception;
 use core\plugininfo\base;
 use core_plugin_manager;
+use dml_exception;
+use moodle_exception;
 use moodle_url;
 use part_of_admin_tree;
 
 defined('MOODLE_INTERNAL') || die();
 
 class certifygenvalidation extends base {
+
     /**
      * Finds all enabled plugins, the result may include missing plugins.
-     * @return array|null of enabled plugins $pluginname=>$pluginname, null means unknown
+     * @return array
+     * @throws coding_exception
+     * @throws dml_exception
      */
-    public static function get_enabled_plugins() {
+    public static function get_enabled_plugins() : array {
         global $DB;
 
         $plugins = core_plugin_manager::instance()->get_installed_plugins('certifygenvalidation');
@@ -75,36 +81,12 @@ class certifygenvalidation extends base {
     }
 
     /**
-     * @param string $pluginname
-     * @param int $enabled
-     * @return bool
-     * @throws \dml_exception
-     */
-//    public static function enable_plugin(string $pluginname, int $enabled): bool {
-//        $haschanged = false;
-//
-//        error_log(__FUNCTION__ . ' ' . __LINE__);
-//        $plugin = 'certifygenvalidation_' . $pluginname;
-//        $oldvalue = get_config($plugin, 'disabled');
-//        $disabled = !$enabled;
-//        // Only set value if there is no config setting or if the value is different from the previous one.
-//        if ($oldvalue === false || ((bool) $oldvalue != $disabled)) {
-//            set_config('disabled', $disabled, $plugin);
-//            $haschanged = true;
-//
-//            add_to_config_log('disabled', $oldvalue, $disabled, $plugin);
-//            core_plugin_manager::reset_caches();
-//        }
-//
-//        return $haschanged;
-//    }
-
-    /**
      * Return URL used for management of plugins of this type.
      * @return moodle_url
-     * @throws \moodle_exception
+     * @throws moodle_exception
      */
-    public static function get_manage_url() {
+    public static function get_manage_url(): moodle_url
+    {
         return new moodle_url('/mod/certifygen/adminmanageplugins.php', array('subtype'=>'certifygenvalidation'));
     }
 
@@ -114,7 +96,8 @@ class certifygenvalidation extends base {
      * @param $hassiteconfig
      * @return void
      */
-    public function load_settings(part_of_admin_tree $adminroot, $parentnodename, $hassiteconfig) {
+    public function load_settings(part_of_admin_tree $adminroot, $parentnodename, $hassiteconfig): void
+    {
         global $CFG, $USER, $DB, $OUTPUT, $PAGE; // In case settings.php wants to refer to them.
         $ADMIN = $adminroot; // May be used in settings.php.
         $plugininfo = $this; // Also can be used inside settings.php.
@@ -137,7 +120,8 @@ class certifygenvalidation extends base {
     /**
      * @return string
      */
-    public function get_settings_section_name() {
+    public function get_settings_section_name(): string
+    {
         return 'certifygenvalidation';
     }
 }

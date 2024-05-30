@@ -22,12 +22,12 @@
     Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos
 }}
 {{!
-    @template mod_certifygen/associatemodelcontexts
+    @template mod_certifygen/student
 
-    associatemodelcontexts
+    Student
 
     Classes required for JS:
-    * None
+    * mod_certifygen/context_certificate
 
     Data attibutes required for JS:
     * None
@@ -37,19 +37,21 @@
 
     Example context (json):
     {
-        form: html form
     }
 }}
-<div data-region="associate-model-contexts">
-     {{{ form }}}
+<div data-region="context-certificate-view">
+    {{#hasvalidator}}
+        {{> mod_certifygen/my_certificates_validator }}
+    {{/hasvalidator}}
+    {{^hasvalidator}}
+        {{> mod_certifygen/my_certificates_no_validator }}
+    {{/hasvalidator}}
 </div>
+{{#js}}
+    require(['mod_certifygen/certificatemanager'], (module) => module.init());
+{{/js}}
 <style>
-
-    [data-region="associate-model-contexts"] .likelink {
-        color: #0f6cbf;
-        &:hover {
-            cursor: pointer;
-            text-decoration: underline;
-        }
+    [data-region="context-certificate-view"] {
+        margin: 2em 0;
     }
 </style>

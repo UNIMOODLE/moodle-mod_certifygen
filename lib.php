@@ -30,7 +30,10 @@
 */
 
 // This line protects the file from being accessed by a URL directly.
+use core\invalid_persistent_exception;
+use core_user\output\myprofile\tree;
 use mod_certifygen\persistents\certifygen;
+use mod_certifygen\persistents\certifygen_context;
 use mod_certifygen\persistents\certifygen_model;
 use tool_certificate\permission;
 
@@ -40,17 +43,18 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * The features this activity supports.
  *
- * @uses FEATURE_GROUPS
- * @uses FEATURE_GROUPINGS
- * @uses FEATURE_GROUPMEMBERSONLY
+ * @param string $feature FEATURE_xx constant for requested feature
+ * @return true|null True if module supports feature, null if doesn't know
+ *@uses FEATURE_GROUPMEMBERSONLY
  * @uses FEATURE_MOD_INTRO
  * @uses FEATURE_COMPLETION_TRACKS_VIEWS
  * @uses FEATURE_GRADE_HAS_GRADE
  * @uses FEATURE_GRADE_OUTCOMES
- * @param string $feature FEATURE_xx constant for requested feature
- * @return mixed True if module supports feature, null if doesn't know
+ * @uses FEATURE_GROUPS
+ * @uses FEATURE_GROUPINGS
  */
-function certifygen_supports($feature) {
+function certifygen_supports(string $feature): ?bool
+{
     switch ($feature) {
         case FEATURE_GROUPINGS:
         case FEATURE_MOD_INTRO:
@@ -63,14 +67,17 @@ function certifygen_supports($feature) {
             return null;
     }
 }
+
 /**
  * Add certifygen instance.
- *
  * @param stdClass $data
  * @param mod_certifygen_mod_form $mform
  * @return int new certifygen instance id
+ * @throws coding_exception
+ * @throws invalid_persistent_exception
  */
-function certifygen_add_instance($data, $mform) {
+function certifygen_add_instance(stdClass $data, mod_certifygen_mod_form $mform): int
+{
     global $USER;
 
     $data->modelname = $data->name;
@@ -98,21 +105,19 @@ function certifygen_add_instance($data, $mform) {
 /**
  * Update certifygen instance.
  *
- * @param stdClass $data
- * @param mod_certifygen_mod_form $mform
- * @return bool Success/Fail
+ * @param $data
+ * @param $mform
+ * @return bool
+ * @throws invalid_persistent_exception
+ * @throws coding_exception
  */
-function certifygen_update_instance($data, $mform) {
+function certifygen_update_instance($data, $mform): bool
+{
     global $USER;
 
     // Update a model.
-    $model = new certifygen_model($data->modelid);
-    $model->set('name', $data->name);
-    $model->set('mode', $data->mode);
-    $model->set('templateid', $data->templateid);
-    $model->set('usermodified', $USER->id);
-    $model->set('timemodified', time());
-    $model->update();
+    $data->modelname = $data->name;
+    certifygen_model::save_model_object($data);
 
     // Update a certifygen.
     $certifygen = new certifygen($data->instance);
@@ -120,7 +125,7 @@ function certifygen_update_instance($data, $mform) {
     $certifygen->set('intro', $data->intro);
     $certifygen->set('introformat', $data->introformat);
     $certifygen->set('usermodified', $USER->id);
-    $model->set('timemodified', time());
+    $certifygen->set('timemodified', time());
     return $certifygen->update();
 }
 
@@ -130,9 +135,10 @@ function certifygen_update_instance($data, $mform) {
  * @param stdClass $data
  * @param mod_certifygen_mod_form $mform
  * @return bool Success/Fail
+ * @throws coding_exception
  */
-function certifygen_delete_instance($data, $mform) {
-    global $USER;
+function certifygen_delete_instance(stdClass $data, mod_certifygen_mod_form $mform): bool
+{
 
     // Delete a model.
     $model = new certifygen_model($data->modelid);
@@ -147,6 +153,7 @@ function certifygen_delete_instance($data, $mform) {
 /**
  * Get certifygen model modes
  * @return array
+ * @throws coding_exception
  */
 function mod_certifygen_get_modes() : array {
     return [
@@ -154,17 +161,6 @@ function mod_certifygen_get_modes() : array {
         certifygen_model::MODE_PERIODIC => get_string('mode_2', 'mod_certifygen'),
     ];
 }
-/**
- * Get certifygen model submitoptions
- * @return array
- */
-//function mod_certifygen_get_submitoptions() : array {
-//    return [
-//        certifygen_model::SUBMIT_OPTION_1 => get_string('submit_option_1', 'mod_certifygen'),
-//        certifygen_model::SUBMIT_OPTION_2 => get_string('submit_option_2', 'mod_certifygen'),
-//        certifygen_model::SUBMIT_OPTION_3 => get_string('submit_option_3', 'mod_certifygen'),
-//    ];
-//}
 
 /**
  * Get certifygen model validation types
@@ -189,10 +185,12 @@ function mod_certifygen_get_validation() : array {
 
     return $all;
 }
+
 /**
  * Get certifygen templates available by tool_certificate
  * @param int $courseid
  * @return array
+ * @throws dml_exception
  */
 function mod_certifygen_get_templates(int $courseid = 0) : array {
     $context = context_system::instance();
@@ -228,7 +226,7 @@ function mod_certifygen_extend_navigation_course(navigation_node $navigation, st
     if (!in_array($USER->id, $enrolledids)) {
         return;
     }
-    if (\mod_certifygen\persistents\certifygen_context::has_course_context($course->id)) {
+    if (certifygen_context::has_course_context($course->id)) {
         $label = get_string('contextcertificatelink', 'mod_certifygen');
         $url = new moodle_url('/mod/certifygen/courselink.php', array('id' => $course->id));
         $icon = new pix_icon('t/edit', $label);
@@ -237,7 +235,7 @@ function mod_certifygen_extend_navigation_course(navigation_node $navigation, st
 }
 
 /**
- * @param \core_user\output\myprofile\tree $tree
+ * @param tree $tree
  * @param $user
  * @param $iscurrentuser
  * @param $course

@@ -32,37 +32,60 @@
 
 namespace mod_certifygen\output\views;
 
+use coding_exception;
+use dml_exception;
+use mod_certifygen\persistents\certifygen;
+use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\tables\activityteacherview_table;
-use mod_certifygen\template;
+use mod_certifygen\tables\activityteacherviewnovalidator_table;
+use moodle_exception;
+use moodle_url;
 use renderable;
 use stdClass;
 use templatable;
 use renderer_base;
 class teacher_view implements renderable, templatable {
+    private int $courseid;
+    private int $templateid;
+    private int $pagesize;
+    private stdClass $cm;
+    private bool $useinitialsbar;
+    private certifygen_model $certificatemodel;
+    private bool $hasvalidator;
+
     /**
      * @param int $courseid
      * @param int $templateid
-     * @param int $cmid
-     * @param $pagesize
-     * @param $useinitialsbar
+     * @param stdClass $cm
+     * @param int $pagesize
+     * @param bool $useinitialsbar
+     * @throws coding_exception
      */
-    public function __construct(int $courseid, int $templateid, int $cmid, $pagesize = 10, $useinitialsbar = true) {
+    public function __construct(int $courseid, int $templateid, stdClass $cm, int $pagesize = 10, bool $useinitialsbar = true) {
         $this->courseid = $courseid;
         $this->templateid = $templateid;
-        $this->cmid = $cmid;
+        $this->cm = $cm;
         $this->pagesize = $pagesize;
         $this->useinitialsbar = $useinitialsbar;
+        $certificate = new certifygen($cm->instance);
+        $this->certificatemodel = new certifygen_model($certificate->get('modelid'));
+        $this->hasvalidator = !is_null($this->certificatemodel->get('validation'));
     }
 
-    /**
-     * @param renderer_base $output
-     * @return stdClass
-     * @throws \moodle_exception
-     */
-    public function export_for_template(renderer_base $output): stdClass {
 
-        $activityteachertable = new activityteacherview_table($this->courseid, $this->templateid);
-        $activityteachertable->baseurl = new \moodle_url('/mod/certifygen/view.php', ['id' => $this->cmid]);
+    /**
+     * @throws coding_exception
+     * @throws moodle_exception
+     * @throws dml_exception
+     */
+    public function export_for_template(renderer_base $output) : stdClass {
+
+        if ($this->hasvalidator) {
+            $activityteachertable = new activityteacherview_table($this->courseid, $this->templateid, $this->cm->instance);
+        } else {
+            $activityteachertable = new activityteacherviewnovalidator_table($this->courseid, $this->templateid);
+        }
+        $activityteachertable->baseurl = new moodle_url('/mod/certifygen/view.php', ['id' => $this->cm->id]);
         ob_start();
         $activityteachertable->out($this->pagesize, $this->useinitialsbar);
         $out1 = ob_get_contents();

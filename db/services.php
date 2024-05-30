@@ -31,6 +31,8 @@
 
 // This line protects the file from being accessed by a URL directly.
 use mod_certifygen\external\deletemodel_external;
+use mod_certifygen\external\emitcertificate_external;
+use mod_certifygen\external\getcontextcertificatedata_external;
 use mod_certifygen\external\getCoursesAsStudent_external;
 use mod_certifygen\external\getCoursesAsTeacher_external;
 use mod_certifygen\external\getJsonStudentCourseCompleted_external;
@@ -77,6 +79,24 @@ $functions = [
         'description' => 'Search course',
         'type' => 'read',
         'capabilities' => 'mod/certifygen:manage',
+        'ajax' => true,
+        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
+    'mod_certifygen_emitcertificate' => [
+        'classname' => emitcertificate_external::class,
+        'methodname' => 'emitcertificate',
+        'description' => 'Emit Certificate',
+        'type' => 'write',
+        'capabilities' => 'mod/certifygen:view',
+        'ajax' => true,
+        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
+    'mod_certifygen_getcontextcertificatedata' => [
+        'classname' => getcontextcertificatedata_external::class,
+        'methodname' => 'getcontextcertificatedata',
+        'description' => 'Emit Certificate',
+        'type' => 'write',
+        'capabilities' => 'mod/certifygen:view',
         'ajax' => true,
         'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],

@@ -32,18 +32,18 @@
  */
 
 require_once('../../config.php');
+global $PAGE;
 
 $issuecode = required_param('code', PARAM_TEXT);
 $preview = optional_param('preview', false, PARAM_BOOL);
 
+require_login();
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url(new moodle_url('/mod/certifygen/certificateview.php', ['code' => $issuecode]));
-
+$lang = explode('_', $issuecode);
 if ($preview) {
     $templateid = required_param('templateid', PARAM_INT);
-    require_login();
-//    $template = \tool_certificate\template::instance($templateid);
-    $template = \mod_certifygen\template::instance($templateid);
+    $template = \mod_certifygen\template::instance($templateid, (object) ['lang' => $lang[1]]);
     if ($template->can_manage()) {
         $template->generate_pdf(true);
     }
@@ -52,10 +52,11 @@ if ($preview) {
     $issue = \tool_certificate\template::get_issue_from_code($issuecode);
     $context = \context_course::instance($issue->courseid, IGNORE_MISSING) ?: null;
 
-    $template = $issue ? \mod_certifygen\template::instance($issue->templateid) : null;
+    $template = $issue ? \mod_certifygen\template::instance($issue->templateid, (object) ['lang' => $lang[1]]) : null;
     if ($template && (\tool_certificate\permission::can_verify() ||
             \tool_certificate\permission::can_view_issue($template, $issue, $context))) {
         $url = $template->get_issue_file_url($issue);
+
         redirect($url);
     } else {
         throw new moodle_exception('notfound');

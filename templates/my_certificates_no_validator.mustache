@@ -22,9 +22,9 @@
     Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos
 }}
 {{!
-    @template mod_certifygen/associatemodelcontexts
+    @template mod_certifygen/my_certificates_no_validator
 
-    associatemodelcontexts
+    my_certificates_no_validator
 
     Classes required for JS:
     * None
@@ -37,19 +37,24 @@
 
     Example context (json):
     {
-        form: html form
     }
 }}
-<div data-region="associate-model-contexts">
-     {{{ form }}}
-</div>
-<style>
 
-    [data-region="associate-model-contexts"] .likelink {
-        color: #0f6cbf;
-        &:hover {
-            cursor: pointer;
-            text-decoration: underline;
-        }
-    }
-</style>
+<table  class="table">
+    <thead>
+        <tr>
+            <th scope="col"> {{#str}} language {{/str}} </th>
+            <th scope="col"> </th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#list}}
+            <tr data-id="{{id}}">
+                <td>{{langstring}}</td>
+                <td>
+                    <a href="{{url}}" class="btn btn-primary"> {{#str}}download, mod_certifygen{{/str}}</a>
+                </td>
+            </tr>
+        {{/list}}
+    </tbody>
+</table>

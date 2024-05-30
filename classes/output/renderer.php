@@ -31,10 +31,13 @@
 
 
 namespace mod_certifygen\output;
+use dml_exception;
+use mod_certifygen\output\views\context_certificate_view;
 use mod_certifygen\output\views\model_view;
 use mod_certifygen\output\views\student_view;
 use mod_certifygen\output\views\teacher_view;
 use mod_certifygen\output\views\associatemodelcontexts_view;
+use moodle_exception;
 use plugin_renderer_base;
 
 class renderer extends plugin_renderer_base {
@@ -48,6 +51,9 @@ class renderer extends plugin_renderer_base {
      */
     public function render_student_view(student_view $view): string {
         $data = $view->export_for_template($this);
+        if (!$data->hasvalidator) {
+            unset($data->hasvalidator);
+        }
         return $this->render_from_template('mod_certifygen/student', $data);
     }
     /**
@@ -66,7 +72,7 @@ class renderer extends plugin_renderer_base {
     /**
      * @param model_view $view
      * @return string
-     * @throws \moodle_exception
+     * @throws moodle_exception
      */
     public function render_model_view(model_view $view): string {
 
@@ -77,11 +83,24 @@ class renderer extends plugin_renderer_base {
     /**
      * @param associatemodelcontexts_view $view
      * @return string
-     * @throws \moodle_exception
+     * @throws moodle_exception
      */
     public function render_associatemodelcontexts_view(associatemodelcontexts_view $view): string {
 
         $data = $view->export_for_template($this);
         return $this->render_from_template('mod_certifygen/associatemodelcontexts', $data);
+    }
+    /**
+     * @param context_certificate_view $view
+     * @return string
+     * @throws moodle_exception
+     */
+    public function render_context_certificate_view(context_certificate_view $view): string {
+
+        $data = $view->export_for_template($this);
+        if (!$data->hasvalidator) {
+            unset($data->hasvalidator);
+        }
+        return $this->render_from_template('mod_certifygen/context_certificate', $data);
     }
 }

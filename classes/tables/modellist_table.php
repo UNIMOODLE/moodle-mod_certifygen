@@ -16,7 +16,7 @@
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
-// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos..
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 /**
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
@@ -27,7 +27,7 @@
 
 
 namespace mod_certifygen\tables;
-
+global $CFG;
 require "$CFG->libdir/tablelib.php";
 
 use coding_exception;
@@ -59,12 +59,13 @@ class modellist_table extends table_sql {
     }
 
     /**
-     * @param $pagesize
-     * @param $useinitialsbar
+     * @param int $pagesize
+     * @param bool $useinitialsbar
      * @return void
      * @throws dml_exception
      */
-    public final function query_db($pagesize, $useinitialsbar = true) {
+    public final function query_db($pagesize, $useinitialsbar = true): void
+    {
 
         $total = certifygen_model::count_context_models();
 
@@ -89,6 +90,7 @@ class modellist_table extends table_sql {
     /**
      * @param $values
      * @return string
+     * @throws coding_exception
      */
     final function col_template($values) : string {
         return template::instance($values->templateid)->get_name();

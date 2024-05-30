@@ -20,12 +20,17 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 namespace mod_certifygen\external;
 
+use coding_exception;
+use context_system;
+use dml_exception;
 use external_api;
 use external_description;
 use external_function_parameters;
 use external_multiple_structure;
 use external_single_structure;
 use external_value;
+use invalid_parameter_exception;
+use restricted_context_exception;
 
 /**
  * @package    mod_certifygen
@@ -50,10 +55,10 @@ class searchcategory_external extends external_api {
     /**
      * @param string $query
      * @return array
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \invalid_parameter_exception
-     * @throws \restricted_context_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws restricted_context_exception
      */
     public static function searchcategory(string $query): array {
         global $DB, $CFG;
@@ -63,7 +68,7 @@ class searchcategory_external extends external_api {
         ]);
         $query = clean_param($params['query'], PARAM_TEXT);
         // Validate context.
-        $context = \context_system::instance();
+        $context = context_system::instance();
         self::validate_context($context);
 
         $likename = $DB->sql_like('name', ':name');

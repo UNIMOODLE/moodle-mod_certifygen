@@ -40,30 +40,12 @@
     }
 }}
 <div data-region="student-view">
-    {{^ hascertificate }}
-        <div>
-            {{ text }}
-        </div>
-    {{/ hascertificate }}
-    {{# hascertificate }}
-        <div>
-            <table  class="table">
-                <thead>
-                    <th scope="col"> Código</th>
-                    <th scope="col"> Estado</th>
-                    <th scope="col"> </th>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>{{code}}</td>
-                    <td>{{status}}</td>
-                    <td><a href="{{link}}"> {{#str}} download, mod_certifygen{{/str}} </a></td>
-                </tr>
-
-                </tbody>
-            </table>
-        </div>
-    {{/ hascertificate }}
+    {{#hasvalidator}}
+        {{> mod_certifygen/my_certificates_validator }}
+    {{/hasvalidator}}
+    {{^hasvalidator}}
+        {{> mod_certifygen/my_certificates_no_validator }}
+    {{/hasvalidator}}
 </div>
 
 <style>

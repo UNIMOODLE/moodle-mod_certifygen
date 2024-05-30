@@ -38,6 +38,11 @@ use external_single_structure;
 use external_value;
 
 class getJsonTeaching_external extends external_api {
+    /**
+     * Describes the external function parameters.
+     *
+     * @return external_function_parameters
+     */
     public static function getJsonTeaching_parameters(): external_function_parameters {
         return new external_function_parameters(
             [
@@ -55,6 +60,11 @@ class getJsonTeaching_external extends external_api {
          */
         return ['json' => '{"elemento1":"imagen"}'];
     }
+    /**
+     * Describes the data returned from the external function.
+     *
+     * @return external_single_structure
+     */
     public static function getJsonTeaching_returns(): external_single_structure {
         return new external_single_structure(array(
                 'json' => new external_value(PARAM_RAW, 'Certificate elements in a json'),

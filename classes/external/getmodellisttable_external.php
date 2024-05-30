@@ -19,7 +19,7 @@
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
-// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos..
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 /**
  * @package    mod_certifygen
  * * @copyright  2024 Proyecto UNIMOODLE
@@ -32,17 +32,34 @@
 namespace mod_certifygen\external;
 
 
+use dml_exception;
 use external_api;
+use invalid_parameter_exception;
 use mod_certifygen\tables\modellist_table;
 use moodle_url;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
 class getmodellisttable_external extends external_api {
+    /**
+     * Describes the external function parameters.
+     *
+     * @return external_function_parameters
+     */
     public static function getmodellisttable_parameters(): external_function_parameters {
         return new external_function_parameters([]);
     }
+
+    /**
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     */
     public static function getmodellisttable(): array {
+        global $PAGE;
+        self::validate_parameters(
+            self::getmodellisttable_parameters(), []
+        );
+        $PAGE->set_context(\context_system::instance());
         $tablelist = new modellist_table();
         $tablelist->baseurl = new moodle_url('/mod/certifygen/modelmanager.php');
         ob_start();
@@ -54,6 +71,11 @@ class getmodellisttable_external extends external_api {
             'table' => $out1
         ];
     }
+    /**
+     * Describes the data returned from the external function.
+     *
+     * @return external_single_structure
+     */
     public static function getmodellisttable_returns(): external_single_structure {
         return new external_single_structure(
             [

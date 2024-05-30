@@ -88,17 +88,16 @@ class mod_certifygen_mod_form extends moodleform_mod {
      * Returns true if course certificate has been issued.
      *
      * @return bool
-     * @uses \tool_certificate\certificate
+     * @throws coding_exception
+     * @uses certificate
      */
     private function has_issues(): bool {
-        global $DB;
 
         if ($instance = $this->get_instance()) {
-//            $certificate = $DB->get_record('certifygen', ['id' => $instance], '*', MUST_EXIST);
             $certificate = new certifygen($instance);
-//            $certificatemodel = certifygen_model::get
-            if (!is_null($certificate) && !is_null($certificate->template)) {
-                $courseissues = certificate::count_issues_for_course($certificate->template, $certificate->course,
+            $certificatemodel = new certifygen_model($certificate->get('modelid'));
+            if (!is_null($certificate) && !is_null($certificatemodel->get('templateid'))) {
+                $courseissues = certificate::count_issues_for_course($certificatemodel->get('templateid'), $certificate->get('course'),
                     'mod_certifygen', null, null);
                 if ($courseissues > 0) {
                     return  true;
@@ -107,10 +106,12 @@ class mod_certifygen_mod_form extends moodleform_mod {
         }
         return false;
     }
+
     /**
      * Gets the current coursecertificate template for the template selector.
      *
      * @return array
+     * @throws dml_exception
      */
     private function get_current_template(): array {
         global $DB;
@@ -119,7 +120,8 @@ class mod_certifygen_mod_form extends moodleform_mod {
             $sql = "SELECT ct.id, ct.name
                     FROM {tool_certificate_templates} ct
                     JOIN {certifygen} c
-                    ON c.template = ct.id
+                    JOIN {certifygen_model} m
+                    ON m.templateid = ct.id
                     AND c.id = :instance";
             if ($record = $DB->get_record_sql($sql, ['instance' => $instance], IGNORE_MISSING)) {
                 $templates[$record->id] = format_string($record->name);

@@ -33,16 +33,23 @@
 
 namespace mod_certifygen;
 
-use context_helper;
+
+use coding_exception;
+use context_system;
+use core\lock\lock;
 use core\message\message;
-use core\output\inplace_editable;
 use core_user;
+use dml_exception;
+use file_exception;
 use moodle_url;
+use pdf;
+use stdClass;
+use stored_file;
+use stored_file_creation_exception;
+use tool_certificate\certificate;
 use tool_certificate\customfield\issue_handler;
-use tool_certificate\output;
-use tool_certificate\page;
-use tool_certificate\permission;
-use tool_certificate\persistent;
+use tool_certificate\event\certificate_issued;
+use tool_tenant\config;
 
 /**
  * Class represents a certificate template.
@@ -54,41 +61,44 @@ use tool_certificate\persistent;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class template extends \tool_certificate\template {
+    private string $lang;
+
     /**
      * @param int $id
-     * @param \stdClass|null $obj
+     * @param stdClass|null $obj
      * @return template
-     * @throws \coding_exception
+     * @throws coding_exception
      */
 
-    public static function instance(int $id = 0, ?\stdClass $obj = null): \mod_certifygen\template
+    public static function instance(int $id = 0, ?stdClass $obj = null): template
     {
-        $data = new \stdClass();
+        $data = new stdClass();
         if ($obj !== null) {
+            $lang = $obj->lang;
             // Ignore fields that are not properties.
             $data = (object)array_intersect_key((array)$obj, \tool_certificate\persistent\template::properties_definition());
         }
         $t = new self();
         $t->persistent = new \tool_certificate\persistent\template($id, $data);
+        $t->lang = $lang ?? '';
         return $t;
     }
 
     /**
      * Generate the PDF for the template.
-     *
      * @param bool $preview True if it is a preview, false otherwise
-     * @param \stdClass $issue The issued certificate we want to view
-     * @param string $lang Language
+     * @param stdClass $issue The issued certificate we want to view
      * @param bool $return
      * @return string|null Return the PDF as string if $return specified
+     * @throws dml_exception
      */
-    public function generate_pdf($preview = false, $issue = null, $return = false, string $lang = "") {
+    public function generate_pdf($preview = false, $issue = null, $return = false) : string | null {
         global $CFG, $USER;
 
         if (is_null($issue)) {
             $user = $USER;
         } else {
-            $user = \core_user::get_user($issue->userid);
+            $user = core_user::get_user($issue->userid);
         }
 
         require_once($CFG->libdir . '/pdflib.php');
@@ -96,23 +106,15 @@ class template extends \tool_certificate\template {
         // Get the pages for the template, there should always be at least one page for each template.
         if ($pages = $this->get_pages()) {
             // Create the pdf object.
-            $pdf = new \pdf();
-
-            //TODO: mi logica de lang
-            // If 'issuelang' setting, force the current language to the users being issued otherwise force site language.
-            if (get_config('tool_certificate', 'issuelang') && isset($user->lang)) {
-                $currentlang = force_current_language($user->lang);
-            } else {
-                $currentlang = force_current_language($CFG->lang);
-            }
-
+            $pdf = new pdf();
+            $currentlang = force_current_language($this->lang);
             $pdf->setPrintHeader(false);
             $pdf->setPrintFooter(false);
             $pdf->SetTitle($this->get_formatted_name());
             $pdf->setViewerPreferences([
                 'DisplayDocTitle' => true,
             ]);
-            $pdf->SetAutoPageBreak(true, 0);
+            $pdf->SetAutoPageBreak(true);
             // Remove full-stop at the end, if it exists, to avoid "..pdf" being created and being filtered by clean_filename.
             $filename = rtrim($this->get_formatted_name(), '.');
             $filename = clean_filename($filename . '.pdf');
@@ -148,25 +150,30 @@ class template extends \tool_certificate\template {
                 $pdf->Output($filename);
             }
         }
+        return null;
     }
 
     /**
      * Gets the stored file for an issue. If issue file doesn't exist new file is created.
-     *
-     * @param \stdClass $issue
-     * @return \stored_file
+     * @param stdClass $issue
+     * @return stored_file
+     * @throws dml_exception
+     * @throws file_exception
+     * @throws stored_file_creation_exception
      */
-    public function get_issue_file(\stdClass $issue): \stored_file {
+    public function get_issue_file(stdClass $issue): stored_file {
         $fs = get_file_storage();
         $file = $fs->get_file(
-            \context_system::instance()->id,
+            context_system::instance()->id,
             'tool_certificate',
             'issues',
             $issue->id,
             '/',
             $issue->code . '.pdf'
         );
+
         if (!$file) {
+
             $file = $this->create_issue_file($issue);
         }
         return $file;
@@ -174,11 +181,13 @@ class template extends \tool_certificate\template {
 
     /**
      * Gets the stored file url for an issue. If issue file doesn't exist, new file is created first.
-     *
-     * @param \stdClass $issue
+     * @param stdClass $issue
      * @return moodle_url
+     * @throws dml_exception
+     * @throws file_exception
+     * @throws stored_file_creation_exception
      */
-    public function get_issue_file_url(\stdClass $issue): moodle_url {
+    public function get_issue_file_url(stdClass $issue): moodle_url {
         $file = $this->get_issue_file($issue);
         // We add timemodified instead of issue id to prevent caching of changed certificate.
         // The callback tool_certificate_pluginfile() ignores the itemid and only takes the code.
@@ -188,20 +197,20 @@ class template extends \tool_certificate\template {
 
     /**
      * Creates stored file for an issue.
-     *
-     * @param \stdClass $issue
+     * @param stdClass $issue
      * @param bool $regenerate
-     * @return \stored_file
+     * @return stored_file
+     * @throws file_exception
+     * @throws stored_file_creation_exception
+     * @throws dml_exception
      */
-    public function create_issue_file(\stdClass $issue, bool $regenerate = false): \stored_file {
-        // TODO: comprobar de que modelo se trata para coger el idioma definido.
-        // A partir del $issue->code , tendré una tabla en la que asocio idioma con codigo, y asi sabré cual tengo que escoger para generar el pdf.
-        $lang = 'en';
+    public function create_issue_file(stdClass $issue, bool $regenerate = false): stored_file {
+
         // Generate issue pdf contents.
-        $filecontents = $this->generate_pdf(false, $issue, true, $lang);
+        $filecontents = $this->generate_pdf(false, $issue, true);
         // Create a file instance.
         $file = (object) [
-            'contextid' => \context_system::instance()->id,
+            'contextid' => context_system::instance()->id,
             'component' => 'tool_certificate',
             'filearea'  => 'issues',
             'itemid'    => $issue->id,
@@ -218,5 +227,111 @@ class template extends \tool_certificate\template {
         }
 
         return $fs->create_file_from_string($file, $filecontents);
+    }
+
+    /**
+     * Issues a certificate to a user.
+     *
+     * @param $userid
+     * @param null $expires
+     * @param array $data
+     * @param $component
+     * @param null $courseid
+     * @param lock|null $lock
+     * @return int The ID of the issue
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws file_exception
+     * @throws stored_file_creation_exception
+     * @uses \tool_tenant\config::push_for_user()
+     * @uses \tool_tenant\config::pop()
+     *
+     */
+    public function issue_certificate($userid, $expires = null, array $data = [], $component = 'tool_certificate',
+                                      $courseid = null, ?lock $lock = null) : int {
+        global $DB;
+
+
+        component_class_callback(config::class, 'push_for_user', [$userid]);
+
+        $issue = new stdClass();
+        $issue->userid = $userid;
+        $issue->templateid = $this->get_id();
+        $issue->code = certificate::generate_code($issue->userid) . '_' . $this->lang ;
+        $issue->emailed = 0;
+        $issue->timecreated = time();
+        $issue->expires = $expires;
+        $issue->component = $component;
+        $issue->courseid = $courseid;
+        $issue->archived = 0;
+
+        // Store user fullname.
+        $data['userfullname'] = fullname($DB->get_record('user', ['id' => $userid]));
+        $issue->data = json_encode($data);
+
+        // Insert the record into the database.
+        $issue->id = $DB->insert_record('tool_certificate_issues', $issue);
+        if ($lock) {
+            $lock->release();
+        }
+        issue_handler::create()->save_additional_data($issue, $data);
+
+        // Trigger event.
+        certificate_issued::create_from_issue($issue)->trigger();
+
+        // Reload issue from DB in case the event handlers modified it.
+        $issue = $this->get_issue_from_code($issue->code);
+
+        // Create the issue file and send notification.
+        $issuefile = $this->create_issue_file($issue);
+        self::send_issue_notification($issue, $issuefile);
+
+        component_class_callback(config::class, 'pop', []);
+
+        return $issue->id;
+    }
+
+    /**
+     * Sends a moodle notification of the certificate issued.
+     *
+     * @param stdClass $issue
+     * @param stored_file $file
+     * @return void
+     * @throws coding_exception
+     * @throws dml_exception
+     */
+    private function send_issue_notification(stdClass $issue, stored_file $file): void {
+        global $DB;
+
+        $user = core_user::get_user($issue->userid);
+        $userfullname = fullname($user, true);
+        $mycertificatesurl = new moodle_url('/admin/tool/certificate/my.php');
+        $subject = get_string('notificationsubjectcertificateissued', 'tool_certificate');
+        $fullmessage = get_string(
+            'notificationmsgcertificateissued',
+            'tool_certificate',
+            ['fullname' => $userfullname, 'url' => $mycertificatesurl->out(false)]
+        );
+
+        $message = new message();
+        $message->courseid = $issue->courseid ?? SITEID;
+        $message->component = 'tool_certificate';
+        $message->name = 'certificateissued';
+        $message->notification = 1;
+        $message->userfrom = core_user::get_noreply_user();
+        $message->userto = $user;
+        $message->subject = $subject;
+        $message->contexturl = $mycertificatesurl;
+        $message->contexturlname = get_string('mycertificates', 'tool_certificate');
+        $message->fullmessage = html_to_text($fullmessage);
+        $message->fullmessagehtml = $fullmessage;
+        $message->fullmessageformat = FORMAT_HTML;
+        $message->smallmessage = '';
+        $message->attachment = $file;
+        $message->attachname = $file->get_filename();
+
+        if (message_send($message)) {
+            $DB->set_field('tool_certificate_issues', 'emailed', 1, ['id' => $issue->id]);
+        }
     }
 }

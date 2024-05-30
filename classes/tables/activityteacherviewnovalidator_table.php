@@ -36,23 +36,15 @@ require_once($CFG->libdir . '/tablelib.php');
 
 use coding_exception;
 use dml_exception;
-use mod_certifygen\certifygen;
-use mod_certifygen\persistents\certifygen_model;
-use mod_certifygen\persistents\certifygen_validations;
 use mod_certifygen\template;
 use moodle_exception;
 use moodle_url;
 use table_sql;
 use tool_certificate\certificate;
 
-class activityteacherview_table extends table_sql {
+class activityteacherviewnovalidator_table extends table_sql {
     private int $courseid;
     private int $templateid;
-    private int $instance;
-    /**
-     * @var certifygen_model[]
-     */
-    private certifygen_model $model;
 
     /**
      * Constructor
@@ -60,23 +52,20 @@ class activityteacherview_table extends table_sql {
      * @param int $templateid
      * @throws coding_exception
      */
-    function __construct(int $courseid, int $templateid, int $instance) {
+    function __construct(int $courseid, int $templateid) {
         $this->courseid = $courseid;
         $this->templateid = $templateid;
-        $certifygen = new \mod_certifygen\persistents\certifygen($instance);
-        $this->modelid = $certifygen->get('modelid');
-        $uniqueid = 'certifygen-activity-teacher-view';
+        $uniqueid = 'certifygen-activity-novalidator-teacher-view';
         parent::__construct($uniqueid);
         // Define the list of columns to show.
-        $columns = ['fullname', 'code','status', 'link'];
+        $columns = ['fullname', 'code', 'link'];
         $this->define_columns($columns);
 
         // Define the titles of columns to show in header.
         $headers = [
             get_string('fullname'),
             get_string('code', 'mod_certifygen'),
-            get_string('status', 'mod_certifygen'),
-            '',
+            ''
         ];
         $this->define_headers($headers);
 
@@ -105,22 +94,6 @@ class activityteacherview_table extends table_sql {
 
     /**
      * @param $row
-     * @return string
-     */
-    function col_status($row): string
-    {
-        if (isset($row->issueid)) {
-            $validation = certifygen_validations::get_record(['userid' => $row->userid, 'issuesid' => $row->issueid]);
-            if ($validation) {
-                return get_string('status_'.$validation->get('status'), 'mod_certifygen');
-            }
-        }
-
-        return get_string('status_1', 'mod_certifygen');
-    }
-
-    /**
-     * @param $row
      * @return mixed
      */
     function col_code($row): mixed
@@ -138,32 +111,18 @@ class activityteacherview_table extends table_sql {
     function col_link($row): string
     {
         global $DB;
-        //TODO! $lang
-        $lang = 'en';
+        $lang = explode('_', $row->code);
+        $lang = $lang[0];
         $certificate = template::instance($row->templateid, (object) ['lang' => $lang]);
         $issueid = $certificate->issue_certificate($row->userid);
         $code = $DB->get_field('tool_certificate_issues', 'code', ['id' => $issueid]);
         $link = new moodle_url('/mod/certifygen/certificateview.php', ['code' => $code, 'preview' => true, 'templateid' => $row->templateid]);
-        $status = certifygen_validations::STATUS_NOT_STARTED;
-        $id = 0;
-        if (isset($row->issueid)) {
-            $validation = certifygen_validations::get_record(['userid' => $row->userid, 'issuesid' => $row->issueid]);
-            if ($validation) {
-                $id = $validation->get('id');
-                $status = $validation->get('status');
-            }
-        }
+
 
         if ($this->is_downloading()) {
             return $link->out();
-        } else if ($status != certifygen_validations::STATUS_IN_PROGRESS) {
-            return '<span data-courseid="' . $row->courseid . '" data-modelid="' . $this->modelid . '" data-id="'. $id .
-                '" data-action="emit-certificate" data-userid="'. $row->userid .'" class="btn btn-primary"
-                href='. $link->out().'>'.get_string('emit', 'mod_certifygen').'</span>';
-        } else if ($status == certifygen_validations::STATUS_FINISHED_OK) {
-            return 'Pendiente desacargar funcionalidad';
         } else {
-            return '';
+            return '<a href='. $link->out().'>'.get_string('download', 'mod_certifygen').'</a>';
         }
     }
     /**

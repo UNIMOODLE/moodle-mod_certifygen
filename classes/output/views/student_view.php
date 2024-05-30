@@ -32,51 +32,162 @@
 
 namespace mod_certifygen\output\views;
 
+use coding_exception;
+use dml_exception;
+use mod_certifygen\certifygen;
+use mod_certifygen\persistents\certifygen_model;
+use mod_certifygen\persistents\certifygen_validations;
+use moodle_exception;
 use renderable;
 use stdClass;
 use templatable;
 use renderer_base;
-use tool_certificate\certificate;
 
 class student_view implements renderable, templatable {
     /**
+     * @var bool|mixed|null
+     */
+    private mixed $hasvalidator;
+    private certifygen_model $certificatemodel;
+    private int $instance;
+    private int $templateid;
+    private int $courseid;
+
+    /**
      * @param int $courseid
      * @param int $templateid
-     * @param int $cmid
+     * @param int $instance
+     * @throws coding_exception
      */
-    public function __construct(int $courseid, int $templateid, int $cmid) {
+    public function __construct(int $courseid, int $templateid, int $instance) {
         $this->courseid = $courseid;
         $this->templateid = $templateid;
-        $this->cmid = $cmid;
+        $this->instance = $instance;
+        $certificate = new \mod_certifygen\persistents\certifygen($instance);
+        $this->certificatemodel = new certifygen_model($certificate->get('modelid'));
+        $this->hasvalidator = !is_null($this->certificatemodel->get('validation'));
+
     }
 
     /**
-     * @param renderer_base $output
-     * @return stdClass
-     * @throws \moodle_exception
+     * @throws coding_exception
+     * @throws moodle_exception
+     * @throws dml_exception
      */
-    public function export_for_template(renderer_base $output): stdClass {
-        global $USER;
-        $certificates = certificate::get_issues_for_user($USER->id, 0, 0);
-        $usercertificate = null;
-        foreach ($certificates as $certificate) {
-            if ($certificate->courseid != $this->courseid) {
-                continue;
-            }
-            $usercertificate = $certificate;
-        }
-        $data = new stdClass();
-        if (is_null($usercertificate)) {
-            //TODO: entiendo que aqui habría que generarlo!
-            $data->text = 'No hay certificado de momento creado.';
+    public function export_for_template(renderer_base $output) : stdClass {
+
+        if ($this->hasvalidator) {
+            return $this->export_with_validator_data();
         } else {
-            $data->hascertificate = true;
-            $data->code = $usercertificate->code;
-            $data->expires = $usercertificate->expires;
-            $data->status = 'PENDIENTE';
-            $params = ['code' => $usercertificate->code, 'preview' => false, 'templateid' => $usercertificate->templateid];
-            $data->link = new \moodle_url('/mod/certifygen/certificateview.php', $params);
+            return $this->export_no_validator_data();
         }
+    }
+
+
+    /**
+     * @throws coding_exception
+     * @throws moodle_exception
+     */
+    public function export_no_validator_data() : stdClass {
+        global $USER;
+
+        $list = [];
+        $langlist = get_string_manager()->get_list_of_translations();
+        // Generamos tantos como idiomas en la plataforma.
+        $langs = $this->certificatemodel->get('langs');
+        $langs = explode(',', $langs);
+        foreach($langs as $lang) {
+            $list[] = [
+                'modelid' => $this->certificatemodel->get('id'),
+                'lang' => $lang,
+                'langstring' => $langlist[$lang],
+                'courseid' => $this->courseid,
+                'userid' => $USER->id,
+                'haslink' => true,
+                'url' => certifygen::get_user_certificate_file_url($this->certificatemodel->get('templateid'), $USER->id, $this->courseid, $lang),
+            ];
+        }
+
+        $data = new stdClass();
+        $data->list = $list;
+        $data->hasvalidator = $this->hasvalidator;
+
+        return $data;
+    }
+    /**
+     * @throws dml_exception
+     * @throws coding_exception
+     */
+    public function export_with_validator_data() : stdClass {
+        global $USER;
+
+        $validationrecords = certifygen_validations::get_records(['modelid' => $this->certificatemodel->get('id')]);
+        $list = [];
+        $langlist = get_string_manager()->get_list_of_translations();
+        // Generamos tantos como idiomas en la plataforma.
+        $langs = $this->certificatemodel->get('langs');
+        $langs = explode(',', $langs);
+        if (empty($validationrecords)) {
+            $id = 0;
+            foreach($langs as $lang) {
+                $list[] = [
+                    'code' => '',
+                    'status' => get_string('status_' . certifygen_validations::STATUS_NOT_STARTED, 'mod_certifygen'),
+                    'modelid' => $this->certificatemodel->get('id'),
+                    'lang' => $lang,
+                    'langstring' => $langlist[$lang],
+                    'id' => $id,
+                    'courseid' => $this->courseid,
+                    'userid' => $USER->id,
+                    'canemit' => true,
+                ];
+            }
+        } else {
+            $langused = [];
+            foreach($validationrecords as $validationrecord) {
+                $langused[] = $validationrecord->get('lang');
+                $data = [
+                    'code' => certifygen::get_user_certificate($USER->id, $this->courseid, $this->certificatemodel->get('templateid'), $validationrecord->get('lang'))->code,
+                    'status' => get_string('status_' . $validationrecord->get('status'), 'mod_certifygen'),
+                    'modelid' => $this->certificatemodel->get('id'),
+                    'lang' => $validationrecord->get('lang'),
+                    'langstring' => $langlist[$validationrecord->get('lang')],
+                    'id' =>  $validationrecord->get('id'),
+                    'courseid' => $this->courseid,
+                    'userid' => $USER->id,
+                ];
+                if ($validationrecord->get('status')  == certifygen_validations::STATUS_FINISHED_OK) {
+                    $data['candownload'] = true;
+                }
+                if ($validationrecord->get('status')  !== certifygen_validations::STATUS_IN_PROGRESS
+                    && $validationrecord->get('status')  !== certifygen_validations::STATUS_FINISHED_OK) {
+                    $data['canemit'] = true;
+                }
+                $list[] = $data;
+            }
+            if (count($langused) != count($langs)) {
+                foreach($langs as $lang) {
+                    if (in_array($lang, $langused)) {
+                        continue;
+                    }
+                    $list[] = [
+                        'code' => '',
+                        'status' => get_string('status_' . certifygen_validations::STATUS_NOT_STARTED, 'mod_certifygen'),
+                        'modelid' => $this->certificatemodel->get('id'),
+                        'lang' => $lang,
+                        'langstring' => $langlist[$lang],
+                        'id' => 0,
+                        'courseid' => $this->courseid,
+                        'userid' => $USER->id,
+                        'canemit' => true,
+                    ];
+                }
+            }
+        }
+
+        $data = new stdClass();
+        $data->list = $list;
+        $data->hasvalidator = $this->hasvalidator;
 
         return $data;
     }
