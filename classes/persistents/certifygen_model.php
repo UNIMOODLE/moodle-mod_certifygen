@@ -136,6 +136,6 @@ class certifygen_model extends persistent {
     public static function get_context_models(int $limitfrom = 0, int $limitnum = 0, string $sort = '') : array {
         global $DB;
 
-        return $DB->get_records('certifygen_model', ['type' => self::TYPE_TEACHER]);
+        return $DB->get_records('certifygen_model', ['type' => self::TYPE_TEACHER], $sort, '*', $limitfrom, $limitnum);
     }
 }
