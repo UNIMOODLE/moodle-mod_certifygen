@@ -36,18 +36,28 @@ use stdClass;
 class certifygenvalidation_cmd implements ICertificateValidation
 {
 
+    /**
+     * @param certifygen_file $file
+     * @return array
+     */
     public function sendFile(certifygen_file $file): array
     {
         // TODO: Implement sendFile() method.
         return [];
     }
 
+    /**
+     * @return array
+     */
     public function getState(): array
     {
         // TODO: Implement getState() method.
         return [];
     }
 
+    /**
+     * @return array
+     */
     public function getFile(): array
     {
         // TODO: Implement getFile() method.
@@ -55,23 +65,10 @@ class certifygenvalidation_cmd implements ICertificateValidation
     }
 
     /**
-     * @throws coding_exception
-     * @throws invalid_persistent_exception
-     */
-    public function addRecord(stdClass $data): int {
-        $cmd = new persistent\cmd(0, $data);
-        $cmd->create();
-        return $cmd->get('id');
-
-    }
-
-    /**
-     * @param stdClass $data
      * @return bool
-     * @throws coding_exception
      */
-    public function deleteRecord(stdClass $data): bool {
-        $cmd = new persistent\cmd($data->modelid);
-        return $cmd->delete();
+    public function canRevoke(): bool
+    {
+        return false;
     }
 }

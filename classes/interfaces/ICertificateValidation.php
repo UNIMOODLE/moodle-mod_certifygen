@@ -34,5 +34,6 @@ interface ICertificateValidation {
     public function sendFile(certifygen_file $file): array;
     public function getState(): array;
     public function getFile(): array;
+    public function canRevoke(): bool;
 }
 

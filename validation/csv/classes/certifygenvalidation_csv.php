@@ -75,4 +75,12 @@ class certifygenvalidation_csv implements ICertificateValidation
         return $csv->get('id');
 
     }
+
+    /**
+     * @return bool
+     */
+    public function canRevoke(): bool
+    {
+        return false;
+    }
 }
