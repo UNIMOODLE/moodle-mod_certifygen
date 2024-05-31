@@ -30,7 +30,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2024052105;
-$plugin->requires  = 2022112810;
+$plugin->requires  = 2022112802;
 $plugin->component = 'certifygenvalidation_csv';
 $plugin->dependencies = [
     'mod_certifygen' => 2024042919,
