@@ -49,7 +49,6 @@ use stored_file_creation_exception;
 use tool_certificate\certificate;
 use tool_certificate\customfield\issue_handler;
 use tool_certificate\event\certificate_issued;
-use tool_tenant\config;
 
 /**
  * Class represents a certificate template.
@@ -92,7 +91,7 @@ class template extends \tool_certificate\template {
      * @return string|null Return the PDF as string if $return specified
      * @throws dml_exception
      */
-    public function generate_pdf($preview = false, $issue = null, $return = false) : string | null {
+    public function generate_pdf($preview = false, $issue = null, $return = false) {
         global $CFG, $USER;
 
         if (is_null($issue)) {
@@ -251,8 +250,7 @@ class template extends \tool_certificate\template {
                                       $courseid = null, ?lock $lock = null) : int {
         global $DB;
 
-
-        component_class_callback(config::class, 'push_for_user', [$userid]);
+//        component_class_callback(tool_tenant\config::class, 'push_for_user', [$userid]);
 
         $issue = new stdClass();
         $issue->userid = $userid;
@@ -271,9 +269,10 @@ class template extends \tool_certificate\template {
 
         // Insert the record into the database.
         $issue->id = $DB->insert_record('tool_certificate_issues', $issue);
-        if ($lock) {
-            $lock->release();
-        }
+//        if ($lock) {
+//            error_log(__FUNCTION__ . ' lock released ' . __LINE__);
+//            $lock->release();
+//        }
         issue_handler::create()->save_additional_data($issue, $data);
 
         // Trigger event.
@@ -286,7 +285,7 @@ class template extends \tool_certificate\template {
         $issuefile = $this->create_issue_file($issue);
         self::send_issue_notification($issue, $issuefile);
 
-        component_class_callback(config::class, 'pop', []);
+//        component_class_callback(tool_tenant\config::class, 'pop', []);
 
         return $issue->id;
     }

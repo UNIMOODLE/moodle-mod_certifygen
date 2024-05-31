@@ -29,6 +29,7 @@ namespace certifygenvalidation_cmd;
 
 use coding_exception;
 use core\invalid_persistent_exception;
+use core\session\exception;
 use mod_certifygen\certifygen_file;
 use mod_certifygen\interfaces\ICertificateValidation;
 use stdClass;
@@ -42,8 +43,40 @@ class certifygenvalidation_cmd implements ICertificateValidation
      */
     public function sendFile(certifygen_file $file): array
     {
-        // TODO: Implement sendFile() method.
-        return [];
+        $path = get_config('certifygenvalidation_cmd', 'path');
+        if (empty($path)) {
+            throw new exception('cmdnotconfigured', 'certifygenvalidation_cmd');
+        }
+
+        // Recupera los parámetros
+        $filename = escapeshellarg($file->get_file()->get_filename());
+        $userid = escapeshellarg($file->get_user()->username);
+
+        // Ruta al ejecutable (asegúrate de que la ruta sea correcta)
+//        $executable = '/path/to/crear_fichero.sh';
+
+        // Construye el comando
+        $command = "$path $filename $userid";
+
+        // Ejecuta el comando y captura la salida
+        $output = [];
+        $return_var = 0;
+        exec($command, $output, $return_var);
+
+        $haserror = false;
+        // Muestra la salida del comando
+        if ($return_var !== 0) {
+            $haserror = true;
+            error_log(__FUNCTION__ . " Error ejecutando el comando. Código de salida: ".var_export($return_var, true));
+        } else {
+            error_log(__FUNCTION__ .  "Comando ejecutado exitosamente.".var_export($output, true));
+//            foreach ($output as $line) {
+//                echo $line . "\n";
+//            }
+        }
+        return [
+            'haserror' => $haserror
+        ];
     }
 
     /**

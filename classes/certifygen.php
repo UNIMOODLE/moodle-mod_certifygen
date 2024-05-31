@@ -137,26 +137,39 @@ class certifygen {
      */
     public static function issue_certificate(stdClass $user, int $templateid, stdClass $course, string $lang): int {
 
-        $lockfactory = lock_config::get_lock_factory('mod_certifygen_issue');
-        $lock = $lockfactory->get_lock("i_{$user->id}_{$templateid}_{$course->id}_{$lang}", MINSECS);
-        if (!$lock) {
-            throw new moodle_exception('locktimeout');
-        }
+//        $lockfactory = lock_config::get_lock_factory('mod_certifygen');
 
-        if (self::get_user_certificate($user->id, $course->id, $templateid, $lang)) {
-            // If user already has a certificate - do not issue a new one.
-            $lock->release();
-            return 0;
+//        $lock = $lockfactory->get_lock("i_{$user->id}_{$templateid}_{$course->id}_{$lang}", MINSECS);
+
+//        if (!$lock) {
+//            error_log(__FUNCTION__ . ' lock timeout ' . __LINE__);
+//            throw new moodle_exception('locktimeout');
+//        }
+
+//        if (self::get_user_certificate($user->id, $course->id, $templateid, $lang)) {
+//            error_log(__FUNCTION__ . ' loc released ' . __LINE__);
+//            // If user already has a certificate - do not issue a new one.
+//            $lock->release();
+//            return 0;
+//        }
+
+        try {
+            $template = template::instance($templateid, (object) ['lang' => $lang]);
+
+            $issuedata = self::get_issue_data($course, $user);
+
+            $expirydatetype = $expirydateoffset = 0;
+
+            $expirydate = certificate::calculate_expirydate(
+                $expirydatetype,
+                $expirydateoffset,
+                $expirydateoffset
+            );
+            return $template->issue_certificate($user->id, $expirydate, $issuedata, 'mod_certifygen', $course->id);
+        } catch(moodle_exception $e) {
+            error_log(__FUNCTION__ . ' ' . __LINE__. ' ERROR: '. var_export($e->getMessage(), true));
         }
-        $template = $template ?? template::instance($templateid, (object) ['lang' => $lang]);
-        $issuedata = self::get_issue_data($course, $user);
-        $expirydatetype = $expirydateoffset = 0;
-        $expirydate = certificate::calculate_expirydate(
-            $expirydatetype,
-            $expirydateoffset,
-            $expirydateoffset
-        );
-        return $template->issue_certificate($user->id, $expirydate, $issuedata, 'mod_certifygen', $course->id, $lock);
+        return 0;
     }
 
     /**
@@ -246,7 +259,7 @@ class certifygen {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public static function get_user_certificate_file(string $templateid, int $userid, int $courseid, string $lang) : stored_file | null {
+    public static function get_user_certificate_file(string $templateid, int $userid, int $courseid, string $lang) {
         $users = user_get_users_by_id([$userid]);
         $user = reset($users);
         $course = get_course($courseid);

@@ -56,10 +56,15 @@ class mod_certifygen_mod_form extends moodleform_mod {
 
         $this->standard_intro_elements(get_string('introduction', 'mod_certifygen'));
 
+        $modelid = 0;
+        if (!is_null($this->get_instance())) {
+            $certifygen = new certifygen($this->get_instance());
+            $modelid = $certifygen->get('modelid');
+        }
         $hasissues = $this->has_issues();
         if ($hasissues) {
             // If coursecertificate has issues, just add the current template to the selector.
-            $templates = $this->get_current_template();
+            $templates = $this->get_current_template($modelid);
         } else {
             // Get all available templates for the user.
             $templates = mod_certifygen_get_templates();
@@ -71,10 +76,7 @@ class mod_certifygen_mod_form extends moodleform_mod {
         // Course module elements.
         $this->standard_coursemodule_elements();
 
-        $modelid = 0;
-        if (!is_null($this->get_instance())) {
-            $certifygen = new certifygen($this->get_instance());
-            $modelid = $certifygen->get('modelid');
+        if ($modelid) {
             $mform = $modelform->set_default_values($modelid, $mform);
         }
         $mform->addElement('hidden', 'modelid', $modelid);
@@ -113,7 +115,7 @@ class mod_certifygen_mod_form extends moodleform_mod {
      * @return array
      * @throws dml_exception
      */
-    private function get_current_template(): array {
+    private function get_current_template(int $modelid): array {
         global $DB;
         $templates = [];
         if ($instance = $this->get_instance()) {
@@ -122,8 +124,9 @@ class mod_certifygen_mod_form extends moodleform_mod {
                     JOIN {certifygen} c
                     JOIN {certifygen_model} m
                     ON m.templateid = ct.id
-                    AND c.id = :instance";
-            if ($record = $DB->get_record_sql($sql, ['instance' => $instance], IGNORE_MISSING)) {
+                    AND c.id = :instance
+                    AND m.id = :modelid";
+            if ($record = $DB->get_record_sql($sql, ['instance' => $instance, 'modelid' => $modelid], IGNORE_MISSING)) {
                 $templates[$record->id] = format_string($record->name);
             }
         }

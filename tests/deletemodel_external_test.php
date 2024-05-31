@@ -17,21 +17,22 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
- * @package   certifygenvalidation_cmd
+ * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// This line protects the file from being accessed by a URL directly.
-defined('MOODLE_INTERNAL') || die();
+class deletemodel_external_test extends advanced_testcase {
 
-$string['pluginname'] = 'CMD Validation';
-$string['enable'] = 'Enable';
-$string['enable_help'] = 'If this plugin is enable, you can use it to validate Unimoodle Certificates';
-$string['path'] = 'Path';
-$string['path_help'] = 'External service command path HELP';
-$string['certifygenvalidation_cmd_settings'] = 'Configuración del CMD';
-$string['cmdnotconfigured'] = 'CMD not configured';
+    public function test_deletemodel(): void {
+        $course = self::getDataGenerator()->create_course();
+        $certifygen = self::getDataGenerator()->create_module(
+            'certifygen',
+            ['course' => $course->id]
+        );
+    }
+}

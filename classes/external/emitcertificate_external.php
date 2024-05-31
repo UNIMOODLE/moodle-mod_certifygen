@@ -83,6 +83,7 @@ class emitcertificate_external extends external_api {
         self::validate_parameters(
             self::emitcertificate_parameters(), ['id' => $id, 'modelid' => $modelid, 'lang' => $lang, 'userid' => $userid, 'courseid' => $courseid]
         );
+
         $result = ['result' => true, 'message' => 'OK'];
         $returndata = ['id' => 0, 'code' => ''];
 
@@ -96,6 +97,7 @@ class emitcertificate_external extends external_api {
             'usermodified' => $userid,
         ];
         $validation = certifygen_validations::manage_validation($id, (object) $data);
+
         try {
             // Step 2: Generate issue.
             $users = user_get_users_by_id([$userid]);
@@ -115,7 +117,6 @@ class emitcertificate_external extends external_api {
                 $result['message'] = 'File not found';
             } else {
                 $certifygenfile = new certifygen_file($file, $userid, $lang, $modelid);
-
                 // Step 4: Call to validation plugin.
                 $validationplugin = $certifygenmodel->get('validation');
                 $validationpluginclass = $validationplugin . '\\' . $validationplugin;

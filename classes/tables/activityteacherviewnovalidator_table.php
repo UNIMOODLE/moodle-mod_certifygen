@@ -98,7 +98,7 @@ class activityteacherviewnovalidator_table extends table_sql {
      * @param $row
      * @return mixed
      */
-    function col_code($row): mixed
+    function col_code($row): string
     {
         return $row->code;
     }

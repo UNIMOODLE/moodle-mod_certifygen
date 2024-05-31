@@ -33,7 +33,7 @@ class context_certificate_view  implements renderable, templatable {
     public function export_with_validator_data() : stdClass {
         global $USER;
 
-        $validationrecords = certifygen_validations::get_records(['modelid' => $this->model->get('id')]);
+        $validationrecords = certifygen_validations::get_records(['modelid' => $this->model->get('id'), 'userid' => $USER->id]);
         $list = [];
         $langlist = get_string_manager()->get_list_of_translations();
         // Generamos tantos como idiomas en la plataforma.

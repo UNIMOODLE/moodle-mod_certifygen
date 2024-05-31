@@ -47,7 +47,7 @@ class student_view implements renderable, templatable {
     /**
      * @var bool|mixed|null
      */
-    private mixed $hasvalidator;
+    private bool $hasvalidator;
     private certifygen_model $certificatemodel;
     private int $instance;
     private int $templateid;
@@ -121,7 +121,7 @@ class student_view implements renderable, templatable {
     public function export_with_validator_data() : stdClass {
         global $USER;
 
-        $validationrecords = certifygen_validations::get_records(['modelid' => $this->certificatemodel->get('id')]);
+        $validationrecords = certifygen_validations::get_records(['modelid' => $this->certificatemodel->get('id'), 'userid' => $USER->id]);
         $list = [];
         $langlist = get_string_manager()->get_list_of_translations();
         // Generamos tantos como idiomas en la plataforma.
@@ -147,7 +147,7 @@ class student_view implements renderable, templatable {
             foreach($validationrecords as $validationrecord) {
                 $langused[] = $validationrecord->get('lang');
                 $data = [
-                    'code' => certifygen::get_user_certificate($USER->id, $this->courseid, $this->certificatemodel->get('templateid'), $validationrecord->get('lang'))->code,
+                    'code' => certifygen::get_user_certificate($USER->id, $this->courseid, $this->certificatemodel->get('templateid'), $validationrecord->get('lang'))->code ?? '',
                     'status' => get_string('status_' . $validationrecord->get('status'), 'mod_certifygen'),
                     'modelid' => $this->certificatemodel->get('id'),
                     'lang' => $validationrecord->get('lang'),

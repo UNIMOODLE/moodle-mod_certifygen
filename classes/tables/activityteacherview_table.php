@@ -76,7 +76,7 @@ class activityteacherview_table extends table_sql {
             get_string('fullname'),
             get_string('code', 'mod_certifygen'),
             get_string('status', 'mod_certifygen'),
-            get_string('lang', 'mod_certifygen'),
+            get_string('language'),
             '',
         ];
         $this->define_headers($headers);
@@ -140,7 +140,7 @@ class activityteacherview_table extends table_sql {
      * @param $row
      * @return mixed
      */
-    function col_code($row): mixed
+    function col_code($row): string
     {
         return $row->code;
     }
