@@ -36,6 +36,7 @@ require_once($CFG->libdir . '/tablelib.php');
 
 use coding_exception;
 use dml_exception;
+use mod_certifygen\persistents\certifygen_validations;
 use mod_certifygen\template;
 use moodle_exception;
 use moodle_url;
@@ -58,13 +59,14 @@ class activityteacherviewnovalidator_table extends table_sql {
         $uniqueid = 'certifygen-activity-novalidator-teacher-view';
         parent::__construct($uniqueid);
         // Define the list of columns to show.
-        $columns = ['fullname', 'code', 'link'];
+        $columns = ['fullname', 'code', 'lang', 'link'];
         $this->define_columns($columns);
 
         // Define the titles of columns to show in header.
         $headers = [
             get_string('fullname'),
             get_string('code', 'mod_certifygen'),
+            get_string('language'),
             ''
         ];
         $this->define_headers($headers);
@@ -100,7 +102,17 @@ class activityteacherviewnovalidator_table extends table_sql {
     {
         return $row->code;
     }
+    function col_lang($row): string
+    {
+        if (isset($row->issueid)) {
+            $validation = certifygen_validations::get_record(['userid' => $row->userid, 'issuesid' => $row->issueid]);
+            if ($validation) {
+                $validation->get('lang');
+            }
+        }
 
+        return '-';
+    }
     /**
      * @param $row
      * @return string

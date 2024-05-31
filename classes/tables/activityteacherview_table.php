@@ -68,7 +68,7 @@ class activityteacherview_table extends table_sql {
         $uniqueid = 'certifygen-activity-teacher-view';
         parent::__construct($uniqueid);
         // Define the list of columns to show.
-        $columns = ['fullname', 'code','status', 'link'];
+        $columns = ['fullname', 'code', 'status', 'lang', 'link'];
         $this->define_columns($columns);
 
         // Define the titles of columns to show in header.
@@ -76,6 +76,7 @@ class activityteacherview_table extends table_sql {
             get_string('fullname'),
             get_string('code', 'mod_certifygen'),
             get_string('status', 'mod_certifygen'),
+            get_string('lang', 'mod_certifygen'),
             '',
         ];
         $this->define_headers($headers);
@@ -101,6 +102,22 @@ class activityteacherview_table extends table_sql {
 
             return $OUTPUT->user_picture($row, array('size' => 35, 'courseid' => $this->courseid, 'includefullname' => true));
         }
+    }
+
+    /**
+     * @param $row
+     * @return string
+     */
+    function col_lang($row): string
+    {
+        if (isset($row->issueid)) {
+            $validation = certifygen_validations::get_record(['userid' => $row->userid, 'issuesid' => $row->issueid]);
+            if ($validation) {
+                $validation->get('lang');
+            }
+        }
+
+        return '-';
     }
 
     /**
