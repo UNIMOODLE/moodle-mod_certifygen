@@ -32,9 +32,11 @@
 // This line protects the file from being accessed by a URL directly.
 use core\invalid_persistent_exception;
 use core_user\output\myprofile\tree;
+use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_context;
 use mod_certifygen\persistents\certifygen_model;
+use mod_certifygen\persistents\certifygen_validations;
 use tool_certificate\permission;
 
 defined('MOODLE_INTERNAL') || die();
@@ -257,6 +259,80 @@ function mod_certifygen_myprofile_navigation(core_user\output\myprofile\tree $tr
             $node = new core_user\output\myprofile\node('mycertifygens', 'modcertifygenmy', $link, null, $url);
             $tree->add_node($node);
         }
-
     }
+}
+
+/**
+ * @param $course
+ * @param $cm
+ * @param $context
+ * @param string $filearea
+ * @param array $args
+ * @param bool $forcedownload
+ * @param array $options
+ * @return false|void
+ * @throws coding_exception
+ * @throws moodle_exception
+ * @throws require_login_exception
+ */
+function mod_certifygen_pluginfile(
+    $course,
+    $cm,
+    $context,
+    string $filearea,
+    array $args,
+        bool $forcedownload,
+    array $options
+    ) {
+
+    if ($context->contextlevel != CONTEXT_COURSE) {
+        return false;
+    }
+
+    // Make sure the filearea is one of those used by the plugin.
+    if ($filearea !== ICertificateValidation::FILE_AREA) {
+        return false;
+    }
+
+    // Make sure the user is logged in and has access to the module (plugins that are not course modules should leave out the 'cm' part).
+    require_login($course);
+
+    // Check the relevant capabilities - these may vary depending on the filearea being accessed.
+    if (!has_capability('mod/certifygen:view', $context)) {
+        return false;
+    }
+
+    // The args is an array containing [itemid, path].
+    // Fetch the itemid from the path.
+    $itemid = array_shift($args);
+
+    // The itemid can be used to check access to a record, and ensure that the
+    // record belongs to the specifeid context. For example:
+    if ($filearea === ICertificateValidation::FILE_AREA) {
+        $validation = new certifygen_validations($itemid);
+        if (!$validation) {
+            return false;
+        }
+    }
+
+    // Extract the filename / filepath from the $args array.
+    $filename = array_pop($args); // The last item in the $args array.
+    if (empty($args)) {
+        // $args is empty => the path is '/'.
+        $filepath = '/';
+    } else {
+        // $args contains the remaining elements of the filepath.
+        $filepath = '/' . implode('/', $args) . '/';
+    }
+
+    // Retrieve the file from the Files API.
+    $fs = get_file_storage();
+    $file = $fs->get_file($context->id, ICertificateValidation::FILE_COMPONENT, $filearea, $itemid, $filepath, $filename);
+    if (!$file) {
+        // The file does not exist.
+        return false;
+    }
+
+    // We can now send the file back to the browser - in this case with a cache lifetime of 1 day and no filtering.
+    send_stored_file($file,  null, 0, $forcedownload, $options);
 }

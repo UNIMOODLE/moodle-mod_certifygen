@@ -116,7 +116,7 @@ class emitcertificate_external extends external_api {
                 $result['result'] = false;
                 $result['message'] = 'File not found';
             } else {
-                $certifygenfile = new certifygen_file($file, $userid, $lang, $modelid);
+                $certifygenfile = new certifygen_file($file, $userid, $lang, $modelid, $course, $validation->get('id'));
                 // Step 4: Call to validation plugin.
                 $validationplugin = $certifygenmodel->get('validation');
                 $validationpluginclass = $validationplugin . '\\' . $validationplugin;

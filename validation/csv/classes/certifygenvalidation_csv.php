@@ -29,10 +29,13 @@
 namespace certifygenvalidation_csv;
 
 
+use context_course;
 use core\invalid_persistent_exception;
 use mod_certifygen\certifygen_file;
 use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\persistents\certifygen_validations;
 use stdClass;
+use stored_file;
 
 class certifygenvalidation_csv implements ICertificateValidation
 {
@@ -43,16 +46,28 @@ class certifygenvalidation_csv implements ICertificateValidation
         return [];
     }
 
-    public function getState(): array
-    {
-        // TODO: Implement getState() method.
-        return [];
+    /**
+     * @param int $courseid
+     * @param int $validationid
+     * @param string $code
+     * @return int
+     */
+    public function getState(int $courseid, int $validationid, string $code): int {
+        return certifygen_validations::STATUS_IN_PROGRESS;
     }
 
-    public function getFile(): array
+    /**
+     * @param int $courseid
+     * @param int $validationid
+     * @param string $code
+     * @return stored_file
+     */
+    public function getFile(int $courseid, int $validationid, string $code)
     {
-        // TODO: Implement getFile() method.
-        return [];
+        $fs = get_file_storage();
+        $contextid = context_course::instance($courseid)->id;
+        return $fs->get_file($contextid, self::FILE_COMPONENT,
+            self::FILE_AREA, $validationid, self::FILE_PATH, $code);
     }
 
     /**
@@ -82,5 +97,11 @@ class certifygenvalidation_csv implements ICertificateValidation
     public function canRevoke(): bool
     {
         return false;
+    }
+
+    public function getFileUrl(int $courseid, int $validationid, string $code): string
+    {
+        // TODO: Implement getFileUrl() method.
+        return '';
     }
 }

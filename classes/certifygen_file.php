@@ -11,21 +11,22 @@ use stored_file;
 
 class certifygen_file {
     private stored_file $file;
-    private int $courseid;
+    private stdClass $course;
     private int $userid;
     private int $modelid;
+    private int $validationid;
     private string $lang;
 
     /**
      * @throws coding_exception
      */
-    public function __construct(stored_file $file, int $userid, string $lang, int $modelid) {
+    public function __construct(stored_file $file, int $userid, string $lang, int $modelid, stdClass $course, int $validationid) {
         $this->file = $file;
-        $context = context::instance_by_id($this->file->get_contextid());
-        $this->courseid = $context->instanceid;
+        $this->course = $course;
         $this->userid = $userid;
         $this->lang = $lang;
         $this->modelid = $modelid;
+        $this->validationid = $validationid;
     }
 
     /**
@@ -33,9 +34,14 @@ class certifygen_file {
      * @throws dml_exception
      */
     public function get_course() : stdClass {
-        return get_course($this->courseid);
+        return $this->course;
     }
-
+    /**
+     * @return int
+     */
+    public function get_validationid() : int {
+        return $this->validationid;
+    }
     /**
      * @return stored_file
      */

@@ -29,11 +29,18 @@
 namespace mod_certifygen\interfaces;
 
 use mod_certifygen\certifygen_file;
+use stored_file;
 
 interface ICertificateValidation {
+    const FILE_COMPONENT = 'mod_certifygen';
+    const FILE_AREA = 'certifygenvalidation';
+    const FILE_PATH = '/';
+    const FILE_NAME_STARTSWITH = 'certifygenvalidation_';
+
     public function sendFile(certifygen_file $file): array;
-    public function getState(): array;
-    public function getFile(): array;
+    public function getState(int $courseid, int $validationid, string $code): int;
+    public function getFile(int $courseid, int $validationid, string $code);
+    public function getFileUrl(int $courseid, int $validationid, string $code): string;
     public function canRevoke(): bool;
 }
 

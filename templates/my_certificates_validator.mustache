@@ -60,7 +60,13 @@
                             <span class="btn btn-primary" data-id="{{id}}" data-action="emit-certificate" data-modelid="{{modelid}}" data-courseid="{{courseid}}" data-userid="{{userid}}" data-langstring="{{langstring}}" data-lang="{{lang}}"> {{#str}} emit, mod_certifygen{{/str}} </span>
                         {{/canemit}}
                         {{#candownload}}
-                            <span class="btn btn-primary" data-id="{{id}}" data-action="download-certificate" data-modelid="{{modelid}}" data-courseid="{{courseid}}" data-userid="{{userid}}" data-langstring="{{langstring}}" data-lang="{{lang}}"> {{#str}} download, mod_certifygen{{/str}} </span>
+                            {{#downloadurl}}
+                                <a class="btn btn-primary" href="{{downloadurl}}">{{#str}} download, mod_certifygen{{/str}}</a>
+                            {{/downloadurl}}
+                            {{^downloadurl}}
+                                <span class="btn btn-primary" data-id="{{id}}" data-action="download-certificate" data-modelid="{{modelid}}" data-courseid="{{courseid}}" data-userid="{{userid}}" data-langstring="{{langstring}}" data-lang="{{lang}}"> {{#str}} download, mod_certifygen{{/str}} </span>
+                            {{/downloadurl}}
+
                         {{/candownload}}
 
                     </td>
