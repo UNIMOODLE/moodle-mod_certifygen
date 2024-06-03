@@ -1,12 +1,11 @@
-# README #
+<img src="https://github.com/UNIMOODLE/p31_mod/blob/develop/pix/icon.png" width="160" >
 
-This README would normally document whatever steps are necessary to get your application up and running.
-
-### What is this repository for? ###
+#  P31 Certifygen custom Course Certificate mod #
 
 * Quick summary
 * Version
 * [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+
 
 ### How do I get set up? ###
 
