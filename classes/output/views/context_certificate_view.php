@@ -5,6 +5,7 @@ namespace mod_certifygen\output\views;
 use coding_exception;
 use dml_exception;
 use mod_certifygen\certifygen;
+use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
@@ -58,8 +59,9 @@ class context_certificate_view  implements renderable, templatable {
             $langused = [];
             foreach($validationrecords as $validationrecord) {
                 $langused[] = $validationrecord->get('lang');
+                $code = certifygen::get_user_certificate($USER->id, $this->courseid, $this->model->get('templateid'), $validationrecord->get('lang'))->code;
                 $data = [
-                    'code' => certifygen::get_user_certificate($USER->id, $this->courseid, $this->model->get('templateid'), $validationrecord->get('lang'))->code,
+                    'code' => $code,
                     'status' => get_string('status_' . $validationrecord->get('status'), 'mod_certifygen'),
                     'modelid' => $this->model->get('id'),
                     'lang' => $validationrecord->get('lang'),
@@ -70,6 +72,16 @@ class context_certificate_view  implements renderable, templatable {
                 ];
                 if ($validationrecord->get('status')  == certifygen_validations::STATUS_FINISHED_OK) {
                     $data['candownload'] = true;
+                    $validationplugin = $this->model->get('validation');
+                    $validationpluginclass = $validationplugin . '\\' . $validationplugin;
+                    if (get_config($validationplugin, 'enable') === '1') {
+                        /** @var ICertificateValidation $subplugin */
+                        $subplugin = new $validationpluginclass();
+                        $url = $subplugin->getFileUrl($this->courseid, $validationrecord->get('id'), $code.'.pdf');
+                        if (!empty($url)) {
+                            $data['downloadurl'] = $url;
+                        }
+                    }
                 }
                 if ($validationrecord->get('status')  !== certifygen_validations::STATUS_IN_PROGRESS
                 && $validationrecord->get('status')  !== certifygen_validations::STATUS_FINISHED_OK) {
