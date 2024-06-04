@@ -40,6 +40,10 @@ to complete the installation from the command line.
 ## Global Configuration ##
 ## CLI Executions ##
 ## Subplugins ##
+
+### certifygenvalidation_cmd ###
+### certifygenvalidation_csv ###
+   
 ## Database Tables ##
 ## Unit Test ##
 
