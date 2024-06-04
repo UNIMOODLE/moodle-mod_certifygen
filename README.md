@@ -30,5 +30,26 @@ The plugin can also be installed by placing the contents of this directory in
 ```
 {your/moodle/dirroot}/mod/certifygen}
 ```
+Then, log in to your Moodle site as an administrator and go to Site Administration > Notifications to complete the installation.
+
+Alternatively, you can run
+```
+$ php admin/cli/upgrade.php
+```
+to complete the installation from the command line.
+## Global Configuration ##
+## CLI Executions ##
+## Subplugins ##
+## Database Tables ##
+## Unit Test ##
+
+ES
+
+<img src="https://github.com/UNIMOODLE/p31_mod/blob/develop/pix/icon.png" width="160" >
+
+#  P31 Certifygen custom Course Certificate mod #
+
+## Compatibilidad ##
+
 
 
