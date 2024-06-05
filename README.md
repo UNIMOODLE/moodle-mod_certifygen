@@ -45,6 +45,19 @@ to complete the installation from the command line.
 ### certifygenvalidation_csv ###
    
 ## Database Tables ##
+
+* certifygen
+  
+Contains definitions about certifygens
+* certifygen_model
+  
+Contains information about stores each certifygen models
+* certifygen_context
+  
+Contains information about stores each context of a certifygen
+* certifygen_validations
+  
+Contains information about stores each validation of a certifygen
 ## Unit Test ##
 
 ES
