@@ -1,6 +1,6 @@
 <img src="https://github.com/UNIMOODLE/p31_mod/blob/develop/pix/icon.png" width="160" >
 
-#  P31 Certifygen custom Course Certificate mod #
+#  Certifygen Custom Course Certificate Mod #
 
 ## Compatibility ##
 
@@ -28,7 +28,7 @@ The plugin has been tested on the following versions:
 
 The plugin can also be installed by placing the contents of this directory in
 ```
-{your/moodle/dirroot}/mod/certifygen}
+{your/moodle/dirroot}/mod/certifygen
 ```
 Then, log in to your Moodle site as an administrator and go to Site Administration > Notifications to complete the installation.
 
@@ -46,16 +46,16 @@ to complete the installation from the command line.
    
 ## Database Tables ##
 
-* certifygen
+* __certifygen__
   
 Contains definitions about certifygens
-* certifygen_model
+* __certifygen_model__
   
 Contains information about stores each certifygen models
-* certifygen_context
+* __certifygen_context__
   
 Contains information about stores each context of a certifygen
-* certifygen_validations
+* __certifygen_validations__
   
 Contains information about stores each validation of a certifygen
 ## Unit Test ##
