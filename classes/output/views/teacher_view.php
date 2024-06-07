@@ -82,11 +82,10 @@ class teacher_view implements renderable, templatable {
      * @throws dml_exception
      */
     public function export_for_template(renderer_base $output) : stdClass {
-
-
+        $url = new moodle_url('/mod/certifygen/view.php', ['id' => $this->cm->id]);
         $data = new stdClass();
         $data->table = $this->get_certificates_table();
-        $data->form = mod_certifygen_get_certificates_table_form($this->certificatemodel, $this->cm->id);
+        $data->form = mod_certifygen_get_certificates_table_form($this->certificatemodel, $url);
         return $data;
     }
 

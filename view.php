@@ -57,7 +57,7 @@ if ($isteacher) {
     $view = new teacher_view($course->id, $certifygenmodel->templateid, $cm);
 } else {
 
-    $view = new student_view($course->id, $certifygenmodel->templateid, $cm);
+    $view = new student_view($course->id, $cm);
 }
 
 $output = $PAGE->get_renderer('mod_certifygen');

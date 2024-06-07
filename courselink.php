@@ -61,53 +61,16 @@ if (!has_capability('mod/certifygen:viewcontextcertificates', $coursecontext)) {
     throw new moodle_exception('hasnocapabilityrequired', 'mod_certifygen');
 }
 $PAGE->set_context($coursecontext);
-$PAGE->set_url(new moodle_url('/mod/certifygen/courselink.php', ['id' => $courseid]));
+$url = new moodle_url('/mod/certifygen/courselink.php', ['id' => $courseid]);
+$PAGE->set_url($url);
 $modelid = certifygen_context::get_course_context_modelid($courseid);
 $certifygenmodel = new certifygen_model($modelid);
-//if (is_null($certifygenmodel->get('validation'))) {
-//    // TODO:
-////    mostrar tabla, una linea por cada idioma.
-//    $url = certifygen::get_user_certificate_file_url($certifygenmodel->get('templateid'), $USER->id, $course->id, $lang);
-//    if (!empty($url)) {
-//        redirect($url);
-//    } else {
-//        throw  new moodle_exception('certificatenotfound', 'certifygen');
-//    }
-//}
 
-$view = new context_certificate_view($certifygenmodel, $courseid);
+$view = new \mod_certifygen\output\views\mycertificates_view($certifygenmodel, $courseid, $url);
 $output = $PAGE->get_renderer('mod_certifygen');
 
 echo $output->header();
 echo $output->heading(format_string($certifygenmodel->get('name')));
 echo $output->render($view);
 echo $output->footer();
-// Crear registros en bbdd.
-//$datamodel = [
-//    'type' => \mod_certifygen\persistents\certifygen_model::TYPE_COURSE_USED,
-//    'mode' => \mod_certifygen\persistents\certifygen_model::MODE_UNIQUE,
-//    'availability' => '{"op":"&","c":[],"showc":[]}',
-//    'templateid' => 3,
-//
-//];
-//$um = new \mod_certifygen\persistents\certifygen_model(0, (object) $datamodel);
-//$um->create();
-//
-//$data = [
-//    'contextid' => context_course::instance($courseid)->id,
-//    'modelid' => $um->get('id'),
-//    'type' => \mod_certifygen\persistents\certifygen_context::CONTEXT_TYPE_COURSE,
-//    'usermodified' => $USER->id,
-//
-//];
-//$uc = new \mod_certifygen\persistents\certifygen_context(0, (object) $data);
-//$uc->create();
-
-//$um = new \mod_certifygen\persistents\certifygen_model(2);
-//// Crear certificado.
-//$template = template::instance($um->get('templateid'));
-//$issuedata = \mod_coursecertificate\helper::get_issue_data($course, $USER);
-//$certificateid = $template->issue_certificate($USER->id, null, $issuedata, 'mod_certifygen', $courseid, null);
-//print_object("certificateid: ");
-//print_object($certificateid);
 

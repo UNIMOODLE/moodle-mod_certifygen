@@ -40,9 +40,11 @@
     }
 }}
 <div data-region="teacher-view">
-    <div>
-        {{{ form }}}
-    </div>
+    {{#form}}
+        <div>
+            {{{ form }}}
+        <div>
+    {{/form}}
     <div>
         {{{ table }}}
     </div>

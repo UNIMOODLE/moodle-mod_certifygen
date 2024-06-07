@@ -40,6 +40,9 @@
     }
 }}
 <div data-region="context-certificate-view">
+    {{#form }}
+        {{{form}}}
+    {{/form}}
     {{#hasvalidator}}
         {{> mod_certifygen/my_certificates_validator }}
     {{/hasvalidator}}

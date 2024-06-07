@@ -34,6 +34,7 @@ namespace mod_certifygen\output;
 use dml_exception;
 use mod_certifygen\output\views\context_certificate_view;
 use mod_certifygen\output\views\model_view;
+use mod_certifygen\output\views\mycertificates_view;
 use mod_certifygen\output\views\student_view;
 use mod_certifygen\output\views\teacher_view;
 use mod_certifygen\output\views\associatemodelcontexts_view;
@@ -91,11 +92,11 @@ class renderer extends plugin_renderer_base {
         return $this->render_from_template('mod_certifygen/associatemodelcontexts', $data);
     }
     /**
-     * @param context_certificate_view $view
+     * @param mycertificates_view $view
      * @return string
      * @throws moodle_exception
      */
-    public function render_context_certificate_view(context_certificate_view $view): string {
+    public function render_mycertificates_view(mycertificates_view $view): string {
 
         $data = $view->export_for_template($this);
         if (!$data->hasvalidator) {

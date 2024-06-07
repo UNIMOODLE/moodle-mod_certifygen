@@ -352,21 +352,19 @@ function mod_certifygen_get_lang_selected(certifygen_model $model) : string {
     }
     return optional_param('lang', $lang, PARAM_RAW);
 }
-
 /**
  * @param certifygen_model $model
- * @param int $cmid
+ * @param moodle_url $url
  * @return string
  * @throws coding_exception
  * @throws moodle_exception
  */
-function mod_certifygen_get_certificates_table_form(certifygen_model $model, int $cmid) : string {
+function mod_certifygen_get_certificates_table_form(certifygen_model $model, moodle_url $url) : string {
 
     $data = [
         'langs' => $model->get_model_languages(),
         'defaultlang' => mod_certifygen_get_lang_selected($model),
     ];
-    $url = new moodle_url('/mod/certifygen/view.php', ['id' => $cmid]);
     $form = new certificatestablefiltersform($url->out(), $data);
     return $form->render();
 }
