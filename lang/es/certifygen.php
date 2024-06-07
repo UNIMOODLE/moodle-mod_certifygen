@@ -110,3 +110,4 @@ $string['emitcertificate_body'] = '¿Estás seguro de querer emitir el certifica
 $string['emitcertificate_error'] = 'Ha ocurrido un error intentando emitir el certificado';
 $string['confirm'] = 'Aceptar';
 $string['certificatenotfound'] = 'No se encuentra el certificado';
+$string['filter'] = 'Filtrar';

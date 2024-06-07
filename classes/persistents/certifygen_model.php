@@ -138,4 +138,18 @@ class certifygen_model extends persistent {
 
         return $DB->get_records('certifygen_model', ['type' => self::TYPE_TEACHER], $sort, '*', $limitfrom, $limitnum);
     }
+
+    /**
+     * @return array
+     * @throws coding_exception
+     */
+    public function get_model_languages() : array {
+        $languages = $this->get('langs');
+        if (empty($languages)) {
+            return [];
+        }
+        return explode(',', $languages);
+
+
+    }
 }

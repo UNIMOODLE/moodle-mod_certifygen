@@ -279,4 +279,160 @@ class certifygen {
         }
         return null;
     }
+
+    /**
+     * Get groupmode subquery
+     *
+     * @param int $groupmode
+     * @param int $groupid
+     * @return array
+     */
+    private static function get_groupmode_subquery(int $groupmode, int $groupid) {
+        if (($groupmode != NOGROUPS) && $groupid) {
+            [$sql, $params] = groups_get_members_ids_sql($groupid);
+            $groupmodequery = "AND u.id IN ($sql)";
+            return [$groupmodequery, $params];
+        }
+        return ['', []];
+    }
+
+    /**
+     * @throws coding_exception
+     * @throws dml_exception
+     */
+    public static function get_issues_for_course_by_lang(string $lang, int $templateid, int $courseid, string $component,
+                                                         ?int $userid, ?int $groupmode, ?int $groupid,
+                                                         int $limitfrom, int $limitnum, string $sort = ''): array {
+        global $DB;
+
+        $likelang = $DB->sql_like('ci.code', ':lang');
+        if (empty($sort)) {
+            $sort = 'ci.timecreated DESC';
+        }
+
+        $params = ['templateid' => $templateid,
+            'courseid' => $courseid,
+            'component' => $component,
+            'now' => time(),
+            'lang' => '%_' . $lang,
+            ];
+        $userquery = '';
+        $groupmodequery = '';
+        if ($groupmode) {
+            [$groupmodequery, $groupmodeparams] = self::get_groupmode_subquery($groupmode, $groupid);
+            $params += $groupmodeparams;
+        }
+        if ($userid) {
+            $params['userid'] = $userid;
+            $userquery = ' AND ' . $DB->sql_like('ci.userid', ':userid');
+        }
+        $usersquery = self::get_users_subquery();
+        $context = \context_course::instance($courseid);
+        $userfields = self::get_extra_user_fields($context);
+
+        $sql = "SELECT ci.id as issueid, ci.code, ci.emailed, ci.timecreated, ci.userid, ci.templateid, ci.expires,
+                       t.name, ci.courseid, ci.archived, $userfields,
+                  CASE WHEN ci.expires > 0  AND ci.expires < :now THEN 0
+                  ELSE 1
+                  END AS status
+                  FROM {tool_certificate_templates} t
+                  JOIN {tool_certificate_issues} ci
+                    ON (ci.templateid = t.id) AND (ci.courseid = :courseid) AND (component = :component)
+                  JOIN {user} u
+                    ON (u.id = ci.userid)
+                 WHERE t.id = :templateid
+                   AND $usersquery
+                   $groupmodequery AND $likelang $userquery
+              ORDER BY {$sort}";
+
+        return $DB->get_records_sql($sql, $params, $limitfrom, $limitnum);
+    }
+    /**
+     * Get extra fields for select query of certificates.
+     *
+     * @param \context $context
+     * @return string
+     */
+    public static function get_extra_user_fields(\context $context): string {
+        global $CFG;
+
+        if ($CFG->version < 2021050700) {
+            // Moodle 3.9-3.10.
+            $extrafields = get_extra_user_fields($context);
+            $userfields = \user_picture::fields('u', $extrafields);
+
+        } else {
+            // Moodle 3.11 and above.
+            $extrafields = \core_user\fields::for_identity($context, false)->get_required_fields();
+            $userfields = \core_user\fields::for_userpic()->including(...$extrafields)
+                ->get_sql('u', false, '', '', false)->selects;
+        }
+
+        return str_replace(' ', '', $userfields);
+    }
+    /**
+     * Helps to build SQL to retrieve users that can be displayed to the current user
+     *
+     * If tool_tenant is installed - adds a tenant filter
+     *
+     * @uses \tool_tenant\tenancy::get_users_subquery()
+     *
+     * @param string $usertablealias
+     * @param bool $canseeall do not add tenant check if user has capability 'tool/tenant:manage'
+     * @return string
+     */
+    public static function get_users_subquery(string $usertablealias = 'u', bool $canseeall = true): string {
+        return component_class_callback('tool_tenant\\tenancy', 'get_users_subquery',
+            [$canseeall, false, $usertablealias.'.id'], '1=1');
+    }
+
+    /**
+     * @param string $lang
+     * @param int $templateid
+     * @param int $courseid
+     * @param string $component
+     * @param int|null $userid
+     * @param int|null $groupmode
+     * @param int|null $groupid
+     * @return int
+     * @throws dml_exception
+     */
+    public static function count_issues_for_course_by_lang(string $lang, int $templateid, int $courseid, string $component, ?int $userid, ?int $groupmode,
+                                                           ?int $groupid) {
+        global $DB;
+
+        $params = [
+            'templateid' => $templateid,
+            'courseid' => $courseid,
+            'component' => $component,
+            'lang' => '%_' . $lang,
+        ];
+
+        if ($groupmode) {
+            $likelang = $DB->sql_like('ci.code', ':lang');
+            [$groupmodequery, $groupmodeparams] = self::get_groupmode_subquery($groupmode, $groupid);
+            $params += $groupmodeparams;
+
+            $sql = "SELECT COUNT(u.id) as count
+                  FROM {user} u
+            INNER JOIN {tool_certificate_issues} ci
+                    ON u.id = ci.userid
+                 WHERE ci.templateid = :templateid
+                    AND ci.courseid = :courseid
+                    AND ci.component = :component
+                    $groupmodequery AND $likelang";
+
+            return $DB->count_records_sql($sql, $params);
+        } else {
+            $wherestring = $DB->sql_like('code', ':lang');
+            $wherestring .= 'AND ' . $DB->sql_like('templateid', ':templateid');
+            $wherestring .= 'AND ' . $DB->sql_like('courseid', ':courseid');
+            $wherestring .= 'AND ' . $DB->sql_like('component', ':component');
+            if ($userid) {
+                $wherestring .= 'AND ' . $DB->sql_like('userid', ':userid');
+                $params['userid'] = $userid;
+            }
+            return $DB->count_records_select('tool_certificate_issues', $wherestring, $params);
+        }
+    }
 }

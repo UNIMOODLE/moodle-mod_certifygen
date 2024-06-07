@@ -33,11 +33,17 @@
 namespace mod_certifygen\output\views;
 
 use coding_exception;
+use core_table\local\filter\filter;
+use core_table\local\filter\integer_filter;
+use core_table\local\filter\string_filter;
 use dml_exception;
+use mod_certifygen\forms\certificatestablefiltersform;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\tables\activityteacherview_table;
 use mod_certifygen\tables\activityteacherviewnovalidator_table;
+use mod_certifygen\tables\certificates_filterset;
+use mod_certifygen\tables\certificateswithvalidation_table;
 use moodle_exception;
 use moodle_url;
 use renderable;
@@ -72,7 +78,18 @@ class teacher_view implements renderable, templatable {
         $this->hasvalidator = !is_null($this->certificatemodel->get('validation'));
     }
 
-
+    /**
+     * @throws coding_exception
+     */
+    private function get_lang_selected() : string {
+        global $USER;
+        $langs = $this->certificatemodel->get_model_languages();
+        $lang = $USER->lang;
+        if (!empty($langs)) {
+            $lang = $langs[0];
+        }
+        return optional_param('lang', $lang, PARAM_RAW);
+    }
     /**
      * @throws coding_exception
      * @throws moodle_exception
@@ -80,19 +97,54 @@ class teacher_view implements renderable, templatable {
      */
     public function export_for_template(renderer_base $output) : stdClass {
 
+
+        $data = new stdClass();
+        $data->table = $this->get_certificates_table();
+        $data->form = $this->get_certificates_table_form();
+        return $data;
+    }
+
+    /**
+     * @return string
+     * @throws coding_exception
+     * @throws moodle_exception
+     */
+    private function get_certificates_table_form() : string {
+
+
+        $data = [
+            'langs' => $this->certificatemodel->get_model_languages(),
+            'defaultlang' => $this->get_lang_selected(),
+        ];
+        $url = new moodle_url('/mod/certifygen/view.php', ['id' => $this->cm->id]);
+        $form = new certificatestablefiltersform($url->out(), $data);
+        return $form->render();
+    }
+    /**
+     * @return string
+     * @throws coding_exception
+     * @throws moodle_exception
+     */
+    private function get_certificates_table() : string {
+        global $PAGE;
+        $filters = new certificates_filterset();
+        $lang = $this->get_lang_selected();
+        $filters->add_filter(new string_filter('lang',filter::JOINTYPE_DEFAULT, [$lang]));
+        if ($userid = optional_param('userid', 0, PARAM_INT)) {
+            $filters->add_filter(new integer_filter('userid',filter::JOINTYPE_DEFAULT, [$userid]));
+        }
         if ($this->hasvalidator) {
             $activityteachertable = new activityteacherview_table($this->courseid, $this->templateid, $this->cm->instance);
+            $activityteachertable->set_filterset($filters);
         } else {
             $activityteachertable = new activityteacherviewnovalidator_table($this->courseid, $this->templateid);
         }
-        $activityteachertable->baseurl = new moodle_url('/mod/certifygen/view.php', ['id' => $this->cm->id]);
+        $paramsurl = ['id' => $this->cm->id, 'lang' => $lang];
+        $activityteachertable->baseurl = new moodle_url('/mod/certifygen/view.php', $paramsurl);
         ob_start();
         $activityteachertable->out($this->pagesize, $this->useinitialsbar);
         $out1 = ob_get_contents();
         ob_end_clean();
-        $data = new stdClass();
-        $data->table = $out1;
-
-        return $data;
+        return $out1;
     }
 }

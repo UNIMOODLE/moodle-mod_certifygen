@@ -49,15 +49,13 @@ class activityteacherview_table extends table_sql {
     private int $courseid;
     private int $templateid;
     private int $instance;
-    /**
-     * @var certifygen_model[]
-     */
-    private certifygen_model $model;
+    private int $modelid;
 
     /**
      * Constructor
      * @param int $courseid template id
      * @param int $templateid
+     * @param int $instance
      * @throws coding_exception
      */
     function __construct(int $courseid, int $templateid, int $instance) {
@@ -68,7 +66,7 @@ class activityteacherview_table extends table_sql {
         $uniqueid = 'certifygen-activity-teacher-view';
         parent::__construct($uniqueid);
         // Define the list of columns to show.
-        $columns = ['fullname', 'code', 'status', 'lang', 'link'];
+        $columns = ['fullname', 'code', 'status', 'link'];
         $this->define_columns($columns);
 
         // Define the titles of columns to show in header.
@@ -76,7 +74,6 @@ class activityteacherview_table extends table_sql {
             get_string('fullname'),
             get_string('code', 'mod_certifygen'),
             get_string('status', 'mod_certifygen'),
-            get_string('language'),
             '',
         ];
         $this->define_headers($headers);
@@ -104,25 +101,11 @@ class activityteacherview_table extends table_sql {
         }
     }
 
-    /**
-     * @param $row
-     * @return string
-     */
-    function col_lang($row): string
-    {
-        if (isset($row->issueid)) {
-            $validation = certifygen_validations::get_record(['userid' => $row->userid, 'issuesid' => $row->issueid]);
-            if ($validation) {
-                $validation->get('lang');
-            }
-        }
-
-        return '-';
-    }
 
     /**
      * @param $row
      * @return string
+     * @throws coding_exception
      */
     function col_status($row): string
     {
@@ -192,13 +175,21 @@ class activityteacherview_table extends table_sql {
     public function query_db($pagesize, $useinitialsbar = true): void
     {
 
-        $total = certificate::count_issues_for_course($this->templateid, $this->courseid, 'mod_certifygen', 0, 0);
+        $userid = 0;
+        $groupmode = 0;
+        $groupid = 0;
+        if ($this->filterset->has_filter('userid')) {
+            $userid = $this->filterset->get_filter('userid')->current();
+        }
+        $params['lang'] = $this->filterset->get_filter('lang')->current();
+        $total = certifygen::count_issues_for_course_by_lang($params['lang'], $this->templateid, $this->courseid,
+            'mod_certifygen', $userid, $groupmode, $groupid);
 
         $this->pagesize($pagesize, $total);
 
-        $this->rawdata = certificate::get_issues_for_course($this->templateid, $this->courseid, 'mod_certifygen', 0 , 0, $this->get_page_start(),
+        $this->rawdata = certifygen::get_issues_for_course_by_lang($params['lang'], $this->templateid, $this->courseid,
+            'mod_certifygen', $userid, $groupmode, $groupid, $this->get_page_start(),
             $this->get_page_size(), $this->get_sql_sort());
-
         // Set initial bars.
         if ($useinitialsbar) {
             $this->initialbars($total > $pagesize);
