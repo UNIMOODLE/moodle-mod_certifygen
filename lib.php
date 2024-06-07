@@ -32,6 +32,7 @@
 // This line protects the file from being accessed by a URL directly.
 use core\invalid_persistent_exception;
 use core_user\output\myprofile\tree;
+use mod_certifygen\forms\certificatestablefiltersform;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_context;
@@ -335,4 +336,37 @@ function mod_certifygen_pluginfile(
 
     // We can now send the file back to the browser - in this case with a cache lifetime of 1 day and no filtering.
     send_stored_file($file,  null, 0, $forcedownload, $options);
+}
+
+/**
+ * @param certifygen_model $model
+ * @return string
+ * @throws coding_exception
+ */
+function mod_certifygen_get_lang_selected(certifygen_model $model) : string {
+    global $USER;
+    $langs = $model->get_model_languages();
+    $lang = $USER->lang;
+    if (!empty($langs)) {
+        $lang = $langs[0];
+    }
+    return optional_param('lang', $lang, PARAM_RAW);
+}
+
+/**
+ * @param certifygen_model $model
+ * @param int $cmid
+ * @return string
+ * @throws coding_exception
+ * @throws moodle_exception
+ */
+function mod_certifygen_get_certificates_table_form(certifygen_model $model, int $cmid) : string {
+
+    $data = [
+        'langs' => $model->get_model_languages(),
+        'defaultlang' => mod_certifygen_get_lang_selected($model),
+    ];
+    $url = new moodle_url('/mod/certifygen/view.php', ['id' => $cmid]);
+    $form = new certificatestablefiltersform($url->out(), $data);
+    return $form->render();
 }

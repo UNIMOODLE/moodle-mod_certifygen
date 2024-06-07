@@ -35,10 +35,12 @@ namespace mod_certifygen\output\views;
 use coding_exception;
 use dml_exception;
 use mod_certifygen\certifygen;
+use mod_certifygen\forms\certificatestablefiltersform;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
+use moodle_url;
 use renderable;
 use stdClass;
 use templatable;
@@ -50,24 +52,26 @@ class student_view implements renderable, templatable {
      */
     private bool $hasvalidator;
     private certifygen_model $certificatemodel;
-    private int $instance;
+    private stdClass $cm;
     private int $templateid;
+    private string $lang;
     private int $courseid;
 
     /**
      * @param int $courseid
      * @param int $templateid
-     * @param int $instance
+     * @param stdClass $cm
      * @throws coding_exception
      */
-    public function __construct(int $courseid, int $templateid, int $instance) {
+    public function __construct(int $courseid, int $templateid, stdClass $cm) {
+
         $this->courseid = $courseid;
         $this->templateid = $templateid;
-        $this->instance = $instance;
-        $certificate = new \mod_certifygen\persistents\certifygen($instance);
+        $this->cm = $cm;
+        $certificate = new \mod_certifygen\persistents\certifygen($cm->instance);
         $this->certificatemodel = new certifygen_model($certificate->get('modelid'));
         $this->hasvalidator = !is_null($this->certificatemodel->get('validation'));
-
+        $this->lang = mod_certifygen_get_lang_selected($this->certificatemodel);
     }
 
     /**
@@ -78,12 +82,13 @@ class student_view implements renderable, templatable {
     public function export_for_template(renderer_base $output) : stdClass {
 
         if ($this->hasvalidator) {
-            return $this->export_with_validator_data();
+            $data = $this->export_with_validator_data();
         } else {
-            return $this->export_no_validator_data();
+            $data = $this->export_no_validator_data();
         }
+        $data->form = mod_certifygen_get_certificates_table_form($this->certificatemodel, $this->cm->id);
+        return $data;
     }
-
 
     /**
      * @throws coding_exception
@@ -98,6 +103,9 @@ class student_view implements renderable, templatable {
         $langs = $this->certificatemodel->get('langs');
         $langs = explode(',', $langs);
         foreach($langs as $lang) {
+            if ($lang != $this->lang) {
+                continue;
+            }
             $list[] = [
                 'modelid' => $this->certificatemodel->get('id'),
                 'lang' => $lang,
@@ -128,9 +136,13 @@ class student_view implements renderable, templatable {
         // Generamos tantos como idiomas en la plataforma.
         $langs = $this->certificatemodel->get('langs');
         $langs = explode(',', $langs);
+
         if (empty($validationrecords)) {
             $id = 0;
             foreach($langs as $lang) {
+                if ($lang != $this->lang) {
+                    continue;
+                }
                 $list[] = [
                     'code' => '',
                     'status' => get_string('status_' . certifygen_validations::STATUS_NOT_STARTED, 'mod_certifygen'),
@@ -146,6 +158,9 @@ class student_view implements renderable, templatable {
         } else {
             $langused = [];
             foreach($validationrecords as $validationrecord) {
+                if ($validationrecord->get('lang') != $this->lang) {
+                    continue;
+                }
                 $langused[] = $validationrecord->get('lang');
                 $code = certifygen::get_user_certificate($USER->id, $this->courseid, $this->certificatemodel->get('templateid'), $validationrecord->get('lang'))->code ?? '';
                 $data = [
@@ -200,7 +215,6 @@ class student_view implements renderable, templatable {
         $data = new stdClass();
         $data->list = $list;
         $data->hasvalidator = $this->hasvalidator;
-
         return $data;
     }
 }
