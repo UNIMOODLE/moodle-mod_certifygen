@@ -36,12 +36,12 @@ require_once($CFG->libdir . '/tablelib.php');
 
 use coding_exception;
 use dml_exception;
+use mod_certifygen\certifygen;
 use mod_certifygen\persistents\certifygen_validations;
 use mod_certifygen\template;
 use moodle_exception;
 use moodle_url;
 use table_sql;
-use tool_certificate\certificate;
 
 class activityteacherviewnovalidator_table extends table_sql {
     private int $courseid;
@@ -59,14 +59,13 @@ class activityteacherviewnovalidator_table extends table_sql {
         $uniqueid = 'certifygen-activity-novalidator-teacher-view';
         parent::__construct($uniqueid);
         // Define the list of columns to show.
-        $columns = ['fullname', 'code', 'lang', 'link'];
+        $columns = ['fullname', 'code', 'link'];
         $this->define_columns($columns);
 
         // Define the titles of columns to show in header.
         $headers = [
             get_string('fullname'),
             get_string('code', 'mod_certifygen'),
-            get_string('language'),
             ''
         ];
         $this->define_headers($headers);
@@ -83,15 +82,9 @@ class activityteacherviewnovalidator_table extends table_sql {
      */
     function col_fullname($row): string
     {
+        global $OUTPUT;
 
-        // If the data is being downloaded than we don't want to show HTML.
-        if ($this->is_downloading()) {
-            return $row->firstname .  ' ' . $row->lastname;
-        } else {
-            global $OUTPUT;
-
-            return $OUTPUT->user_picture($row, array('size' => 35, 'courseid' => $this->courseid, 'includefullname' => true));
-        }
+        return $OUTPUT->user_picture($row, array('size' => 35, 'courseid' => $this->courseid, 'includefullname' => true));
     }
 
     /**
@@ -102,17 +95,7 @@ class activityteacherviewnovalidator_table extends table_sql {
     {
         return $row->code;
     }
-    function col_lang($row): string
-    {
-        if (isset($row->issueid)) {
-            $validation = certifygen_validations::get_record(['userid' => $row->userid, 'issuesid' => $row->issueid]);
-            if ($validation) {
-                $validation->get('lang');
-            }
-        }
 
-        return '-';
-    }
     /**
      * @param $row
      * @return string
@@ -131,28 +114,35 @@ class activityteacherviewnovalidator_table extends table_sql {
         $link = new moodle_url('/mod/certifygen/certificateview.php', ['code' => $code, 'preview' => true, 'templateid' => $row->templateid]);
 
 
-        if ($this->is_downloading()) {
-            return $link->out();
-        } else {
-            return '<a href='. $link->out().'>'.get_string('download', 'mod_certifygen').'</a>';
-        }
+        return '<a href='. $link->out().'>'.get_string('download', 'mod_certifygen').'</a>';
     }
+
     /**
      * Query the reader.
      *
      * @param int $pagesize size of page for paginated displayed table.
      * @param bool $useinitialsbar do you want to use the initials bar?
+     * @throws dml_exception
+     * @throws coding_exception
      */
     public function query_db($pagesize, $useinitialsbar = true): void
     {
 
-        $total = certificate::count_issues_for_course($this->templateid, $this->courseid, 'mod_certifygen', 0, 0);
+        $userid = 0;
+        $groupmode = 0;
+        $groupid = 0;
+        if ($this->filterset->has_filter('userid')) {
+            $userid = $this->filterset->get_filter('userid')->current();
+        }
+        $params['lang'] = $this->filterset->get_filter('lang')->current();
+        $total = certifygen::count_issues_for_course_by_lang($params['lang'], $this->templateid, $this->courseid,
+            'mod_certifygen', $userid, $groupmode, $groupid);
 
         $this->pagesize($pagesize, $total);
 
-        $this->rawdata = certificate::get_issues_for_course($this->templateid, $this->courseid, 'mod_certifygen', 0 , 0, $this->get_page_start(),
+        $this->rawdata = certifygen::get_issues_for_course_by_lang($params['lang'], $this->templateid, $this->courseid,
+            'mod_certifygen', $userid, $groupmode, $groupid, $this->get_page_start(),
             $this->get_page_size(), $this->get_sql_sort());
-
         // Set initial bars.
         if ($useinitialsbar) {
             $this->initialbars($total > $pagesize);

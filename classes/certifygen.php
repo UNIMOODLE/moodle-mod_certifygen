@@ -36,12 +36,10 @@ namespace mod_certifygen;
 
 use coding_exception;
 use context_course;
-use core\lock\lock_config;
 use core_course\customfield\course_handler;
 use dml_exception;
 use moodle_exception;
 use stdClass;
-use stored_file;
 use tool_certificate\certificate;
 use tool_certificate\permission;
 
@@ -137,21 +135,9 @@ class certifygen {
      */
     public static function issue_certificate(stdClass $user, int $templateid, stdClass $course, string $lang): int {
 
-//        $lockfactory = lock_config::get_lock_factory('mod_certifygen');
-
-//        $lock = $lockfactory->get_lock("i_{$user->id}_{$templateid}_{$course->id}_{$lang}", MINSECS);
-
-//        if (!$lock) {
-//            error_log(__FUNCTION__ . ' lock timeout ' . __LINE__);
-//            throw new moodle_exception('locktimeout');
-//        }
-
-//        if (self::get_user_certificate($user->id, $course->id, $templateid, $lang)) {
-//            error_log(__FUNCTION__ . ' loc released ' . __LINE__);
-//            // If user already has a certificate - do not issue a new one.
-//            $lock->release();
-//            return 0;
-//        }
+        if (self::get_user_certificate($user->id, $course->id, $templateid, $lang)) {
+            return 0;
+        }
 
         try {
             $template = template::instance($templateid, (object) ['lang' => $lang]);
@@ -259,7 +245,8 @@ class certifygen {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public static function get_user_certificate_file(string $templateid, int $userid, int $courseid, string $lang) {
+    public static function get_user_certificate_file(string $templateid, int $userid, int $courseid, string $lang)
+    {
         $users = user_get_users_by_id([$userid]);
         $user = reset($users);
         $course = get_course($courseid);
@@ -286,6 +273,7 @@ class certifygen {
      * @param int $groupmode
      * @param int $groupid
      * @return array
+     * @throws coding_exception
      */
     private static function get_groupmode_subquery(int $groupmode, int $groupid) {
         if (($groupmode != NOGROUPS) && $groupid) {
@@ -297,8 +285,7 @@ class certifygen {
     }
 
     /**
-     * @throws coding_exception
-     * @throws dml_exception
+     * @throws dml_exception|coding_exception
      */
     public static function get_issues_for_course_by_lang(string $lang, int $templateid, int $courseid, string $component,
                                                          ?int $userid, ?int $groupmode, ?int $groupid,
@@ -347,11 +334,13 @@ class certifygen {
 
         return $DB->get_records_sql($sql, $params, $limitfrom, $limitnum);
     }
+
     /**
      * Get extra fields for select query of certificates.
      *
      * @param \context $context
      * @return string
+     * @throws coding_exception
      */
     public static function get_extra_user_fields(\context $context): string {
         global $CFG;
@@ -395,7 +384,7 @@ class certifygen {
      * @param int|null $groupmode
      * @param int|null $groupid
      * @return int
-     * @throws dml_exception
+     * @throws dml_exception|coding_exception
      */
     public static function count_issues_for_course_by_lang(string $lang, int $templateid, int $courseid, string $component, ?int $userid, ?int $groupmode,
                                                            ?int $groupid) {
