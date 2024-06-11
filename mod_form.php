@@ -33,7 +33,6 @@
 use mod_certifygen\forms\modelform;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
-use tool_certificate\certificate;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
@@ -103,50 +102,5 @@ class mod_certifygen_mod_form extends moodleform_mod {
         $this->add_action_buttons();
     }
 
-    /**
-     * Returns true if course certificate has been issued.
-     *
-     * @return bool
-     * @throws coding_exception
-     * @uses certificate
-     */
-    private function has_issues(): bool {
 
-        if ($instance = $this->get_instance()) {
-            $certificate = new certifygen($instance);
-            $certificatemodel = new certifygen_model($certificate->get('modelid'));
-            if (!is_null($certificate) && !is_null($certificatemodel->get('templateid'))) {
-                $courseissues = certificate::count_issues_for_course($certificatemodel->get('templateid'), $certificate->get('course'),
-                    'mod_certifygen', null, null);
-                if ($courseissues > 0) {
-                    return  true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Gets the current coursecertificate template for the template selector.
-     *
-     * @return array
-     * @throws dml_exception
-     */
-    private function get_current_template(int $modelid): array {
-        global $DB;
-        $templates = [];
-        if ($instance = $this->get_instance()) {
-            $sql = "SELECT ct.id, ct.name
-                    FROM {tool_certificate_templates} ct
-                    JOIN {certifygen} c
-                    JOIN {certifygen_model} m
-                    ON m.templateid = ct.id
-                    AND c.id = :instance
-                    AND m.id = :modelid";
-            if ($record = $DB->get_record_sql($sql, ['instance' => $instance, 'modelid' => $modelid], IGNORE_MISSING)) {
-                $templates[$record->id] = format_string($record->name);
-            }
-        }
-        return $templates;
-    }
 }
