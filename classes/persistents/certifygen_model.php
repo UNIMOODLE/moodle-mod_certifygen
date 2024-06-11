@@ -105,8 +105,6 @@ class certifygen_model extends persistent {
             'timemodified' => time(),
         ];
         $id = $data->modelid ?? 0;
-        error_log(__FUNCTION__ . ' modeldata: '.var_export($modeldata, true));
-        error_log(__FUNCTION__ . ' id: '.var_export($id, true));
         $model = new self($id, (object)$modeldata);
         try {
             if ($id > 0) {

@@ -58,7 +58,7 @@ class mod_certifygen_mod_form extends moodleform_mod {
 
         //TODO: capability.
         $canmanagemodels = true;
-        $activitymodels =  mod_certifygen_get_activity_models();
+        $activitymodels =  mod_certifygen_get_activity_models($this->get_course()->id);
         $templateoptions = ['' => get_string('chooseamodel', 'mod_certifygen')] + $activitymodels;
         $manageurl = new moodle_url('/mod/certifygen/modelmanager.php');
         $elements = [$mform->createElement('select', 'modelid', get_string('model', 'mod_certifygen'), $templateoptions)];

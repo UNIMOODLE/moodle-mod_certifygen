@@ -250,7 +250,7 @@ class template extends \tool_certificate\template {
     public function issue_certificate($userid, $expires = null, array $data = [], $component = 'mod_certifygen',
                                       $courseid = null, ?lock $lock = null) : int {
         global $DB;
-        error_log(__FUNCTION__. ' ' . __LINE__);
+
 //        component_class_callback(tool_tenant\config::class, 'push_for_user', [$userid]);
 
         $issue = new stdClass();

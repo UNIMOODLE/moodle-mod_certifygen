@@ -178,14 +178,20 @@ function mod_certifygen_get_types() : array {
 }
 
 /**
- * @return string[]
+ * @param int $courseid
+ * @return array
  * @throws coding_exception
+ * @throws dml_exception
+ * @throws moodle_exception
  */
-function mod_certifygen_get_activity_models() : array {
+function mod_certifygen_get_activity_models(int $courseid) : array {
     $models = certifygen_model::get_records(['type' => certifygen_model::TYPE_ACTIVITY]);
+    $validmodels = certifygen_context::get_course_valid_modelids($courseid);
     $list = [];
     foreach ($models as $model) {
-        $list[$model->get('id')] = $model->get('name');
+        if (in_array($model->get('id'), $validmodels)) {
+            $list[$model->get('id')] = $model->get('name');
+        }
     }
     return $list;
 }

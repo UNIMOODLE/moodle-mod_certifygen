@@ -180,4 +180,28 @@ class certifygen_context extends persistent {
         }
         return $modelid;
     }
+
+    /**
+     * @param int $courseid
+     * @return int
+     * @throws dml_exception
+     * @throws moodle_exception
+     */
+    public static function get_course_valid_modelids(int $courseid) : array {
+        global $DB;
+        $modelids = [];
+        $contexts = $DB->get_records(self::TABLE);
+        foreach ($contexts as $context) {
+            if ($context->type == self::CONTEXT_TYPE_COURSE) {
+                $hascontext = self::has_course_course_context($courseid, $context);
+            } else if ($context->type == self::CONTEXT_TYPE_CATEGORY) {
+                $hascontext = self::has_course_category_context($courseid, $context);
+            }
+            if ($hascontext) {
+                $modelids[] = $context->modelid;
+                break;
+            }
+        }
+        return $modelids;
+    }
 }

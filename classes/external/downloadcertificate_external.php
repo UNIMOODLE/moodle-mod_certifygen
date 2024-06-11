@@ -103,17 +103,11 @@ class downloadcertificate_external extends external_api {
             $user = reset($users);
             $certifygenmodel = new certifygen_model($modelid);
             $course = get_course($courseid);
-            error_log(__FUNCTION__. ' ' . __LINE__);
             certifygen::issue_certificate($user, $certifygenmodel->get('templateid'), $course, $lang);
-//            if ($existingcertificate = certifygen::get_user_certificate($userid, $courseid, $certifygenmodel->get('templateid'), $lang)) {
-//                $validation->set('issueid', $existingcertificate->id);
-//                $validation->save();
-//            }
             $fileurl = certifygen::get_user_certificate_file_url($certifygenmodel->get('templateid'), $userid, $courseid, $lang);
             $issue = certifygen::get_user_certificate( $userid, $courseid, $certifygenmodel->get('templateid'), $lang);
             $codelink =  new \moodle_url('/admin/tool/certificate/index.php', ['code' => $issue->code]);
             // Step 3: Generate the tool_certificate certificate.
-//            $file = certifygen::get_user_certificate_file($certifygenmodel->get('templateid'), $userid, $courseid, $lang);
             $result['url'] = $fileurl;
             $result['codetag'] = '<a href="'.$codelink->out().'" target="_blank">' . $issue->code .'</a>';
             if (empty($fileurl)) {
@@ -139,7 +133,7 @@ class downloadcertificate_external extends external_api {
 //            $validation->set('status', certifygen_validations::STATUS_FINISHED_ERROR);
 //            $validation->save();
         }
-        error_log(__FUNCTION__. ' ' . __LINE__ .' result_ '.var_export($result, true));
+
         return $result;
     }
     /**
