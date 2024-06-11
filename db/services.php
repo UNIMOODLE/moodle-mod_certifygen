@@ -32,6 +32,7 @@
 // This line protects the file from being accessed by a URL directly.
 use mod_certifygen\external\deletemodel_external;
 use mod_certifygen\external\emitcertificate_external;
+use mod_certifygen\external\downloadcertificate_external;
 use mod_certifygen\external\getmycertificatedata_external;
 use mod_certifygen\external\getCoursesAsStudent_external;
 use mod_certifygen\external\getCoursesAsTeacher_external;
@@ -97,6 +98,15 @@ $functions = [
         'classname' => emitcertificate_external::class,
         'methodname' => 'emitcertificate',
         'description' => 'Emit Certificate',
+        'type' => 'write',
+        'capabilities' => 'mod/certifygen:view',
+        'ajax' => true,
+        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
+    'mod_certifygen_downloadcertificate' => [
+        'classname' => downloadcertificate_external::class,
+        'methodname' => 'downloadcertificate',
+        'description' => 'Download Certificate',
         'type' => 'write',
         'capabilities' => 'mod/certifygen:view',
         'ajax' => true,

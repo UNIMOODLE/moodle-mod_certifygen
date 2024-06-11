@@ -134,8 +134,9 @@ class certifygen {
      * @throws moodle_exception
      */
     public static function issue_certificate(stdClass $user, int $templateid, stdClass $course, string $lang): int {
-
+        error_log(__FUNCTION__. ' ' . __LINE__);
         if (self::get_user_certificate($user->id, $course->id, $templateid, $lang)) {
+            error_log(__FUNCTION__. ' ' . __LINE__);
             return 0;
         }
 
@@ -151,7 +152,8 @@ class certifygen {
                 $expirydateoffset,
                 $expirydateoffset
             );
-            return $template->issue_certificate($user->id, $expirydate, $issuedata, 'tool_certifygen', $course->id);
+            error_log(__FUNCTION__. ' ' . __LINE__);
+            return $template->issue_certificate($user->id, $expirydate, $issuedata, 'mod_certifygen', $course->id);
         } catch(moodle_exception $e) {
             error_log(__FUNCTION__ . ' ' . __LINE__. ' ERROR: '. var_export($e->getMessage(), true));
         }

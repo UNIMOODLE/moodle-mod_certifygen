@@ -85,12 +85,12 @@ function certifygen_add_instance(stdClass $data, mod_certifygen_mod_form $mform)
 
     $data->modelname = $data->name;
     // Create a model.
-    $model = certifygen_model::save_model_object($data);
+//    $model = certifygen_model::save_model_object($data);
 
     // Create a certifygen.
     $certifygendata = [
         'course' => $data->course,
-        'modelid' => $model->get('id'),
+        'modelid' => $data->modelid,
         'name' => $data->name,
         'intro' => $data->intro,
         'introformat' => $data->introformat,
@@ -119,12 +119,13 @@ function certifygen_update_instance($data, $mform): bool
     global $USER;
 
     // Update a model.
-    $data->modelname = $data->name;
-    certifygen_model::save_model_object($data);
+//    $data->modelname = $data->name;
+//    certifygen_model::save_model_object($data);
 
     // Update a certifygen.
     $certifygen = new certifygen($data->instance);
     $certifygen->set('name', $data->name);
+    $certifygen->set('modelid', $data->modelid);
     $certifygen->set('intro', $data->intro);
     $certifygen->set('introformat', $data->introformat);
     $certifygen->set('usermodified', $USER->id);
@@ -163,6 +164,30 @@ function mod_certifygen_get_modes() : array {
         certifygen_model::MODE_UNIQUE => get_string('mode_1', 'mod_certifygen'),
         certifygen_model::MODE_PERIODIC => get_string('mode_2', 'mod_certifygen'),
     ];
+}
+/**
+ * Get certifygen model types
+ * @return array
+ * @throws coding_exception
+ */
+function mod_certifygen_get_types() : array {
+    return [
+        certifygen_model::TYPE_ACTIVITY => get_string('type_'. certifygen_model::TYPE_ACTIVITY, 'mod_certifygen'),
+        certifygen_model::TYPE_TEACHER => get_string('type_'. certifygen_model::TYPE_TEACHER, 'mod_certifygen'),
+    ];
+}
+
+/**
+ * @return string[]
+ * @throws coding_exception
+ */
+function mod_certifygen_get_activity_models() : array {
+    $models = certifygen_model::get_records(['type' => certifygen_model::TYPE_ACTIVITY]);
+    $list = [];
+    foreach ($models as $model) {
+        $list[$model->get('id')] = $model->get('name');
+    }
+    return $list;
 }
 
 /**
@@ -291,7 +316,7 @@ function mod_certifygen_pluginfile(
     }
 
     // Make sure the filearea is one of those used by the plugin.
-    if ($filearea !== ICertificateValidation::FILE_AREA) {
+    if ($filearea !== ICertificateValidation::FILE_AREA && $filearea !== 'issues') {
         return false;
     }
 
@@ -299,9 +324,9 @@ function mod_certifygen_pluginfile(
     require_login($course);
 
     // Check the relevant capabilities - these may vary depending on the filearea being accessed.
-    if (!has_capability('mod/certifygen:view', $context)) {
-        return false;
-    }
+//    if (!has_capability('mod/certifygen:view', $context)) {
+//        return false;
+//    }
 
     // The args is an array containing [itemid, path].
     // Fetch the itemid from the path.
@@ -328,7 +353,6 @@ function mod_certifygen_pluginfile(
 
     // Retrieve the file from the Files API.
     $fs = get_file_storage();
-
     $file = $fs->get_file($context->id, ICertificateValidation::FILE_COMPONENT, $filearea, $itemid, $filepath, $filename);
     if (!$file) {
         // The file does not exist.

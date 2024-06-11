@@ -192,7 +192,7 @@ class template extends \tool_certificate\template {
         // We add timemodified instead of issue id to prevent caching of changed certificate.
         // The callback tool_certificate_pluginfile() ignores the itemid and only takes the code.
         return moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(),
-            $file->get_timemodified(), $file->get_filepath(), $issue->code . '.pdf');
+            $file->get_itemid(), $file->get_filepath(), $issue->code . '.pdf');
     }
 
     /**
@@ -211,7 +211,7 @@ class template extends \tool_certificate\template {
         // Create a file instance.
         $file = (object) [
             'contextid' => context_system::instance()->id,
-            'component' => 'tool_certificate',
+            'component' => 'mod_certifygen',
             'filearea'  => 'issues',
             'itemid'    => $issue->id,
             'filepath'  => '/',
@@ -247,10 +247,10 @@ class template extends \tool_certificate\template {
      * @uses \tool_tenant\config::pop()
      *
      */
-    public function issue_certificate($userid, $expires = null, array $data = [], $component = 'tool_certificate',
+    public function issue_certificate($userid, $expires = null, array $data = [], $component = 'mod_certifygen',
                                       $courseid = null, ?lock $lock = null) : int {
         global $DB;
-
+        error_log(__FUNCTION__. ' ' . __LINE__);
 //        component_class_callback(tool_tenant\config::class, 'push_for_user', [$userid]);
 
         $issue = new stdClass();
@@ -309,13 +309,13 @@ class template extends \tool_certificate\template {
         $subject = get_string('notificationsubjectcertificateissued', 'tool_certificate');
         $fullmessage = get_string(
             'notificationmsgcertificateissued',
-            'tool_certificate',
+            'mod_certifygen',
             ['fullname' => $userfullname, 'url' => $mycertificatesurl->out(false)]
         );
 
         $message = new message();
         $message->courseid = $issue->courseid ?? SITEID;
-        $message->component = 'tool_certificate';
+        $message->component = 'mod_certifygen';
         $message->name = 'certificateissued';
         $message->notification = 1;
         $message->userfrom = core_user::get_noreply_user();

@@ -91,9 +91,9 @@ class mycertificates_view implements renderable, templatable {
      * @throws moodle_exception
      */
     public function export_no_validator_data() : stdClass {
-        global $USER;
+        global $USER, $DB;
 
-        //TODO: change url! not to generate by default the certificate.
+
         $list = [];
         $langlist = get_string_manager()->get_list_of_translations();
         // Generamos tantos como idiomas en la plataforma.
@@ -103,15 +103,23 @@ class mycertificates_view implements renderable, templatable {
             if ($lang != $this->lang) {
                 continue;
             }
-            $list[] = [
+            $element = [
                 'modelid' => $this->model->get('id'),
                 'lang' => $lang,
                 'langstring' => $langlist[$lang],
                 'courseid' => $this->courseid,
                 'userid' => $USER->id,
-                'haslink' => true,
-                'url' => certifygen::get_user_certificate_file_url($this->model->get('templateid'), $USER->id, $this->courseid, $lang),
+                'code' =>  '',
             ];
+            if ($data = certifygen::get_user_certificate($USER->id, $this->courseid, $this->model->get('templateid'), $lang)) {
+
+                $link = new moodle_url('/admin/tool/certificate/index.php', ['code' => $data->code]);
+                $element['codelink'] = $link->out();
+                $element['code'] =  $data->code;
+//                return $row->status == 0 ? get_string('expired', 'tool_certificate')
+//                    : get_string('valid', 'tool_certificate');
+            }
+            $list[] = $element;
         }
 
         $data = new stdClass();
@@ -162,8 +170,10 @@ class mycertificates_view implements renderable, templatable {
                 }
                 $langused[] = $validationrecord->get('lang');
                 $code = \mod_certifygen\certifygen::get_user_certificate($USER->id, $this->courseid, $this->model->get('templateid'), $validationrecord->get('lang'))->code ?? '';
+                $codelink =  new moodle_url('/admin/tool/certificate/index.php', ['code' => $code]);
                 $data = [
                     'code' => $code,
+                    'codelink' => $codelink->out(),
                     'status' => get_string('status_' . $validationrecord->get('status'), 'mod_certifygen'),
                     'modelid' => $this->model->get('id'),
                     'lang' => $validationrecord->get('lang'),

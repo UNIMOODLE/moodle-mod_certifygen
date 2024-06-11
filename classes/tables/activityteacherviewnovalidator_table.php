@@ -159,7 +159,6 @@ class activityteacherviewnovalidator_table extends table_sql {
         $code = $DB->get_field('tool_certificate_issues', 'code', ['id' => $row->issueid]);
         $link = new moodle_url('/mod/certifygen/certificateview.php', ['code' => $code, 'templateid' => $row->templateid]);
 
-
         return '<a href='. $link->out().'>'.get_string('download', 'mod_certifygen').'</a>';
     }
 

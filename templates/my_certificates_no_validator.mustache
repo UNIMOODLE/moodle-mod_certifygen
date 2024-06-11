@@ -44,7 +44,6 @@
     <thead>
         <tr>
             <th scope="col"> {{#str}} code, mod_certifygen{{/str}} </th>
-            <th scope="col"> {{#str}} status, mod_certifygen{{/str}} </th>
             <th scope="col"> {{#str}} language {{/str}} </th>
             <th scope="col"> </th>
         </tr>
@@ -52,11 +51,19 @@
     <tbody>
         {{#list}}
             <tr data-id="{{id}}">
-                <td>{{code}}</td>
-                <td>{{status}}</td>
+                {{#codelink}}
+                    <td class="code"><a href="{{codelink}}">{{code}}</a></td>
+                {{/codelink}}
+                {{^codelink}}
+                    <td class="code">{{code}}</td>
+                {{/codelink}}
                 <td>{{langstring}}</td>
                 <td>
-                    <a href="{{url}}" class="btn btn-primary"> {{#str}}download, mod_certifygen{{/str}}</a>
+                    <span class="btn btn-primary" data-id="{{id}}" data-action="download-certificate"
+                          data-modelid="{{modelid}}" data-courseid="{{courseid}}" data-userid="{{userid}}"
+                          data-langstring="{{langstring}}" data-lang="{{lang}}">
+                        {{#str}} download, mod_certifygen{{/str}}
+                    </span>
                 </td>
             </tr>
         {{/list}}

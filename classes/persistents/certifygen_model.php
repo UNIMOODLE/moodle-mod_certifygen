@@ -105,13 +105,21 @@ class certifygen_model extends persistent {
             'timemodified' => time(),
         ];
         $id = $data->modelid ?? 0;
+        error_log(__FUNCTION__ . ' modeldata: '.var_export($modeldata, true));
+        error_log(__FUNCTION__ . ' id: '.var_export($id, true));
         $model = new self($id, (object)$modeldata);
-        if ($id > 0) {
-            $model->update();
-            return $model;
+        try {
+            if ($id > 0) {
+                $model->update();
+                return $model;
+            }
+
+            return $model->create();
+        } catch (\moodle_exception $e) {
+            error_log(__FUNCTION__ . ' error: '.var_export($e->getMessage(), true));
+            return false;
         }
 
-        return $model->create();
     }
 
     /**
@@ -120,11 +128,11 @@ class certifygen_model extends persistent {
      * @return int
      * @throws dml_exception
      */
-    public static function count_context_models(int $limitfrom = 0, int $limitnum = 0) : int {
-        global $DB;
-
-        return $DB->count_records('certifygen_model', ['type' => self::TYPE_TEACHER]);
-    }
+//    public static function count_context_models(int $limitfrom = 0, int $limitnum = 0) : int {
+//        global $DB;
+//
+//        return $DB->count_records('certifygen_model', ['type' => self::TYPE_TEACHER]);
+//    }
 
     /**
      * @param int $limitfrom
@@ -133,11 +141,11 @@ class certifygen_model extends persistent {
      * @return array
      * @throws dml_exception
      */
-    public static function get_context_models(int $limitfrom = 0, int $limitnum = 0, string $sort = '') : array {
-        global $DB;
-
-        return $DB->get_records('certifygen_model', ['type' => self::TYPE_TEACHER], $sort, '*', $limitfrom, $limitnum);
-    }
+//    public static function get_context_models(int $limitfrom = 0, int $limitnum = 0, string $sort = '') : array {
+//        global $DB;
+//
+//        return $DB->get_records('certifygen_model', ['type' => self::TYPE_TEACHER], $sort, '*', $limitfrom, $limitnum);
+//    }
 
     /**
      * @return array
@@ -149,7 +157,5 @@ class certifygen_model extends persistent {
             return [];
         }
         return explode(',', $languages);
-
-
     }
 }

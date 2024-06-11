@@ -45,7 +45,7 @@ class modellist_table extends table_sql {
         $uniqueid = 'certifygen-model-list-view';
         parent::__construct($uniqueid);
         // Define the list of columns to show.
-        $columns = array('modelname', 'template', 'lastupdate', 'editmodel', 'deletemodel', 'associatecontexts');
+        $columns = array('modelname', 'template', 'lastupdate', 'type', 'editmodel', 'deletemodel', 'associatecontexts');
         $this->define_columns($columns);
 
         // Define the titles of columns to show in header.
@@ -53,6 +53,7 @@ class modellist_table extends table_sql {
             get_string('modelname', 'mod_certifygen'),
             get_string('template', 'mod_certifygen'),
             get_string('lastupdate', 'mod_certifygen'),
+            get_string('type', 'mod_certifygen'),
             '', '', '');
         $this->define_headers($headers);
 
@@ -67,11 +68,13 @@ class modellist_table extends table_sql {
     public final function query_db($pagesize, $useinitialsbar = true): void
     {
 
-        $total = certifygen_model::count_context_models();
+        $total = certifygen_model::count_records();
 
         $this->pagesize($pagesize, $total);
-        $this->rawdata = certifygen_model::get_context_models($this->get_page_start(), $this->get_page_size(),
-            $this->get_sql_sort());
+//        $this->rawdata = certifygen_model::get_context_models($this->get_page_start(), $this->get_page_size(),
+//            $this->get_sql_sort());
+        $this->rawdata = certifygen_model::get_records([],
+            $this->get_sql_sort(), 'ASC',$this->get_page_start(), $this->get_page_size());
 
         // Set initial bars.
         if ($useinitialsbar) {
@@ -82,10 +85,22 @@ class modellist_table extends table_sql {
     /**
      * @param $values
      * @return string
+     * @throws coding_exception
+     */
+    final function col_type($values) : string {
+//        return $values->name;
+        return get_string('type_'. $values->get('type'), 'mod_certifygen');
+    }
+
+    /**
+     * @param $values
+     * @return string
      */
     final function col_modelname($values) : string {
-        return $values->name;
+//        return $values->name;
+        return $values->get('name');
     }
+
 
     /**
      * @param $values
@@ -93,7 +108,8 @@ class modellist_table extends table_sql {
      * @throws coding_exception
      */
     final function col_template($values) : string {
-        return template::instance($values->templateid)->get_name();
+//        return template::instance($values->templateid)->get_name();
+        return template::instance($values->get('templateid'))->get_name();
     }
 
     /**
@@ -101,7 +117,8 @@ class modellist_table extends table_sql {
      * @return string
      */
     final function col_lastupdate($values) : string {
-        return date('d-m-Y', $values->timemodified);
+//        return date('d-m-Y', $values->timemodified);
+        return date('d-m-Y', $values->get('timemodified'));
     }
 
     /**
@@ -110,7 +127,9 @@ class modellist_table extends table_sql {
      * @throws coding_exception
      */
     final function col_deletemodel($values) : string {
-        return '<span class="likelink" data-id="'. $values->id . '" data-name="'. $values->name . '" data-action="delete-model">'
+//        return '<span class="likelink" data-id="'. $values->id . '" data-name="'. $values->name . '" data-action="delete-model">'
+//            . get_string('delete', 'mod_certifygen') . '</span>';
+        return '<span class="likelink" data-id="'. $values->get('id') . '" data-name="'. $values->get('name') . '" data-action="delete-model">'
             . get_string('delete', 'mod_certifygen') . '</span>';
     }
 
@@ -120,7 +139,8 @@ class modellist_table extends table_sql {
      * @throws coding_exception
      */
     final function col_editmodel($values) : string {
-        return '<span class="likelink" data-action="edit-model" data-id="'. $values->id . '">'.get_string('edit', 'mod_certifygen').'</span>';
+//        return '<span class="likelink" data-action="edit-model" data-id="'. $values->id . '">'.get_string('edit', 'mod_certifygen').'</span>';
+        return '<span class="likelink" data-action="edit-model" data-id="'. $values->get('id') . '">'.get_string('edit', 'mod_certifygen').'</span>';
     }
 
     /**
@@ -131,11 +151,13 @@ class modellist_table extends table_sql {
      */
     final function col_associatecontexts($values) : string {
         global $DB;
-        $contextid = $DB->get_field('certifygen_context', 'id', ['modelid' => $values->id]);
+//        $contextid = $DB->get_field('certifygen_context', 'id', ['modelid' => $values->id]);
+        $contextid = $DB->get_field('certifygen_context', 'id', ['modelid' => $values->get('id')]);
 
         if (empty($contextid)) {
             $contextid = 0;
         }
-        return '<span class="likelink" data-action="assign-context" data-id="' . $contextid . '" data-modelid="'. $values->id . '" data-name="'. $values->name . '">'.get_string('assigncontext', 'mod_certifygen').'</span>';
+//        return '<span class="likelink" data-action="assign-context" data-id="' . $contextid . '" data-modelid="'. $values->id . '" data-name="'. $values->name . '">'.get_string('assigncontext', 'mod_certifygen').'</span>';
+        return '<span class="likelink" data-action="assign-context" data-id="' . $contextid . '" data-modelid="'. $values->get('id') . '" data-name="'. $values->get('name') . '">'.get_string('assigncontext', 'mod_certifygen').'</span>';
     }
 }

@@ -102,6 +102,7 @@ class teacher_view implements renderable, templatable {
         if ($userid = optional_param('userid', 0, PARAM_INT)) {
             $filters->add_filter(new integer_filter('userid',filter::JOINTYPE_DEFAULT, [$userid]));
         }
+
         if ($this->hasvalidator) {
             $activityteachertable = new activityteacherview_table($this->courseid, $this->templateid, $this->cm->instance);
         } else {

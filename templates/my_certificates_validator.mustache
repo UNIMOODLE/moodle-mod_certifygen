@@ -52,6 +52,12 @@
         <tbody>
             {{#list}}
                 <tr data-id="{{id}}">
+                    {{#codelink}}
+                        <td><a href="{{codelink}}">{{code}}</a></td>
+                    {{/codelink}}
+                    {{^codelink}}
+                        <td>{{code}}</td>
+                    {{/codelink}}
                     <td>{{code}}</td>
                     <td>{{status}}</td>
                     <td>{{langstring}}</td>

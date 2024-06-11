@@ -50,6 +50,9 @@
         {{> mod_certifygen/my_certificates_no_validator }}
     {{/hasvalidator}}
 </div>
+{{#js}}
+    require(['mod_certifygen/studentcertificatemanager'], (module) => module.init('[data-region="student-view"]'));
+{{/js}}
 
 <style>
     [data-region="student-view"] {
