@@ -32,7 +32,7 @@
 // This line protects the file from being accessed by a URL directly.
 use mod_certifygen\external\deletemodel_external;
 use mod_certifygen\external\emitcertificate_external;
-use mod_certifygen\external\getcontextcertificatedata_external;
+use mod_certifygen\external\getmycertificatedata_external;
 use mod_certifygen\external\getCoursesAsStudent_external;
 use mod_certifygen\external\getCoursesAsTeacher_external;
 use mod_certifygen\external\getJsonStudentCourseCompleted_external;
@@ -42,10 +42,21 @@ use mod_certifygen\external\getPdfStudentCourseCompleted_external;
 use mod_certifygen\external\getPdfTeaching_external;
 use mod_certifygen\external\searchcategory_external;
 use mod_certifygen\external\searchcourse_external;
+use mod_certifygen\external\revokecertificate_external;
+use mod_certifygen\external\get_students_certificates_table_external;
 
 defined('MOODLE_INTERNAL') || die();
 
 $functions = [
+    'mod_certifygen_revokecertificate' => [
+        'classname' => revokecertificate_external::class,
+        'methodname' => 'revokecertificate',
+        'description' => 'Delete a certificate',
+        'type' => 'write',
+        'capabilities' => 'mod/certifygen:manage',
+        'ajax' => true,
+        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
     'mod_certifygen_deletemodel' => [
         'classname' => deletemodel_external::class,
         'methodname' => 'deletemodel',
@@ -91,11 +102,20 @@ $functions = [
         'ajax' => true,
         'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
-    'mod_certifygen_getcontextcertificatedata' => [
-        'classname' => getcontextcertificatedata_external::class,
-        'methodname' => 'getcontextcertificatedata',
+    'mod_certifygen_getmycertificatedata' => [
+        'classname' => getmycertificatedata_external::class,
+        'methodname' => 'getmycertificatedata',
         'description' => 'Emit Certificate',
         'type' => 'write',
+        'capabilities' => 'mod/certifygen:view',
+        'ajax' => true,
+        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
+    'mod_certifygen_get_students_certificates_table' => [
+        'classname' => get_students_certificates_table_external::class,
+        'methodname' => 'get_students_certificates_table',
+        'description' => 'Emit Certificate',
+        'type' => 'read',
         'capabilities' => 'mod/certifygen:view',
         'ajax' => true,
         'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],

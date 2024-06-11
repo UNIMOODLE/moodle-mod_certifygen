@@ -32,7 +32,6 @@
 
 namespace mod_certifygen\output;
 use dml_exception;
-use mod_certifygen\output\views\context_certificate_view;
 use mod_certifygen\output\views\model_view;
 use mod_certifygen\output\views\mycertificates_view;
 use mod_certifygen\output\views\student_view;

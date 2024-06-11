@@ -59,18 +59,22 @@
                         {{#canemit}}
                             <span class="btn btn-primary" data-id="{{id}}" data-action="emit-certificate"
                                   data-modelid="{{modelid}}" data-courseid="{{courseid}}" data-userid="{{userid}}"
-                                  data-langstring="{{langstring}}" data-lang="{{lang}}"> {{#str}} emit, mod_certifygen{{/str}} </span>
+                                  data-langstring="{{langstring}}" data-lang="{{lang}}" data-cmid="{{cmid}}">
+                                    {{#str}} emit, mod_certifygen{{/str}}
+                            </span>
                         {{/canemit}}
                         {{#candownload}}
                             {{#downloadurl}}
                                 <a target="_blank" class="btn btn-primary" href="{{downloadurl}}">{{#str}} download, mod_certifygen{{/str}}</a>
                             {{/downloadurl}}
                             {{^downloadurl}}
-                                <span class="btn btn-primary" data-id="{{id}}" data-action="download-certificate" data-modelid="{{modelid}}" data-courseid="{{courseid}}" data-userid="{{userid}}" data-langstring="{{langstring}}" data-lang="{{lang}}"> {{#str}} download, mod_certifygen{{/str}} </span>
+                                <span class="btn btn-primary" data-id="{{id}}" data-action="download-certificate"
+                                      data-modelid="{{modelid}}" data-courseid="{{courseid}}" data-userid="{{userid}}"
+                                      data-langstring="{{langstring}}" data-lang="{{lang}}">
+                                    {{#str}} download, mod_certifygen{{/str}}
+                                </span>
                             {{/downloadurl}}
-
                         {{/candownload}}
-
                     </td>
                 </tr>
             {{/list}}
@@ -78,7 +82,7 @@
     </table>
 </div>
 {{#js}}
-    require(['mod_certifygen/certificatemanager'], (module) => module.init());
+    require(['mod_certifygen/certificatemanager'], (module) => module.init('[data-region="certificate-validator"]'));
 {{/js}}
 <style>
     .certifygen-actions .btn {

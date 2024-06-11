@@ -31,7 +31,8 @@
 
 
 namespace mod_certifygen\output\views;
-
+global $CFG;
+require_once($CFG->dirroot . '/mod/certifygen/lib.php');
 use coding_exception;
 use dml_exception;
 use mod_certifygen\certifygen;
@@ -46,24 +47,27 @@ use templatable;
 use renderer_base;
 
 class mycertificates_view implements renderable, templatable {
-    private certifygen_model $model;
-    private int $courseid;
-    private bool $hasvalidator;
-    private moodle_url $url;
-    private string $lang;
+    protected certifygen_model $model;
+    protected int $courseid;
+    protected int $cmid;
+    protected bool $hasvalidator;
+    protected moodle_url $url;
+    protected string $lang;
 
     /**
      * @param certifygen_model $model
      * @param int $courseid
      * @param moodle_url $url
+     * @param int $cmid
      * @throws coding_exception
      */
-    public function __construct(certifygen_model $model, int $courseid, moodle_url $url) {
+    public function __construct(certifygen_model $model, int $courseid, moodle_url $url, int $cmid = 0) {
         $this->model = $model;
         $this->courseid = $courseid;
         $this->hasvalidator = !is_null($model->get('validation'));
         $this->url = $url;
         $this->lang = mod_certifygen_get_lang_selected($this->model);
+        $this->cmid = $cmid;
     }
 
     /**
@@ -89,6 +93,7 @@ class mycertificates_view implements renderable, templatable {
     public function export_no_validator_data() : stdClass {
         global $USER;
 
+        //TODO: change url! not to generate by default the certificate.
         $list = [];
         $langlist = get_string_manager()->get_list_of_translations();
         // Generamos tantos como idiomas en la plataforma.
@@ -143,6 +148,7 @@ class mycertificates_view implements renderable, templatable {
                     'langstring' => $langlist[$lang],
                     'id' => $id,
                     'courseid' => $this->courseid,
+                    'cmid' => $this->cmid,
                     'userid' => $USER->id,
                     'canemit' => true,
                 ];
@@ -150,11 +156,12 @@ class mycertificates_view implements renderable, templatable {
         } else {
             $langused = [];
             foreach($validationrecords as $validationrecord) {
+
                 if ($validationrecord->get('lang') != $this->lang) {
                     continue;
                 }
                 $langused[] = $validationrecord->get('lang');
-                $code = certifygen::get_user_certificate($USER->id, $this->courseid, $this->model->get('templateid'), $validationrecord->get('lang'))->code ?? '';
+                $code = \mod_certifygen\certifygen::get_user_certificate($USER->id, $this->courseid, $this->model->get('templateid'), $validationrecord->get('lang'))->code ?? '';
                 $data = [
                     'code' => $code,
                     'status' => get_string('status_' . $validationrecord->get('status'), 'mod_certifygen'),
@@ -163,6 +170,7 @@ class mycertificates_view implements renderable, templatable {
                     'langstring' => $langlist[$validationrecord->get('lang')],
                     'id' =>  $validationrecord->get('id'),
                     'courseid' => $this->courseid,
+                    'cmid' => $this->cmid,
                     'userid' => $USER->id,
                 ];
                 if ($validationrecord->get('status')  == certifygen_validations::STATUS_FINISHED_OK) {
@@ -189,6 +197,9 @@ class mycertificates_view implements renderable, templatable {
                     if (in_array($lang, $langused)) {
                         continue;
                     }
+                    if ($lang != $this->lang) {
+                        continue;
+                    }
                     $list[] = [
                         'code' => '',
                         'status' => get_string('status_' . certifygen_validations::STATUS_NOT_STARTED, 'mod_certifygen'),
@@ -197,6 +208,7 @@ class mycertificates_view implements renderable, templatable {
                         'langstring' => $langlist[$lang],
                         'id' => 0,
                         'courseid' => $this->courseid,
+                        'cmid' => $this->cmid,
                         'userid' => $USER->id,
                         'canemit' => true,
                     ];

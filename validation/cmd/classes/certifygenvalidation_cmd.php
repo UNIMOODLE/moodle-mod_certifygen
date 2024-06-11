@@ -135,17 +135,6 @@ class certifygenvalidation_cmd implements ICertificateValidation
             $file->get_file()->get_filename());
 
         $fs->create_file_from_string($filerecord, $pdfcontent);
-//        $newfile = $fs->create_file_from_string($filerecord, $pdfcontent);
-//        $url = moodle_url::make_pluginfile_url(
-//            $newfile->get_contextid(),
-//            $newfile->get_component(),
-//            $newfile->get_filearea(),
-//            $newfile->get_itemid(),
-//            $newfile->get_filepath(),
-//            $newfile->get_filename(),
-//            false                     // Do not force download of the file.
-//        );
-//        error_log(__FUNCTION__ . ' url: : '.var_export($url->out(), true));
     }
 
     /**

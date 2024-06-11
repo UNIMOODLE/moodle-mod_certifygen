@@ -49,88 +49,73 @@ use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 
-class emitcertificate_external extends external_api {
+class revokecertificate_external extends external_api {
     /**
      * Describes the external function parameters.
      *
      * @return external_function_parameters
      */
-    public static function emitcertificate_parameters(): external_function_parameters {
+    public static function revokecertificate_parameters(): external_function_parameters {
         return new external_function_parameters(
             [
-                'id' => new external_value(PARAM_INT, 'id'),
+                'issueid' => new external_value(PARAM_INT, 'tool_certificate_issues id'),
+                'userid' => new external_value(PARAM_INT, 'user id'),
                 'modelid' => new external_value(PARAM_INT, 'model id'),
-                'lang' => new external_value(PARAM_RAW, 'model lang'),
-                'userid' => new external_value(PARAM_RAW, 'user id'),
-                'courseid' => new external_value(PARAM_RAW, 'course id'),
             ]
         );
     }
 
     /**
-     * @param int $id
-     * @param int $modelid
-     * @param string $lang
+     * @param int $issueid
      * @param int $userid
-     * @param int $courseid
+     * @param int $modelid
      * @return array
      * @throws coding_exception
      * @throws invalid_parameter_exception
-     * @throws invalid_persistent_exception
      */
-    public static function emitcertificate(int $id, int $modelid, string $lang, int $userid, int $courseid): array {
+    public static function revokecertificate(int $issueid, int $userid, int $modelid): array {
+        global $DB;
 
         self::validate_parameters(
-            self::emitcertificate_parameters(), ['id' => $id, 'modelid' => $modelid, 'lang' => $lang, 'userid' => $userid, 'courseid' => $courseid]
+            self::revokecertificate_parameters(), ['issueid' => $issueid, 'userid' => $userid, 'modelid' => $modelid]
         );
-
         $result = ['result' => true, 'message' => 'OK'];
-        $returndata = ['id' => 0, 'code' => ''];
 
-        // Step 1: Change status to in progress.
+        // Step 1: Find validation id..
         $data = [
+            'issueid' => $issueid,
             'userid' => $userid,
-            'lang' => $lang,
             'modelid' => $modelid,
-            'status' => certifygen_validations::STATUS_IN_PROGRESS,
-            'issueid' => null,
-            'usermodified' => $userid,
         ];
-        $validation = certifygen_validations::manage_validation($id, (object) $data);
-
+        $validation = null;
         try {
-            // Step 2: Generate issue.
-            $users = user_get_users_by_id([$userid]);
-            $user = reset($users);
-            $certifygenmodel = new certifygen_model($modelid);
-            $course = get_course($courseid);
-            certifygen::issue_certificate($user, $certifygenmodel->get('templateid'), $course, $lang);
-            if ($existingcertificate = certifygen::get_user_certificate($userid, $courseid, $certifygenmodel->get('templateid'), $lang)) {
-                $validation->set('issueid', $existingcertificate->id);
-                $validation->save();
+            // Step 2: Remove tool_certificate_issues record
+            $issue = $DB->get_record('tool_certificate_issues', ['id' => $issueid], '*', MUST_EXIST);
+            $template = \tool_certificate\template::instance($issue->templateid);
+            // Make sure the user has the required capabilities.
+            $context = \context_course::instance($issue->courseid, IGNORE_MISSING) ?: $template->get_context();
+            self::validate_context($context);
+            if (!$template->can_revoke($issue->userid, $context)) {
+                throw new \required_capability_exception($template->get_context(), 'tool/certificate:issue', 'nopermissions', 'error');
             }
 
-            // Step 3: Generate the tool_certificate certificate.
-            $file = certifygen::get_user_certificate_file($certifygenmodel->get('templateid'), $userid, $courseid, $lang);
-            if (is_null($file)) {
-                $result['result'] = false;
-                $result['message'] = 'File not found';
-            } else {
-                $certifygenfile = new certifygen_file($file, $userid, $lang, $modelid, $course, $validation->get('id'));
-                // Step 4: Call to validation plugin.
-                $validationplugin = $certifygenmodel->get('validation');
-                $validationpluginclass = $validationplugin . '\\' . $validationplugin;
-                if (get_config($validationplugin, 'enable') === '1') {
-                    /** @var ICertificateValidation $subplugin */
-                    $subplugin = new $validationpluginclass();
-                    $subplugin->sendFile($certifygenfile);
-                }
+            // Step 4: Delete the issue.
+            $template->revoke_issue($issueid);
 
+            // Step 5: Remove validation id.
+            try {
+                $validation = certifygen_validations::get_record($data, MUST_EXIST);
+                $validation->delete();
+            } catch (moodle_exception $exception) {
+                error_log(__FUNCTION__ . ' ' . __LINE__ . ' validation - getMessage: '.var_export($exception->getMessage(), true));
             }
-
         } catch (moodle_exception $e) {
             $result['result'] = false;
             $result['message'] = $e->getMessage();
+            if (!is_null($validation)) {
+                $validation->set('status', certifygen_validations::STATUS_FINISHED_ERROR);
+                $validation->save();
+            }
             $validation->set('status', certifygen_validations::STATUS_FINISHED_ERROR);
             $validation->save();
         }
@@ -142,7 +127,7 @@ class emitcertificate_external extends external_api {
      *
      * @return external_single_structure
      */
-    public static function emitcertificate_returns(): external_single_structure {
+    public static function revokecertificate_returns(): external_single_structure {
         return new external_single_structure(
             [
                 'result' => new external_value(PARAM_BOOL, 'model deleted'),

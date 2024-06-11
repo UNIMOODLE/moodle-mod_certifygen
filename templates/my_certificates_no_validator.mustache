@@ -43,6 +43,8 @@
 <table  class="table">
     <thead>
         <tr>
+            <th scope="col"> {{#str}} code, mod_certifygen{{/str}} </th>
+            <th scope="col"> {{#str}} status, mod_certifygen{{/str}} </th>
             <th scope="col"> {{#str}} language {{/str}} </th>
             <th scope="col"> </th>
         </tr>
@@ -50,6 +52,8 @@
     <tbody>
         {{#list}}
             <tr data-id="{{id}}">
+                <td>{{code}}</td>
+                <td>{{status}}</td>
                 <td>{{langstring}}</td>
                 <td>
                     <a href="{{url}}" class="btn btn-primary"> {{#str}}download, mod_certifygen{{/str}}</a>

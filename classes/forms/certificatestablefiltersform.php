@@ -31,11 +31,15 @@
 
 namespace mod_certifygen\forms;
 
-class certificatestablefiltersform extends \moodleform
+use coding_exception;
+use moodleform;
+
+class certificatestablefiltersform extends moodleform
 {
 
     /**
      * @inheritDoc
+     * @throws coding_exception
      */
     protected function definition()
     {
@@ -56,7 +60,7 @@ class certificatestablefiltersform extends \moodleform
             unset($choices[$defaultlang]);
             $langchoices = array_merge($langchoices, $choices);
         }
-        $mform->addElement('select', 'lang', get_string('langs', 'mod_certifygen'), $langchoices);
+        $mform->addElement('select', 'lang', get_string('chooselang', 'mod_certifygen'), $langchoices);
         $mform->setType('lang', PARAM_INT);
 
         $this->add_action_buttons(false, get_string('filter', 'mod_certifygen'));

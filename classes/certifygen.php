@@ -151,7 +151,7 @@ class certifygen {
                 $expirydateoffset,
                 $expirydateoffset
             );
-            return $template->issue_certificate($user->id, $expirydate, $issuedata, 'mod_certifygen', $course->id);
+            return $template->issue_certificate($user->id, $expirydate, $issuedata, 'tool_certifygen', $course->id);
         } catch(moodle_exception $e) {
             error_log(__FUNCTION__ . ' ' . __LINE__. ' ERROR: '. var_export($e->getMessage(), true));
         }
@@ -318,7 +318,7 @@ class certifygen {
         $userfields = self::get_extra_user_fields($context);
 
         $sql = "SELECT ci.id as issueid, ci.code, ci.emailed, ci.timecreated, ci.userid, ci.templateid, ci.expires,
-                       t.name, ci.courseid, ci.archived, $userfields,
+                       t.name, ci.courseid, ci.archived, $userfields, 
                   CASE WHEN ci.expires > 0  AND ci.expires < :now THEN 0
                   ELSE 1
                   END AS status

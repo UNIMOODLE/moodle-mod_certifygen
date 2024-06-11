@@ -286,7 +286,7 @@ function mod_certifygen_pluginfile(
     array $options
     ) {
 
-    if ($context->contextlevel != CONTEXT_COURSE) {
+    if ($context->contextlevel != CONTEXT_COURSE && $context->contextlevel != CONTEXT_SYSTEM) {
         return false;
     }
 
@@ -328,6 +328,7 @@ function mod_certifygen_pluginfile(
 
     // Retrieve the file from the Files API.
     $fs = get_file_storage();
+
     $file = $fs->get_file($context->id, ICertificateValidation::FILE_COMPONENT, $filearea, $itemid, $filepath, $filename);
     if (!$file) {
         // The file does not exist.

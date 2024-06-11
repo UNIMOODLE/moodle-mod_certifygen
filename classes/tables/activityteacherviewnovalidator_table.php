@@ -33,11 +33,12 @@
 namespace mod_certifygen\tables;
 global $CFG;
 require_once($CFG->libdir . '/tablelib.php');
+require_once($CFG->libdir . '/modinfolib.php');
 
+use cm_info;
 use coding_exception;
 use dml_exception;
 use mod_certifygen\certifygen;
-use mod_certifygen\persistents\certifygen_validations;
 use mod_certifygen\template;
 use moodle_exception;
 use moodle_url;
@@ -46,27 +47,38 @@ use table_sql;
 class activityteacherviewnovalidator_table extends table_sql {
     private int $courseid;
     private int $templateid;
+    private int $cmid;
+    private int $modelid;
 
     /**
      * Constructor
      * @param int $courseid template id
      * @param int $templateid
-     * @throws coding_exception
+     * @param int $modelid
+     * @throws coding_exception|moodle_exception
      */
-    function __construct(int $courseid, int $templateid) {
+    function __construct(int $courseid, int $templateid, int $modelid) {
         $this->courseid = $courseid;
         $this->templateid = $templateid;
+        $this->modelid = $modelid;
+        $certifygen = \mod_certifygen\persistents\certifygen::get_record(['modelid' => $modelid]);
+        /** @var cm_info $cm**/
+        [$course, $cm] = get_course_and_cm_from_instance($certifygen->get('id'), 'certifygen', $courseid);
+        $this->cmid = $cm->id;
         $uniqueid = 'certifygen-activity-novalidator-teacher-view';
         parent::__construct($uniqueid);
         // Define the list of columns to show.
-        $columns = ['fullname', 'code', 'link'];
+        $columns = ['fullname', 'code', 'status', 'dateissued', 'download', 'revoke' ];
         $this->define_columns($columns);
 
         // Define the titles of columns to show in header.
         $headers = [
             get_string('fullname'),
             get_string('code', 'mod_certifygen'),
-            ''
+            get_string('status', 'mod_certifygen'),
+            get_string('date'),
+            '',
+            '',
         ];
         $this->define_headers($headers);
 
@@ -89,11 +101,49 @@ class activityteacherviewnovalidator_table extends table_sql {
 
     /**
      * @param $row
+     * @return string
+     */
+    function col_dateissued($row): string
+    {
+        return date('d/m/y', $row->timecreated);
+    }
+
+    /**
+     * @param $row
+     * @return string
+     * @throws coding_exception
+     */
+    function col_status($row): string
+    {
+
+        return $row->status == 0 ? get_string('expired', 'tool_certificate')
+            : get_string('valid', 'tool_certificate');
+    }
+
+    /**
+     * @param $row
      * @return mixed
+     * @throws moodle_exception
      */
     function col_code($row): string
     {
-        return $row->code;
+        $url = new moodle_url('/admin/tool/certificate/index.php', ['code' => $row->code]);
+        return '<a href="' . $url->out() . '">' . $row->code . '</a>';
+    }
+
+    /**
+     * @param $row
+     * @return string
+     * @throws coding_exception
+     */
+    function col_revoke($row): string
+    {
+        $code = explode('_', $row->code);
+        $lang = $code[1];
+        return '<span class="likelink" data-action="revoke-certificate" data-username="'. $row->firstname. ' '
+            . $row->lastname .'" data-issueid="'. $row->issueid.'" data-modelid="'. $this->modelid
+            .'" data-courseid="'. $this->courseid.'" data-userid="'. $row->userid.'" data-cmid="'.  $this->cmid .'">' .
+            get_string('revoke', 'tool_certificate') . '</span>';
     }
 
     /**
@@ -103,15 +153,11 @@ class activityteacherviewnovalidator_table extends table_sql {
      * @throws moodle_exception
      * @throws coding_exception
      */
-    function col_link($row): string
+    function col_download($row): string
     {
         global $DB;
-        $lang = explode('_', $row->code);
-        $lang = $lang[0];
-        $certificate = template::instance($row->templateid, (object) ['lang' => $lang]);
-        $issueid = $certificate->issue_certificate($row->userid);
-        $code = $DB->get_field('tool_certificate_issues', 'code', ['id' => $issueid]);
-        $link = new moodle_url('/mod/certifygen/certificateview.php', ['code' => $code, 'preview' => true, 'templateid' => $row->templateid]);
+        $code = $DB->get_field('tool_certificate_issues', 'code', ['id' => $row->issueid]);
+        $link = new moodle_url('/mod/certifygen/certificateview.php', ['code' => $code, 'templateid' => $row->templateid]);
 
 
         return '<a href='. $link->out().'>'.get_string('download', 'mod_certifygen').'</a>';

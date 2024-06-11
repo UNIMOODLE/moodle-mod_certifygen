@@ -35,6 +35,7 @@ namespace mod_certifygen;
 
 
 use coding_exception;
+use context_course;
 use context_system;
 use core\lock\lock;
 use core\message\message;
@@ -164,7 +165,7 @@ class template extends \tool_certificate\template {
         $fs = get_file_storage();
         $file = $fs->get_file(
             context_system::instance()->id,
-            'tool_certificate',
+            'mod_certifygen',
             'issues',
             $issue->id,
             '/',

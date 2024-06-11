@@ -50,11 +50,16 @@
         {{> mod_certifygen/my_certificates_no_validator }}
     {{/hasvalidator}}
 </div>
-{{#js}}
-    require(['mod_certifygen/certificatemanager'], (module) => module.init());
-{{/js}}
 <style>
     [data-region="context-certificate-view"] {
         margin: 2em 0;
+    }
+    [data-region="context-certificate-view"] .likelink {
+        color: #0f6cbf;
+        text-decoration: none;
+    }
+    [data-region="context-certificate-view"] .likelink:hover {
+        color: #094478;
+        text-decoration: underline;
     }
 </style>

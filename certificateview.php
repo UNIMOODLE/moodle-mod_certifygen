@@ -49,7 +49,7 @@ if ($preview) {
     }
 
 } else {
-    $issue = \tool_certificate\template::get_issue_from_code($issuecode);
+    $issue = \mod_certifygen\template::get_issue_from_code($issuecode);
     $context = \context_course::instance($issue->courseid, IGNORE_MISSING) ?: null;
 
     $template = $issue ? \mod_certifygen\template::instance($issue->templateid, (object) ['lang' => $lang[1]]) : null;

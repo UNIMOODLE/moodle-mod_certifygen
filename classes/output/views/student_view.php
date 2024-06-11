@@ -33,14 +33,18 @@
 namespace mod_certifygen\output\views;
 
 use coding_exception;
+use dml_exception;
+use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
+use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 use moodle_url;
 use stdClass;
 
 class student_view extends mycertificates_view {
 
+    private stdClass $cm;
 
     /**
      * @param int $courseid
@@ -50,9 +54,10 @@ class student_view extends mycertificates_view {
      */
     public function __construct(int $courseid, stdClass $cm) {
 
+        $this->cm = $cm;
         $certificate = new certifygen($cm->instance);
         $model = new certifygen_model($certificate->get('modelid'));
         $url = new moodle_url('/mod/certifygen/view.php', ['id' => $cm->id]);
-        parent::__construct($model, $courseid, $url);
+        parent::__construct($model, $courseid, $url, $this->cm->id);
     }
 }

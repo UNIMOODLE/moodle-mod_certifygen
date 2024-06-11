@@ -31,51 +31,62 @@
 
 namespace mod_certifygen\external;
 
-
+global $CFG;
+require_once($CFG->dirroot . '/lib/formslib.php');
 use coding_exception;
 use context_system;
 use dml_exception;
 use external_api;
 use external_multiple_structure;
 use invalid_parameter_exception;
-use mod_certifygen\output\views\context_certificate_view;
+use mod_certifygen\output\views\mycertificates_view;
+use mod_certifygen\output\views\student_view;
 use mod_certifygen\persistents\certifygen_model;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
+use moodle_exception;
 use moodle_url;
 
-class getcontextcertificatedata_external extends external_api {
+class getmycertificatedata_external extends external_api {
     /**
      * Describes the external function parameters.
      *
      * @return external_function_parameters
      */
-    public static function getcontextcertificatedata_parameters(): external_function_parameters {
+    public static function getmycertificatedata_parameters(): external_function_parameters {
         return new external_function_parameters([
             'modelid' => new external_value(PARAM_INT, 'model id'),
             'courseid' => new external_value(PARAM_INT, 'course id'),
+            'cmid' => new external_value(PARAM_INT, 'cm id'),
         ]);
     }
 
     /**
      * @param int $modelid
      * @param int $courseid
+     * @param int $cmid
      * @return array
      * @throws coding_exception
      * @throws dml_exception
      * @throws invalid_parameter_exception
-     * @throws \moodle_exception
+     * @throws moodle_exception
      */
-    public static function getcontextcertificatedata(int $modelid, int $courseid): array {
+    public static function getmycertificatedata(int $modelid, int $courseid, int $cmid): array {
         global $PAGE;
         self::validate_parameters(
-            self::getcontextcertificatedata_parameters(), ['modelid' => $modelid, 'courseid' => $courseid]
+            self::getmycertificatedata_parameters(), ['modelid' => $modelid, 'courseid' => $courseid, 'cmid' => $cmid]
         );
         $PAGE->set_context(context_system::instance());
         $model = new certifygen_model($modelid);
-        $url = new moodle_url('/mod/certifygen/courselink.php', ['id' => $courseid]);
-        $view = new \mod_certifygen\output\views\mycertificates_view($model, $courseid, $url);
+        if ($cmid > 0) {
+            $cm = get_coursemodule_from_id('certifygen', $cmid, 0, false, MUST_EXIST);
+            $view = new student_view($courseid, $cm);
+        } else {
+            $url = new moodle_url('/mod/certifygen/courselink.php', ['id' => $courseid]);
+            $view = new mycertificates_view($model, $courseid, $url);    
+        }
+        
         $output = $PAGE->get_renderer('mod_certifygen');
         $data = $view->export_for_template($output);
 
@@ -86,7 +97,7 @@ class getcontextcertificatedata_external extends external_api {
      *
      * @return external_single_structure
      */
-    public static function getcontextcertificatedata_returns(): external_single_structure {
+    public static function getmycertificatedata_returns(): external_single_structure {
         return new external_single_structure(
             [
                 'list' => new external_multiple_structure(

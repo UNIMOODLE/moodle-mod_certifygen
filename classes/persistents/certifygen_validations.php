@@ -27,7 +27,7 @@ class certifygen_validations extends persistent {
             'userid' => [
                 'type' => PARAM_INT,
             ],
-            'issuesid' => [
+            'issueid' => [
                 'type' => PARAM_INT,
                 'default' => NULL,
                 'null' => NULL_ALLOWED,

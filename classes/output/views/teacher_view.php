@@ -31,7 +31,8 @@
 
 
 namespace mod_certifygen\output\views;
-
+global $CFG;
+require_once($CFG->dirroot . '/mod/certifygen/lib.php');
 use coding_exception;
 use core_table\local\filter\filter;
 use core_table\local\filter\integer_filter;
@@ -104,7 +105,7 @@ class teacher_view implements renderable, templatable {
         if ($this->hasvalidator) {
             $activityteachertable = new activityteacherview_table($this->courseid, $this->templateid, $this->cm->instance);
         } else {
-            $activityteachertable = new activityteacherviewnovalidator_table($this->courseid, $this->templateid);
+            $activityteachertable = new activityteacherviewnovalidator_table($this->courseid, $this->templateid, $this->certificatemodel->get('id'));
         }
         $activityteachertable->set_filterset($filters);
         $paramsurl = ['id' => $this->cm->id, 'lang' => $lang];

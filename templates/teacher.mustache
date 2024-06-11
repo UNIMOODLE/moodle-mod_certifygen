@@ -43,10 +43,27 @@
     {{#form}}
         <div>
             {{{ form }}}
-        <div>
+        </div>
     {{/form}}
     <div>
         {{{ table }}}
     </div>
 
 </div>
+
+{{#js}}
+    require(['mod_certifygen/certificatemanager'], (module) => module.init('[data-region="teacher-view"]'));
+{{/js}}
+
+<style>
+
+    [data-region="teacher-view"] .likelink {
+        cursor: pointer;
+        color: #0f6cbf;
+        text-decoration: none;
+    }
+    [data-region="teacher-view"] .likelink:hover {
+        color: #094478;
+        text-decoration: underline;
+    }
+</style>
