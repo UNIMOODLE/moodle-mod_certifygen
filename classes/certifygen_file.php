@@ -64,7 +64,7 @@ class certifygen_file {
     public function get_metadata() : array {
         return [
             'userid' => $this->userid,
-            'courseid' => $this->courseid,
+            'courseid' => $this->course->id,
             'coursefullname' => $this->get_course()->fullname,
             'lang' => $this->lang,
             'contentfile' => $this->file->get_content(),
