@@ -37,38 +37,38 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 
-class getPdfTeaching_external extends external_api {
+class get_json_certificate_external extends external_api {
     /**
      * Describes the external function parameters.
      *
      * @return external_function_parameters
      */
-    public static function getPdfTeaching_parameters(): external_function_parameters {
+    public static function get_json_certificate_parameters(): external_function_parameters {
         return new external_function_parameters(
             [
-                'id' => new external_value(PARAM_INT, 'model id'),
-                'dni' => new external_value(PARAM_RAW, 'user dni'),
-                'courseid' => new external_value(PARAM_INT, 'course id'),
+                'userid' => new external_value(PARAM_INT, 'user id'),
+                'idinstance' => new external_value(PARAM_INT, 'instance id'),
+                'customfields' => new external_value(PARAM_RAW, 'customfields'),
             ]
         );
     }
-    public static function getPdfTeaching(int $id, string $dni, int $courseid): array {
+    public static function get_json_certificate(int $userid, int $idinstance, string $customfields): array {
         /**
-         * Devuelve el PDF del certificado de que el profesor ha impartido docencia en el curso
-         * indicado con el detalle del uso que ha realizado de la herramienta que aparecerá en el
-         * certificado. Este servicio web llamará a getJsonTeaching para obtener la información a
-         * maquetar
+         * Devuelve un json con la información necesaria para el anterior servicio para
+         * confeccionar el certificado. El objetivo de este servicio es independizar el proceso de
+         * obtención de los datos del proceso de generación del documento con la presentación
+         * final.
          */
-        return ['file' => 'The file'];
+        return ['json' => '{"elemento1":"imagen"}'];
     }
     /**
      * Describes the data returned from the external function.
      *
      * @return external_single_structure
      */
-    public static function getPdfTeaching_returns(): external_single_structure {
+    public static function get_json_certificate_returns(): external_single_structure {
         return new external_single_structure(array(
-                'file' => new external_value(PARAM_RAW, 'File content on base64'),
+                'json' => new external_value(PARAM_RAW, 'Certificate elements in a json'),
             )
         );
     }

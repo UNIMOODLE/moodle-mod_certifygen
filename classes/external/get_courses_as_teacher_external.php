@@ -38,26 +38,44 @@ use external_single_structure;
 use external_multiple_structure;
 use external_value;
 
-class getCoursesAsTeacher_external extends external_api {
+class get_courses_as_teacher_external extends external_api {
     /**
      * Describes the external function parameters.
      *
      * @return external_function_parameters
      */
-    public static function getCoursesAsTeacher_parameters(): external_function_parameters {
+    public static function get_courses_as_teacher_parameters(): external_function_parameters {
         return new external_function_parameters(
             [
-                'dni' => new external_value(PARAM_RAW, 'user dni'),
+                'userid' => new external_value(PARAM_INT, 'user id'),
             ]
         );
     }
-    public static function getCoursesAsTeacher(string $dni): array {
+
+    /**
+     * @param int $userid
+     * @return array
+     */
+    public static function get_courses_as_teacher(int $userid): array {
         /**
+         * OLD
          * Devuelve un json con la información necesaria para el anterior servicio para
          * confeccionar el certificado. El objetivo de este servicio es independizar el proceso de
          * obtención de los datos del proceso de generación del documento con la presentación
          * final.
          */
+        /**
+         * NEW:
+         * Devuelve un json con la lista de cursos en los cuales figura como profesor la persona indicada
+         * por su identificador (userid).
+         * Este servicio permitirá a un sistema externo mostrar los cursos certificables.
+         * El servicio devolverá como mínimo los siguientes atributos de cada curso y se valorará que se ofrezca un
+         * servicio para configurar otros atributos de los disponibles para el profesor y los cursos en moodle:
+         * a. course.shortname
+         * b. course.fullname
+         * c. course.categoryid.
+         * d. reportype asociado al curso: [model type]
+ */
         return [
             'courses' => [
                 [
@@ -67,10 +85,17 @@ class getCoursesAsTeacher_external extends external_api {
                     'categoryid'   => 1,
                     'completed'   => false,
                     'modellist'   => '1,2',
+                    'reporttypes'   => [
+                        [
+                            'type' => 1,
+                            'modelid' => 1,
+                        ]
+                    ],
                 ]
             ],
             'teacher' => [
-                'fullname' => 'Nombre fake'
+                'fullname' => 'Nombre fake',
+                'id' => 1
             ]
         ];
     }
@@ -79,7 +104,7 @@ class getCoursesAsTeacher_external extends external_api {
      *
      * @return external_single_structure
      */
-    public static function getCoursesAsTeacher_returns(): external_single_structure {
+    public static function get_courses_as_teacher_returns(): external_single_structure {
         return new external_single_structure(array(
                 'courses' => new external_multiple_structure( new external_single_structure(
                         [
@@ -89,11 +114,19 @@ class getCoursesAsTeacher_external extends external_api {
                             'categoryid' => new external_value(PARAM_INT, 'Course category id'),
                             'completed' => new external_value(PARAM_BOOL, 'student has course completed '),
                             'modellist' => new external_value(PARAM_RAW, 'model id list separated by commas.'),
+                            'reporttypes' => new external_multiple_structure(
+                                new external_single_structure(
+                                    [
+                                        'type'   => new external_value(PARAM_INT, 'model type'),
+                                        'modelid'   => new external_value(PARAM_INT, 'model id'),
+                                    ], 'courses list')
+                                ),
                         ], 'courses list')
                 ),
                 'teacher' => new external_single_structure (
                     [
                         'fullname' => new external_value(PARAM_RAW, 'User fullname'),
+                        'id' => new external_value(PARAM_INT, 'User id'),
                     ], 'Student info')
             )
         );

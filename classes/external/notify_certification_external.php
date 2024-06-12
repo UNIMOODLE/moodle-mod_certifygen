@@ -37,38 +37,46 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 
-class getJsonTeaching_external extends external_api {
+class notify_certification_external extends external_api {
     /**
      * Describes the external function parameters.
      *
      * @return external_function_parameters
      */
-    public static function getJsonTeaching_parameters(): external_function_parameters {
+    public static function notify_certification_parameters(): external_function_parameters {
         return new external_function_parameters(
             [
-                'dni' => new external_value(PARAM_RAW, 'user dni'),
-                'courseid' => new external_value(PARAM_INT, 'course id'),
+                'userid' => new external_value(PARAM_INT, 'user id'),
+                'idinstance' => new external_value(PARAM_INT, 'instance id'),
+                'datos' => new external_value(PARAM_RAW, 'datos'),
             ]
         );
     }
-    public static function getJsonTeaching(string $dni, int $courseid): array {
+
+    /**
+     * @param int $userid
+     * @param int $idinstance
+     * @param string $datos
+     * @return string[]
+     */
+    public static function notify_certification(int $userid, int $idinstance, string $datos): array {
         /**
-         * Devuelve un json con la información necesaria para el anterior servicio para
-         * confeccionar el certificado. El objetivo de este servicio es independizar el proceso de
-         * obtención de los datos del proceso de generación del documento con la presentación
-         * final.
-         */
-        return ['json' => '{"elemento1":"imagen"}'];
+         * El sistema externo notificará a Moodle (en concreto a la instancia de subplugin repositorio que esté asociado
+         * al idInstance), proporcionando la información del certificado en el parámetro “datos”
+         * (url de almacenaje, tamaño fichero, etc).
+         * El plugin de repositorio utilizará esta información para gestionar el resultado del certificado y mostrar 
+         * la información visible por el usuario al acceder a dicha instancia de certificado dentro de su curso de Moodle.
+ */
+        return ['status' => 'OK'];
     }
     /**
      * Describes the data returned from the external function.
      *
      * @return external_single_structure
      */
-    public static function getJsonTeaching_returns(): external_single_structure {
-        return new external_single_structure(array(
-                'json' => new external_value(PARAM_RAW, 'Certificate elements in a json'),
-            )
-        );
+    public static function notify_certification_returns(): external_single_structure {
+        return new external_single_structure([
+                'status' => new external_value(PARAM_RAW, 'status'),
+            ]);
     }
 }
