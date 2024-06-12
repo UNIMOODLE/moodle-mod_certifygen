@@ -59,6 +59,7 @@ class getmycertificatedata_external extends external_api {
             'modelid' => new external_value(PARAM_INT, 'model id'),
             'courseid' => new external_value(PARAM_INT, 'course id'),
             'cmid' => new external_value(PARAM_INT, 'cm id'),
+            'lang' => new external_value(PARAM_RAW, 'lang'),
         ]);
     }
 
@@ -72,19 +73,19 @@ class getmycertificatedata_external extends external_api {
      * @throws invalid_parameter_exception
      * @throws moodle_exception
      */
-    public static function getmycertificatedata(int $modelid, int $courseid, int $cmid): array {
+    public static function getmycertificatedata(int $modelid, int $courseid, int $cmid, string $lang): array {
         global $PAGE;
         self::validate_parameters(
-            self::getmycertificatedata_parameters(), ['modelid' => $modelid, 'courseid' => $courseid, 'cmid' => $cmid]
+            self::getmycertificatedata_parameters(), ['modelid' => $modelid, 'courseid' => $courseid, 'cmid' => $cmid, 'lang' => $lang]
         );
         $PAGE->set_context(context_system::instance());
         $model = new certifygen_model($modelid);
         if ($cmid > 0) {
             $cm = get_coursemodule_from_id('certifygen', $cmid, 0, false, MUST_EXIST);
-            $view = new student_view($courseid, $cm);
+            $view = new student_view($courseid, $cm, $lang);
         } else {
             $url = new moodle_url('/mod/certifygen/courselink.php', ['id' => $courseid]);
-            $view = new mycertificates_view($model, $courseid, $url);    
+            $view = new mycertificates_view($model, $courseid, $url, $lang);
         }
         
         $output = $PAGE->get_renderer('mod_certifygen');
@@ -112,6 +113,9 @@ class getmycertificatedata_external extends external_api {
                         'userid' => new external_value(PARAM_INT, 'model deleted'),
                         'canemit' => new external_value(PARAM_BOOL, 'model deleted', VALUE_OPTIONAL),
                         'candownload' => new external_value(PARAM_BOOL, 'model deleted', VALUE_OPTIONAL),
+                        'iscodelink' => new external_value(PARAM_BOOL, 'model deleted', VALUE_OPTIONAL),
+                        'codelink' => new external_value(PARAM_RAW, 'model deleted', VALUE_OPTIONAL),
+                        'downloadurl' => new external_value(PARAM_RAW, 'model deleted', VALUE_OPTIONAL),
                     ])
                 )
             ]

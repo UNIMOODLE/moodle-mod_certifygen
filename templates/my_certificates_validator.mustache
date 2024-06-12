@@ -52,13 +52,16 @@
         <tbody>
             {{#list}}
                 <tr data-id="{{id}}">
-                    {{#codelink}}
-                        <td><a href="{{codelink}}">{{code}}</a></td>
-                    {{/codelink}}
-                    {{^codelink}}
-                        <td>{{code}}</td>
-                    {{/codelink}}
-                    <td>{{code}}</td>
+                    <td>
+                        {{#iscodelink}}
+                            <a href="{{codelink}}">
+                                {{code}}
+                            </a>
+                        {{/iscodelink}}
+                        {{^iscodelink}}
+                            {{code}}
+                        {{/iscodelink}}
+                    </td>
                     <td>{{status}}</td>
                     <td>{{langstring}}</td>
                     <td class="certifygen-actions">

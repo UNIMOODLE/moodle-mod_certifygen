@@ -58,15 +58,16 @@ class mycertificates_view implements renderable, templatable {
      * @param certifygen_model $model
      * @param int $courseid
      * @param moodle_url $url
+     * @param string $lang
      * @param int $cmid
      * @throws coding_exception
      */
-    public function __construct(certifygen_model $model, int $courseid, moodle_url $url, int $cmid = 0) {
+    public function __construct(certifygen_model $model, int $courseid, moodle_url $url, string $lang = '', int $cmid = 0) {
         $this->model = $model;
         $this->courseid = $courseid;
         $this->hasvalidator = !is_null($model->get('validation'));
         $this->url = $url;
-        $this->lang = mod_certifygen_get_lang_selected($this->model);
+        $this->lang = empty($lang) ? mod_certifygen_get_lang_selected($this->model): $lang;
         $this->cmid = $cmid;
     }
 
@@ -82,6 +83,7 @@ class mycertificates_view implements renderable, templatable {
         } else {
             $data = $this->export_no_validator_data();
         }
+
         $data->form = mod_certifygen_get_certificates_table_form($this->model, $this->url);
         return $data;
     }
@@ -128,9 +130,11 @@ class mycertificates_view implements renderable, templatable {
 
         return $data;
     }
+
     /**
      * @throws dml_exception
      * @throws coding_exception
+     * @throws moodle_exception
      */
     public function export_with_validator_data() : stdClass {
         global $USER;
@@ -169,11 +173,8 @@ class mycertificates_view implements renderable, templatable {
                     continue;
                 }
                 $langused[] = $validationrecord->get('lang');
-                $code = \mod_certifygen\certifygen::get_user_certificate($USER->id, $this->courseid, $this->model->get('templateid'), $validationrecord->get('lang'))->code ?? '';
-                $codelink =  new moodle_url('/admin/tool/certificate/index.php', ['code' => $code]);
+
                 $data = [
-                    'code' => $code,
-                    'codelink' => $codelink->out(),
                     'status' => get_string('status_' . $validationrecord->get('status'), 'mod_certifygen'),
                     'modelid' => $this->model->get('id'),
                     'lang' => $validationrecord->get('lang'),
@@ -188,12 +189,18 @@ class mycertificates_view implements renderable, templatable {
                     $validationplugin = $this->model->get('validation');
                     $validationpluginclass = $validationplugin . '\\' . $validationplugin;
                     if (get_config($validationplugin, 'enable') === '1') {
+                        $usercertificate = certifygen::get_user_certificate($USER->id, $this->courseid, $this->model->get('templateid'), $validationrecord->get('lang'));
+                        $code = !is_null($usercertificate) ?  $usercertificate->code : '';
                         /** @var ICertificateValidation $subplugin */
                         $subplugin = new $validationpluginclass();
                         $url = $subplugin->getFileUrl($this->courseid, $validationrecord->get('id'), $code.'.pdf');
                         if (!empty($url)) {
                             $data['downloadurl'] = $url;
                         }
+                        $codelink =  new moodle_url('/admin/tool/certificate/index.php', ['code' => $code]);
+                        $data['codelink'] = $codelink->out();
+                        $data['iscodelink'] = true;
+                        $data['code'] = $code;
                     }
                 }
                 if ($validationrecord->get('status')  !== certifygen_validations::STATUS_IN_PROGRESS
@@ -225,10 +232,10 @@ class mycertificates_view implements renderable, templatable {
                 }
             }
         }
-
         $data = new stdClass();
         $data->list = $list;
         $data->hasvalidator = $this->hasvalidator;
+
         return $data;
     }
 }

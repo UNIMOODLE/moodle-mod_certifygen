@@ -49,15 +49,16 @@ class student_view extends mycertificates_view {
     /**
      * @param int $courseid
      * @param stdClass $cm
+     * @param string $lang
      * @throws coding_exception
      * @throws moodle_exception
      */
-    public function __construct(int $courseid, stdClass $cm) {
+    public function __construct(int $courseid, stdClass $cm, string $lang = '') {
 
         $this->cm = $cm;
         $certificate = new certifygen($cm->instance);
         $model = new certifygen_model($certificate->get('modelid'));
         $url = new moodle_url('/mod/certifygen/view.php', ['id' => $cm->id]);
-        parent::__construct($model, $courseid, $url, $this->cm->id);
+        parent::__construct($model, $courseid, $url, $lang, $this->cm->id);
     }
 }

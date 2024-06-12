@@ -120,7 +120,7 @@ const emitCertificate = async(event) => {
         modal.destroy();
         Ajax.call([request])[0].done(function(response) {
             if (response.result === true) {
-                studentsReloadTable(modelid, courseid, cmid);
+                studentsReloadTable(modelid, courseid, cmid, lang);
             } else {
                 Notification.alert('Error', response.message, langStrings[2]);
             }
@@ -152,7 +152,7 @@ const teacherReloadTable = (modelid, courseid, cmid) => {
         });
     });
 };
-const studentsReloadTable = (modelid, courseid, cmid) => {
+const studentsReloadTable = (modelid, courseid, cmid, lang) => {
     modelid = parseInt(modelid);
     courseid = parseInt(courseid);
     cmid = parseInt(cmid);
@@ -161,10 +161,10 @@ const studentsReloadTable = (modelid, courseid, cmid) => {
         identifier.append(html);
         let request = {
             methodname: SERVICES.GET_MYCERTIFICATE_TABLE_DATA,
-            args: {modelid, courseid, cmid}
+            args: {modelid, courseid, cmid, lang}
         };
         Ajax.call([request])[0].done(function(data) {
-            Templates.render(TEMPLATES.STUDENTS_TABLE, data).then((html, js) => {
+            Templates.render(TEMPLATES.STUDENTS_TABLE, data).then(function(html, js) {
                 identifier.html(html);
                 Templates.runTemplateJS(js);
             }).fail(Notification.exception);

@@ -168,7 +168,7 @@ class activityteacherview_table extends table_sql {
         global $DB;
 
         $lang = explode('_', $row->code);
-        $lang = $lang[0];
+        $lang = $lang[1];
         $code = $DB->get_field('tool_certificate_issues', 'code', ['id' => $row->issueid]);
         $link = new moodle_url('/mod/certifygen/certificateview.php', ['code' => $code, 'preview' => true, 'templateid' => $row->templateid]);
         $status = certifygen_validations::STATUS_NOT_STARTED;
@@ -190,7 +190,14 @@ class activityteacherview_table extends table_sql {
                 href='. $link->out().'>'.get_string('emit', 'mod_certifygen').'</span>';
         } else if ($status == certifygen_validations::STATUS_FINISHED_OK) {
             $validationplugin = $this->model->get('validation');
-            $validationrecord = certifygen_validations::get_record(['modelid' => $this->model->get('id'), 'userid' => $row->userid]);
+            $validationrecords = certifygen_validations::get_records(['modelid' => $this->model->get('id'), 'userid' => $row->userid]);
+            $validationrecord = null;
+            foreach ($validationrecords as $record) {
+                if ($record->get('lang') != $lang) {
+                    continue;
+                }
+                $validationrecord = $record;
+            }
             $validationpluginclass = $validationplugin . '\\' . $validationplugin;
             if (get_config($validationplugin, 'enable') === '1') {
                 /** @var ICertificateValidation $subplugin */
