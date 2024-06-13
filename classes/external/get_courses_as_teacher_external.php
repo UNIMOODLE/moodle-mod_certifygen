@@ -37,7 +37,11 @@ use external_function_parameters;
 use external_single_structure;
 use external_multiple_structure;
 use external_value;
+use mod_certifygen\persistents\certifygen_context;
+use mod_certifygen\persistents\certifygen_model;
 
+global $CFG;
+require_once($CFG->dirroot.'/user/lib.php');
 class get_courses_as_teacher_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -55,6 +59,7 @@ class get_courses_as_teacher_external extends external_api {
     /**
      * @param int $userid
      * @return array
+     * @throws \invalid_parameter_exception
      */
     public static function get_courses_as_teacher(int $userid): array {
         /**
@@ -76,28 +81,65 @@ class get_courses_as_teacher_external extends external_api {
          * c. course.categoryid.
          * d. reportype asociado al curso: [model type]
  */
-        return [
-            'courses' => [
-                [
-                    'id'   => 1,
-                    'shortname'   => 'Course test',
-                    'fullname'   => 'Course test',
-                    'categoryid'   => 1,
-                    'completed'   => false,
-                    'modellist'   => '1,2',
-                    'reporttypes'   => [
-                        [
-                            'type' => 1,
-                            'modelid' => 1,
-                        ]
-                    ],
-                ]
-            ],
-            'teacher' => [
-                'fullname' => 'Nombre fake',
-                'id' => 1
-            ]
-        ];
+        $params = self::validate_parameters(
+            self::get_courses_as_teacher_parameters(), ['userid' => $userid]
+        );
+        $results = ['courses' => [], 'teacher' => [], 'error' => []];
+        $haserror = false;
+        $courses = [];
+        try {
+            // User exists.
+            $users = user_get_users_by_id([$params['userid']]);
+            if (empty($users)) {
+                unset($results['courses']);
+                unset($results['teacher']);
+                $results['error']['code'] = 'user_not_found';
+                $results['error']['message'] = 'User not found';
+                return $results;
+            }
+            $results['teacher'] = [
+                'id' => $params['userid'],
+                'fullname' => fullname(reset($users)),
+            ];
+            // Get courses with a certifygen_model asociated where the user is editingteacher.
+            $enrolments = enrol_get_all_users_courses($params['userid'], true);
+            foreach ($enrolments as $enrolment) {
+                $coursecontext = \context_course::instance($enrolment->ctxinstance);
+                $roles = get_users_roles($coursecontext, [$params['userid']]);
+                $roles = reset($roles);
+                $reporttypes = [];
+                foreach ($roles as $role) {
+                    if ($role->shortname != 'editingteacher') {
+                        continue;
+                    }
+                    $modelsids = certifygen_context::get_course_valid_modelids($enrolment->ctxinstance);
+                    foreach ($modelsids as $modelid) {
+                        $model = new certifygen_model($modelid);
+                        $reporttypes[] = [
+                            'type' => $model->get('type'),
+                            'modelid' => $modelid,
+                        ];
+                    }
+                }
+                if (empty($reporttypes)) {
+                    continue;
+                }
+                $courses[] = [
+                    'shortname' => $enrolment->shortname,
+                    'fullname' => $enrolment->fullname,
+                    'categoryid' => $enrolment->category,
+                    'reporttypes'   => $reporttypes,
+                ];
+            }
+            $results['courses'] = $courses;
+        } catch (\moodle_exception $e) {
+            $haserror = true;$results['error']['code'] = $e->getCode();
+            $results['error']['message'] = $e->getMessage();
+        }
+        if (!$haserror) {
+            unset($results['error']);
+        }
+        return $results;
     }
     /**
      * Describes the data returned from the external function.
@@ -106,28 +148,32 @@ class get_courses_as_teacher_external extends external_api {
      */
     public static function get_courses_as_teacher_returns(): external_single_structure {
         return new external_single_structure(array(
-                'courses' => new external_multiple_structure( new external_single_structure(
+                'courses' => new external_multiple_structure(
+                    new external_single_structure(
                         [
-                            'id'   => new external_value(PARAM_RAW, 'Course id'),
-                            'shortname'   => new external_value(PARAM_RAW, 'Course shortname'),
-                            'fullname' => new external_value(PARAM_RAW, 'Course fullname'),
-                            'categoryid' => new external_value(PARAM_INT, 'Course category id'),
-                            'completed' => new external_value(PARAM_BOOL, 'student has course completed '),
-                            'modellist' => new external_value(PARAM_RAW, 'model id list separated by commas.'),
+                            'id'   => new external_value(PARAM_RAW, 'Course id', VALUE_OPTIONAL),
+                            'shortname'   => new external_value(PARAM_RAW, 'Course shortname', VALUE_OPTIONAL),
+                            'fullname' => new external_value(PARAM_RAW, 'Course fullname', VALUE_OPTIONAL),
+                            'categoryid' => new external_value(PARAM_INT, 'Course category id', VALUE_OPTIONAL),
                             'reporttypes' => new external_multiple_structure(
                                 new external_single_structure(
                                     [
-                                        'type'   => new external_value(PARAM_INT, 'model type'),
-                                        'modelid'   => new external_value(PARAM_INT, 'model id'),
+                                        'type'   => new external_value(PARAM_INT, 'model type', VALUE_OPTIONAL),
+                                        'modelid'   => new external_value(PARAM_INT, 'model id', VALUE_OPTIONAL),
                                     ], 'courses list')
-                                ),
-                        ], 'courses list')
-                ),
+                                , '', VALUE_OPTIONAL),
+                        ],
+                        'courses list', VALUE_OPTIONAL)
+                , '', VALUE_OPTIONAL),
                 'teacher' => new external_single_structure (
                     [
-                        'fullname' => new external_value(PARAM_RAW, 'User fullname'),
-                        'id' => new external_value(PARAM_INT, 'User id'),
-                    ], 'Student info')
+                        'fullname' => new external_value(PARAM_RAW, 'User fullname', VALUE_OPTIONAL),
+                        'id' => new external_value(PARAM_INT, 'User id', VALUE_OPTIONAL),
+                    ], 'Student info', VALUE_OPTIONAL),
+                'error' => new external_single_structure([
+                    'message' => new external_value(PARAM_RAW, 'Error message', VALUE_OPTIONAL),
+                    'code' => new external_value(PARAM_RAW, 'Error code', VALUE_OPTIONAL),
+                ], 'Errors information', VALUE_OPTIONAL),
             )
         );
     }
