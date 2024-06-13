@@ -107,6 +107,7 @@ class get_id_instance_certificate_external extends external_api {
                         }
                         $model = certifygen_model::get_record(['id' => $activity->get('modelid')]);
                         $instance['instance'] = [
+                            'id' => $activity->get('id'),
                             'name' => $activity->get('name'),
                             'modelname' => $model->get('name'),
                             'modelmode' => $model->get('mode'),
@@ -147,6 +148,7 @@ class get_id_instance_certificate_external extends external_api {
                                 'categoryid' => new external_value(PARAM_INT, 'Category id', VALUE_OPTIONAL),
                             ], 'Course information', VALUE_OPTIONAL),
                             'instance'   => new external_single_structure([
+                                'id' => new external_value(PARAM_INT, 'Instance id', VALUE_OPTIONAL),
                                 'name' => new external_value(PARAM_RAW, 'Instance name', VALUE_OPTIONAL),
                                 'modelname' => new external_value(PARAM_RAW, 'Model name', VALUE_OPTIONAL),
                                 'modelmode' => new external_value(PARAM_INT, 'Model mode', VALUE_OPTIONAL),
