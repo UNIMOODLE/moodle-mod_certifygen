@@ -39,6 +39,7 @@ use external_single_structure;
 use external_value;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_context;
+use mod_certifygen\persistents\certifygen_model;
 
 global $CFG;
 require_once($CFG->dirroot.'/user/lib.php');
@@ -100,17 +101,23 @@ class get_id_instance_certificate_external extends external_api {
                         'categoryid' => $enrolment->category,
                     ];
                     $instance['course'] = $course;
-                    $instance['instance'] = [
-                        'name' => 'asd',
-                        'modelname' => 'asd',
-                        'modelmode' => 1,
-                        'modeltimeondemmand' => 0,
-                        'modeltype' => 1,
-                        'modeltemplateid' => 1,
-                        'modellangs' => 'asd,asd',
-                        'modelvalidation' => 'asd',
-                    ];
-                    $instances[] = $instance;
+                    foreach ($allactivities as $activity) {
+                        if ($activity->get('course') != $enrolment->ctxinstance) {
+                            continue;
+                        }
+                        $model = certifygen_model::get_record(['id' => $activity->get('modelid')]);
+                        $instance['instance'] = [
+                            'name' => $activity->get('name'),
+                            'modelname' => $model->get('name'),
+                            'modelmode' => $model->get('mode'),
+                            'modeltimeondemmand' => $model->get('timeondemmand'),
+                            'modeltype' => $model->get('type'),
+                            'modeltemplateid' => $model->get('templateid'),
+                            'modellangs' => $model->get('langs'),
+                            'modelvalidation' => $model->get('validation'),
+                        ];
+                        $instances[] = $instance;
+                    }
                 }
             }
             $results['instances'] = $instances;
