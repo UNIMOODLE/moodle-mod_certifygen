@@ -283,8 +283,8 @@ class template extends \tool_certificate\template {
         $issue = $this->get_issue_from_code($issue->code);
 
         // Create the issue file and send notification.
-        $issuefile = $this->create_issue_file($issue);
-        self::send_issue_notification($issue, $issuefile);
+//        $issuefile = $this->create_issue_file($issue);
+//        self::send_issue_notification($issue, $issuefile);
 
 //        component_class_callback(tool_tenant\config::class, 'pop', []);
 

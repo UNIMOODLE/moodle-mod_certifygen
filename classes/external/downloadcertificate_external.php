@@ -121,7 +121,7 @@ class downloadcertificate_external extends external_api {
                 $validation = new certifygen_validations(0, (object) $data);
                 $validation->save();
 
-                $template = template::instance($issue->templateid, (object) ['lang' => $lang]);
+//                $template = template::instance($issue->templateid, (object) ['lang' => $lang]);
                 $fileurl = certifygen::get_user_certificate_file_url($certifygenmodel->get('templateid'), $userid, $courseid, $lang);
                 $codelink =  new \moodle_url('/admin/tool/certificate/index.php', ['code' => $issue->code]);
                 // Step 3: Generate the tool_certificate certificate.
