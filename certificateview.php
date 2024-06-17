@@ -31,6 +31,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_certifygen\persistents\certifygen_validations;
+
 require_once('../../config.php');
 global $PAGE;
 
@@ -40,19 +42,18 @@ $preview = optional_param('preview', false, PARAM_BOOL);
 require_login();
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url(new moodle_url('/mod/certifygen/certificateview.php', ['code' => $issuecode]));
-$lang = explode('_', $issuecode);
+$lang = certifygen_validations::get_lang_by_code($issuecode);
+//$lang = explode('_', $issuecode);
 if ($preview) {
     $templateid = required_param('templateid', PARAM_INT);
-    $template = \mod_certifygen\template::instance($templateid, (object) ['lang' => $lang[1]]);
+    $template = \mod_certifygen\template::instance($templateid, (object) ['lang' => $lang]);
     if ($template->can_manage()) {
         $template->generate_pdf(true);
     }
-
 } else {
     $issue = \mod_certifygen\template::get_issue_from_code($issuecode);
     $context = \context_course::instance($issue->courseid, IGNORE_MISSING) ?: null;
-
-    $template = $issue ? \mod_certifygen\template::instance($issue->templateid, (object) ['lang' => $lang[1]]) : null;
+    $template = $issue ? \mod_certifygen\template::instance($issue->templateid, (object) ['lang' => $lang]) : null;
     if ($template && (\tool_certificate\permission::can_verify() ||
             \tool_certificate\permission::can_view_issue($template, $issue, $context))) {
         $url = $template->get_issue_file_url($issue);

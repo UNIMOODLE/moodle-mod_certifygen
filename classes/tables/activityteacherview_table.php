@@ -112,8 +112,6 @@ class activityteacherview_table extends table_sql {
      */
     function col_revoke($row): string
     {
-        $code = explode('_', $row->code);
-        $lang = $code[1];
         return '<span class="likelink" data-action="revoke-certificate" data-username="'. $row->firstname. ' '
             . $row->lastname .'" data-issueid="'. $row->issueid.'" data-modelid="'. $this->modelid
             .'" data-courseid="'. $this->courseid.'" data-userid="'. $row->userid.'" data-cmid="'.  $this->cmid .'">' .
@@ -167,10 +165,9 @@ class activityteacherview_table extends table_sql {
     {
         global $DB;
 
-        $lang = explode('_', $row->code);
-        $lang = $lang[1];
         $code = $DB->get_field('tool_certificate_issues', 'code', ['id' => $row->issueid]);
-        $link = new moodle_url('/mod/certifygen/certificateview.php', ['code' => $code, 'preview' => true, 'templateid' => $row->templateid]);
+        $link = new moodle_url('/mod/certifygen/certificateview.php',
+            ['code' => $code, 'preview' => true, 'templateid' => $row->templateid]);
         $status = certifygen_validations::STATUS_NOT_STARTED;
         $id = 0;
         if (isset($row->issueid)) {
@@ -190,14 +187,8 @@ class activityteacherview_table extends table_sql {
                 href='. $link->out().'>'.get_string('emit', 'mod_certifygen').'</span>';
         } else if ($status == certifygen_validations::STATUS_FINISHED_OK) {
             $validationplugin = $this->model->get('validation');
-            $validationrecords = certifygen_validations::get_records(['modelid' => $this->model->get('id'), 'userid' => $row->userid]);
-            $validationrecord = null;
-            foreach ($validationrecords as $record) {
-                if ($record->get('lang') != $lang) {
-                    continue;
-                }
-                $validationrecord = $record;
-            }
+            $validationrecord = certifygen_validations::get_record(
+                ['modelid' => $this->model->get('id'), 'userid' => $row->userid, 'lang' => $row->lang]);
             $validationpluginclass = $validationplugin . '\\' . $validationplugin;
             if (get_config($validationplugin, 'enable') === '1') {
                 /** @var ICertificateValidation $subplugin */

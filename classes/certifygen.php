@@ -105,17 +105,23 @@ class certifygen {
     public static function get_user_certificate(int $userid, int $courseid, int $templateid, string $lang): ?stdClass {
 
         global $DB;
-        $likecode = $DB->sql_like('ci.code', ':code');
-        $sql = "SELECT * FROM {tool_certificate_issues} ci
-                WHERE component = :component AND courseid = :courseid AND templateid = :templateid AND userid = :userid
-                      AND archived = 0 AND $likecode
+
+        $sql = "SELECT ci.* 
+                FROM {tool_certificate_issues} ci
+                INNER JOIN {certifygen_validations} cv ON (cv.issueid = ci.id AND cv.userid = ci.userid)
+                WHERE ci.component = :component 
+                    AND ci.courseid = :courseid 
+                    AND ci.templateid = :templateid 
+                    AND ci.userid = :userid
+                    AND ci.archived = 0 
+                    AND cv.lang = :lang
                 ORDER BY id DESC";
         $params = [
             'component' => 'mod_certifygen',
             'courseid' => $courseid,
             'templateid' => $templateid,
             'userid' => $userid,
-            'code' => '%_' . $lang,
+            'lang' => $lang,
         ];
         $records = $DB->get_records_sql($sql, $params);
 
@@ -137,14 +143,10 @@ class certifygen {
         if (self::get_user_certificate($user->id, $course->id, $templateid, $lang)) {
             return 0;
         }
-
         try {
             $template = template::instance($templateid, (object) ['lang' => $lang]);
-
             $issuedata = self::get_issue_data($course, $user);
-
             $expirydatetype = $expirydateoffset = 0;
-
             $expirydate = certificate::calculate_expirydate(
                 $expirydatetype,
                 $expirydateoffset,
@@ -224,10 +226,8 @@ class certifygen {
         certifygen::issue_certificate($user, $templateid, $course, $lang);
         $url = "";
         if ($existingcertificate = self::get_user_certificate($userid, $course->id, $templateid, $lang)) {
-
             $issue = template::get_issue_from_code($existingcertificate->code);
             $context = context_course::instance($issue->courseid, IGNORE_MISSING) ?: null;
-
             $template = $issue ? template::instance($issue->templateid, (object) ['lang' => $lang]) : null;
             if ($template && (permission::can_verify() ||
                     permission::can_view_issue($template, $issue, $context))) {
@@ -291,7 +291,6 @@ class certifygen {
                                                          int $limitfrom, int $limitnum, string $sort = ''): array {
         global $DB;
 
-        $likelang = $DB->sql_like('ci.code', ':lang');
         if (empty($sort)) {
             $sort = 'ci.timecreated DESC';
         }
@@ -300,7 +299,7 @@ class certifygen {
             'courseid' => $courseid,
             'component' => $component,
             'now' => time(),
-            'lang' => '%_' . $lang,
+            'lang' => $lang,
             ];
         $userquery = '';
         $groupmodequery = '';
@@ -317,18 +316,20 @@ class certifygen {
         $userfields = self::get_extra_user_fields($context);
 
         $sql = "SELECT ci.id as issueid, ci.code, ci.emailed, ci.timecreated, ci.userid, ci.templateid, ci.expires,
-                       t.name, ci.courseid, ci.archived, $userfields, 
+                       t.name, ci.courseid, ci.archived, cv.lang, $userfields, 
                   CASE WHEN ci.expires > 0  AND ci.expires < :now THEN 0
                   ELSE 1
                   END AS status
                   FROM {tool_certificate_templates} t
                   JOIN {tool_certificate_issues} ci
                     ON (ci.templateid = t.id) AND (ci.courseid = :courseid) AND (component = :component)
+                  JOIN {certifygen_validations} cv
+                    ON (cv.issueid = ci.id AND cv.userid = ci.userid)
                   JOIN {user} u
                     ON (u.id = ci.userid)
                  WHERE t.id = :templateid
                    AND $usersquery
-                   $groupmodequery AND $likelang $userquery
+                   $groupmodequery $userquery
               ORDER BY {$sort}";
 
         return $DB->get_records_sql($sql, $params, $limitfrom, $limitnum);
@@ -393,34 +394,25 @@ class certifygen {
             'templateid' => $templateid,
             'courseid' => $courseid,
             'component' => $component,
-            'lang' => '%_' . $lang,
+            'lang' => $lang,
         ];
-
+        $groupmodequery = "";
         if ($groupmode) {
-            $likelang = $DB->sql_like('ci.code', ':lang');
             [$groupmodequery, $groupmodeparams] = self::get_groupmode_subquery($groupmode, $groupid);
             $params += $groupmodeparams;
+        }
 
-            $sql = "SELECT COUNT(u.id) as count
+        $sql = "SELECT COUNT(u.id) as count
                   FROM {user} u
-            INNER JOIN {tool_certificate_issues} ci
-                    ON u.id = ci.userid
+                    INNER JOIN {tool_certificate_issues} ci
+                            ON u.id = ci.userid
+                    INNER JOIN {certifygen_validations} cv 
+                        ON (cv.issueid = ci.id AND cv.userid = ci.userid)
                  WHERE ci.templateid = :templateid
                     AND ci.courseid = :courseid
                     AND ci.component = :component
-                    $groupmodequery AND $likelang";
-
-            return $DB->count_records_sql($sql, $params);
-        } else {
-            $wherestring = $DB->sql_like('code', ':lang');
-            $wherestring .= 'AND ' . $DB->sql_like('templateid', ':templateid');
-            $wherestring .= 'AND ' . $DB->sql_like('courseid', ':courseid');
-            $wherestring .= 'AND ' . $DB->sql_like('component', ':component');
-            if ($userid) {
-                $wherestring .= 'AND ' . $DB->sql_like('userid', ':userid');
-                $params['userid'] = $userid;
-            }
-            return $DB->count_records_select('tool_certificate_issues', $wherestring, $params);
-        }
+                    AND cv.lang = :lang
+                    $groupmodequery";
+        return $DB->count_records_sql($sql, $params);
     }
 }

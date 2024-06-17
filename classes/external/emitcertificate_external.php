@@ -85,7 +85,6 @@ class emitcertificate_external extends external_api {
         );
 
         $result = ['result' => true, 'message' => 'OK'];
-        $returndata = ['id' => 0, 'code' => ''];
 
         // Step 1: Change status to in progress.
         $data = [
@@ -104,10 +103,20 @@ class emitcertificate_external extends external_api {
             $user = reset($users);
             $certifygenmodel = new certifygen_model($modelid);
             $course = get_course($courseid);
-            certifygen::issue_certificate($user, $certifygenmodel->get('templateid'), $course, $lang);
-            if ($existingcertificate = certifygen::get_user_certificate($userid, $courseid, $certifygenmodel->get('templateid'), $lang)) {
-                $validation->set('issueid', $existingcertificate->id);
+            $issueid = certifygen::issue_certificate($user, $certifygenmodel->get('templateid'), $course, $lang);
+            $saved = false;
+            if ($issueid) {
+                $saved = true;
+                $validation->set('issueid', $issueid);
                 $validation->save();
+            }
+
+            if ($existingcertificate = certifygen::get_user_certificate($userid, $courseid, $certifygenmodel->get('templateid'), $lang)) {
+                if (!$saved) {
+                    $saved = true;
+                    $validation->set('issueid', $existingcertificate->id);
+                    $validation->save();
+                }
             }
 
             // Step 3: Generate the tool_certificate certificate.
@@ -125,9 +134,7 @@ class emitcertificate_external extends external_api {
                     $subplugin = new $validationpluginclass();
                     $subplugin->sendFile($certifygenfile);
                 }
-
             }
-
         } catch (moodle_exception $e) {
             $result['result'] = false;
             $result['message'] = $e->getMessage();

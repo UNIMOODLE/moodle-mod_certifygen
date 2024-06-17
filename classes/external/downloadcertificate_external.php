@@ -97,48 +97,55 @@ class downloadcertificate_external extends external_api {
 //            'usermodified' => $userid,
 //        ];
 //        $validation = certifygen_validations::manage_validation($id, (object) $data);
-
         try {
             // Step 2: Generate issue.
             $users = user_get_users_by_id([$userid]);
             $user = reset($users);
             $certifygenmodel = new certifygen_model($modelid);
             $course = get_course($courseid);
-            certifygen::issue_certificate($user, $certifygenmodel->get('templateid'), $course, $lang);
-            $issue = certifygen::get_user_certificate( $userid, $courseid, $certifygenmodel->get('templateid'), $lang);
-
             // Save on database.
             $data = [
                 'userid' => $userid,
                 'lang' => $lang,
                 'modelid' => $modelid,
-                'issueid' => $issue->id,
                 'usermodified' => $userid,
             ];
-            $validation = certifygen_validations::get_record($data);
-            if (!$validation) {
-                $data['status'] = certifygen_validations::STATUS_FINISHED_OK;
-                $validation = new certifygen_validations(0, (object) $data);
-                $validation->save();
-
-//                $template = template::instance($issue->templateid, (object) ['lang' => $lang]);
-                $fileurl = certifygen::get_user_certificate_file_url($certifygenmodel->get('templateid'), $userid, $courseid, $lang);
-                $codelink =  new \moodle_url('/admin/tool/certificate/index.php', ['code' => $issue->code]);
-                // Step 3: Generate the tool_certificate certificate.
-                $result['url'] = $fileurl;
-                $result['codetag'] = '<a href="'.$codelink->out().'" target="_blank">' . $issue->code .'</a>';
-                if (empty($fileurl)) {
-                    $result['result'] = false;
-                    $result['message'] = 'File not found';
-                }
-//                $issuefile = $template->create_issue_file($issue);
+            $issueid = certifygen::issue_certificate($user, $certifygenmodel->get('templateid'), $course, $lang);
+            $saved = false;
+            if ($issueid) {
+                $saved = true;
+                $data['issueid'] = $issueid;
+                self::save_certifygen_validation($data);
+            }
+            $issue = certifygen::get_user_certificate( $userid, $courseid, $certifygenmodel->get('templateid'), $lang);
+            if (!$saved) {
+                $saved = true;
+                $data['issueid'] = $issue->id;
+                self::save_certifygen_validation($data);
+            }
+            $fileurl = certifygen::get_user_certificate_file_url($certifygenmodel->get('templateid'), $userid, $courseid, $lang);
+            $codelink =  new \moodle_url('/admin/tool/certificate/index.php', ['code' => $issue->code]);
+            // Step 3: Generate the tool_certificate certificate.
+            $result['url'] = $fileurl;
+            $result['codetag'] = '<a href="'.$codelink->out().'" target="_blank">' . $issue->code .'</a>';
+            if (empty($fileurl)) {
+                $result['result'] = false;
+                $result['message'] = 'File not found';
             }
         } catch (moodle_exception $e) {
+            error_log(__FUNCTION__ . ' ' . __LINE__ . var_export($e->getMessage(), true));
             $result['result'] = false;
             $result['message'] = $e->getMessage();
         }
-
         return $result;
+    }
+    private static function save_certifygen_validation(array $data) : void {
+        $validation = certifygen_validations::get_record($data);
+        if (!$validation) {
+            $data['status'] = certifygen_validations::STATUS_FINISHED_OK;
+            $validation = new certifygen_validations(0, (object) $data);
+            $validation->save();
+        }
     }
     /**
      * Describes the data returned from the external function.

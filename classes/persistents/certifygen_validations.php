@@ -5,6 +5,7 @@ namespace mod_certifygen\persistents;
 use coding_exception;
 use core\invalid_persistent_exception;
 use core\persistent;
+use dml_exception;
 use stdClass;
 
 class certifygen_validations extends persistent {
@@ -63,5 +64,27 @@ class certifygen_validations extends persistent {
             $validation->update();
         }
         return $validation;
+    }
+
+    /**
+     * @param string $code
+     * @return string
+     * @throws dml_exception
+     */
+    public static function get_lang_by_code(string $code) : string {
+
+        global $DB;
+        $params = [
+            'code' => $code,
+            'component' => 'mod_certifygen'
+        ];
+        $sql = "SELECT cv.lang
+                  FROM {tool_certificate_issues} ci
+                  JOIN {certifygen_validations} cv
+                    ON (cv.issueid = ci.id AND cv.userid = ci.userid)
+                    WHERE code =:code AND component =:component";
+
+        $record = $DB->get_record_sql($sql, $params);
+        return $record->lang;
     }
 }

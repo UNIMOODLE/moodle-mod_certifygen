@@ -138,8 +138,6 @@ class activityteacherviewnovalidator_table extends table_sql {
      */
     function col_revoke($row): string
     {
-        $code = explode('_', $row->code);
-        $lang = $code[1];
         return '<span class="likelink" data-action="revoke-certificate" data-username="'. $row->firstname. ' '
             . $row->lastname .'" data-issueid="'. $row->issueid.'" data-modelid="'. $this->modelid
             .'" data-courseid="'. $this->courseid.'" data-userid="'. $row->userid.'" data-cmid="'.  $this->cmid .'">' .

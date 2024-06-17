@@ -256,7 +256,7 @@ class template extends \tool_certificate\template {
         $issue = new stdClass();
         $issue->userid = $userid;
         $issue->templateid = $this->get_id();
-        $issue->code = certificate::generate_code($issue->userid) . '_' . $this->lang ;
+        $issue->code = certificate::generate_code($issue->userid);
         $issue->emailed = 0;
         $issue->timecreated = time();
         $issue->expires = $expires;
@@ -275,13 +275,11 @@ class template extends \tool_certificate\template {
 //            $lock->release();
 //        }
         issue_handler::create()->save_additional_data($issue, $data);
-
         // Trigger event.
         certificate_issued::create_from_issue($issue)->trigger();
 
         // Reload issue from DB in case the event handlers modified it.
         $issue = $this->get_issue_from_code($issue->code);
-
         // Create the issue file and send notification.
 //        $issuefile = $this->create_issue_file($issue);
 //        self::send_issue_notification($issue, $issuefile);
