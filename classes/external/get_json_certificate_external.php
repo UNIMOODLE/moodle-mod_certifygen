@@ -54,10 +54,11 @@ class get_json_certificate_external extends external_api {
                 'userid' => new external_value(PARAM_INT, 'user id'),
                 'idinstance' => new external_value(PARAM_INT, 'instance id'),
                 'customfields' => new external_value(PARAM_RAW, 'customfields'),
+                'lang' => new external_value(PARAM_RAW, 'lang'),
             ]
         );
     }
-    public static function get_json_certificate(int $userid, int $idinstance, string $customfields): array {
+    public static function get_json_certificate(int $userid, int $idinstance, string $customfields, string $lang): array {
         /**
          * Devuelve un json con la información necesaria para el anterior servicio para
          * confeccionar el certificado. El objetivo de este servicio es independizar el proceso de
@@ -66,7 +67,8 @@ class get_json_certificate_external extends external_api {
          */
         // TODO:customfields... que modifica el fichero.
         $params = self::validate_parameters(
-            self::get_json_certificate_parameters(), ['userid' => $userid, 'idinstance' => $idinstance, 'customfields' => $customfields]
+            self::get_json_certificate_parameters(),
+            ['userid' => $userid, 'idinstance' => $idinstance, 'customfields' => $customfields, 'lang' => $lang]
         );
         $result = ['json' => '', 'error' => []];
         $haserror = false;

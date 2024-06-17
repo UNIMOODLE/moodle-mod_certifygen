@@ -53,11 +53,12 @@ class get_pdf_certificate_external extends external_api {
             [
                 'userid' => new external_value(PARAM_INT, 'user id'),
                 'idinstance' => new external_value(PARAM_INT, 'instance id'),
+                'lang' => new external_value(PARAM_RAW, 'lang'),
                 'customfields' => new external_value(PARAM_RAW, 'customfields'),
             ]
         );
     }
-    public static function get_pdf_certificate(int $userid, int $idinstance, string $customfields): array {
+    public static function get_pdf_certificate(int $userid, int $idinstance, string $lang, string $customfields): array {
         /**
          * Devuelve el PDF del certificado identificado con los parámetros de entrada validando su acceso en base a
          * las restricciones de la configuración de la instancia.
@@ -68,7 +69,8 @@ class get_pdf_certificate_external extends external_api {
         // PENDIENTE:
         // TODO:customfields... que modifica el fichero.
         $params = self::validate_parameters(
-            self::get_pdf_certificate_parameters(), ['userid' => $userid, 'idinstance' => $idinstance, 'customfields' => $customfields]
+            self::get_pdf_certificate_parameters(),
+            ['userid' => $userid, 'idinstance' => $idinstance, 'lang' => $lang, 'customfields' => $customfields]
         );
         $result = ['file' => '', 'error' => []];
         $haserror = false;

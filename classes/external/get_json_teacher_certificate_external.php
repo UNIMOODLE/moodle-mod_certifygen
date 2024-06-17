@@ -47,11 +47,12 @@ class get_json_teacher_certificate_external extends external_api {
         return new external_function_parameters(
             [
                 'userid' => new external_value(PARAM_INT, 'user id'),
-                'courses' => new external_value(PARAM_RAW, 'courses'),
+                'courses' => new external_value(PARAM_RAW, 'courses'), //TOO: arrays de ids.
+                'lang' => new external_value(PARAM_RAW, 'lang'),
             ]
         );
     }
-    public static function get_json_teacher_certificate(int $userid, string $courses): array {
+    public static function get_json_teacher_certificate(int $userid, string $courses, string $lang): array {
         /**
          * Devuelve un json con la información necesaria para el anterior servicio para
          * confeccionar el certificado. El objetivo de este servicio es independizar el proceso de

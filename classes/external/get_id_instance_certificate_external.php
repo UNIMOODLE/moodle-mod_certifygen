@@ -53,17 +53,21 @@ class get_id_instance_certificate_external extends external_api {
         return new external_function_parameters(
             [
                 'userid' => new external_value(PARAM_INT, 'user id'),
+                'lang' => new external_value(PARAM_RAW, 'user id'),
             ]
         );
     }
-    public static function get_id_instance_certificate(int $userid): array {
+    public static function get_id_instance_certificate(int $userid, string $lang): array {
+        global $CFG;
         /**
          * Devuelve una lista de aquellas instancias de mod_certificate visibles,
          * con restricciones verificadas a las que el usuario puede acceder y generar el certificado de acuerdo
          * con la configuración de la instancia.
          */
+        //TODO: revisar el acceso a la actividad por cm_info->visible.
+        // TODO: // si no envian lang, se pone el idioma de la plataforma.
         $params = self::validate_parameters(
-            self::get_id_instance_certificate_parameters(), ['userid' => $userid]
+            self::get_id_instance_certificate_parameters(), ['userid' => $userid, 'lang' => $lang]
         );
         $results = ['instances' => [], 'error' => []];
         $haserror = false;
@@ -75,6 +79,16 @@ class get_id_instance_certificate_external extends external_api {
                 $results['error']['code'] = 'user_not_found';
                 $results['error']['message'] = 'User not found';
                 return $results;
+            }
+            // Lang exists.
+            $langstrings = get_string_manager()->get_list_of_translations();
+            if (!in_array($lang, array_keys($langstrings)) || empty($lang)) {
+                $lang = $CFG->lang;
+            }
+            if (!empty($langs)) {
+                foreach ($langs as $lang) {
+                    $choices[$lang] = $langstrings[$lang];
+                }
             }
             // Get all mod_certifygen activities;
             $allactivities = certifygen::get_records();
@@ -95,9 +109,13 @@ class get_id_instance_certificate_external extends external_api {
                     if ($role->shortname != 'student') {
                         continue;
                     }
+                    $coursefullname = format_text($enrolment->fullname);
+                    $coursefullname = strip_tags($coursefullname);
+                    $courseshortname = format_text($enrolment->shortname);
+                    $courseshortname = strip_tags($courseshortname);
                     $course = [
-                        'shortname' => $enrolment->shortname,
-                        'fullname' => $enrolment->fullname,
+                        'shortname' => $courseshortname,
+                        'fullname' => $coursefullname,
                         'categoryid' => $enrolment->category,
                     ];
                     $instance['course'] = $course;
@@ -106,9 +124,11 @@ class get_id_instance_certificate_external extends external_api {
                             continue;
                         }
                         $model = certifygen_model::get_record(['id' => $activity->get('modelid')]);
+                        $actvname = format_text($activity->get('name'));
+                        $actvname = strip_tags($actvname);
                         $instance['instance'] = [
                             'id' => $activity->get('id'),
-                            'name' => $activity->get('name'),
+                            'name' => $actvname,
                             'modelname' => $model->get('name'),
                             'modelmode' => $model->get('mode'),
                             'modeltimeondemmand' => $model->get('timeondemmand'),
@@ -143,6 +163,7 @@ class get_id_instance_certificate_external extends external_api {
                 'instances' => new external_multiple_structure( new external_single_structure(
                         [
                             'course'   => new external_single_structure([
+                                'id' => new external_value(PARAM_INT, 'Course id', VALUE_OPTIONAL),
                                 'shortname' => new external_value(PARAM_RAW, 'Course shortname', VALUE_OPTIONAL),
                                 'fullname' => new external_value(PARAM_RAW, 'Course fullname', VALUE_OPTIONAL),
                                 'categoryid' => new external_value(PARAM_INT, 'Category id', VALUE_OPTIONAL),

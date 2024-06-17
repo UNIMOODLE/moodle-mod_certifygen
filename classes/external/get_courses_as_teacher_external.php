@@ -52,6 +52,7 @@ class get_courses_as_teacher_external extends external_api {
         return new external_function_parameters(
             [
                 'userid' => new external_value(PARAM_INT, 'user id'),
+                'lang' => new external_value(PARAM_LANG, 'user lang'),
             ]
         );
     }
@@ -61,7 +62,9 @@ class get_courses_as_teacher_external extends external_api {
      * @return array
      * @throws \invalid_parameter_exception
      */
-    public static function get_courses_as_teacher(int $userid): array {
+    public static function get_courses_as_teacher(int $userid, string $lang): array {
+        global $CFG;
+        // si no envian lang, se pone el idioma de la plataforma.
         /**
          * OLD
          * Devuelve un json con la información necesaria para el anterior servicio para
@@ -80,9 +83,11 @@ class get_courses_as_teacher_external extends external_api {
          * b. course.fullname
          * c. course.categoryid.
          * d. reportype asociado al curso: [model type]
+         *
+         * Enviar la info en el idioma pedido por $lang. si no se envia nada, el idioma e la plataforma.
  */
         $params = self::validate_parameters(
-            self::get_courses_as_teacher_parameters(), ['userid' => $userid]
+            self::get_courses_as_teacher_parameters(), ['userid' => $userid, 'lang' => $lang]
         );
         $results = ['courses' => [], 'teacher' => [], 'error' => []];
         $haserror = false;
@@ -101,6 +106,16 @@ class get_courses_as_teacher_external extends external_api {
                 'id' => $params['userid'],
                 'fullname' => fullname(reset($users)),
             ];
+            // Lang exists.
+            $langstrings = get_string_manager()->get_list_of_translations();
+            if (!in_array($lang, array_keys($langstrings)) || empty($lang)) {
+                $lang = $CFG->lang;
+            }
+            if (!empty($langs)) {
+                foreach ($langs as $lang) {
+                    $choices[$lang] = $langstrings[$lang];
+                }
+            }
             // Get courses with a certifygen_model asociated where the user is editingteacher.
             $enrolments = enrol_get_all_users_courses($params['userid'], true);
             foreach ($enrolments as $enrolment) {
@@ -118,15 +133,21 @@ class get_courses_as_teacher_external extends external_api {
                         $reporttypes[] = [
                             'type' => $model->get('type'),
                             'modelid' => $modelid,
+                            'issue' => 0, //TODO: sacar el issueid.hablado en la reunion 14/06/2024, si no se selcciona template, no tiene sentido.
                         ];
                     }
                 }
                 if (empty($reporttypes)) {
                     continue;
                 }
+                $coursefullname = format_text($enrolment->fullname);
+                $coursefullname = strip_tags($coursefullname);
+                $courseshortname = format_text($enrolment->shortname);
+                $courseshortname = strip_tags($courseshortname);
                 $courses[] = [
-                    'shortname' => $enrolment->shortname,
-                    'fullname' => $enrolment->fullname,
+                    'id' => $enrolment->ctxinstance,
+                    'shortname' => $courseshortname,
+                    'fullname' => $coursefullname,
                     'categoryid' => $enrolment->category,
                     'reporttypes'   => $reporttypes,
                 ];
@@ -160,6 +181,7 @@ class get_courses_as_teacher_external extends external_api {
                                     [
                                         'type'   => new external_value(PARAM_INT, 'model type', VALUE_OPTIONAL),
                                         'modelid'   => new external_value(PARAM_INT, 'model id', VALUE_OPTIONAL),
+                                        'issueid'   => new external_value(PARAM_INT, 'issue id', VALUE_OPTIONAL),
                                     ], 'courses list')
                                 , '', VALUE_OPTIONAL),
                         ],

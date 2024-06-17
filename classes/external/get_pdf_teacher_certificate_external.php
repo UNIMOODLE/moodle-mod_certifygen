@@ -49,12 +49,13 @@ class get_pdf_teacher_certificate_external extends external_api {
         return new external_function_parameters(
             [
                 'userid' => new external_value(PARAM_INT, 'user id'),
-                'courses' => new external_value(PARAM_RAW, 'course list'),
+                'courses' => new external_value(PARAM_RAW, 'course list'), // TODO: array de ids.
                 'reporttype' => new external_value(PARAM_INT, 'certificate model type'),
+                'lang' => new external_value(PARAM_RAW, 'certificate model type'),
             ]
         );
     }
-    public static function get_pdf_teacher_certificate(int $userid, string $courses, int $type): array {
+    public static function get_pdf_teacher_certificate(int $userid, string $courses, int $type, string $lang): array {
         /**
          * Devuelve el PDF del certificado de que el profesor ha impartido docencia en el curso
          * indicado con el detalle del uso que ha realizado de la herramienta que aparecerá en el

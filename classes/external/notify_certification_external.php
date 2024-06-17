@@ -59,7 +59,7 @@ class notify_certification_external extends external_api {
      * @param string $datos
      * @return string[]
      */
-    public static function notify_certification(int $userid, int $idinstance, string $datos): array {
+    public static function notify_certification(int $userid, int $issueid, string $datos): array {
         /**
          * El sistema externo notificará a Moodle (en concreto a la instancia de subplugin repositorio que esté asociado
          * al idInstance), proporcionando la información del certificado en el parámetro “datos”
@@ -67,6 +67,7 @@ class notify_certification_external extends external_api {
          * El plugin de repositorio utilizará esta información para gestionar el resultado del certificado y mostrar 
          * la información visible por el usuario al acceder a dicha instancia de certificado dentro de su curso de Moodle.
  */
+        // NO mirar las restricciones de la actividad.
         return ['status' => 'OK'];
     }
     /**

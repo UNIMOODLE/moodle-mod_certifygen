@@ -47,6 +47,7 @@ use mod_certifygen\certifygen_file;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
+use mod_certifygen\template;
 use moodle_exception;
 
 class downloadcertificate_external extends external_api {
@@ -104,34 +105,37 @@ class downloadcertificate_external extends external_api {
             $certifygenmodel = new certifygen_model($modelid);
             $course = get_course($courseid);
             certifygen::issue_certificate($user, $certifygenmodel->get('templateid'), $course, $lang);
-            $fileurl = certifygen::get_user_certificate_file_url($certifygenmodel->get('templateid'), $userid, $courseid, $lang);
             $issue = certifygen::get_user_certificate( $userid, $courseid, $certifygenmodel->get('templateid'), $lang);
-            $codelink =  new \moodle_url('/admin/tool/certificate/index.php', ['code' => $issue->code]);
-            // Step 3: Generate the tool_certificate certificate.
-            $result['url'] = $fileurl;
-            $result['codetag'] = '<a href="'.$codelink->out().'" target="_blank">' . $issue->code .'</a>';
-            if (empty($fileurl)) {
-                $result['result'] = false;
-                $result['message'] = 'File not found';
+
+            // Save on database.
+            $data = [
+                'userid' => $userid,
+                'lang' => $lang,
+                'modelid' => $modelid,
+                'issueid' => $issue->id,
+                'usermodified' => $userid,
+            ];
+            $validation = certifygen_validations::get_record($data);
+            if (!$validation) {
+                $data['status'] = certifygen_validations::STATUS_FINISHED_OK;
+                $validation = new certifygen_validations(0, (object) $data);
+                $validation->save();
+
+                $template = template::instance($issue->templateid, (object) ['lang' => $lang]);
+                $fileurl = certifygen::get_user_certificate_file_url($certifygenmodel->get('templateid'), $userid, $courseid, $lang);
+                $codelink =  new \moodle_url('/admin/tool/certificate/index.php', ['code' => $issue->code]);
+                // Step 3: Generate the tool_certificate certificate.
+                $result['url'] = $fileurl;
+                $result['codetag'] = '<a href="'.$codelink->out().'" target="_blank">' . $issue->code .'</a>';
+                if (empty($fileurl)) {
+                    $result['result'] = false;
+                    $result['message'] = 'File not found';
+                }
+//                $issuefile = $template->create_issue_file($issue);
             }
-//            else {
-//                $certifygenfile = new certifygen_file($file, $userid, $lang, $modelid, $course, $validation->get('id'));
-//                // Step 4: Call to validation plugin.
-//                $validationplugin = $certifygenmodel->get('validation');
-//                $validationpluginclass = $validationplugin . '\\' . $validationplugin;
-//                if (get_config($validationplugin, 'enable') === '1') {
-//                    /** @var ICertificateValidation $subplugin */
-//                    $subplugin = new $validationpluginclass();
-//                    $subplugin->sendFile($certifygenfile);
-//                }
-
-//            }
-
         } catch (moodle_exception $e) {
             $result['result'] = false;
             $result['message'] = $e->getMessage();
-//            $validation->set('status', certifygen_validations::STATUS_FINISHED_ERROR);
-//            $validation->save();
         }
 
         return $result;
