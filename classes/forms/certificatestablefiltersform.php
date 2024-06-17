@@ -55,7 +55,12 @@ class certificatestablefiltersform extends moodleform
                 $choices[$lang] = $langstrings[$lang];
             }
         }
-        $mform->addElement('select', 'lang', get_string('chooselang', 'mod_certifygen'), $choices);
+
+        $identifier = get_string('selectmycertificateslangdesc', 'mod_certifygen');
+        if ($this->_customdata['role'] != 'student') {
+            $identifier = get_string('chooselang', 'mod_certifygen');
+        }
+        $mform->addElement('select', 'lang', $identifier, $choices);
         $mform->setType('lang', PARAM_RAW);
         $mform->setDefault('lang', $defaultlang);
         $this->add_action_buttons(false, get_string('filter', 'mod_certifygen'));

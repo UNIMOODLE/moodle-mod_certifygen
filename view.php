@@ -62,6 +62,5 @@ if ($isteacher) {
 
 $output = $PAGE->get_renderer('mod_certifygen');
 echo $output->header();
-echo $output->heading(format_string($certifygen->name));
 echo $output->render($view);
 echo $output->footer();

@@ -86,7 +86,11 @@ class teacher_view implements renderable, templatable {
         $url = new moodle_url('/mod/certifygen/view.php', ['id' => $this->cm->id]);
         $data = new stdClass();
         $data->table = $this->get_certificates_table();
-        $data->form = mod_certifygen_get_certificates_table_form($this->certificatemodel, $url);
+        $modellangs = $this->certificatemodel->get_model_languages();
+        if (count($modellangs) > 1) {
+            $data->form = mod_certifygen_get_certificates_table_form($this->certificatemodel, $url, 'teacher');
+        }
+
         return $data;
     }
 

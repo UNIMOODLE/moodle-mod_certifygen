@@ -83,8 +83,11 @@ class mycertificates_view implements renderable, templatable {
         } else {
             $data = $this->export_no_validator_data();
         }
+        $modellangs = $this->model->get_model_languages();
+        if (count($modellangs) > 1) {
+            $data->form = mod_certifygen_get_certificates_table_form($this->model, $this->url);
+        }
 
-        $data->form = mod_certifygen_get_certificates_table_form($this->model, $this->url);
         return $data;
     }
 

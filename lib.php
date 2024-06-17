@@ -391,11 +391,12 @@ function mod_certifygen_get_lang_selected(certifygen_model $model) : string {
  * @throws coding_exception
  * @throws moodle_exception
  */
-function mod_certifygen_get_certificates_table_form(certifygen_model $model, moodle_url $url) : string {
+function mod_certifygen_get_certificates_table_form(certifygen_model $model, moodle_url $url, string $role = 'student') : string {
 
     $data = [
         'langs' => $model->get_model_languages(),
         'defaultlang' => mod_certifygen_get_lang_selected($model),
+        'role' => $role,
     ];
     $form = new certificatestablefiltersform($url->out(), $data);
     return $form->render();
