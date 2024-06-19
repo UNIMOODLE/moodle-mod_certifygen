@@ -57,7 +57,7 @@ class certifygenvalidation_cmd implements ICertificateValidation
     public function sendFile(certifygen_file $file): array
     {
         $path = get_config('certifygenvalidation_cmd', 'path');
-        if (empty($path)) {
+        if (!$this->is_enabled()) {
             throw new exception('cmdnotconfigured', 'certifygenvalidation_cmd');
         }
 
@@ -213,5 +213,19 @@ class certifygenvalidation_cmd implements ICertificateValidation
             false                     // Do not force download of the file.
         );
         return $url->out();
+    }
+
+    /**
+     * @return bool
+     * @throws dml_exception
+     */
+    public function is_enabled(): bool
+    {
+        $enabled = (int) get_config('certifygenvalidation_cmd', 'enabled');
+        $pathenabled = (int) get_config('certifygenvalidation_cmd', 'path');
+        if ($enabled && $pathenabled) {
+            return true;
+        }
+        return false;
     }
 }

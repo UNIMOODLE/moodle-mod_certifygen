@@ -191,7 +191,7 @@ class mycertificates_view implements renderable, templatable {
                     $data['candownload'] = true;
                     $validationplugin = $this->model->get('validation');
                     $validationpluginclass = $validationplugin . '\\' . $validationplugin;
-                    if (get_config($validationplugin, 'enable') === '1') {
+                    if (get_config($validationplugin, 'enabled') === '1') {
                         $usercertificate = certifygen::get_user_certificate($USER->id, $this->courseid, $this->model->get('templateid'), $validationrecord->get('lang'));
                         $code = !is_null($usercertificate) ?  $usercertificate->code : '';
                         /** @var ICertificateValidation $subplugin */

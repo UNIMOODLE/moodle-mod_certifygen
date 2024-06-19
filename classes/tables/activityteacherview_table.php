@@ -190,7 +190,7 @@ class activityteacherview_table extends table_sql {
             $validationrecord = certifygen_validations::get_record(
                 ['modelid' => $this->model->get('id'), 'userid' => $row->userid, 'lang' => $row->lang]);
             $validationpluginclass = $validationplugin . '\\' . $validationplugin;
-            if (get_config($validationplugin, 'enable') === '1') {
+            if (get_config($validationplugin, 'enabled') === '1') {
                 /** @var ICertificateValidation $subplugin */
                 $subplugin = new $validationpluginclass();
                 $url = $subplugin->getFileUrl($this->courseid, $validationrecord->get('id'), $code.'.pdf');

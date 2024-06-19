@@ -96,7 +96,6 @@ class emitcertificate_external extends external_api {
             'usermodified' => $userid,
         ];
         $validation = certifygen_validations::manage_validation($id, (object) $data);
-
         try {
             // Step 2: Generate issue.
             $users = user_get_users_by_id([$userid]);
@@ -110,7 +109,6 @@ class emitcertificate_external extends external_api {
                 $validation->set('issueid', $issueid);
                 $validation->save();
             }
-
             if ($existingcertificate = certifygen::get_user_certificate($userid, $courseid, $certifygenmodel->get('templateid'), $lang)) {
                 if (!$saved) {
                     $saved = true;
@@ -118,7 +116,6 @@ class emitcertificate_external extends external_api {
                     $validation->save();
                 }
             }
-
             // Step 3: Generate the tool_certificate certificate.
             $file = certifygen::get_user_certificate_file($certifygenmodel->get('templateid'), $userid, $courseid, $lang);
             if (is_null($file)) {
@@ -129,19 +126,31 @@ class emitcertificate_external extends external_api {
                 // Step 4: Call to validation plugin.
                 $validationplugin = $certifygenmodel->get('validation');
                 $validationpluginclass = $validationplugin . '\\' . $validationplugin;
-                if (get_config($validationplugin, 'enable') === '1') {
+                if (get_config($validationplugin, 'enabled') === '1') {
                     /** @var ICertificateValidation $subplugin */
                     $subplugin = new $validationpluginclass();
-                    $subplugin->sendFile($certifygenfile);
+                    $response = $subplugin->sendFile($certifygenfile);
+                    if ($response['haserror']) {
+                        if (!array_key_exists('message', $result)) {
+                            $result['message'] = 'validation_plugin_send_file_error';
+                        }
+                        $validation->set('status', certifygen_validations::STATUS_FINISHED_ERROR);
+                        $validation->save();
+                    }
+                } else {
+                    $result['result'] = false;
+                    $result['message'] = 'plugin_not_enabled';
+                    $validation->set('status', certifygen_validations::STATUS_FINISHED_ERROR);
+                    $validation->save();
                 }
             }
         } catch (moodle_exception $e) {
+            error_log(__FUNCTION__ . ' ' . ' error: '.var_export($e->getMessage(), true));
             $result['result'] = false;
             $result['message'] = $e->getMessage();
             $validation->set('status', certifygen_validations::STATUS_FINISHED_ERROR);
             $validation->save();
         }
-
         return $result;
     }
     /**

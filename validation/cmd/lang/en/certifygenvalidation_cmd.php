@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'CMD Validation';
 $string['enable'] = 'Enable';
-$string['enable_help'] = 'If this plugin is enable, you can use it to validate Unimoodle Certificates';
+$string['enable_help'] = 'If this plugin is enabled, you can use it to validate Unimoodle Certificates';
 $string['path'] = 'Path';
 $string['path_help'] = 'External service command path HELP';
 $string['certifygenvalidation_cmd_settings'] = 'Configuración del CMD';

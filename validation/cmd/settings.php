@@ -28,7 +28,7 @@
 // This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
-$settings->add(new admin_setting_configcheckbox('certifygenvalidation_cmd/enable',
+$settings->add(new admin_setting_configcheckbox('certifygenvalidation_cmd/enabled',
     new lang_string('enable', 'certifygenvalidation_cmd'),
     new lang_string('enable_help', 'certifygenvalidation_cmd'), 0));
 

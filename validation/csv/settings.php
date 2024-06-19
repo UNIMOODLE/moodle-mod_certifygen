@@ -28,14 +28,21 @@
 // This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
-$settings->add(new admin_setting_configcheckbox('certifygenvalidation_csv/enable',
+$settings->add(new admin_setting_configcheckbox('certifygenvalidation_csv/enabled',
     new lang_string('enable', 'certifygenvalidation_csv'),
     new lang_string('enable_help', 'certifygenvalidation_csv'), 0));
 
-$settings->add(new admin_setting_configtext('certifygenvalidation_csv/url',
-    new lang_string('url', 'certifygenvalidation_csv'),
-    new lang_string('url_help', 'certifygenvalidation_csv'), ""));
+// FirmaCatalogService?wsdl
+$settings->add(new admin_setting_configtext('certifygenvalidation_csv/firmacatalogservicewsdl',
+    new lang_string('firmacatalogservicewsdl', 'certifygenvalidation_csv'),
+    new lang_string('firmacatalogservicewsdl_help', 'certifygenvalidation_csv'), ""));
 
-$settings->add(new admin_setting_configtext('certifygenvalidation_csv/token',
-    new lang_string('token', 'certifygenvalidation_csv'),
-    new lang_string('token_help', 'certifygenvalidation_csv'), ""));
+// FirmaQueryCatalogService?wsdl
+$settings->add(new admin_setting_configtext('certifygenvalidation_csv/firmaquerycatalogservicewsdl',
+    new lang_string('firmaquerycatalogservicewsdl', 'certifygenvalidation_csv'),
+    new lang_string('firmaquerycatalogservicewsdl_help', 'certifygenvalidation_csv'), ""));
+
+// AppId.
+$settings->add(new admin_setting_configtext('certifygenvalidation_csv/appID',
+    new lang_string('appID', 'certifygenvalidation_csv'),
+    new lang_string('appID_help', 'certifygenvalidation_csv'), ""));

@@ -25,17 +25,30 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// This line protects the file from being accessed by a URL directly.
-defined('MOODLE_INTERNAL') || die();
+namespace certifygenvalidation_csv;
 
-$string['pluginname'] = 'CSV Validation';
-$string['enable'] = 'Enable';
-$string['enable_help'] = 'If this plugin is enabled, you can use it to validate Unimoodle Certificates';
-$string['firmacatalogservicewsdl'] = 'FirmaCatalogService Wsdl';
-$string['firmacatalogservicewsdl_help'] = 'This is the FirmaCatalogService url to obtain the wsdl. <span class="bold">It is required in all the requests.</span>';
-$string['firmaquerycatalogservicewsdl'] = 'FirmaQueryCatalogService Wsdl';
-$string['firmaquerycatalogservicewsdl_help'] = 'This is the FirmaQueryCatalogService url to obtain the wsdl. <span class="bold">It is required in all the requests.</span>';
-$string['appID'] = 'Application ID';
-$string['appID_help'] = 'This is the application identifier. <span class="bold">It is required in all the requests.</span>';
-$string['certifygenvalidation_csv_settings'] = 'CSV settings';
-$string['csvnotconfigured'] = 'CSV not configured';
+use SoapClient;
+
+class soapconnection
+{
+    private $options = [];
+    public function __construct()
+    {
+        $this->options = [
+//                "uri"=> $this->configuration->get_wsdl(),
+            "style"=> SOAP_RPC,
+            "use"=> SOAP_ENCODED,
+            "soap_version"=> SOAP_1_1,
+//                "cache_wsdl"=> WSDL_CACHE_BOTH,
+            "connection_timeout" => 15,
+            "trace" => true, // false
+            "encoding" => "UTF-8",
+            "exceptions" => true, // false
+        ];
+    }
+
+    function call(string $wsdl, string $function, array $params) {
+        $client = new SoapClient($wsdl, $this->options);
+        return $client->__soapCall('iniciarProcesoFirma', $params);
+    }
+}

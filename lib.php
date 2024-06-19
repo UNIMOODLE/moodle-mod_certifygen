@@ -208,8 +208,12 @@ function mod_certifygen_get_validation() : array {
     $all[0] = get_string('selectvalidation', 'mod_certifygen');
     $enabled = [];
     foreach (core_plugin_manager::instance()->get_plugins_of_type('certifygenvalidation') as $plugin) {
-        $enable = (int) get_config($plugin->component, 'enable');
-        if ($enable) {
+
+        $validationplugin = $plugin->component;
+        $validationpluginclass = $validationplugin . '\\' . $validationplugin;
+        /** @var ICertificateValidation $subplugin */
+        $subplugin = new $validationpluginclass();
+        if ($subplugin->is_enabled()) {
             $enabled[$plugin->component] = get_string('pluginname', $plugin->component);
             $all[$plugin->component] = get_string('pluginname', $plugin->component);
         }

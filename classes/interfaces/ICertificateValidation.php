@@ -37,6 +37,7 @@ interface ICertificateValidation {
     const FILE_PATH = '/';
     const FILE_NAME_STARTSWITH = 'certifygenvalidation_';
 
+    public function is_enabled(): bool;
     public function sendFile(certifygen_file $file): array;
     public function getState(int $courseid, int $validationid, string $code): int;
     public function getFile(int $courseid, int $validationid, string $code);
