@@ -31,6 +31,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_certifygen\output\views\profile_my_certificates_view;
+
 require_once('../../config.php');
 require_once('lib.php');
 global $PAGE, $OUTPUT;
@@ -38,8 +40,8 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_url(new moodle_url('/mod/certifygen/mycertificates.php'));
 $name = get_string('mycertificates', 'mod_certifygen');
 
-
+$output = $PAGE->get_renderer('mod_certifygen');
+$view = new profile_my_certificates_view();
 echo $OUTPUT->header();
-echo $OUTPUT->heading(format_string($name));
-echo "De momento no hay nada para mostrar";
+echo $output->render($view);
 echo $OUTPUT->footer();

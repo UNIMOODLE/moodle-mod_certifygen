@@ -40,6 +40,26 @@ $ADMIN->add('modsettings',
 
 // Certifygen settings.
 $settings = new admin_settingpage('modsettingcertifygen', get_string('pluginnamesettings', 'mod_certifygen'), 'moodle/site:config');
+if ($ADMIN->fulltree) {
+    // Logo.
+    $name = new lang_string('logo', 'mod_certifygen');
+    $desc = new lang_string('logo_desc', 'mod_certifygen');
+    $setting = new admin_setting_configstoredfile('mod_certifygen/logo',
+        $name,
+        $desc, 'logo', 0, ['accepted_types' => ['image']]);
+    $settings->add($setting);
+
+    // Footer.
+    $name = new lang_string('footer', 'mod_certifygen');
+    $desc = new lang_string('footer_desc', 'mod_certifygen');
+    $setting = new admin_setting_confightmleditor('mod_certifygen/footer',
+        $name,
+        $desc, '');
+    $settings->add($setting);
+    $settings->add($setting);
+
+
+}
 $ADMIN->add('modsettingcertifygencat', $settings);
 
 // Model manager page access.

@@ -45,10 +45,50 @@ use mod_certifygen\external\get_id_instance_certificate_external;
 use mod_certifygen\external\get_json_certificate_external;
 use mod_certifygen\external\get_pdf_certificate_external;
 use mod_certifygen\external\notify_certification_external;
+use mod_certifygen\external\getteacherrequestviewdata_external;
+use mod_certifygen\external\deleteteacherrequest_external;
+use mod_certifygen\external\getcoursesnames_external;
+use mod_certifygen\external\emitteacherrequest_external;
 
 defined('MOODLE_INTERNAL') || die();
 
 $functions = [
+    'mod_certifygen_emitteacherrequest' => [
+        'classname' => emitteacherrequest_external::class,
+        'methodname' => 'emitteacherrequest',
+        'description' => 'emitteacherrequest',
+        'type' => 'write',
+        'capabilities' => 'mod/certifygen:view',
+        'ajax' => true,
+        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
+    'mod_certifygen_deleteteacherrequest' => [
+        'classname' => deleteteacherrequest_external::class,
+        'methodname' => 'deleteteacherrequest',
+        'description' => 'deleteteacherrequest',
+        'type' => 'write',
+        'capabilities' => 'mod/certifygen:view',
+        'ajax' => true,
+        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
+    'mod_certifygen_getcoursesnames' => [
+        'classname' => getcoursesnames_external::class,
+        'methodname' => 'getcoursesnames',
+        'description' => 'getcoursesnames',
+        'type' => 'read',
+        'capabilities' => 'mod/certifygen:view',
+        'ajax' => true,
+        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
+    'mod_certifygen_getteacherrequestviewdata' => [
+        'classname' => getteacherrequestviewdata_external::class,
+        'methodname' => 'getteacherrequestviewdata',
+        'description' => 'getteacherrequestviewdata',
+        'type' => 'read',
+        'capabilities' => 'mod/certifygen:view',
+        'ajax' => true,
+        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
     'mod_certifygen_revokecertificate' => [
         'classname' => revokecertificate_external::class,
         'methodname' => 'revokecertificate',

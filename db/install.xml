@@ -31,6 +31,7 @@
                 <FIELD NAME="timeondemmand" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="time between demands."/>
                 <FIELD NAME="langs" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Languages list seprated by commas."/>
                 <FIELD NAME="validation" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Type of validator used"/>
+                <FIELD NAME="report" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Certificate report subplugin"/>
                 <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -55,7 +56,7 @@
                 <KEY NAME="fk_model" TYPE="foreign" FIELDS="modelid" REFTABLE="certifygen_model" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
-        <TABLE NAME="certifygen_validations" COMMENT="Stores each context of a certifygen">
+        <TABLE NAME="certifygen_validations" COMMENT="Stores each student request of a certifygen certification">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -63,6 +64,23 @@
                 <FIELD NAME="modelid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="lang" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Language"/>
                 <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false" COMMENT="1:course, 2:category."/>
+                <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for certifygen_context"/>
+                <KEY NAME="fk_model" TYPE="foreign" FIELDS="modelid" REFTABLE="certifygen_model" REFFIELDS="id"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="certifygen_teacherrequests" COMMENT="Stores each context of a certifygen">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="modelid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false" COMMENT="1:notstarted,2:inprogress,3:error,4: finished"/>
+                <FIELD NAME="lang" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Language"/>
+                <FIELD NAME="courses" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="List of course ids separated by commas"/>
+                <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>

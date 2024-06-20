@@ -177,7 +177,18 @@ function mod_certifygen_get_types() : array {
         certifygen_model::TYPE_TEACHER_ALL_COURSES_USED => get_string('type_'. certifygen_model::TYPE_TEACHER_ALL_COURSES_USED, 'mod_certifygen'),
     ];
 }
-
+/**
+ * Get certifygen context types
+ * @return array
+ * @throws coding_exception
+ */
+function mod_certifygen_get_context_types() : array {
+    return [
+        certifygen_context::CONTEXT_TYPE_COURSE => get_string('course'),
+        certifygen_context::CONTEXT_TYPE_CATEGORY => get_string('category'),
+        certifygen_context::CONTEXT_TYPE_SYSTEM => get_string('system', 'mod_certifygen'),
+    ];
+}
 /**
  * @param int $courseid
  * @return array
@@ -246,32 +257,32 @@ function mod_certifygen_get_templates(int $courseid = 0) : array {
     return $templates;
 }
 
+//TODO: no se si el enlace del curso lo mantengo... ahroa q es contexto sistema... no se si tiene sentido
 /**
- * This function extends the course navigation with MYUA Configuration.
- *
  * @param navigation_node $navigation
  * @param stdClass $course
  * @param context_course $context
  * @throws coding_exception|moodle_exception
  */
-function mod_certifygen_extend_navigation_course(navigation_node $navigation, stdClass $course, context_course $context) {
-
-    global $USER;
-    // Only for teachers (capability managegroups).
-    $enrolledids = get_enrolled_users($context, 'moodle/course:managegroups', 0, 'u.id');
-    if (!empty($enrolledids)) {
-        $enrolledids = array_keys($enrolledids);
-    }
-    if (!in_array($USER->id, $enrolledids)) {
-        return;
-    }
-    if (certifygen_context::has_course_context($course->id)) {
-        $label = get_string('contextcertificatelink', 'mod_certifygen');
-        $url = new moodle_url('/mod/certifygen/courselink.php', array('id' => $course->id));
-        $icon = new pix_icon('t/edit', $label);
-        $navigation->add($label, $url, navigation_node::TYPE_COURSE, null, null, $icon);
-    }
-}
+//function mod_certifygen_extend_navigation_course(navigation_node $navigation, stdClass $course, context_course $context) {
+//
+//    global $USER;
+//    // Only for teachers (capability managegroups).
+//    $enrolledids = get_enrolled_users($context, 'moodle/course:managegroups', 0, 'u.id');
+//    if (!empty($enrolledids)) {
+//        $enrolledids = array_keys($enrolledids);
+//    }
+//    if (!in_array($USER->id, $enrolledids)) {
+//        return;
+//    }
+////    if (certifygen_context::has_course_context($course->id)) {
+//    if (certifygen_context::exists_system_context_model()) {
+//        $label = get_string('contextcertificatelink', 'mod_certifygen');
+//        $url = new moodle_url('/mod/certifygen/courselink.php', array('id' => $course->id));
+//        $icon = new pix_icon('t/edit', $label);
+//        $navigation->add($label, $url, navigation_node::TYPE_SYSTEM, null, null, $icon);
+//    }
+//}
 
 /**
  * @param tree $tree
@@ -285,7 +296,7 @@ function mod_certifygen_myprofile_navigation(core_user\output\myprofile\tree $tr
 
     global $USER;
     if (permission::can_view_list($user->id)) {
-        if ($USER->id == $user->id) {
+        if ($USER->id == $user->id && certifygen_context::exists_system_context_model()) {
 
             $coursedetailscategory = new core_user\output\myprofile\category('mycertifygens',
                 get_string('pluginname', 'mod_certifygen'), 'coursedetails');

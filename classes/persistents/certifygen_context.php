@@ -45,6 +45,7 @@ class certifygen_context extends persistent {
     public const TABLE = 'certifygen_context';
     public const CONTEXT_TYPE_COURSE = 1;
     public const CONTEXT_TYPE_CATEGORY = 2;
+    public const CONTEXT_TYPE_SYSTEM = 3;
 
     /**
      * Define properties
@@ -94,6 +95,15 @@ class certifygen_context extends persistent {
         return $model->create();
     }
 
+    /**
+     * @return bool
+     * @throws dml_exception
+     */
+    public static function exists_system_context_model() : bool {
+        global $DB;
+        $cont = $DB->count_records(self::TABLE, ['type' => self::CONTEXT_TYPE_SYSTEM]);
+        return $cont > 0;
+    }
     /**
      * @throws moodle_exception
      * @throws dml_exception
@@ -204,5 +214,31 @@ class certifygen_context extends persistent {
             }
         }
         return $modelids;
+    }
+
+    /**
+     * @return array[]
+     * @throws dml_exception
+     */
+    public static function get_system_context_modelids_and_langs() : array {
+        global $DB;
+        $modelids = [];
+        $langs = [];
+        $sql = "SELECT m.id as modelid, m.name, m.langs
+        FROM {certifygen_model} m
+        INNER JOIN {certifygen_context} c ON c.modelid = m.id
+        WHERE c.type = :type";
+        $contexts = $DB->get_records_sql($sql, ['type' => self::CONTEXT_TYPE_SYSTEM]);
+        $langstrings = get_string_manager()->get_list_of_translations();
+        foreach ($contexts as $context) {
+            $modelids[$context->modelid] = $context->name;
+            $modellangs = explode(',', $context->langs);
+            $modellangstrings = [];
+            foreach ($modellangs as $modellang) {
+                $modellangstrings[$modellang] = $langstrings[$modellang];
+            }
+            $langs[$context->modelid] = $modellangstrings;
+        }
+        return [$modelids, $langs];
     }
 }
