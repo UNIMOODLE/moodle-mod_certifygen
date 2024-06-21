@@ -1,6 +1,8 @@
 <?php
 
 namespace mod_certifygen\output\views;
+global $CFG;
+require_once($CFG->dirroot . '/user/lib.php');
 use mod_certifygen\tables\profile_my_certificates_table;
 use renderable;
 use stdClass;
@@ -29,7 +31,6 @@ class profile_my_certificates_view implements renderable, templatable
      * @return stdClass
      */
     public function export_for_template(renderer_base $output): stdClass {
-
         global $USER;
         $data = new stdClass();
 
@@ -42,6 +43,13 @@ class profile_my_certificates_view implements renderable, templatable
         ob_end_clean();
         $data->table = $out1;
         $data->userid = $this->userid;
+        if ($this->userid == $USER->id) {
+            $data->mycertificates = true;
+        } else {
+            $user = user_get_users_by_id([$this->userid]);
+            $user = reset($user);
+            $data->title = get_string('othercertificates', 'mod_certifygen', fullname($user));
+        }
         return $data;
     }
 }

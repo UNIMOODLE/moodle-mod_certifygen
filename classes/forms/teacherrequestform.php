@@ -111,10 +111,9 @@ class teacherrequestform extends dynamic_form {
      */
     protected function check_access_for_dynamic_submission(): void
     {
-        //TODO:
-//        if (!has_capability('mod/certifygen:manage', $this->get_context_for_dynamic_submission())) {
-//            throw new moodle_exception('nopermissions', 'error', '', 'manage models');
-//        }
+        if (!has_capability('mod/certifygen:viewmycontextcertificates', $this->get_context_for_dynamic_submission())) {
+            throw new moodle_exception('nopermissions', 'error', '', 'viewcontextcertificates');
+        }
     }
 
     /**

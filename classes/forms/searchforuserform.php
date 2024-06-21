@@ -13,17 +13,16 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 // Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU".
 //
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
-// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos..
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
- * Version File
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -31,14 +30,28 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace mod_certifygen\forms;
 
-$plugin->version = 2024060712;
-$plugin->requires = 2022112802;//Moodle 4.1.2 //  2022112810; // Moodle 4.1.10+.
-$plugin->component = 'mod_certifygen';
-$plugin->cron = 0;
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = 'v0.0.1';
-$plugin->dependencies = [
-    'tool_certificate' => 2024042300,
-];
+use context_system;
+use moodleform;
+
+use core_user;
+class searchforuserform extends moodleform
+{
+
+    protected function definition()
+    {
+        $mform =& $this->_form;
+        $context = context_system::instance();
+        $options = [
+            'ajax' => 'core_user/form_user_selector',
+            'multiple' => false,
+            'valuehtmlcallback' => function($userid) use ($context): string {
+                $user = core_user::get_user($userid);
+                return fullname($user, has_capability('moodle/site:viewfullnames', $context));
+            }
+        ];
+        $mform->addElement('autocomplete', 'user', get_string('user'), [], $options);
+        $this->add_action_buttons(false, get_string('filter', 'mod_certifygen'));
+    }
+}

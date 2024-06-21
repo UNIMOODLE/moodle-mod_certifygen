@@ -41,7 +41,14 @@
     }
 }}
 <div data-region="profile-my-certificates">
-    <h3 class="mt-3 mb-3 ">{{#str}}mycertificates, mod_certifygen{{/str}}</h3>
+    {{#mycertificates}}
+        <h3 class="mt-3 mb-3 ">{{#str}}mycertificates, mod_certifygen{{/str}}</h3>
+    {{/mycertificates}}
+
+    {{^mycertificates}}
+        <h3 class="mt-3 mb-3 ">{{ title }}</h3>
+    {{/mycertificates}}
+
     <div class="mt-3 mb-3 text-right">
         <span data-id="0" data-userid="{{userid}}" data-action="create-request" class="btn btn-primary"> {{#str}} create_request, mod_certifygen {{/str}}</span>
     </div>

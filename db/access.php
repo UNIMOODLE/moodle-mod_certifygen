@@ -60,14 +60,21 @@ $capabilities = [
             'manager' => CAP_ALLOW,
         ],
     ],
+    'mod/certifygen:viewmycontextcertificates' => [
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => [
+            'user' => CAP_ALLOW
+        ],
+    ],
     'mod/certifygen:viewcontextcertificates' => [
         'captype' => 'read',
-        'contextlevel' => CONTEXT_COURSE,
+        'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => [
             'guest' => CAP_PROHIBIT,
             'student' => CAP_PROHIBIT,
-            'teacher' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
+            'teacher' => CAP_PROHIBIT,
+            'editingteacher' => CAP_PROHIBIT,
             'manager' => CAP_ALLOW,
         ],
     ],

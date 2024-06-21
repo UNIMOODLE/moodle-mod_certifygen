@@ -36,9 +36,12 @@ use mod_certifygen\output\views\profile_my_certificates_view;
 require_once('../../config.php');
 require_once('lib.php');
 global $PAGE, $OUTPUT;
+require_login();
+$context = context_system::instance();
+require_capability('mod/certifygen:viewmycontextcertificates', $context);
+
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url(new moodle_url('/mod/certifygen/mycertificates.php'));
-$name = get_string('mycertificates', 'mod_certifygen');
 
 $output = $PAGE->get_renderer('mod_certifygen');
 $view = new profile_my_certificates_view();

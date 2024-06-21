@@ -68,6 +68,12 @@ $modelsmanagersettings = new admin_externalpage('certifygenmodelsmanager',
     '/mod/certifygen/modelmanager.php',  'moodle/site:config', $module->is_enabled() === false);
 $ADMIN->add('modsettingcertifygencat', $modelsmanagersettings);
 
+// See teacher requests.
+$teacherrequestreportsettings = new admin_externalpage('certifygenteacherrequestreport',
+    get_string('certifygenteacherrequestreport', 'mod_certifygen'),
+    '/mod/certifygen/teacherrequestreport.php',  'mod/certifygen:viewcontextcertificates', $module->is_enabled() === false);
+$ADMIN->add('modsettingcertifygencat', $teacherrequestreportsettings);
+
 $ADMIN->add('modsettingcertifygencat',
     new admin_category('certifygenvalidationplugins',
         get_string('managecertifygenvalidationplugins', 'mod_certifygen'),

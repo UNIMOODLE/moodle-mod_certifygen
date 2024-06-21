@@ -139,3 +139,5 @@ $string['footer'] = 'Footer';
 $string['footer_desc'] = 'On teacher\'s certifications you can add a footer';
 $string['emitrequesttitle'] = 'Emiti certificate';
 $string['emitrequestbody'] = 'Are you sure, you want to emit request with id "{$a}"?';
+$string['certifygenteacherrequestreport'] = 'View teacher requests certificates';
+$string['othercertificates'] = 'List of "{$a}" \'s requests';

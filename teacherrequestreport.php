@@ -13,17 +13,17 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 // Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU".
 //
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
-// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos..
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
- * Version File
+ * View list of my context certificates
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -31,14 +31,27 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+use mod_certifygen\output\views\profile_my_certificates_view;
 
-$plugin->version = 2024060712;
-$plugin->requires = 2022112802;//Moodle 4.1.2 //  2022112810; // Moodle 4.1.10+.
-$plugin->component = 'mod_certifygen';
-$plugin->cron = 0;
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = 'v0.0.1';
-$plugin->dependencies = [
-    'tool_certificate' => 2024042300,
-];
+require_once('../../config.php');
+global $CFG;
+require_once($CFG->dirroot. '/lib/formslib.php');
+require_once('lib.php');
+global $PAGE, $OUTPUT;
+require_login();
+$context = context_system::instance();
+require_capability('mod/certifygen:viewcontextcertificates', $context);
+
+$PAGE->set_context(context_system::instance());
+$PAGE->set_url(new moodle_url('/mod/certifygen/teacherrequestreport.php'));
+
+$form = new \mod_certifygen\forms\searchforuserform();
+
+echo $OUTPUT->header();
+echo $form->display();
+if ($data = $form->get_data()) {
+    $output = $PAGE->get_renderer('mod_certifygen');
+    $view = new profile_my_certificates_view($data->user);
+    echo $output->render($view);
+}
+echo $OUTPUT->footer();

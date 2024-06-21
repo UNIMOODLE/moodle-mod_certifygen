@@ -139,3 +139,5 @@ $string['footer'] = 'Pie de página';
 $string['footer_desc'] = 'Pie de página que aparece en los certificados de profesor';
 $string['emitrequesttitle'] = 'Emitir certificado';
 $string['emitrequestbody'] = '¿Estás seguro de querer emitir el certificado {$a}?';
+$string['certifygenteacherrequestreport'] = 'View teacher requests certificates';
+$string['othercertificates'] = 'Lists de peticiones de "{$a}"';
