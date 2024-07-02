@@ -176,7 +176,7 @@ class certifygenvalidation_cmd implements ICertificateValidation
      */
     public function getFile(int $courseid, int $validationid, string $code)
     {
-        $code = self::FILE_NAME_STARTSWITH . $code;
+        $code = self::FILE_NAME_STARTSWITH . $code . '.pdf';
         $fs = get_file_storage();
         $contextid = context_course::instance($courseid)->id;
         return $fs->get_file($contextid, self::FILE_COMPONENT,
@@ -222,8 +222,8 @@ class certifygenvalidation_cmd implements ICertificateValidation
     public function is_enabled(): bool
     {
         $enabled = (int) get_config('certifygenvalidation_cmd', 'enabled');
-        $pathenabled = (int) get_config('certifygenvalidation_cmd', 'path');
-        if ($enabled && $pathenabled) {
+        $pathenabled = get_config('certifygenvalidation_cmd', 'path');
+        if ($enabled && !empty($pathenabled)) {
             return true;
         }
         return false;

@@ -46,12 +46,15 @@ use moodle_exception;
 use moodle_url;
 use table_sql;
 
-class activityteacherview_table extends table_sql {
+class activityteacher_table extends table_sql {
     private int $courseid;
     private int $templateid;
     private int $cmid;
     private int $instance;
     private int $modelid;
+    private string $lang;
+    private string $langstring;
+    private bool $canrevoke;
 
     /**
      * Constructor
@@ -72,9 +75,12 @@ class activityteacherview_table extends table_sql {
         $uniqueid = 'certifygen-activity-teacher-view';
         parent::__construct($uniqueid);
         // Define the list of columns to show.
-        $columns = ['fullname', 'code', 'status', 'dateissued', 'link', 'revoke' ];
+        $columns = ['fullname', 'code', 'status', 'dateissued', 'emit', 'download', 'revoke' ];
         $this->define_columns($columns);
-
+        $validationplugin = $this->model->get('validation');
+        $validationpluginclass = $validationplugin . '\\' . $validationplugin;
+        $subplugin = new $validationpluginclass();
+        $this->canrevoke = $subplugin->canrevoke();
         // Define the titles of columns to show in header.
         $headers = [
             get_string('fullname'),
@@ -100,9 +106,22 @@ class activityteacherview_table extends table_sql {
      */
     function col_fullname($row): string
     {
-        global $OUTPUT;
 
-        return $OUTPUT->user_picture($row, array('size' => 35, 'courseid' => $this->courseid, 'includefullname' => true));
+        global $OUTPUT;
+        $data = [
+            'id' => $row->id,
+            'picture' => $row->picture,
+            'firstname' => $row->firstname,
+            'lastname' => $row->lastname,
+            'firstnamephonetic' => $row->firstnamephonetic,
+            'lastnamephonetic' => $row->lastnamephonetic,
+            'middlename' => $row->middlename,
+            'alternatename' => $row->alternatename,
+            'imagealt' => $row->imagealt,
+            'email' => $row->email,
+        ];
+
+        return $OUTPUT->user_picture((object) $data, array('size' => 35, 'courseid' => $this->courseid, 'includefullname' => true));
     }
 
     /**
@@ -112,10 +131,21 @@ class activityteacherview_table extends table_sql {
      */
     function col_revoke($row): string
     {
-        return '<span class="likelink" data-action="revoke-certificate" data-username="'. $row->firstname. ' '
-            . $row->lastname .'" data-issueid="'. $row->issueid.'" data-modelid="'. $this->modelid
-            .'" data-courseid="'. $this->courseid.'" data-userid="'. $row->userid.'" data-cmid="'.  $this->cmid .'">' .
-            get_string('revoke', 'tool_certificate') . '</span>';
+        if (!$this->canrevoke) {
+            return '';
+        }
+        $status = $row->status;
+        if (is_null($row->status)) {
+            $status = certifygen_validations::STATUS_NOT_STARTED;
+        }
+        if ($status == certifygen_validations::STATUS_FINISHED_OK) {
+            return '<span class="likelink" data-action="revoke-certificate" data-username="'. $row->firstname. ' '
+                . $row->lastname .'" data-issueid="'. $row->issueid.'" data-modelid="'. $this->modelid
+                .'" data-courseid="'. $this->courseid.'" data-userid="'. $row->id.'" data-cmid="'.  $this->cmid .'"
+                data-lang="'. $this->lang .'" data-langstring="'. $this->langstring .'"  >' .
+                get_string('revoke', 'tool_certificate') . '</span>';
+        }
+        return '';
     }
 
     /**
@@ -126,7 +156,7 @@ class activityteacherview_table extends table_sql {
     function col_status($row): string
     {
         if (isset($row->issueid)) {
-            $validation = certifygen_validations::get_record(['userid' => $row->userid, 'issueid' => $row->issueid]);
+            $validation = certifygen_validations::get_record(['userid' => $row->id, 'issueid' => $row->issueid]);
             if ($validation) {
                 return get_string('status_'.$validation->get('status'), 'mod_certifygen');
             }
@@ -157,78 +187,85 @@ class activityteacherview_table extends table_sql {
     /**
      * @param $row
      * @return string
+     * @throws coding_exception
+     * @throws dml_exception
+     */
+    function col_download($row): string
+    {
+        $status = $row->status;
+        if (is_null($row->status)) {
+            $status = certifygen_validations::STATUS_NOT_STARTED;
+        }
+        if ($status == certifygen_validations::STATUS_FINISHED_OK) {
+            return '<span data-courseid="' . $row->courseid . '" data-modelid="' . $this->modelid . '" 
+            data-id="'. $row->validationid . '" data-action="download-certificate" data-userid="'. $row->id .'" 
+            data-code="'. $row->code .'" data-lang="'. $this->lang .'" data-langstring="'. $this->langstring .'"  data-cmid="'. $this->cmid .'" 
+            class="btn btn-primary">' . get_string('download') . '</span>';
+        }
+        return '';
+    }
+    /**
+     * @param $row
+     * @return string
      * @throws dml_exception
      * @throws moodle_exception
      * @throws coding_exception
      */
-    function col_link($row): string
+    function col_emit($row): string
     {
-        global $DB;
-
-        $code = $DB->get_field('tool_certificate_issues', 'code', ['id' => $row->issueid]);
-        $link = new moodle_url('/mod/certifygen/certificateview.php',
-            ['code' => $code, 'preview' => true, 'templateid' => $row->templateid]);
-        $status = certifygen_validations::STATUS_NOT_STARTED;
-        $id = 0;
-        if (isset($row->issueid)) {
-            $validation = certifygen_validations::get_record(['userid' => $row->userid, 'issueid' => $row->issueid]);
-            if ($validation) {
-                $id = $validation->get('id');
-                $status = $validation->get('status');
-            }
+        $status = $row->status;
+        $id = $row->id;
+        if (is_null($row->status)) {
+            $status = certifygen_validations::STATUS_NOT_STARTED;
+            $id = 0;
         }
 
-        if ($this->is_downloading()) {
-            return $link->out();
-        } else if ($status == certifygen_validations::STATUS_NOT_STARTED
-        || $status == certifygen_validations::STATUS_FINISHED_ERROR) {
+        if ($status == certifygen_validations::STATUS_NOT_STARTED || $status == certifygen_validations::STATUS_FINISHED_ERROR) {
             return '<span data-courseid="' . $row->courseid . '" data-modelid="' . $this->modelid . '" data-id="'. $id .
-                '" data-action="emit-certificate" data-userid="'. $row->userid .'" class="btn btn-primary"
-                href='. $link->out().'>'.get_string('emit', 'mod_certifygen').'</span>';
-        } else if ($status == certifygen_validations::STATUS_FINISHED_OK) {
-            $validationplugin = $this->model->get('validation');
-            $validationrecord = certifygen_validations::get_record(
-                ['modelid' => $this->model->get('id'), 'userid' => $row->userid, 'lang' => $row->lang]);
-            $validationpluginclass = $validationplugin . '\\' . $validationplugin;
-            if (get_config($validationplugin, 'enabled') === '1') {
-                /** @var ICertificateValidation $subplugin */
-                $subplugin = new $validationpluginclass();
-                $url = $subplugin->getFileUrl($this->courseid, $validationrecord->get('id'), $code.'.pdf');
-                if (!empty($url)) {
-                    return '<a href="' . $url . '">' . get_string('download') . '</a>';
-                }
-            }
+                '" data-action="emit-certificate" data-userid="'. $row->id .'" data-lang="'. $this->lang .'" 
+                data-langstring="'. $this->langstring .'"  data-cmid="'. $this->cmid .'" class="btn btn-primary"
+                >'.get_string('emit', 'mod_certifygen').'</span>';
         }
+
         return '';
     }
+
     /**
      * Query the reader.
      *
      * @param int $pagesize size of page for paginated displayed table.
      * @param bool $useinitialsbar do you want to use the initials bar?
+     * @throws dml_exception
      */
     public function query_db($pagesize, $useinitialsbar = true): void
     {
 
         $userid = 0;
-        $groupmode = 0;
-        $groupid = 0;
+        $tifirst = '';
+        $tilast = '';
         if ($this->filterset->has_filter('userid')) {
             $userid = $this->filterset->get_filter('userid')->current();
         }
+        if ($this->filterset->has_filter('tifirst')) {
+            $tifirst = $this->filterset->get_filter('tifirst')->current();
+        }
+        if ($this->filterset->has_filter('tilast')) {
+            $tilast = $this->filterset->get_filter('tilast')->current();
+        }
+        $this->lang = $this->filterset->get_filter('lang')->current();
+        $langs = get_string_manager()->get_list_of_translations();
+        $this->langstring = $langs[$this->lang];
         $params['lang'] = $this->filterset->get_filter('lang')->current();
-        $total = certifygen::count_issues_for_course_by_lang($params['lang'], $this->templateid, $this->courseid,
-            'mod_certifygen', $userid, $groupmode, $groupid);
+        $total = certifygen::count_issues_for_course_by_lang($this->courseid, $tifirst, $tilast, $userid);
 
         $this->pagesize($pagesize, $total);
 
         $this->rawdata = certifygen::get_issues_for_course_by_lang($params['lang'], $this->templateid, $this->courseid,
-            'mod_certifygen', $userid, $groupmode, $groupid, $this->get_page_start(),
+            'mod_certifygen', $userid, $tifirst, $tilast, $this->get_page_start(),
             $this->get_page_size(), $this->get_sql_sort());
+
         // Set initial bars.
-        if ($useinitialsbar) {
-            $this->initialbars($total > $pagesize);
-        }
+        $this->initialbars($total > $pagesize);
     }
 
     /**

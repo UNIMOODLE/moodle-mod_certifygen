@@ -32,6 +32,7 @@
 
 namespace mod_certifygen\output;
 use dml_exception;
+use mod_certifygen\output\views\activity_view;
 use mod_certifygen\output\views\model_view;
 use mod_certifygen\output\views\mycertificates_view;
 use mod_certifygen\output\views\profile_my_certificates_view;
@@ -42,32 +43,18 @@ use moodle_exception;
 use plugin_renderer_base;
 
 class renderer extends plugin_renderer_base {
+
     /**
-     * Student view renderer
-     *
-     * @param student_view $view
+     * Activity view renderer
+     * @param activity_view $view
      * @return string
+     * @throws \coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function render_student_view(student_view $view): string {
+    public function render_activity_view(activity_view $view): string {
         $data = $view->export_for_template($this);
-        if (!$data->hasvalidator) {
-            unset($data->hasvalidator);
-        }
-        return $this->render_from_template('mod_certifygen/student', $data);
-    }
-    /**
-     * Teacher view renderer
-     *
-     * @param teacher_view $view
-     * @return string
-     * @throws dml_exception
-     * @throws moodle_exception
-     */
-    public function render_teacher_view(teacher_view $view): string {
-        $data = $view->export_for_template($this);
-        return $this->render_from_template('mod_certifygen/teacher', $data);
+        return $this->render_from_template('mod_certifygen/activity', $data);
     }
 
     /**

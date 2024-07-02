@@ -29,8 +29,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use mod_certifygen\output\views\student_view;
-use mod_certifygen\output\views\teacher_view;
+use mod_certifygen\output\views\activity_view;
 
 require_once('../../config.php');
 require_once('lib.php');
@@ -48,17 +47,11 @@ $PAGE->set_url('/mod/certifygen/view.php', ['id' => $id]);
 require_login($course, false, $cm);
 $cmcontext = context_module::instance($cm->id);
 require_capability('mod/certifygen:view', $cmcontext);
-$isteacher = has_capability('mod/certifygen:manage', $cmcontext);
 
 $PAGE->set_heading($course->fullname);
 $PAGE->set_title(get_string('modulename', 'certifygen'));
 
-if ($isteacher) {
-    $view = new teacher_view($course->id, $certifygenmodel->templateid, $cm);
-} else {
-
-    $view = new student_view($course->id, $cm);
-}
+$view = new activity_view($course->id, $certifygenmodel->templateid, $cm);
 
 $output = $PAGE->get_renderer('mod_certifygen');
 echo $output->header();

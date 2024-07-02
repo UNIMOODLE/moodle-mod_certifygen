@@ -59,9 +59,9 @@ class downloadcertificate_external extends external_api {
     public static function downloadcertificate_parameters(): external_function_parameters {
         return new external_function_parameters(
             [
+                'id' => new external_value(PARAM_INT, 'validation id'),
                 'modelid' => new external_value(PARAM_INT, 'model id'),
-                'lang' => new external_value(PARAM_RAW, 'model lang'),
-                'userid' => new external_value(PARAM_RAW, 'user id'),
+                'code' => new external_value(PARAM_RAW, 'certificate code'),
                 'courseid' => new external_value(PARAM_RAW, 'course id'),
             ]
         );
@@ -78,75 +78,47 @@ class downloadcertificate_external extends external_api {
      * @throws invalid_parameter_exception
      * @throws invalid_persistent_exception
      */
-    public static function downloadcertificate(int $modelid, string $lang, int $userid, int $courseid): array {
+    public static function downloadcertificate(int $validationid, int $modelid, string $code, int $courseid): array {
 
-//        self::validate_parameters(
-//            self::downloadcertificate_parameters(), ['modelid' => $modelid, 'lang' => $lang, 'userid' => $userid, 'courseid' => $courseid]
-//        );
+        self::validate_parameters(
+            self::downloadcertificate_parameters(), ['id' => $validationid, 'modelid' => $modelid, 'code' => $code,
+                'courseid' => $courseid]
+        );
 
         $result = ['result' => true, 'message' => 'OK', 'url' => '', 'codetag' => ''];
-//        $returndata = ['id' => 0, 'code' => ''];
 
-        // Step 1: Change status to in progress.
-//        $data = [
-//            'userid' => $userid,
-//            'lang' => $lang,
-//            'modelid' => $modelid,
-//            'status' => certifygen_validations::STATUS_IN_PROGRESS,
-//            'issueid' => null,
-//            'usermodified' => $userid,
-//        ];
-//        $validation = certifygen_validations::manage_validation($id, (object) $data);
         try {
-            // Step 2: Generate issue.
-            $users = user_get_users_by_id([$userid]);
-            $user = reset($users);
+            // Step 1: verified status finished.
+            $validation = new certifygen_validations($validationid);
+            if (is_null($validation)) {
+                $result = ['result' => false, 'message' => 'notfound', 'url' => '', 'codetag' => ''];
+                return $result;
+            }
+            // Step 2: call to getfile from validationplugin.
             $certifygenmodel = new certifygen_model($modelid);
-            $course = get_course($courseid);
-            // Save on database.
-            $data = [
-                'userid' => $userid,
-                'lang' => $lang,
-                'modelid' => $modelid,
-                'usermodified' => $userid,
-            ];
-            $issueid = certifygen::issue_certificate($user, $certifygenmodel->get('templateid'), $course, $lang);
-            $saved = false;
-            if ($issueid) {
-                $saved = true;
-                $data['issueid'] = $issueid;
-                self::save_certifygen_validation($data);
-            }
-            $issue = certifygen::get_user_certificate( $userid, $courseid, $certifygenmodel->get('templateid'), $lang);
-            if (!$saved) {
-                $saved = true;
-                $data['issueid'] = $issue->id;
-                self::save_certifygen_validation($data);
-            }
-            $fileurl = certifygen::get_user_certificate_file_url($certifygenmodel->get('templateid'), $userid, $courseid, $lang);
-            $codelink =  new \moodle_url('/admin/tool/certificate/index.php', ['code' => $issue->code]);
-            // Step 3: Generate the tool_certificate certificate.
-            $result['url'] = $fileurl;
-            $result['codetag'] = '<a href="'.$codelink->out().'" target="_blank">' . $issue->code .'</a>';
-            if (empty($fileurl)) {
-                $result['result'] = false;
-                $result['message'] = 'File not found';
+            $validationplugin = $certifygenmodel->get('validation');
+            if (empty($validationplugin)) {
+                $result['url'] = certifygen::get_user_certificate_file_url($certifygenmodel->get('templateid'),
+                    $validation->get('userid'), $courseid, $validation->get('lang'));
+            } else {
+                $validationpluginclass = $validationplugin . '\\' . $validationplugin;
+                if (get_config($validationplugin, 'enabled') === '1') {
+                    /** @var ICertificateValidation $subplugin */
+                    $subplugin = new $validationpluginclass();
+                    $result['url'] = $subplugin->getFileUrl($courseid, $validationid, $code);
+                } else {
+                    $result['result'] = false;
+                    $result['message'] = 'plugin_not_enabled';
+                }
             }
         } catch (moodle_exception $e) {
-            error_log(__FUNCTION__ . ' ' . __LINE__ . var_export($e->getMessage(), true));
             $result['result'] = false;
             $result['message'] = $e->getMessage();
         }
+
         return $result;
     }
-    private static function save_certifygen_validation(array $data) : void {
-        $validation = certifygen_validations::get_record($data);
-        if (!$validation) {
-            $data['status'] = certifygen_validations::STATUS_FINISHED_OK;
-            $validation = new certifygen_validations(0, (object) $data);
-            $validation->save();
-        }
-    }
+
     /**
      * Describes the data returned from the external function.
      *

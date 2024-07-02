@@ -106,16 +106,21 @@ class certifygen {
 
         global $DB;
 
+        $comparelang = $DB->sql_compare_text('cv.lang');
+        $comparelangplaceholder = $DB->sql_compare_text(':lang');
+        $comparecomp = $DB->sql_compare_text('ci.component');
+        $comparecompplaceholder = $DB->sql_compare_text(':component');
         $sql = "SELECT ci.* 
                 FROM {tool_certificate_issues} ci
                 INNER JOIN {certifygen_validations} cv ON (cv.issueid = ci.id AND cv.userid = ci.userid)
-                WHERE ci.component = :component 
+                WHERE $comparecomp = $comparecompplaceholder 
                     AND ci.courseid = :courseid 
                     AND ci.templateid = :templateid 
                     AND ci.userid = :userid
                     AND ci.archived = 0 
-                    AND cv.lang = :lang
-                ORDER BY id DESC";
+                    AND {$comparelang} = {$comparelangplaceholder}
+                ORDER BY ci.id DESC";
+
         $params = [
             'component' => 'mod_certifygen',
             'courseid' => $courseid,
@@ -284,10 +289,21 @@ class certifygen {
     }
 
     /**
-     * @throws dml_exception|coding_exception
+     * @param string $lang
+     * @param int $templateid
+     * @param int $courseid
+     * @param string $component
+     * @param int|null $userid
+     * @param string $tifirst
+     * @param string $tilast
+     * @param int $limitfrom
+     * @param int $limitnum
+     * @param string $sort
+     * @return array
+     * @throws dml_exception
      */
     public static function get_issues_for_course_by_lang(string $lang, int $templateid, int $courseid, string $component,
-                                                         ?int $userid, ?int $groupmode, ?int $groupid,
+                                                         int $userid, string $tifirst, string $tilast,
                                                          int $limitfrom, int $limitnum, string $sort = ''): array {
         global $DB;
 
@@ -295,42 +311,43 @@ class certifygen {
             $sort = 'ci.timecreated DESC';
         }
 
-        $params = ['templateid' => $templateid,
+        $params = [
+            'now' => time(),
+            'templateid' => $templateid,
             'courseid' => $courseid,
             'component' => $component,
-            'now' => time(),
             'lang' => $lang,
             ];
-        $userquery = '';
-        $groupmodequery = '';
-        if ($groupmode) {
-            [$groupmodequery, $groupmodeparams] = self::get_groupmode_subquery($groupmode, $groupid);
-            $params += $groupmodeparams;
+        $where = "";
+        if (!empty($tifirst)) {
+            $params['tifirst'] = $tifirst . '%';
+            $where .= ' AND ' . $DB->sql_like('u.firstname', ':tifirst');
+
+        }
+        if (!empty($tilast)) {
+            $params['tilast'] = $tilast . '%';
+            $where .= ' AND ' . $DB->sql_like('u.lastname', ':tilast');
         }
         if ($userid) {
             $params['userid'] = $userid;
-            $userquery = ' AND ' . $DB->sql_like('ci.userid', ':userid');
+            $where = ' AND u.id = :userid';
         }
-        $usersquery = self::get_users_subquery();
-        $context = \context_course::instance($courseid);
-        $userfields = self::get_extra_user_fields($context);
 
-        $sql = "SELECT ci.id as issueid, ci.code, ci.emailed, ci.timecreated, ci.userid, ci.templateid, ci.expires,
-                       t.name, ci.courseid, ci.archived, cv.lang, $userfields, 
-                  CASE WHEN ci.expires > 0  AND ci.expires < :now THEN 0
-                  ELSE 1
-                  END AS status
-                  FROM {tool_certificate_templates} t
-                  JOIN {tool_certificate_issues} ci
-                    ON (ci.templateid = t.id) AND (ci.courseid = :courseid) AND (component = :component)
-                  JOIN {certifygen_validations} cv
-                    ON (cv.issueid = ci.id AND cv.userid = ci.userid)
-                  JOIN {user} u
-                    ON (u.id = ci.userid)
-                 WHERE t.id = :templateid
-                   AND $usersquery
-                   $groupmodequery $userquery
-              ORDER BY {$sort}";
+        $sql = "SELECT RAND(), us.id, ci.id as issueid, ci.code, ci.emailed, ci.timecreated, ci.userid, ci.templateid, ci.expires,
+       ci.courseid, ci.archived, cv.lang, cv.status, cv.id as validationid, us.*
+                    FROM (SELECT u.*, c.id as courseid
+                        FROM {user} u
+                        INNER JOIN {user_enrolments} ue ON ue.userid = u.id
+                        INNER JOIN {enrol} e ON e.id = ue.enrolid
+                        INNER JOIN {course} c ON c.id = e.courseid
+                        INNER JOIN {context} cont ON (cont.instanceid = c.id AND cont.contextlevel = 50)
+                        INNER JOIN {role_assignments} ra ON ( ra.contextid = cont.id AND  ra.userid = u.id)
+                        INNER JOIN {role} r ON r.id = ra.roleid
+                        WHERE r.shortname = 'student'
+                        AND c.id = :courseid $where
+                        ) AS us
+                    LEFT JOIN {tool_certificate_issues} ci ON (ci.userid = us.id AND ci.courseid = us.courseid AND ci.templateid = :templateid AND ci.component = :component)
+                    LEFT JOIN {certifygen_validations} cv ON (cv.userid = us.id AND cv.issueid = ci.id AND cv.lang = :lang)";
 
         return $DB->get_records_sql($sql, $params, $limitfrom, $limitnum);
     }
@@ -376,43 +393,44 @@ class certifygen {
     }
 
     /**
-     * @param string $lang
-     * @param int $templateid
      * @param int $courseid
-     * @param string $component
-     * @param int|null $userid
-     * @param int|null $groupmode
-     * @param int|null $groupid
+     * @param string $tifirst
+     * @param string $tilast
+     * @param int $userid
      * @return int
-     * @throws dml_exception|coding_exception
+     * @throws dml_exception
      */
-    public static function count_issues_for_course_by_lang(string $lang, int $templateid, int $courseid, string $component, ?int $userid, ?int $groupmode,
-                                                           ?int $groupid) {
+    public static function count_issues_for_course_by_lang(int $courseid, string $tifirst, string $tilast, int $userid = 0) {
         global $DB;
 
+        $where = '';
         $params = [
-            'templateid' => $templateid,
             'courseid' => $courseid,
-            'component' => $component,
-            'lang' => $lang,
         ];
-        $groupmodequery = "";
-        if ($groupmode) {
-            [$groupmodequery, $groupmodeparams] = self::get_groupmode_subquery($groupmode, $groupid);
-            $params += $groupmodeparams;
+        if (!empty($tifirst)) {
+            $where .= " AND u.firstname LIKE '$tifirst%'";
+
+        }
+        if (!empty($tilast)) {
+            $where .= " AND u.firstname LIKE '%$tilast'";
+        }
+
+        if ($userid) {
+            $params['userid'] = $userid;
+            $where = ' AND u.id = :userid';
         }
 
         $sql = "SELECT COUNT(u.id) as count
-                  FROM {user} u
-                    INNER JOIN {tool_certificate_issues} ci
-                            ON u.id = ci.userid
-                    INNER JOIN {certifygen_validations} cv 
-                        ON (cv.issueid = ci.id AND cv.userid = ci.userid)
-                 WHERE ci.templateid = :templateid
-                    AND ci.courseid = :courseid
-                    AND ci.component = :component
-                    AND cv.lang = :lang
-                    $groupmodequery";
+                    FROM {user} u
+                    INNER JOIN {user_enrolments} ue ON ue.userid = u.id
+                    INNER JOIN {enrol} e ON e.id = ue.enrolid
+                    INNER JOIN {course} c ON c.id = e.courseid
+                    INNER JOIN {context} cont ON (cont.instanceid = c.id AND cont.contextlevel = 50)
+                    INNER JOIN {role_assignments} ra ON ( ra.contextid = cont.id AND  ra.userid = u.id)
+                    INNER JOIN {role} r ON r.id = ra.roleid
+                    WHERE r.shortname = 'student'
+                    AND c.id = :courseid $where";
+
         return $DB->count_records_sql($sql, $params);
     }
 }

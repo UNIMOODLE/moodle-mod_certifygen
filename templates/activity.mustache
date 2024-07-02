@@ -22,9 +22,9 @@
     Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos
 }}
 {{!
-    @template mod_certifygen/student
+    @template mod_certifygen/teacher
 
-    Student
+    Teacher
 
     Classes required for JS:
     * None
@@ -39,24 +39,42 @@
     {
     }
 }}
-<div data-region="student-view">
-    <h3 class="mt-5 mb-5">{{#str}} mycertificates, mod_certifygen {{/str}}</h3>
+<div data-region="activity-view" {{#isstudent}} class="student"{{/isstudent}}>
+    <h3 class="mt-5 mb-5">
+        {{#isstudent}}
+            {{#str}} mycertificate, mod_certifygen {{/str}}</h3>
+        {{/isstudent}}
+        {{^isstudent}}
+            {{#str}} certificatelist, mod_certifygen {{/str}}</h3>
+        {{/isstudent}}
+
     {{#form}}
-        {{{ form }}}
+        <div>
+            {{{ form }}}
+        </div>
     {{/form}}
-    {{#hasvalidator}}
-        {{> mod_certifygen/my_certificates_validator }}
-    {{/hasvalidator}}
-    {{^hasvalidator}}
-        {{> mod_certifygen/my_certificates_no_validator }}
-    {{/hasvalidator}}
+    <div>
+        {{{ table }}}
+    </div>
+
 </div>
+
 {{#js}}
-    require(['mod_certifygen/studentcertificatemanager'], (module) => module.init('[data-region="student-view"]'));
+    require(['mod_certifygen/activitymanager'], (module) => module.init());
 {{/js}}
 
 <style>
-    [data-region="student-view"] {
-        margin: 2em 0;
+
+    [data-region="activity-view"].student .c0 {
+        display: none;
+    }
+    [data-region="activity-view"] .likelink {
+        cursor: pointer;
+        color: #0f6cbf;
+        text-decoration: none;
+    }
+    [data-region="activity-view"] .likelink:hover {
+        color: #094478;
+        text-decoration: underline;
     }
 </style>

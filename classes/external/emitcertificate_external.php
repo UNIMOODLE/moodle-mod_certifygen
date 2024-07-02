@@ -79,6 +79,7 @@ class emitcertificate_external extends external_api {
      * @throws invalid_persistent_exception
      */
     public static function emitcertificate(int $id, int $modelid, string $lang, int $userid, int $courseid): array {
+        global $USER;
 
         self::validate_parameters(
             self::emitcertificate_parameters(), ['id' => $id, 'modelid' => $modelid, 'lang' => $lang, 'userid' => $userid, 'courseid' => $courseid]
@@ -93,7 +94,7 @@ class emitcertificate_external extends external_api {
             'modelid' => $modelid,
             'status' => certifygen_validations::STATUS_IN_PROGRESS,
             'issueid' => null,
-            'usermodified' => $userid,
+            'usermodified' => $USER->id,
         ];
         $validation = certifygen_validations::manage_validation($id, (object) $data);
         try {
@@ -126,17 +127,23 @@ class emitcertificate_external extends external_api {
                 // Step 4: Call to validation plugin.
                 $validationplugin = $certifygenmodel->get('validation');
                 $validationpluginclass = $validationplugin . '\\' . $validationplugin;
-                if (get_config($validationplugin, 'enabled') === '1') {
+                if (empty($validationplugin)) {
+                    $validation->set('status', certifygen_validations::STATUS_FINISHED_OK);
+                    $validation->save();
+                } else if (get_config($validationplugin, 'enabled') === '1') {
                     /** @var ICertificateValidation $subplugin */
                     $subplugin = new $validationpluginclass();
                     $response = $subplugin->sendFile($certifygenfile);
-                    if ($response['haserror']) {
-                        if (!array_key_exists('message', $result)) {
-                            $result['message'] = 'validation_plugin_send_file_error';
-                        }
-                        $validation->set('status', certifygen_validations::STATUS_FINISHED_ERROR);
-                        $validation->save();
-                    }
+//                    if ($response['haserror']) {
+//                        if (!array_key_exists('message', $result)) {
+//                            $result['message'] = 'validation_plugin_send_file_error';
+//                        }
+//                        $validation->set('status', certifygen_validations::STATUS_FINISHED_ERROR);
+//                        $validation->save();
+//                    } else {
+//                        $validation->set('status', certifygen_validations::STATUS_FINISHED_OK);
+//                        $validation->save();
+//                    }
                 } else {
                     $result['result'] = false;
                     $result['message'] = 'plugin_not_enabled';

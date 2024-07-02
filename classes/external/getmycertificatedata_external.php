@@ -39,7 +39,9 @@ use dml_exception;
 use external_api;
 use external_multiple_structure;
 use invalid_parameter_exception;
+use mod_certifygen\output\views\activity_view;
 use mod_certifygen\output\views\mycertificates_view;
+use mod_certifygen\output\views\profile_my_certificates_view;
 use mod_certifygen\output\views\student_view;
 use mod_certifygen\persistents\certifygen_model;
 use external_function_parameters;
@@ -74,7 +76,7 @@ class getmycertificatedata_external extends external_api {
      * @throws moodle_exception
      */
     public static function getmycertificatedata(int $modelid, int $courseid, int $cmid, string $lang): array {
-        global $PAGE;
+        global $PAGE, $DB;
         self::validate_parameters(
             self::getmycertificatedata_parameters(), ['modelid' => $modelid, 'courseid' => $courseid, 'cmid' => $cmid, 'lang' => $lang]
         );
@@ -82,10 +84,13 @@ class getmycertificatedata_external extends external_api {
         $model = new certifygen_model($modelid);
         if ($cmid > 0) {
             $cm = get_coursemodule_from_id('certifygen', $cmid, 0, false, MUST_EXIST);
-            $view = new student_view($courseid, $cm, $lang);
+            $certifygen = $DB->get_record('certifygen', ['id' => $cm->instance], '*', MUST_EXIST);
+            $certifygenmodel = $DB->get_record('certifygen_model', ['id' => $certifygen->modelid], '*', MUST_EXIST);
+            $view = new activity_view($courseid, $certifygenmodel->templateid, $cm);
         } else {
-            $url = new moodle_url('/mod/certifygen/courselink.php', ['id' => $courseid]);
-            $view = new mycertificates_view($model, $courseid, $url, $lang);
+//            $url = new moodle_url('/mod/certifygen/courselink.php', ['id' => $courseid]);
+//            $view = new mycertificates_view($model, $courseid, $url, $lang);
+            $view = new profile_my_certificates_view();
         }
         
         $output = $PAGE->get_renderer('mod_certifygen');
@@ -101,23 +106,12 @@ class getmycertificatedata_external extends external_api {
     public static function getmycertificatedata_returns(): external_single_structure {
         return new external_single_structure(
             [
-                'list' => new external_multiple_structure(
-                    new external_single_structure([
-                        'code' => new external_value(PARAM_RAW, 'model deleted', VALUE_OPTIONAL),
-                        'status' => new external_value(PARAM_RAW, 'model deleted'),
-                        'modelid' => new external_value(PARAM_INT, 'model deleted'),
-                        'lang' => new external_value(PARAM_RAW, 'model deleted'),
-                        'langstring' => new external_value(PARAM_RAW, 'model deleted'),
-                        'id' => new external_value(PARAM_INT, 'model deleted', VALUE_OPTIONAL),
-                        'courseid' => new external_value(PARAM_INT, 'model deleted'),
-                        'userid' => new external_value(PARAM_INT, 'model deleted'),
-                        'canemit' => new external_value(PARAM_BOOL, 'model deleted', VALUE_OPTIONAL),
-                        'candownload' => new external_value(PARAM_BOOL, 'model deleted', VALUE_OPTIONAL),
-                        'iscodelink' => new external_value(PARAM_BOOL, 'model deleted', VALUE_OPTIONAL),
-                        'codelink' => new external_value(PARAM_RAW, 'model deleted', VALUE_OPTIONAL),
-                        'downloadurl' => new external_value(PARAM_RAW, 'model deleted', VALUE_OPTIONAL),
-                    ])
-                )
+                'table' => new external_value(PARAM_RAW, 'table html', VALUE_OPTIONAL),
+                'form' => new external_value(PARAM_RAW, 'form html', VALUE_OPTIONAL),
+                'isstudent' => new external_value(PARAM_BOOL, 'user is student', VALUE_OPTIONAL),
+                'userid' => new external_value(PARAM_INT, 'user id', VALUE_OPTIONAL),
+                'mycertificates' => new external_value(PARAM_BOOL, 'user id', VALUE_OPTIONAL),
+                'title' => new external_value(PARAM_RAW, 'page title', VALUE_OPTIONAL),
             ]
         );
     }

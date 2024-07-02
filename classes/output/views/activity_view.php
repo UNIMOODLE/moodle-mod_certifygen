@@ -34,12 +34,14 @@ namespace mod_certifygen\output\views;
 global $CFG;
 require_once($CFG->dirroot . '/mod/certifygen/lib.php');
 use coding_exception;
+use context_module;
 use core_table\local\filter\filter;
 use core_table\local\filter\integer_filter;
 use core_table\local\filter\string_filter;
 use dml_exception;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
+use mod_certifygen\tables\activityteacher_table;
 use mod_certifygen\tables\activityteacherview_table;
 use mod_certifygen\tables\activityteacherviewnovalidator_table;
 use mod_certifygen\tables\certificates_filterset;
@@ -49,12 +51,12 @@ use renderable;
 use stdClass;
 use templatable;
 use renderer_base;
-class teacher_view implements renderable, templatable {
+class activity_view implements renderable, templatable {
     private int $courseid;
+    private bool $isteacher;
     private int $templateid;
     private int $pagesize;
     private stdClass $cm;
-    private bool $useinitialsbar;
     private certifygen_model $certificatemodel;
     private bool $hasvalidator;
 
@@ -63,15 +65,16 @@ class teacher_view implements renderable, templatable {
      * @param int $templateid
      * @param stdClass $cm
      * @param int $pagesize
-     * @param bool $useinitialsbar
      * @throws coding_exception
      */
-    public function __construct(int $courseid, int $templateid, stdClass $cm, int $pagesize = 10, bool $useinitialsbar = true) {
+    public function __construct(int $courseid, int $templateid, stdClass $cm, int $pagesize = 10) {
+
+        $cmcontext = context_module::instance($cm->id);
+        $this->isteacher = has_capability('mod/certifygen:manage', $cmcontext);
         $this->courseid = $courseid;
         $this->templateid = $templateid;
         $this->cm = $cm;
         $this->pagesize = $pagesize;
-        $this->useinitialsbar = $useinitialsbar;
         $certificate = new certifygen($cm->instance);
         $this->certificatemodel = new certifygen_model($certificate->get('modelid'));
         $this->hasvalidator = !is_null($this->certificatemodel->get('validation'));
@@ -90,7 +93,9 @@ class teacher_view implements renderable, templatable {
         if (count($modellangs) > 1) {
             $data->form = mod_certifygen_get_certificates_table_form($this->certificatemodel, $url, 'teacher');
         }
-
+        if (!$this->isteacher) {
+            $data->isstudent = true;
+        }
         return $data;
     }
 
@@ -100,23 +105,31 @@ class teacher_view implements renderable, templatable {
      * @throws moodle_exception
      */
     private function get_certificates_table() : string {
+        global $USER;
         $filters = new certificates_filterset();
         $lang = mod_certifygen_get_lang_selected($this->certificatemodel);
         $filters->add_filter(new string_filter('lang',filter::JOINTYPE_DEFAULT, [$lang]));
-        if ($userid = optional_param('userid', 0, PARAM_INT)) {
-            $filters->add_filter(new integer_filter('userid',filter::JOINTYPE_DEFAULT, [$userid]));
+        if (!$this->isteacher) {
+            $filters->add_filter(new integer_filter('userid',filter::JOINTYPE_DEFAULT, [(int)$USER->id]));
         }
-
-        if ($this->hasvalidator) {
-            $activityteachertable = new activityteacherview_table($this->courseid, $this->templateid, $this->cm->instance);
-        } else {
-            $activityteachertable = new activityteacherviewnovalidator_table($this->courseid, $this->templateid, $this->certificatemodel->get('id'));
+        if ($tifirst = optional_param('tifirst', '', PARAM_RAW)) {
+            $filters->add_filter(new string_filter('tifirst',filter::JOINTYPE_DEFAULT, [$tifirst]));
         }
+        if ($tilast = optional_param('tilast', '', PARAM_RAW)) {
+            $filters->add_filter(new string_filter('tilast',filter::JOINTYPE_DEFAULT, [$tilast]));
+        }
+        $activityteachertable = new activityteacher_table($this->courseid, $this->templateid, $this->cm->instance);
         $activityteachertable->set_filterset($filters);
         $paramsurl = ['id' => $this->cm->id, 'lang' => $lang];
+        if (!empty($tifirst)) {
+            $paramsurl['tifirst'] = $tifirst;
+        }
+        if (!empty($tilast)) {
+            $paramsurl['tilast'] = $tilast;
+        }
         $activityteachertable->baseurl = new moodle_url('/mod/certifygen/view.php', $paramsurl);
         ob_start();
-        $activityteachertable->out($this->pagesize, $this->useinitialsbar);
+        $activityteachertable->out($this->pagesize, true);
         $out1 = ob_get_contents();
         ob_end_clean();
         return $out1;

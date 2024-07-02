@@ -54,6 +54,8 @@ class certificates_filterset extends filterset
     {
         return [
             'userid' => integer_filter::class,
+            'tifirst' => string_filter::class,
+            'tilast' => string_filter::class,
         ];
     }
 }
