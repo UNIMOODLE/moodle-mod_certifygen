@@ -78,19 +78,7 @@ class renderer extends plugin_renderer_base {
         $data = $view->export_for_template($this);
         return $this->render_from_template('mod_certifygen/associatemodelcontexts', $data);
     }
-    /**
-     * @param mycertificates_view $view
-     * @return string
-     * @throws moodle_exception
-     */
-    public function render_mycertificates_view(mycertificates_view $view): string {
 
-        $data = $view->export_for_template($this);
-        if (!$data->hasvalidator) {
-            unset($data->hasvalidator);
-        }
-        return $this->render_from_template('mod_certifygen/context_certificate', $data);
-    }
     /**
      * @param mycertificates_view $view
      * @return string
