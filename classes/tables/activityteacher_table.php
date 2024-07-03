@@ -78,9 +78,12 @@ class activityteacher_table extends table_sql {
         $columns = ['fullname', 'code', 'status', 'dateissued', 'emit', 'download', 'revoke' ];
         $this->define_columns($columns);
         $validationplugin = $this->model->get('validation');
-        $validationpluginclass = $validationplugin . '\\' . $validationplugin;
-        $subplugin = new $validationpluginclass();
-        $this->canrevoke = $subplugin->canrevoke();
+        $this->canrevoke = true;
+        if (!empty($validationplugin)) {
+            $validationpluginclass = $validationplugin . '\\' . $validationplugin;
+            $subplugin = new $validationpluginclass();
+            $this->canrevoke = $subplugin->canrevoke();
+        }
         // Define the titles of columns to show in header.
         $headers = [
             get_string('fullname'),
@@ -134,8 +137,8 @@ class activityteacher_table extends table_sql {
         if (!$this->canrevoke) {
             return '';
         }
-        $status = $row->status;
-        if (is_null($row->status)) {
+        $status = $row->cstatus;
+        if (is_null($row->cstatus)) {
             $status = certifygen_validations::STATUS_NOT_STARTED;
         }
         if ($status == certifygen_validations::STATUS_FINISHED_OK) {
@@ -155,14 +158,10 @@ class activityteacher_table extends table_sql {
      */
     function col_status($row): string
     {
-        if (isset($row->issueid)) {
-            $validation = certifygen_validations::get_record(['userid' => $row->id, 'issueid' => $row->issueid]);
-            if ($validation) {
-                return get_string('status_'.$validation->get('status'), 'mod_certifygen');
-            }
+        if (empty($row->cstatus)) {
+            return get_string('status_1', 'mod_certifygen');
         }
-
-        return get_string('status_1', 'mod_certifygen');
+        return get_string('status_'.$row->cstatus, 'mod_certifygen');
     }
 
     /**
@@ -172,6 +171,9 @@ class activityteacher_table extends table_sql {
      */
     function col_code($row): string
     {
+        if (empty($row->code)) {
+            return '';
+        }
         $url = new moodle_url('/admin/tool/certificate/index.php', ['code' => $row->code]);
         return '<a href="' . $url->out() . '">' . $row->code . '</a>';
     }
@@ -181,7 +183,10 @@ class activityteacher_table extends table_sql {
      */
     function col_dateissued($row): string
     {
-        return date('d/m/y', $row->timecreated);
+        if (empty($row->ctimecreated)) {
+            return '';
+        }
+        return date('d/m/y', $row->ctimecreated);
     }
 
     /**
@@ -192,8 +197,8 @@ class activityteacher_table extends table_sql {
      */
     function col_download($row): string
     {
-        $status = $row->status;
-        if (is_null($row->status)) {
+        $status = $row->cstatus;
+        if (is_null($row->cstatus)) {
             $status = certifygen_validations::STATUS_NOT_STARTED;
         }
         if ($status == certifygen_validations::STATUS_FINISHED_OK) {
@@ -213,9 +218,9 @@ class activityteacher_table extends table_sql {
      */
     function col_emit($row): string
     {
-        $status = $row->status;
+        $status = $row->cstatus;
         $id = $row->id;
-        if (is_null($row->status)) {
+        if (is_null($row->cstatus)) {
             $status = certifygen_validations::STATUS_NOT_STARTED;
             $id = 0;
         }

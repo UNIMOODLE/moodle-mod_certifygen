@@ -56,6 +56,7 @@ class activity_view implements renderable, templatable {
     private bool $isteacher;
     private int $templateid;
     private int $pagesize;
+    private string $lang;
     private stdClass $cm;
     private certifygen_model $certificatemodel;
     private bool $hasvalidator;
@@ -67,7 +68,7 @@ class activity_view implements renderable, templatable {
      * @param int $pagesize
      * @throws coding_exception
      */
-    public function __construct(int $courseid, int $templateid, stdClass $cm, int $pagesize = 10) {
+    public function __construct(int $courseid, int $templateid, stdClass $cm, string $lang = "", int $pagesize = 10) {
 
         $cmcontext = context_module::instance($cm->id);
         $this->isteacher = has_capability('mod/certifygen:manage', $cmcontext);
@@ -78,6 +79,7 @@ class activity_view implements renderable, templatable {
         $certificate = new certifygen($cm->instance);
         $this->certificatemodel = new certifygen_model($certificate->get('modelid'));
         $this->hasvalidator = !is_null($this->certificatemodel->get('validation'));
+        $this->lang = $lang;
     }
 
     /**
@@ -91,7 +93,7 @@ class activity_view implements renderable, templatable {
         $data->table = $this->get_certificates_table();
         $modellangs = $this->certificatemodel->get_model_languages();
         if (count($modellangs) > 1) {
-            $data->form = mod_certifygen_get_certificates_table_form($this->certificatemodel, $url, 'teacher');
+            $data->form = mod_certifygen_get_certificates_table_form($this->certificatemodel, $url, $this->lang, 'teacher');
         }
         if (!$this->isteacher) {
             $data->isstudent = true;
@@ -107,7 +109,10 @@ class activity_view implements renderable, templatable {
     private function get_certificates_table() : string {
         global $USER;
         $filters = new certificates_filterset();
-        $lang = mod_certifygen_get_lang_selected($this->certificatemodel);
+        $lang = $this->lang;
+        if (empty($this->lang)) {
+            $lang = mod_certifygen_get_lang_selected($this->certificatemodel);
+        }
         $filters->add_filter(new string_filter('lang',filter::JOINTYPE_DEFAULT, [$lang]));
         if (!$this->isteacher) {
             $filters->add_filter(new integer_filter('userid',filter::JOINTYPE_DEFAULT, [(int)$USER->id]));

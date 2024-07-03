@@ -86,7 +86,7 @@ class getmycertificatedata_external extends external_api {
             $cm = get_coursemodule_from_id('certifygen', $cmid, 0, false, MUST_EXIST);
             $certifygen = $DB->get_record('certifygen', ['id' => $cm->instance], '*', MUST_EXIST);
             $certifygenmodel = $DB->get_record('certifygen_model', ['id' => $certifygen->modelid], '*', MUST_EXIST);
-            $view = new activity_view($courseid, $certifygenmodel->templateid, $cm);
+            $view = new activity_view($courseid, $certifygenmodel->templateid, $cm, $lang);
         } else {
 //            $url = new moodle_url('/mod/certifygen/courselink.php', ['id' => $courseid]);
 //            $view = new mycertificates_view($model, $courseid, $url, $lang);

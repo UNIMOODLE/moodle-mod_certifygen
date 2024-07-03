@@ -333,9 +333,9 @@ class certifygen {
             $where = ' AND u.id = :userid';
         }
 
-        $sql = "SELECT RAND(), us.id, ci.id as issueid, ci.code, ci.emailed, ci.timecreated, ci.userid, ci.templateid, ci.expires,
-       ci.courseid, ci.archived, cv.lang, cv.status, cv.id as validationid, us.*
-                    FROM (SELECT u.*, c.id as courseid
+        $sql = "SELECT us.userid, ci.id as issueid, ci.code, ci.emailed, ci.timecreated as ctimecreated, ci.userid, ci.templateid, ci.expires,
+       ci.courseid, ci.archived, cv.lang as clang, cv.status as cstatus, cv.id as validationid, us.*, us.courseid
+                    FROM (SELECT u.id AS userid, u.*, c.id as courseid
                         FROM {user} u
                         INNER JOIN {user_enrolments} ue ON ue.userid = u.id
                         INNER JOIN {enrol} e ON e.id = ue.enrolid
@@ -346,8 +346,10 @@ class certifygen {
                         WHERE r.shortname = 'student'
                         AND c.id = :courseid $where
                         ) AS us
-                    LEFT JOIN {tool_certificate_issues} ci ON (ci.userid = us.id AND ci.courseid = us.courseid AND ci.templateid = :templateid AND ci.component = :component)
-                    LEFT JOIN {certifygen_validations} cv ON (cv.userid = us.id AND cv.issueid = ci.id AND cv.lang = :lang)";
+                    LEFT JOIN {certifygen_validations} cv ON (cv.userid = us.userid AND cv.lang = :lang)
+                    LEFT JOIN {tool_certificate_issues} ci ON (ci.userid = us.userid AND cv.issueid = ci.id AND ci.courseid = us.courseid 
+                        AND ci.templateid = :templateid AND ci.component = :component)
+                    ";
 
         return $DB->get_records_sql($sql, $params, $limitfrom, $limitnum);
     }
