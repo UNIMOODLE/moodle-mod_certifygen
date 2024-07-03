@@ -41,6 +41,23 @@ $ADMIN->add('modsettings',
 // Certifygen settings.
 $settings = new admin_settingpage('modsettingcertifygen', get_string('pluginnamesettings', 'mod_certifygen'), 'moodle/site:config');
 if ($ADMIN->fulltree) {
+    // Userfield.
+    $customfields = \availability_profile\condition::get_custom_profile_fields();
+    $options = [0 => get_string('chooseuserprofilefield', 'mod_certifygen')];
+    foreach ($customfields as $customfield) {
+        if ($customfield->datatype == 'text') {
+            $options[$customfield->id] = $customfield->name;
+        }
+    }
+    if (count($options) > 1) {
+        $settings->add(new admin_setting_configselect('mod_certifygen/userfield',
+            new lang_string('userfield', 'mod_certifygen'),
+            new lang_string('userfield_desc', 'mod_certifygen'),
+            0,
+            $options
+        ));
+    }
+
     // Logo.
     $name = new lang_string('logo', 'mod_certifygen');
     $desc = new lang_string('logo_desc', 'mod_certifygen');

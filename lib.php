@@ -416,3 +416,41 @@ function mod_certifygen_get_certificates_table_form(certifygen_model $model, moo
     $form = new certificatestablefiltersform($url->out(), $data);
     return $form->render();
 }
+
+/**
+ * @param int $userid
+ * @param string $userfield
+ * @return array
+ * @throws dml_exception
+ */
+function mod_certifygen_validate_user_parameters_for_ws(int $userid, string $userfield) : array {
+    global $DB;
+
+    $results['userid'] = $userid;
+    if (empty($userid) && empty($userfield)) {
+        $results['error']['code'] = 'user_not_sent';
+        $results['error']['message'] = 'userid or userfield must be filled';
+        return $results;
+    }
+    if (!empty($userfield)) {
+        $fieldid = get_config('mod_certifygen', 'userfield');
+        if (empty($fieldid)) {
+            $results['error']['code'] = 'userfield_not_selected';
+            $results['error']['message'] = 'There is no user field selected on the platform.';
+            return $results;
+        }
+        $id = $DB->get_field('user_info_data', 'userid', ['fieldid' => $fieldid, 'data' => $userfield]);
+        if (!$id) {
+            $results['error']['code'] = 'user_not_found';
+            $results['error']['message'] = 'User not found by userfield parameter';
+            return $results;
+        } else if (!empty($userid) && !empty($userfield) && $id != $userid) {
+            $results['error']['code'] = 'userfield_and_userid_sent';
+            $results['error']['message'] = 'It is necessary to sent only one parameter.';
+            return $results;
+        } else {
+            $results['userid'] = $id;
+        }
+    }
+    return $results;
+}

@@ -40,7 +40,7 @@ use mod_certifygen\external\getmodellisttable_external;
 use mod_certifygen\external\searchcategory_external;
 use mod_certifygen\external\searchcourse_external;
 use mod_certifygen\external\revokecertificate_external;
-use mod_certifygen\external\get_students_certificates_table_external;
+//use mod_certifygen\external\get_students_certificates_table_external;
 use mod_certifygen\external\get_id_instance_certificate_external;
 use mod_certifygen\external\get_json_certificate_external;
 use mod_certifygen\external\get_pdf_certificate_external;
@@ -157,15 +157,6 @@ $functions = [
         'methodname' => 'getmycertificatedata',
         'description' => 'Get mycertificatedata table',
         'type' => 'write',
-        'capabilities' => 'mod/certifygen:view',
-        'ajax' => true,
-        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
-    ],
-    'mod_certifygen_get_students_certificates_table' => [
-        'classname' => get_students_certificates_table_external::class,
-        'methodname' => 'get_students_certificates_table',
-        'description' => 'Emit Certificate',
-        'type' => 'read',
         'capabilities' => 'mod/certifygen:view',
         'ajax' => true,
         'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],

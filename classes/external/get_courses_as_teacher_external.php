@@ -32,6 +32,7 @@
 namespace mod_certifygen\external;
 
 
+use certifygenfilter;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
@@ -42,6 +43,8 @@ use mod_certifygen\persistents\certifygen_model;
 
 global $CFG;
 require_once($CFG->dirroot.'/user/lib.php');
+require_once($CFG->dirroot.'/mod/certifygen/classes/filters/certifygenfilter.php');
+require_once($CFG->dirroot.'/mod/certifygen/lib.php');
 class get_courses_as_teacher_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -52,6 +55,7 @@ class get_courses_as_teacher_external extends external_api {
         return new external_function_parameters(
             [
                 'userid' => new external_value(PARAM_INT, 'user id'),
+                'userfield' => new external_value(PARAM_RAW, 'user field'),
                 'lang' => new external_value(PARAM_LANG, 'user lang'),
             ]
         );
@@ -62,8 +66,8 @@ class get_courses_as_teacher_external extends external_api {
      * @return array
      * @throws \invalid_parameter_exception
      */
-    public static function get_courses_as_teacher(int $userid, string $lang): array {
-        global $CFG;
+    public static function get_courses_as_teacher(int $userid, string $userfield, string $lang): array {
+        global $CFG, $DB;
         // si no envian lang, se pone el idioma de la plataforma.
         /**
          * OLD
@@ -87,14 +91,21 @@ class get_courses_as_teacher_external extends external_api {
          * Enviar la info en el idioma pedido por $lang. si no se envia nada, el idioma e la plataforma.
  */
         $params = self::validate_parameters(
-            self::get_courses_as_teacher_parameters(), ['userid' => $userid, 'lang' => $lang]
+            self::get_courses_as_teacher_parameters(), ['userid' => $userid, 'userfield' => $userfield, 'lang' => $lang]
         );
         $results = ['courses' => [], 'teacher' => [], 'error' => []];
         $haserror = false;
         $courses = [];
         try {
+            // Choose user parameter.
+            $uparam = mod_certifygen_validate_user_parameters_for_ws($params['userid'], $params['userfield']);
+            if (array_key_exists('error', $uparam)) {
+                return $uparam;
+            }
+            $userid = $uparam['userid'];
+
             // User exists.
-            $users = user_get_users_by_id([$params['userid']]);
+            $users = user_get_users_by_id([$userid]);
             if (empty($users)) {
                 unset($results['courses']);
                 unset($results['teacher']);
@@ -103,53 +114,55 @@ class get_courses_as_teacher_external extends external_api {
                 return $results;
             }
             $results['teacher'] = [
-                'id' => $params['userid'],
+                'id' => $userid,
                 'fullname' => fullname(reset($users)),
             ];
+
             // Lang exists.
             $langstrings = get_string_manager()->get_list_of_translations();
-            if (!in_array($lang, array_keys($langstrings)) || empty($lang)) {
-                $lang = $CFG->lang;
+            if (!empty($lang) && !in_array($lang, array_keys($langstrings))) {
+                $results['error']['code'] = 'lang_not_found';
+                $results['error']['message'] = 'Lang not found on platform';
+                return $results;
             }
-            if (!empty($langs)) {
-                foreach ($langs as $lang) {
-                    $choices[$lang] = $langstrings[$lang];
-                }
-            }
+            // Filter to return course names in $lang language.
+            $filter = new certifygenfilter(\context_system::instance(), [], $lang);
             // Get courses with a certifygen_model asociated where the user is editingteacher.
-            $enrolments = enrol_get_all_users_courses($params['userid'], true);
+            $enrolments = enrol_get_all_users_courses($userid, true);
             foreach ($enrolments as $enrolment) {
                 $coursecontext = \context_course::instance($enrolment->ctxinstance);
-                $roles = get_users_roles($coursecontext, [$params['userid']]);
+                $roles = get_users_roles($coursecontext, [$userid]);
                 $roles = reset($roles);
                 $reporttypes = [];
-                foreach ($roles as $role) {
-                    if ($role->shortname != 'editingteacher') {
-                        continue;
-                    }
-                    $modelsids = certifygen_context::get_course_valid_modelids($enrolment->ctxinstance);
-                    foreach ($modelsids as $modelid) {
-                        $model = new certifygen_model($modelid);
-                        $reporttypes[] = [
-                            'type' => $model->get('type'),
-                            'modelid' => $modelid,
-                            'issue' => 0, //TODO: sacar el issueid.hablado en la reunion 14/06/2024, si no se selcciona template, no tiene sentido.
-                        ];
-                    }
-                }
-                if (empty($reporttypes)) {
-                    continue;
-                }
-                $coursefullname = format_text($enrolment->fullname);
+//                foreach ($roles as $role) {
+//                    if ($role->shortname != 'editingteacher') {
+//                        continue;
+//                    }
+//                    $modelsids = certifygen_context::get_course_valid_modelids($enrolment->ctxinstance);
+//                    foreach ($modelsids as $modelid) {
+//                        $model = new certifygen_model($modelid);
+//                        $reporttypes[] = [
+//                            'type' => $model->get('type'),
+//                            'modelid' => $modelid,
+//                            'issue' => 0, //TODO: sacar el issueid.hablado en la reunion 14/06/2024, si no se selcciona template, no tiene sentido.
+//                        ];
+//                    }
+//                }
+//                if (empty($reporttypes)) {
+//                    continue;
+//                }
+//                $coursefullname = format_text($enrolment->fullname);
+                $coursefullname = $filter->filter($enrolment->fullname);
                 $coursefullname = strip_tags($coursefullname);
-                $courseshortname = format_text($enrolment->shortname);
+//                $courseshortname = format_text($enrolment->shortname);
+                $courseshortname = $filter->filter($enrolment->shortname);
                 $courseshortname = strip_tags($courseshortname);
                 $courses[] = [
                     'id' => $enrolment->ctxinstance,
                     'shortname' => $courseshortname,
                     'fullname' => $coursefullname,
                     'categoryid' => $enrolment->category,
-                    'reporttypes'   => $reporttypes,
+//                    'reporttypes'   => $reporttypes,
                 ];
             }
             $results['courses'] = $courses;
@@ -176,14 +189,14 @@ class get_courses_as_teacher_external extends external_api {
                             'shortname'   => new external_value(PARAM_RAW, 'Course shortname', VALUE_OPTIONAL),
                             'fullname' => new external_value(PARAM_RAW, 'Course fullname', VALUE_OPTIONAL),
                             'categoryid' => new external_value(PARAM_INT, 'Course category id', VALUE_OPTIONAL),
-                            'reporttypes' => new external_multiple_structure(
-                                new external_single_structure(
-                                    [
-                                        'type'   => new external_value(PARAM_INT, 'model type', VALUE_OPTIONAL),
-                                        'modelid'   => new external_value(PARAM_INT, 'model id', VALUE_OPTIONAL),
-                                        'issueid'   => new external_value(PARAM_INT, 'issue id', VALUE_OPTIONAL),
-                                    ], 'courses list')
-                                , '', VALUE_OPTIONAL),
+//                            'reporttypes' => new external_multiple_structure(
+//                                new external_single_structure(
+//                                    [
+//                                        'type'   => new external_value(PARAM_INT, 'model type', VALUE_OPTIONAL),
+//                                        'modelid'   => new external_value(PARAM_INT, 'model id', VALUE_OPTIONAL),
+//                                        'issueid'   => new external_value(PARAM_INT, 'issue id', VALUE_OPTIONAL),
+//                                    ], 'courses list')
+//                                , '', VALUE_OPTIONAL),
                         ],
                         'courses list', VALUE_OPTIONAL)
                 , '', VALUE_OPTIONAL),

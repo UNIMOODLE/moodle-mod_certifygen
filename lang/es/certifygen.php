@@ -142,3 +142,6 @@ $string['emitrequestbody'] = '¿Estás seguro de querer emitir el certificado {$
 $string['certifygenteacherrequestreport'] = 'Ver peticiones de certificados de los profesores';
 $string['othercertificates'] = 'Lists de peticiones de "{$a}"';
 $string['mycertificate'] = 'Mi certificado';
+$string['chooseuserprofilefield'] = 'Elige un campo de perfil de usuario';
+$string['userfield'] = 'Campo de Perfil de Usuario';
+$string['userfield_desc'] = 'Este parametro se utiliza en los servicios web para identificar al usuario. Si no se elige nada se usará el id de la tabla user.';
