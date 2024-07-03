@@ -76,6 +76,7 @@
         <TABLE NAME="certifygen_teacherrequests" COMMENT="Stores each context of a certifygen">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="name" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
                 <FIELD NAME="modelid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false" COMMENT="1:notstarted,2:inprogress,3:error,4: finished"/>
                 <FIELD NAME="lang" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Language"/>

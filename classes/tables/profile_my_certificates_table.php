@@ -60,12 +60,12 @@ class profile_my_certificates_table extends table_sql {
         $uniqueid = 'profile-my-certificates-view';
         parent::__construct($uniqueid);
         // Define the list of columns to show.
-        $columns = ['id', 'status', 'lang', 'seecourses', 'emit', 'download', 'delete'];
+        $columns = ['name', 'status', 'lang', 'seecourses', 'emit', 'download', 'delete'];
         $this->define_columns($columns);
 
         // Define the titles of columns to show in header.
         $headers = [
-            get_string('requestid', 'mod_certifygen'),
+            get_string('name', 'mod_certifygen'),
             get_string('status', 'mod_certifygen'),
             get_string('language'),
             '',
@@ -81,9 +81,9 @@ class profile_my_certificates_table extends table_sql {
      * @param $row
      * @return string
      */
-    function col_id(stdClass $row): string
+    function col_name(stdClass $row): string
     {
-        return $row->id;
+        return $row->name;
     }
 
     /**

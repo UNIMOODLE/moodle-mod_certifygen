@@ -25,6 +25,9 @@ class certifygen_teacherrequests extends persistent {
      */
     protected static function define_properties(): array {
         return [
+            'name' => [
+                'type' => PARAM_TEXT,
+            ],
             'modelid' => [
                 'type' => PARAM_INT,
             ],
@@ -59,7 +62,6 @@ class certifygen_teacherrequests extends persistent {
         if (empty($id)) {
             $validation->create();
         } else {
-//            $validation->set_many((array)$data);
             $validation->update();
         }
         return $validation;
@@ -90,7 +92,7 @@ class certifygen_teacherrequests extends persistent {
         $params = [
             'userid' => $userid,
         ];
-        $sql = "SELECT tr.id, tr.modelid, tr.status, tr.lang, tr.courses, tr.userid, m.validation, m.report
+        $sql = "SELECT tr.id, tr.name, tr.modelid, tr.status, tr.lang, tr.courses, tr.userid, m.validation, m.report
         FROM {certifygen_model} m 
         INNER JOIN {certifygen_teacherrequests} tr ON tr.modelid = m.id
         WHERE tr.userid = :userid

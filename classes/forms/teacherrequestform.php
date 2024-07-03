@@ -61,6 +61,9 @@ class teacherrequestform extends dynamic_form {
     {
         $mform =& $this->_form;
 
+        $mform->addElement('text', 'name', get_string('name', 'mod_certifygen'), ['size' => '64']);
+        $mform->setType('name', PARAM_TEXT);
+
         // Model list.
         [$modelids, $langs] = certifygen_context::get_system_context_modelids_and_langs();
         $mform->addElement('select', 'modelid',
@@ -132,6 +135,7 @@ class teacherrequestform extends dynamic_form {
         $data->courses = implode(',', $formdata['courses']);
         $data->userid = $formdata['userid'];
         $data->modelid = $formdata['modelid'];
+        $data->name = $formdata['name'];
 
         certifygen_teacherrequests::manage_teacherrequests($id, $data);
     }
@@ -149,6 +153,7 @@ class teacherrequestform extends dynamic_form {
             $teacherrequest = new certifygen_teacherrequests($data['id']);
             $data['lang'] = $teacherrequest->get('lang');
             $data['courses'] = $teacherrequest->get('courses');
+            $data['name'] = $teacherrequest->get('name');
         }
         $this->set_data($data);
     }
