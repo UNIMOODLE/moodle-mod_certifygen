@@ -25,6 +25,10 @@ class certifygen_validations extends persistent {
      */
     protected static function define_properties(): array {
         return [
+            'certifygenid' => [
+                'type' => PARAM_INT,
+                'default' => 0,
+            ],
             'userid' => [
                 'type' => PARAM_INT,
             ],
@@ -56,7 +60,6 @@ class certifygen_validations extends persistent {
      * @throws invalid_persistent_exception
      */
     public static function manage_validation(int $id, stdClass $data) : self {
-
         $validation = new self($id, $data);
         if (empty($id)) {
             $validation->create();
@@ -86,5 +89,23 @@ class certifygen_validations extends persistent {
 
         $record = $DB->get_record_sql($sql, $params);
         return $record->lang;
+    }
+
+    /**
+     * @param string $lang
+     * @param int $instanceid
+     * @param int $userid
+     * @return certifygen_validations|null
+     * @throws coding_exception
+     */
+    public static function get_validation_by_lang_and_instance(string $lang, int $instanceid, int $userid) {
+
+        $cvalidations = self::get_records(['userid' => $userid, 'certifygenid' => $instanceid]);
+        foreach ($cvalidations as $cvalidation) {
+            if ($cvalidation->get('lang') == $lang) {
+                return $cvalidation;
+            }
+        }
+        return null;
     }
 }

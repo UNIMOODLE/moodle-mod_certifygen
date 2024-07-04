@@ -44,6 +44,7 @@ const downloadCertificate = async(event) => {
     let code = event.currentTarget.getAttribute('data-code');
     let langstring = event.currentTarget.getAttribute('data-langstring');
     let id = parseInt(event.currentTarget.getAttribute('data-id'));
+    let instanceid = parseInt(event.currentTarget.getAttribute('data-instanceid'));
     let courseid = parseInt(event.currentTarget.getAttribute('data-courseid'));
 
     // Modal estas seguro que quieres enviar el certiifcado?.
@@ -66,6 +67,7 @@ const downloadCertificate = async(event) => {
             methodname: SERVICES.DOWNLOAD_CERTIFICATE,
             args: {
                 id,
+                instanceid,
                 modelid,
                 code,
                 courseid,
@@ -140,6 +142,7 @@ const emitCertificate = async(event) => {
     let userid = parseInt(event.currentTarget.getAttribute('data-userid'));
     let courseid = parseInt(event.currentTarget.getAttribute('data-courseid'));
     let cmid = parseInt(event.currentTarget.getAttribute('data-cmid'));
+    let instanceid = parseInt(event.currentTarget.getAttribute('data-instanceid'));
 
     // Modal estas seguro que quieres enviar el certiifcado?.
     const stringkeys = [
@@ -161,6 +164,7 @@ const emitCertificate = async(event) => {
             methodname: SERVICES.EMIT_CERTIFICATE,
             args: {
                 id,
+                instanceid,
                 modelid,
                 lang,
                 userid,

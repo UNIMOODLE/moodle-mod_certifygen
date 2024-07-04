@@ -66,9 +66,6 @@ class certifygenfilter extends filter_multilang {
             // old syntax
             $search = '/(<(?:lang|span) lang="[a-zA-Z0-9_-]*".*?>.*?<\/(?:lang|span)>)(\s*<(?:lang|span) lang="[a-zA-Z0-9_-]*".*?>.*?<\/(?:lang|span)>)+/is';
         }
-        error_log(__FUNCTION__ . ' ' . __LINE__  . ' options: '.var_export($options, true));
-        error_log(__FUNCTION__ . ' ' . __LINE__  . ' search: '.var_export($search, true));
-        error_log(__FUNCTION__ . ' ' . __LINE__  . ' text: '.var_export($text, true));
         $result = preg_replace_callback($search, [$this, 'process_match'], $text);
 
         if (is_null($result)) {
@@ -85,14 +82,12 @@ class certifygenfilter extends filter_multilang {
      * @return string the replacement string (one of the possible translations).
      */
     protected function process_match(array $langblock): string {
-        error_log(__FUNCTION__ . ' ' . __LINE__  . ' langblock: '.var_export($langblock, true));
         $searchtosplit = '/<(?:lang|span)[^>]+lang="([a-zA-Z0-9_-]+)"[^>]*>(.*?)<\/(?:lang|span)>/is';
         if (!preg_match_all($searchtosplit, $langblock[0], $rawlanglist)) {
             // Skip malformed blocks.
             return $langblock[0];
         }
 
-        error_log(__FUNCTION__ . ' ' . __LINE__  . ' rawlanglist: '.var_export($rawlanglist, true));
         $langlist = array();
         foreach ($rawlanglist[1] as $index => $lang) {
             $lang = str_replace('-', '_', strtolower($lang)); // Normalize languages.

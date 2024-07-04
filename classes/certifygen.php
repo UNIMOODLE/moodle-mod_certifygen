@@ -95,6 +95,7 @@ class certifygen {
      *
      * In rare situations (race conditions) there can be more than one certificate, in which case return the last record.
      *
+     * @param int $instaceid
      * @param int $userid
      * @param int $courseid
      * @param int $templateid
@@ -102,7 +103,7 @@ class certifygen {
      * @return stdClass|null
      * @throws dml_exception
      */
-    public static function get_user_certificate(int $userid, int $courseid, int $templateid, string $lang): ?stdClass {
+    public static function get_user_certificate(int $instaceid, int $userid, int $courseid, int $templateid, string $lang): ?stdClass {
 
         global $DB;
 
@@ -113,16 +114,18 @@ class certifygen {
         $sql = "SELECT ci.* 
                 FROM {tool_certificate_issues} ci
                 INNER JOIN {certifygen_validations} cv ON (cv.issueid = ci.id AND cv.userid = ci.userid)
-                WHERE $comparecomp = $comparecompplaceholder 
+                WHERE {$comparecomp} = {$comparecompplaceholder} 
                     AND ci.courseid = :courseid 
                     AND ci.templateid = :templateid 
                     AND ci.userid = :userid
                     AND ci.archived = 0 
+                    AND cv.certifygenid = :instanceid 
                     AND {$comparelang} = {$comparelangplaceholder}
                 ORDER BY ci.id DESC";
 
         $params = [
             'component' => 'mod_certifygen',
+            'instanceid' => $instaceid,
             'courseid' => $courseid,
             'templateid' => $templateid,
             'userid' => $userid,
@@ -135,6 +138,7 @@ class certifygen {
 
     /**
      * Issue a course certificate to the user if they don't already have one
+     * @param int $instanceid
      * @param stdClass $user
      * @param int $templateid
      * @param stdClass $course
@@ -144,8 +148,8 @@ class certifygen {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public static function issue_certificate(stdClass $user, int $templateid, stdClass $course, string $lang): int {
-        if (self::get_user_certificate($user->id, $course->id, $templateid, $lang)) {
+    public static function issue_certificate(int $instanceid, stdClass $user, int $templateid, stdClass $course, string $lang): int {
+        if (self::get_user_certificate($instanceid, $user->id, $course->id, $templateid, $lang)) {
             return 0;
         }
         try {
@@ -224,19 +228,21 @@ class certifygen {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public static function get_user_certificate_file_url(string $templateid, int $userid, int $courseid, string $lang) : string {
+    public static function get_user_certificate_file_url(int $instanceid, string $templateid, int $userid,
+                                                         int $courseid, string $lang) : string {
         $users = user_get_users_by_id([$userid]);
         $user = reset($users);
         $course = get_course($courseid);
-        certifygen::issue_certificate($user, $templateid, $course, $lang);
+        certifygen::issue_certificate($instanceid, $user, $templateid, $course, $lang);
         $url = "";
-        if ($existingcertificate = self::get_user_certificate($userid, $course->id, $templateid, $lang)) {
+        if ($existingcertificate = self::get_user_certificate($instanceid, $userid, $course->id, $templateid, $lang)) {
             $issue = template::get_issue_from_code($existingcertificate->code);
             $context = context_course::instance($issue->courseid, IGNORE_MISSING) ?: null;
             $template = $issue ? template::instance($issue->templateid, (object) ['lang' => $lang]) : null;
             if ($template && (permission::can_verify() ||
                     permission::can_view_issue($template, $issue, $context))) {
                 $url = $template->get_issue_file_url($issue);
+                $url = $url->out();
             } else {
                 throw new moodle_exception('certificatenotfound', 'mod_certifygen');
             }
@@ -249,13 +255,13 @@ class certifygen {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public static function get_user_certificate_file(string $templateid, int $userid, int $courseid, string $lang)
+    public static function get_user_certificate_file(int $instanceid, string $templateid, int $userid, int $courseid, string $lang)
     {
         $users = user_get_users_by_id([$userid]);
         $user = reset($users);
         $course = get_course($courseid);
-        certifygen::issue_certificate($user, $templateid, $course, $lang);
-        if ($existingcertificate = self::get_user_certificate($userid, $course->id, $templateid, $lang)) {
+        certifygen::issue_certificate($instanceid, $user, $templateid, $course, $lang);
+        if ($existingcertificate = self::get_user_certificate($instanceid, $userid, $course->id, $templateid, $lang)) {
 
             $issue = template::get_issue_from_code($existingcertificate->code);
             $context = context_course::instance($issue->courseid, IGNORE_MISSING) ?: null;

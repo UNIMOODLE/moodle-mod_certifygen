@@ -59,6 +59,7 @@ class emitcertificate_external extends external_api {
         return new external_function_parameters(
             [
                 'id' => new external_value(PARAM_INT, 'id'),
+                'instanceid' => new external_value(PARAM_INT, 'instance id'),
                 'modelid' => new external_value(PARAM_INT, 'model id'),
                 'lang' => new external_value(PARAM_RAW, 'model lang'),
                 'userid' => new external_value(PARAM_RAW, 'user id'),
@@ -69,6 +70,7 @@ class emitcertificate_external extends external_api {
 
     /**
      * @param int $id
+     * @param int $instanceid
      * @param int $modelid
      * @param string $lang
      * @param int $userid
@@ -78,11 +80,11 @@ class emitcertificate_external extends external_api {
      * @throws invalid_parameter_exception
      * @throws invalid_persistent_exception
      */
-    public static function emitcertificate(int $id, int $modelid, string $lang, int $userid, int $courseid): array {
+    public static function emitcertificate(int $id, int $instanceid, int $modelid, string $lang, int $userid, int $courseid): array {
         global $USER;
 
         self::validate_parameters(
-            self::emitcertificate_parameters(), ['id' => $id, 'modelid' => $modelid, 'lang' => $lang, 'userid' => $userid, 'courseid' => $courseid]
+            self::emitcertificate_parameters(), ['id' => $id, 'instanceid' => $instanceid, 'modelid' => $modelid, 'lang' => $lang, 'userid' => $userid, 'courseid' => $courseid]
         );
 
         $result = ['result' => true, 'message' => 'OK'];
@@ -90,6 +92,7 @@ class emitcertificate_external extends external_api {
         // Step 1: Change status to in progress.
         $data = [
             'userid' => $userid,
+            'certifygenid' => $instanceid,
             'lang' => $lang,
             'modelid' => $modelid,
             'status' => certifygen_validations::STATUS_IN_PROGRESS,
@@ -103,22 +106,24 @@ class emitcertificate_external extends external_api {
             $user = reset($users);
             $certifygenmodel = new certifygen_model($modelid);
             $course = get_course($courseid);
-            $issueid = certifygen::issue_certificate($user, $certifygenmodel->get('templateid'), $course, $lang);
+            $issueid = certifygen::issue_certificate($instanceid, $user, $certifygenmodel->get('templateid'), $course, $lang);
             $saved = false;
             if ($issueid) {
                 $saved = true;
                 $validation->set('issueid', $issueid);
                 $validation->save();
             }
-            if ($existingcertificate = certifygen::get_user_certificate($userid, $courseid, $certifygenmodel->get('templateid'), $lang)) {
+            if ($existingcertificate = certifygen::get_user_certificate($instanceid, $userid, $courseid, $certifygenmodel->get('templateid'), $lang)) {
                 if (!$saved) {
                     $saved = true;
                     $validation->set('issueid', $existingcertificate->id);
                     $validation->save();
                 }
             }
+
             // Step 3: Generate the tool_certificate certificate.
-            $file = certifygen::get_user_certificate_file($certifygenmodel->get('templateid'), $userid, $courseid, $lang);
+            $file = certifygen::get_user_certificate_file($instanceid, $certifygenmodel->get('templateid'), $userid, $courseid, $lang);
+
             if (is_null($file)) {
                 $result['result'] = false;
                 $result['message'] = 'File not found';
@@ -168,7 +173,7 @@ class emitcertificate_external extends external_api {
     public static function emitcertificate_returns(): external_single_structure {
         return new external_single_structure(
             [
-                'result' => new external_value(PARAM_BOOL, 'model deleted'),
+                'result' => new external_value(PARAM_BOOL, 'certificate emited.'),
                 'message' => new external_value(PARAM_RAW, 'meesage'),
             ]
         );

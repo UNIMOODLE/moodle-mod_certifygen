@@ -40,8 +40,8 @@ use external_value;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_context;
 use mod_certifygen\persistents\certifygen_model;
-
 use certifygenfilter;
+
 global $CFG;
 require_once($CFG->dirroot.'/user/lib.php');
 require_once($CFG->dirroot.'/mod/certifygen/lib.php');
@@ -80,7 +80,6 @@ class get_id_instance_certificate_external extends external_api {
             // Choose user parameter.
             $uparam = mod_certifygen_validate_user_parameters_for_ws($params['userid'], $params['userfield']);
             if (array_key_exists('error', $uparam)) {
-                error_log(__FUNCTION__ . ' result: '.var_export($uparam, true));
                 return $uparam;
             }
             $userid = $uparam['userid'];

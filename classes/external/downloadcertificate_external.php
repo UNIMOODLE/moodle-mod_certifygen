@@ -60,6 +60,7 @@ class downloadcertificate_external extends external_api {
         return new external_function_parameters(
             [
                 'id' => new external_value(PARAM_INT, 'validation id'),
+                'instanceid' => new external_value(PARAM_INT, 'instance id'),
                 'modelid' => new external_value(PARAM_INT, 'model id'),
                 'code' => new external_value(PARAM_RAW, 'certificate code'),
                 'courseid' => new external_value(PARAM_RAW, 'course id'),
@@ -68,7 +69,8 @@ class downloadcertificate_external extends external_api {
     }
 
     /**
-     * @param int $id
+     * @param int $instanceid
+     * @param int $validationid
      * @param int $modelid
      * @param string $lang
      * @param int $userid
@@ -78,10 +80,10 @@ class downloadcertificate_external extends external_api {
      * @throws invalid_parameter_exception
      * @throws invalid_persistent_exception
      */
-    public static function downloadcertificate(int $validationid, int $modelid, string $code, int $courseid): array {
+    public static function downloadcertificate(int $validationid, int $instanceid, int $modelid, string $code, int $courseid): array {
 
         self::validate_parameters(
-            self::downloadcertificate_parameters(), ['id' => $validationid, 'modelid' => $modelid, 'code' => $code,
+            self::downloadcertificate_parameters(), ['id' => $validationid, 'instanceid' => $instanceid, 'modelid' => $modelid, 'code' => $code,
                 'courseid' => $courseid]
         );
 
@@ -98,8 +100,12 @@ class downloadcertificate_external extends external_api {
             $certifygenmodel = new certifygen_model($modelid);
             $validationplugin = $certifygenmodel->get('validation');
             if (empty($validationplugin)) {
-                $result['url'] = certifygen::get_user_certificate_file_url($certifygenmodel->get('templateid'),
+                $result['url'] = certifygen::get_user_certificate_file_url($instanceid, $certifygenmodel->get('templateid'),
                     $validation->get('userid'), $courseid, $validation->get('lang'));
+                if (empty($result['url'])) {
+                    $result = ['result' => false, 'message' => 'file not found. url empty', 'url' => '', 'codetag' => ''];
+                    return $result;
+                }
             } else {
                 $validationpluginclass = $validationplugin . '\\' . $validationplugin;
                 if (get_config($validationplugin, 'enabled') === '1') {

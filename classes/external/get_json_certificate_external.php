@@ -39,9 +39,12 @@ use external_value;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
+use certifygenfilter;
 
 global $CFG;
 require_once($CFG->dirroot.'/user/lib.php');
+require_once($CFG->dirroot.'/mod/certifygen/lib.php');
+require_once($CFG->dirroot.'/mod/certifygen/classes/filters/certifygenfilter.php');
 class get_json_certificate_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -52,13 +55,14 @@ class get_json_certificate_external extends external_api {
         return new external_function_parameters(
             [
                 'userid' => new external_value(PARAM_INT, 'user id'),
+                'userfield' => new external_value(PARAM_RAW, 'user field'),
                 'idinstance' => new external_value(PARAM_INT, 'instance id'),
                 'customfields' => new external_value(PARAM_RAW, 'customfields'),
-                'lang' => new external_value(PARAM_RAW, 'lang'),
+                'lang' => new external_value(PARAM_LANG, 'lang'),
             ]
         );
     }
-    public static function get_json_certificate(int $userid, int $idinstance, string $customfields, string $lang): array {
+    public static function get_json_certificate(int $userid, string $userfield, int $idinstance, string $customfields, string $lang): array {
         /**
          * Devuelve un json con la información necesaria para el anterior servicio para
          * confeccionar el certificado. El objetivo de este servicio es independizar el proceso de
@@ -68,13 +72,21 @@ class get_json_certificate_external extends external_api {
         // TODO:customfields... que modifica el fichero.
         $params = self::validate_parameters(
             self::get_json_certificate_parameters(),
-            ['userid' => $userid, 'idinstance' => $idinstance, 'customfields' => $customfields, 'lang' => $lang]
+            ['userid' => $userid, 'userfield' => $userfield, 'idinstance' => $idinstance,
+                'customfields' => $customfields, 'lang' => $lang]
         );
         $result = ['json' => '', 'error' => []];
         $haserror = false;
         try {
+            // Choose user parameter.
+            $uparam = mod_certifygen_validate_user_parameters_for_ws($params['userid'], $params['userfield']);
+            if (array_key_exists('error', $uparam)) {
+                return $uparam;
+            }
+            $userid = $uparam['userid'];
+
             // User exists.
-            $user = user_get_users_by_id([$params['userid']]);
+            $user = user_get_users_by_id([$userid]);
             if (empty($user)) {
                 unset($result['json']);
                 $result['error']['code'] = 'user_not_found';
@@ -85,40 +97,46 @@ class get_json_certificate_external extends external_api {
             $certifygen = new certifygen($params['idinstance']);
 
             // Is user enrolled on this course as student?
-            $mycourses = enrol_get_users_courses($params['userid'], true, 'id');
-            if (!in_array($certifygen->get('course'), array_keys($mycourses))) {
+            $context = \context_course::instance($certifygen->get('course'));
+            if (has_capability('moodle/course:managegroups', $context, $userid)) {
                 unset($result['json']);
-                $result['error']['code'] = 'user_not_enrolled_on_idinstance_course';
-                $result['error']['message'] = 'User not enrolled on idinstance course';
+                $result['error']['code'] = 'user_not_enrolled_on_idinstance_course_as_student';
+                $result['error']['message'] = 'User not enrolled on idinstance course as student';
                 return $result;
             }
 
             // Model info.
             $model = new certifygen_model($certifygen->get('modelid'));
-            if (is_null($model->get('validation'))) {
-                unset($result['json']);
-                $result['error']['code'] = 'model_has_no_validation';
-                $result['error']['message'] = 'This model is configured with no validation.';
-                return $result;
+
+            // Already emtited?
+            $validation = certifygen_validations::get_validation_by_lang_and_instance($lang, $idinstance, $userid);
+            if (is_null($validation)) {
+                // Emit certificate.
+                $result = emitcertificate_external::emitcertificate(0, $idinstance, $model->get('id'), $lang,
+                    $userid, $certifygen->get('course'));
+                if (!$result['result']) {
+                    $result['error']['code'] = 'certificate_can_not_be_emited';
+                    $result['error']['message'] = $result['message'];
+                    return $result;
+                }
+                $validation = certifygen_validations::get_validation_by_lang_and_instance($lang, $idinstance, $userid);
             }
 
-            // Process status
-            // TODO: me tendrian  especificar el idioma??.
-            $validations = certifygen_validations::get_records(['userid' => $params['userid'], 'modelid' => $model->get('id')]);
-            foreach ($validations as $validation) {
-                if ($validation->get('status') != certifygen_validations::STATUS_IN_PROGRESS) {
-                    continue;
-                }
-                $issue = \mod_certifygen\certifygen::get_user_certificate($params['userid'], $certifygen->get('course'),
-                    $model->get('templateid'), $validation->get('lang'));
-
-                if (is_null($issue)) {
-                    $haserror = true;
-                    $result['error']['code'] = 'issue_not_found';
-                    $result['error']['message'] = 'Issue not found';
-                } else {
-                    $result['json'] = $issue->data;
-                }
+            // Get json.
+            $issue = \mod_certifygen\certifygen::get_user_certificate($idinstance, $userid, $certifygen->get('course'),
+            $model->get('templateid'), $validation->get('lang'));
+            if (is_null($issue)) {
+                $haserror = true;
+                $result['error']['code'] = 'issue_not_found';
+                $result['error']['message'] = 'Issue not found';
+            } else {
+                // Filter multilang course name.
+                // Filter to return course names in $lang language.
+                $filter = new certifygenfilter(\context_system::instance(), [], $lang);
+                $json = json_decode($issue->data);
+                $json->courseshortname = $filter->filter($json->courseshortname);
+                $json->coursefullname = $filter->filter($json->coursefullname);
+                $result['json'] = json_encode($json);
             }
         } catch (\moodle_exception $e) {
             error_log("error: ".var_export($e, true));
@@ -127,13 +145,11 @@ class get_json_certificate_external extends external_api {
             $result['error']['code'] = $e->errorcode;
             $result['error']['message'] = $e->getMessage();
         }
-
         if (!$haserror) {
             unset($result['error']);
         } else {
             unset($result['json']);
         }
-
         return $result;
     }
     /**

@@ -110,14 +110,13 @@ class revokecertificate_external extends external_api {
                 error_log(__FUNCTION__ . ' ' . __LINE__ . ' validation - getMessage: '.var_export($exception->getMessage(), true));
             }
         } catch (moodle_exception $e) {
+            error_log(__FUNCTION__ . ' ' . __LINE__ . ' 2 validation - getMessage: '.var_export($e->getMessage(), true));
             $result['result'] = false;
             $result['message'] = $e->getMessage();
             if (!is_null($validation)) {
                 $validation->set('status', certifygen_validations::STATUS_FINISHED_ERROR);
                 $validation->save();
             }
-            $validation->set('status', certifygen_validations::STATUS_FINISHED_ERROR);
-            $validation->save();
         }
 
         return $result;

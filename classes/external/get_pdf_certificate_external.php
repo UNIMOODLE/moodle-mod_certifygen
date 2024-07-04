@@ -42,6 +42,7 @@ use mod_certifygen\persistents\certifygen_validations;
 
 global $CFG;
 require_once($CFG->dirroot.'/user/lib.php');
+require_once($CFG->dirroot.'/mod/certifygen/lib.php');
 class get_pdf_certificate_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -52,13 +53,14 @@ class get_pdf_certificate_external extends external_api {
         return new external_function_parameters(
             [
                 'userid' => new external_value(PARAM_INT, 'user id'),
+                'userfield' => new external_value(PARAM_RAW, 'user field'),
                 'idinstance' => new external_value(PARAM_INT, 'instance id'),
-                'lang' => new external_value(PARAM_RAW, 'lang'),
+                'lang' => new external_value(PARAM_LANG, 'lang'),
                 'customfields' => new external_value(PARAM_RAW, 'customfields'),
             ]
         );
     }
-    public static function get_pdf_certificate(int $userid, int $idinstance, string $lang, string $customfields): array {
+    public static function get_pdf_certificate(int $userid, string $userfield, int $idinstance, string $lang, string $customfields): array {
         /**
          * Devuelve el PDF del certificado identificado con los parámetros de entrada validando su acceso en base a
          * las restricciones de la configuración de la instancia.
@@ -70,11 +72,18 @@ class get_pdf_certificate_external extends external_api {
         // TODO:customfields... que modifica el fichero.
         $params = self::validate_parameters(
             self::get_pdf_certificate_parameters(),
-            ['userid' => $userid, 'idinstance' => $idinstance, 'lang' => $lang, 'customfields' => $customfields]
+            ['userid' => $userid, 'userfield' => $userfield, 'idinstance' => $idinstance, 'lang' => $lang, 'customfields' => $customfields]
         );
         $result = ['file' => '', 'error' => []];
         $haserror = false;
         try {
+            // Choose user parameter.
+            $uparam = mod_certifygen_validate_user_parameters_for_ws($params['userid'], $params['userfield']);
+            if (array_key_exists('error', $uparam)) {
+                return $uparam;
+            }
+            $userid = $uparam['userid'];
+
             // User exists.
             $user = user_get_users_by_id([$params['userid']]);
             if (empty($user)) {
@@ -87,39 +96,39 @@ class get_pdf_certificate_external extends external_api {
             $certifygen = new certifygen($params['idinstance']);
 
             // Is user enrolled on this course as student?
-            $mycourses = enrol_get_users_courses($params['userid'], true, 'id');
-            if (!in_array($certifygen->get('course'), array_keys($mycourses))) {
-                unset($result['file']);
-                $result['error']['code'] = 'user_not_enrolled_on_idinstance_course';
-                $result['error']['message'] = 'User not enrolled on idinstance course';
+            $context = \context_course::instance($certifygen->get('course'));
+            if (has_capability('moodle/course:managegroups', $context, $userid)) {
+                unset($result['json']);
+                $result['error']['code'] = 'user_not_enrolled_on_idinstance_course_as_student';
+                $result['error']['message'] = 'User not enrolled on idinstance course as student';
                 return $result;
             }
 
             // Model info.
             $model = new certifygen_model($certifygen->get('modelid'));
-            if (is_null($model->get('validation'))) {
-                unset($result['file']);
-                $result['error']['code'] = 'model_has_no_validation';
-                $result['error']['message'] = 'This model is configured with no validation.';
-                return $result;
+
+            // Already emtited?
+            $validation = certifygen_validations::get_validation_by_lang_and_instance($lang, $idinstance, $userid);
+            if (is_null($validation)) {
+                // Emit certificate.
+                $result = emitcertificate_external::emitcertificate(0, $idinstance, $model->get('id'), $lang,
+                    $userid, $certifygen->get('course'));
+                if (!$result['result']) {
+                    $result['error']['code'] = 'certificate_can_not_be_emited';
+                    $result['error']['message'] = $result['message'];
+                    return $result;
+                }
             }
 
             // Process status
-            // TODO: me tendrian  especificar el idioma??.
-            $validations = certifygen_validations::get_records(['userid' => $params['userid'], 'modelid' => $model->get('id')]);
-            foreach ($validations as $validation) {
-                if ($validation->get('status') != certifygen_validations::STATUS_IN_PROGRESS) {
-                    continue;
-                }
-                $file = \mod_certifygen\certifygen::get_user_certificate_file($model->get('templateid'), $userid,
-                    $certifygen->get('course'), $validation->get('lang'));
-                if (is_null($file)) {
-                    $haserror = true;
-                    $result['error']['code'] = 'file_not_found';
-                    $result['error']['message'] = 'File not found';
-                } else {
-                    $result['file'] = $file->get_contenthash(); // PARAM_FILE
-                }
+            $file = \mod_certifygen\certifygen::get_user_certificate_file($idinstance, $model->get('templateid'), $userid,
+                $certifygen->get('course'), $lang);
+            if (is_null($file)) {
+                $haserror = true;
+                $result['error']['code'] = 'file_not_found';
+                $result['error']['message'] = 'File not found';
+            } else {
+                $result['file'] = $file->get_contenthash(); // PARAM_FILE
             }
         } catch (\moodle_exception $e) {
             error_log("error: ".var_export($e, true));

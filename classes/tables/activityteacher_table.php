@@ -50,7 +50,7 @@ class activityteacher_table extends table_sql {
     private int $courseid;
     private int $templateid;
     private int $cmid;
-    private int $instance;
+    private int $instanceid;
     private int $modelid;
     private string $lang;
     private string $langstring;
@@ -64,6 +64,7 @@ class activityteacher_table extends table_sql {
      * @throws coding_exception|moodle_exception
      */
     function __construct(int $courseid, int $templateid, int $instance) {
+        $this->instanceid = $instance;
         $this->courseid = $courseid;
         $this->templateid = $templateid;
         $certifygen = new \mod_certifygen\persistents\certifygen($instance);
@@ -78,8 +79,11 @@ class activityteacher_table extends table_sql {
         $columns = ['fullname', 'code', 'status', 'dateissued', 'emit', 'download', 'revoke' ];
         $this->define_columns($columns);
         $validationplugin = $this->model->get('validation');
-        $this->canrevoke = true;
-        if (!empty($validationplugin)) {
+        $this->canrevoke = false;
+        $context = \context_course::instance($courseid);
+        if (has_capability('moodle/course:managegroups', $context)) {
+            $this->canrevoke = true;
+        } else if (!empty($validationplugin)) {
             $validationpluginclass = $validationplugin . '\\' . $validationplugin;
             $subplugin = new $validationpluginclass();
             $this->canrevoke = $subplugin->canrevoke();
@@ -202,7 +206,7 @@ class activityteacher_table extends table_sql {
             $status = certifygen_validations::STATUS_NOT_STARTED;
         }
         if ($status == certifygen_validations::STATUS_FINISHED_OK) {
-            return '<span data-courseid="' . $row->courseid . '" data-modelid="' . $this->modelid . '" 
+            return '<span data-courseid="' . $row->courseid . '" data-instanceid="' . $this->instanceid . '" data-modelid="' . $this->modelid . '" 
             data-id="'. $row->validationid . '" data-action="download-certificate" data-userid="'. $row->id .'" 
             data-code="'. $row->code .'" data-lang="'. $this->lang .'" data-langstring="'. $this->langstring .'"  data-cmid="'. $this->cmid .'" 
             class="btn btn-primary">' . get_string('download') . '</span>';
@@ -228,7 +232,7 @@ class activityteacher_table extends table_sql {
         if ($status == certifygen_validations::STATUS_NOT_STARTED || $status == certifygen_validations::STATUS_FINISHED_ERROR) {
             return '<span data-courseid="' . $row->courseid . '" data-modelid="' . $this->modelid . '" data-id="'. $id .
                 '" data-action="emit-certificate" data-userid="'. $row->id .'" data-lang="'. $this->lang .'" 
-                data-langstring="'. $this->langstring .'"  data-cmid="'. $this->cmid .'" class="btn btn-primary"
+                data-langstring="'. $this->langstring .'"  data-cmid="'. $this->cmid .'" data-instanceid="'. $this->instanceid .'" class="btn btn-primary"
                 >'.get_string('emit', 'mod_certifygen').'</span>';
         }
 
