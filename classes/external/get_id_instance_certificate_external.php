@@ -41,8 +41,11 @@ use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_context;
 use mod_certifygen\persistents\certifygen_model;
 
+use certifygenfilter;
 global $CFG;
 require_once($CFG->dirroot.'/user/lib.php');
+require_once($CFG->dirroot.'/mod/certifygen/lib.php');
+require_once($CFG->dirroot.'/mod/certifygen/classes/filters/certifygenfilter.php');
 class get_id_instance_certificate_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -53,11 +56,12 @@ class get_id_instance_certificate_external extends external_api {
         return new external_function_parameters(
             [
                 'userid' => new external_value(PARAM_INT, 'user id'),
-                'lang' => new external_value(PARAM_RAW, 'user id'),
+                'userfield' => new external_value(PARAM_RAW, 'user field'),
+                'lang' => new external_value(PARAM_LANG, 'user id'),
             ]
         );
     }
-    public static function get_id_instance_certificate(int $userid, string $lang): array {
+    public static function get_id_instance_certificate(int $userid, string $userfield, string $lang): array {
         global $CFG;
         /**
          * Devuelve una lista de aquellas instancias de mod_certificate visibles,
@@ -67,14 +71,22 @@ class get_id_instance_certificate_external extends external_api {
         //TODO: revisar el acceso a la actividad por cm_info->visible.
         // TODO: // si no envian lang, se pone el idioma de la plataforma.
         $params = self::validate_parameters(
-            self::get_id_instance_certificate_parameters(), ['userid' => $userid, 'lang' => $lang]
+            self::get_id_instance_certificate_parameters(), ['userid' => $userid, 'userfield' => $userfield, 'lang' => $lang]
         );
         $results = ['instances' => [], 'error' => []];
         $haserror = false;
         $instances = [];
         try {
+            // Choose user parameter.
+            $uparam = mod_certifygen_validate_user_parameters_for_ws($params['userid'], $params['userfield']);
+            if (array_key_exists('error', $uparam)) {
+                error_log(__FUNCTION__ . ' result: '.var_export($uparam, true));
+                return $uparam;
+            }
+            $userid = $uparam['userid'];
+
             // User exists.
-            $user = user_get_users_by_id([$params['userid']]);
+            $user = user_get_users_by_id([$userid]);
             if (empty($user)) {
                 $results['error']['code'] = 'user_not_found';
                 $results['error']['message'] = 'User not found';
@@ -82,14 +94,15 @@ class get_id_instance_certificate_external extends external_api {
             }
             // Lang exists.
             $langstrings = get_string_manager()->get_list_of_translations();
-            if (!in_array($lang, array_keys($langstrings)) || empty($lang)) {
-                $lang = $CFG->lang;
+            if (!empty($lang) && !in_array($lang, array_keys($langstrings))) {
+                $results['error']['code'] = 'lang_not_found';
+                $results['error']['message'] = 'Lang not found on platform';
+                return $results;
             }
-            if (!empty($langs)) {
-                foreach ($langs as $lang) {
-                    $choices[$lang] = $langstrings[$lang];
-                }
-            }
+
+            // Filter to return course names in $lang language.
+            $filter = new certifygenfilter(\context_system::instance(), [], $lang);
+
             // Get all mod_certifygen activities;
             $allactivities = certifygen::get_records();
             $courseids = array_map(function($activity) {
@@ -97,21 +110,23 @@ class get_id_instance_certificate_external extends external_api {
             }, $allactivities);
 
             // Get courses with mod_certifygen activity where the user is student.
-            $enrolments = enrol_get_all_users_courses($params['userid'], true);
+            $enrolments = enrol_get_all_users_courses($userid, true);
             foreach ($enrolments as $enrolment) {
                 if (!in_array($enrolment->ctxinstance, $courseids)) {
                     continue;
                 }
                 $coursecontext = \context_course::instance( $enrolment->ctxinstance);
-                $roles = get_users_roles($coursecontext, [$params['userid']]);
+                $roles = get_users_roles($coursecontext, [$userid]);
                 $roles = reset($roles);
                 foreach ($roles as $role) {
                     if ($role->shortname != 'student') {
                         continue;
                     }
-                    $coursefullname = format_text($enrolment->fullname);
+                    $coursefullname = $filter->filter($enrolment->fullname);
+//                    $coursefullname = format_text($enrolment->fullname);
                     $coursefullname = strip_tags($coursefullname);
-                    $courseshortname = format_text($enrolment->shortname);
+                    $courseshortname = $filter->filter($enrolment->shortname);
+//                    $courseshortname = format_text($enrolment->shortname);
                     $courseshortname = strip_tags($courseshortname);
                     $course = [
                         'shortname' => $courseshortname,
@@ -124,7 +139,8 @@ class get_id_instance_certificate_external extends external_api {
                             continue;
                         }
                         $model = certifygen_model::get_record(['id' => $activity->get('modelid')]);
-                        $actvname = format_text($activity->get('name'));
+//                        $actvname = format_text($activity->get('name'));
+                        $actvname = $filter->filter($activity->get('name'));
                         $actvname = strip_tags($actvname);
                         $instance['instance'] = [
                             'id' => $activity->get('id'),
@@ -180,7 +196,7 @@ class get_id_instance_certificate_external extends external_api {
                                 'modelvalidation' => new external_value(PARAM_RAW, 'Model validation', VALUE_OPTIONAL),
                             ], 'Module Instance information', VALUE_OPTIONAL),
                         ], 'Module Instances list', VALUE_OPTIONAL)
-                ),
+                    , '', VALUE_OPTIONAL),
                 'error' => new external_single_structure([
                     'message' => new external_value(PARAM_RAW, 'Error message'),
                     'code' => new external_value(PARAM_RAW, 'Error code'),

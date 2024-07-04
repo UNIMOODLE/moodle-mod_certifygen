@@ -426,7 +426,6 @@ function mod_certifygen_get_certificates_table_form(certifygen_model $model, moo
 function mod_certifygen_validate_user_parameters_for_ws(int $userid, string $userfield) : array {
     global $DB;
 
-    $results['userid'] = $userid;
     if (empty($userid) && empty($userfield)) {
         $results['error']['code'] = 'user_not_sent';
         $results['error']['message'] = 'userid or userfield must be filled';
@@ -451,6 +450,8 @@ function mod_certifygen_validate_user_parameters_for_ws(int $userid, string $use
         } else {
             $results['userid'] = $id;
         }
+    } else {
+        $results['userid'] = $userid;
     }
     return $results;
 }
