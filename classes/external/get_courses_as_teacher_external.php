@@ -131,26 +131,9 @@ class get_courses_as_teacher_external extends external_api {
             $enrolments = enrol_get_all_users_courses($userid, true);
             foreach ($enrolments as $enrolment) {
                 $coursecontext = \context_course::instance($enrolment->ctxinstance);
-                $roles = get_users_roles($coursecontext, [$userid]);
-                $roles = reset($roles);
-                $reporttypes = [];
-//                foreach ($roles as $role) {
-//                    if ($role->shortname != 'editingteacher') {
-//                        continue;
-//                    }
-//                    $modelsids = certifygen_context::get_course_valid_modelids($enrolment->ctxinstance);
-//                    foreach ($modelsids as $modelid) {
-//                        $model = new certifygen_model($modelid);
-//                        $reporttypes[] = [
-//                            'type' => $model->get('type'),
-//                            'modelid' => $modelid,
-//                            'issue' => 0, //TODO: sacar el issueid.hablado en la reunion 14/06/2024, si no se selcciona template, no tiene sentido.
-//                        ];
-//                    }
-//                }
-//                if (empty($reporttypes)) {
-//                    continue;
-//                }
+                if (!has_capability('moodle/course:managegroups', $coursecontext, $userid)) {
+                    continue;
+                }
 //                $coursefullname = format_text($enrolment->fullname);
                 $coursefullname = $filter->filter($enrolment->fullname);
                 $coursefullname = strip_tags($coursefullname);

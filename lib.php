@@ -467,7 +467,13 @@ function mod_certifygen_validate_user_parameters_for_ws(int $userid, string $use
             $results['error']['message'] = 'There is no user field selected on the platform.';
             return $results;
         }
-        $id = $DB->get_field('user_info_data', 'userid', ['fieldid' => $fieldid, 'data' => $userfield]);
+//        $id = $DB->get_field('user_info_data', 'userid', ['fieldid' => $fieldid, 'data' => $userfield]);
+        $select = 'fieldid = :fieldid';
+        $params = ['fieldid' => $fieldid, 'data' => $userfield];
+        $comparename = $DB->sql_compare_text('data');
+        $comparenameplaceholder = $DB->sql_compare_text(':data');
+        $select .= "AND  {$comparename} = {$comparenameplaceholder}";
+        $id = $DB->get_field_select('user_info_data', 'userid', $select, $params);
         if (!$id) {
             $results['error']['code'] = 'user_not_found';
             $results['error']['message'] = 'User not found by userfield parameter';
