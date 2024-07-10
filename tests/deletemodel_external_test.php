@@ -17,7 +17,11 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
-
+use mod_certifygen\external\deletemodel_external;
+use mod_certifygen\persistents\certifygen_model;
+global $CFG;
+require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
+require_once($CFG->dirroot.'/lib/externallib.php');
 /**
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
@@ -28,11 +32,36 @@
 
 class deletemodel_external_test extends advanced_testcase {
 
+    /**
+     * Test set up.
+     */
+    public function setUp(): void {
+        $this->resetAfterTest();
+    }
     public function test_deletemodel(): void {
-        $course = self::getDataGenerator()->create_course();
-        $certifygen = self::getDataGenerator()->create_module(
-            'certifygen',
-            ['course' => $course->id]
+
+        // Create template.
+        $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
+        $certificate1 = $templategenerator->create_template((object)['name' => 'Certificate 1']);
+//        $pageid = $templategenerator->create_page($certificate1)->get_id();
+//        $element = (object)['pageid' => $pageid, 'element' => 'invalidelement'];
+//        \tool_certificate\element::instance(0, $element);
+
+        // Create model.
+        $modgenerator = $this->getDataGenerator()->get_plugin_generator('mod_certifygen');
+        $model = $modgenerator->create_model_by_name(
+            certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
+            $certificate1->get_id(),
         );
+
+        // Assertion model exists.
+        $this->assertTrue($model->get('id') > 0);
+        $count = certifygen_model::count_records();
+        $this->assertEquals(1, $count);
+
+        // Delete model.
+        deletemodel_external::deletemodel($model->get('id'));
+        $count = certifygen_model::count_records();
+        $this->assertEquals(0, $count);
     }
 }

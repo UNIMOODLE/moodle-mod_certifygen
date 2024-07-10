@@ -17,6 +17,7 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+use mod_certifygen\persistents\certifygen_model;
 
 /**
  * @package    mod_certifygen
@@ -28,11 +29,37 @@
 
 class mod_certifygen_generator extends testing_module_generator {
 
-    public function create_model() {
+    private $model;
+    public function create_model(int $type, int $mode, int $templateid, string $validation, string $report) {
+
         $data = [
             'name' => 'Modelo 1',
-            'name' => 'Modelo 1',
+            'type' => $type,
+            'mode' => $mode,
+            'templateid' => $templateid,
+            'timeondemmand' => 0,
+            'langs' => 'en,es',
+            'validation' => $validation,
+            'report' => $report,
+
         ];
-        $model = new \mod_certifygen\persistents\certifygen_model($data);
+        $model = new certifygen_model(0,  (object)$data);
+        return $model->create();
+    }
+    public function create_model_by_name(string $name, int $templateid) {
+
+        $data = [
+            'name' => $name,
+            'type' => certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
+            'mode' => certifygen_model::MODE_UNIQUE,
+            'templateid' => $templateid,
+            'timeondemmand' => 0,
+            'langs' => 'en,es',
+            'validation' => '',
+            'report' => '',
+
+        ];
+        $model = new certifygen_model(0, (object)$data);
+        return $model->create();
     }
 }
