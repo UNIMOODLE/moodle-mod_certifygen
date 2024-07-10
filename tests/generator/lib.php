@@ -18,6 +18,7 @@
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 use mod_certifygen\persistents\certifygen_model;
+use mod_certifygen\persistents\certifygen_teacherrequests;
 
 /**
  * @package    mod_certifygen
@@ -29,7 +30,17 @@ use mod_certifygen\persistents\certifygen_model;
 
 class mod_certifygen_generator extends testing_module_generator {
 
-    private $model;
+
+    /**
+     * @param int $type
+     * @param int $mode
+     * @param int $templateid
+     * @param string $validation
+     * @param string $report
+     * @return certifygen_model
+     * @throws \core\invalid_persistent_exception
+     * @throws coding_exception
+     */
     public function create_model(int $type, int $mode, int $templateid, string $validation, string $report) {
 
         $data = [
@@ -46,6 +57,14 @@ class mod_certifygen_generator extends testing_module_generator {
         $model = new certifygen_model(0,  (object)$data);
         return $model->create();
     }
+
+    /**
+     * @param string $name
+     * @param int $templateid
+     * @return certifygen_model
+     * @throws \core\invalid_persistent_exception
+     * @throws coding_exception
+     */
     public function create_model_by_name(string $name, int $templateid) {
 
         $data = [
@@ -61,5 +80,27 @@ class mod_certifygen_generator extends testing_module_generator {
         ];
         $model = new certifygen_model(0, (object)$data);
         return $model->create();
+    }
+
+    /**
+     * @param int $modelid
+     * @param string $courses
+     * @param int $userid
+     * @return certifygen_teacherrequests
+     * @throws \core\invalid_persistent_exception
+     * @throws coding_exception
+     */
+    public function create_teacher_request(int $modelid, string $courses, int $userid) {
+        $data = [
+            'name' => 'test1',
+            'modelid' => $modelid,
+            'status' => certifygen_teacherrequests::STATUS_IN_PROGRESS,
+            'lang' => 'es',
+            'courses' => $courses,
+            'langs' => 'en,es',
+            'userid' => $userid,
+        ];
+        $trequest = new certifygen_teacherrequests(0, (object)$data);
+        return $trequest->create();
     }
 }

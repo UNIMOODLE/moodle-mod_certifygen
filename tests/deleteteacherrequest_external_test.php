@@ -31,22 +31,23 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-use mod_certifygen\external\deletemodel_external;
+
+use mod_certifygen\external\deleteteacherrequest_external;
 use mod_certifygen\persistents\certifygen_model;
+use mod_certifygen\persistents\certifygen_teacherrequests;
+
 global $CFG;
 require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
 require_once($CFG->dirroot.'/lib/externallib.php');
-
-class deletemodel_external_test extends advanced_testcase {
-
+class deleteteacherrequest_external_test extends advanced_testcase
+{
     /**
      * Test set up.
      */
     public function setUp(): void {
         $this->resetAfterTest();
     }
-    public function test_deletemodel(): void {
-
+    public function test_deleteteacherrequest(): void {
         // Create template.
         $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
         $certificate1 = $templategenerator->create_template((object)['name' => 'Certificate 1']);
@@ -57,15 +58,30 @@ class deletemodel_external_test extends advanced_testcase {
             certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
             $certificate1->get_id(),
         );
+        // Create courses.
+        $course1 = self::getDataGenerator()->create_course();
+        $course2 = self::getDataGenerator()->create_course();
+        $courses = [$course1->id, $course2->id];
+        ksort($courses);
+        $courses = implode(',', $courses);
 
-        // Assertion model exists.
-        $this->assertTrue($model->get('id') > 0);
-        $count = certifygen_model::count_records();
+        // Create user.
+        $user = $this->getDataGenerator()->create_user(['username' => 'test_user_1', 'firstname' => 'test', 'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+
+        // Create teacher request.
+        $trequest = $modgenerator->create_teacher_request($model->get('id'), $courses, $user->id);
+
+        // Tests teacher request exists.
+        $this->assertTrue($trequest->get('id') > 0);
+        $count = certifygen_teacherrequests::count_records();
         $this->assertEquals(1, $count);
 
-        // Delete model.
-        deletemodel_external::deletemodel($model->get('id'));
-        $count = certifygen_model::count_records();
+        // Delete teacher request.
+        deleteteacherrequest_external::deleteteacherrequest($trequest->get('id'));
+
+        // Tests teacher request not exists.
+        $count = certifygen_teacherrequests::count_records();
         $this->assertEquals(0, $count);
+
     }
 }
