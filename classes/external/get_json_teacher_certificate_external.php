@@ -36,7 +36,11 @@ use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
+use certifygenfilter;
 
+global $CFG;
+require_once($CFG->dirroot.'/mod/certifygen/lib.php');
+require_once($CFG->dirroot.'/mod/certifygen/classes/filters/certifygenfilter.php');
 class get_json_teacher_certificate_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -47,12 +51,13 @@ class get_json_teacher_certificate_external extends external_api {
         return new external_function_parameters(
             [
                 'userid' => new external_value(PARAM_INT, 'user id'),
+                'userfield' => new external_value(PARAM_RAW, 'user field'),
                 'courses' => new external_value(PARAM_RAW, 'courses'), //TOO: arrays de ids.
                 'lang' => new external_value(PARAM_RAW, 'lang'),
             ]
         );
     }
-    public static function get_json_teacher_certificate(int $userid, string $courses, string $lang): array {
+    public static function get_json_teacher_certificate(int $userid, string $userfield, string $courses, string $lang): array {
         /**
          * Devuelve un json con la información necesaria para el anterior servicio para
          * confeccionar el certificado. El objetivo de este servicio es independizar el proceso de

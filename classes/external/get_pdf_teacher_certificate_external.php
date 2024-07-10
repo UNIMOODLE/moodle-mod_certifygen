@@ -37,7 +37,17 @@ use external_function_parameters;
 use external_multiple_structure;
 use external_single_structure;
 use external_value;
+use mod_certifygen\interfaces\ICertificateReport;
+use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
+use certifygenfilter;
+use mod_certifygen\persistents\certifygen_teacherrequests;
+use mod_certifygen\persistents\certifygen_validations;
+
+global $CFG;
+require_once($CFG->dirroot.'/user/lib.php');
+require_once($CFG->dirroot.'/mod/certifygen/lib.php');
+require_once($CFG->dirroot.'/mod/certifygen/classes/filters/certifygenfilter.php');
 
 class get_pdf_teacher_certificate_external extends external_api {
     /**
@@ -49,30 +59,129 @@ class get_pdf_teacher_certificate_external extends external_api {
         return new external_function_parameters(
             [
                 'userid' => new external_value(PARAM_INT, 'user id'),
-                'courses' => new external_value(PARAM_RAW, 'course list'), // TODO: array de ids.
-                'reporttype' => new external_value(PARAM_INT, 'certificate model type'),
+                'userfield' => new external_value(PARAM_RAW, 'user field'),
+                'name' => new external_value(PARAM_RAW, 'request name'),
+                'courses' => new external_value(PARAM_RAW, 'course list separated by commas.'),
+                'modelid' => new external_value(PARAM_INT, 'Model id'),
                 'lang' => new external_value(PARAM_RAW, 'certificate model type'),
             ]
         );
     }
-    public static function get_pdf_teacher_certificate(int $userid, string $courses, int $type, string $lang): array {
+    public static function get_pdf_teacher_certificate(int $userid, string $userfield, string $name, string $courses,
+                                                       int $modelid, string $lang): array {
         /**
          * Devuelve el PDF del certificado de que el profesor ha impartido docencia en el curso
          * indicado con el detalle del uso que ha realizado de la herramienta que aparecerá en el
          * certificado. Este servicio web llamará a getJsonTeaching para obtener la información a
          * maquetar
          */
-        $list = [];
-        $list[] = [
-            'courseid' => 1,
-            'files' => [
-                [
-                    'file' => 'asdasd',
-                    'reporttype' => certifygen_model::TYPE_TEACHER_ALL_COURSES_USED
-                ]
-            ],
+        $params = self::validate_parameters(
+            self::get_pdf_teacher_certificate_parameters(),
+            ['userid' => $userid, 'userfield' => $userfield, 'name' => $name, 'courses' => $courses,
+                'modelid' => $modelid, 'lang' => $lang]
+        );
+        try {
+            // Choose user parameter.
+            $uparam = mod_certifygen_validate_user_parameters_for_ws($params['userid'], $params['userfield']);
+            if (array_key_exists('error', $uparam)) {
+                return $uparam;
+            }
+            $userid = $uparam['userid'];
+
+            // User exists.
+            $user = user_get_users_by_id([$params['userid']]);
+            if (empty($user)) {
+                $result['error']['code'] = 'user_not_found';
+                $result['error']['message'] = 'User not found';
+                return $result;
+            }
+
+            // Is user enrolled on this course as teacher?
+            $coursesarray = explode(',', $courses);
+            foreach ($coursesarray as $course) {
+                $context = \context_course::instance($course);
+                if (!has_capability('moodle/course:managegroups', $context, $userid)) {
+                    $result['error']['code'] = 'user_not_enrolled_as_teacher';
+                    $result['error']['message'] = 'User not enrolled on course id=' . $course . ', as teacher';
+                    return $result;
+                }
+            }
+            // Check model type.
+            $certifygenmodel = new certifygen_model($modelid);
+            if ($certifygenmodel->get('type') == certifygen_model::TYPE_ACTIVITY) {
+                $result['error']['code'] = 'model_type_assigned_to_activity';
+                $result['error']['message'] = 'This model is assigned for activities.';
+                return $result;
+            }
+            // Check certificate report.
+            $reportplugin = $certifygenmodel->get('report');
+            if (empty($reportplugin)) {
+                $result['error']['code'] = 'no_reportplugin_set';
+                $result['error']['message'] = 'This model has no report plugin set';
+                return $result;
+            }
+            // Check if request exists.
+            $trequest = certifygen_teacherrequests::get_request_by_data($userid, $courses, $lang, $modelid, $name);
+            $id = 0;
+            if ($trequest) {
+                $id = $trequest->id;
+            } else {
+                // Create teacher request.
+                $data = [
+                    'name' => $name,
+                    'modelid' => $modelid,
+                    'status' => certifygen_teacherrequests::STATUS_IN_PROGRESS,
+                    'lang' => $lang,
+                    'courses' => $courses,
+                    'userid' => $userid,
+                ];
+                $trequest = certifygen_teacherrequests::manage_teacherrequests($id, (object) $data);
+                $id = $trequest->get('id');
+                // Emit teacher request.
+                $output = emitteacherrequest_external::emitteacherrequest($id);
+            }
+            // Ask again in case status has changed.
+            $trequest = new certifygen_teacherrequests($id);
+            if ((int)$trequest->get('status') === certifygen_teacherrequests::STATUS_FINISHED_OK) {
+                // Get file.
+                $validationplugin = $certifygenmodel->get('validation');
+                $validationpluginclass = $validationplugin . '\\' . $validationplugin;
+                if (empty($validationplugin)) {
+                    // Get file from moodledata.
+                    $code = ICertificateReport::FILE_NAME_STARTSWITH . $trequest->get('id') . '.pdf';
+                    $fs = get_file_storage();
+                    $contextid = \context_system::instance()->id;
+                    $file = $fs->get_file($contextid, ICertificateReport::FILE_COMPONENT,
+                        ICertificateReport::FILE_AREA, $trequest->get('id'), ICertificateReport::FILE_PATH, $code);
+                } else if (get_config($validationplugin, 'enabled') === '1') {
+                    /** @var ICertificateValidation $subplugin */
+                    $subplugin = new $validationpluginclass();
+                    $file = $subplugin->getFile(0, $trequest->get('id'), 'TR_'.$trequest->get('id'));
+
+                } else {
+                    $result['error']['code'] = 'validation_plugin_not_enabled';
+                    $result['error']['message'] = 'Certificate validation plugin is not enabled';
+                    return $result;
+                }
+            } else {
+                $result['error']['code'] = 'certificate_not_ready';
+                $result['error']['message'] = 'Certificate validation status is: ' . $trequest->get('status');
+                return $result;
+            }
+
+        } catch (\moodle_exception $e) {
+            $result['error']['code'] = 'teacherrequest_pdf_can_not_be_obtained';
+            $result['error']['message'] = $e->getMessage();
+            return $result;
+        }
+        $certificate = [
+            'teacherrequestid' => $id,
+            'status' => $trequest->get('status'),
+            'file' => $file->get_contenthash(),
+            'reporttype' => $certifygenmodel->get('type'),
+            'reporttypestr' => get_string('status_' . $certifygenmodel->get('type'), 'mod_certifygen'),
         ];
-        return ['certificates' => $list];
+        return ['certificate' => $certificate];
     }
     /**
      * Describes the data returned from the external function.
@@ -81,20 +190,17 @@ class get_pdf_teacher_certificate_external extends external_api {
      */
     public static function get_pdf_teacher_certificate_returns(): external_single_structure {
         return new external_single_structure([
-                'certificates' => new external_multiple_structure(
-                    new external_single_structure(
-                        [
-                            'courseid'   => new external_value(PARAM_INT, 'Course id'),
-                            'files'   => new external_multiple_structure(
-                                new external_single_structure(
-                                    [
-                                        'file' => new external_value(PARAM_RAW, 'certificate'),
-                                        'reporttype' => new external_value(PARAM_INT, 'model type'),
-                                    ]
-                                ),
-                            )
-                        ], 'Certificates list by course')
-                ),
+            'certificate' => new external_single_structure(
+                [
+                    'teacherrequestid'   => new external_value(PARAM_INT, 'Teacher request id'),
+                    'status'   => new external_value(PARAM_INT, 'Teacher request status'),
+                    'file' => new external_value(PARAM_CLEANFILE, 'certificate'),
+                    'reporttype' => new external_value(PARAM_INT, 'model type'),
+                ], 'Certificate info', VALUE_OPTIONAL),
+            'error' => new external_single_structure([
+                'message' => new external_value(PARAM_RAW, 'Error message'),
+                'code' => new external_value(PARAM_RAW, 'Error code'),
+            ], 'Errors information', VALUE_OPTIONAL),
         ]);
     }
 }

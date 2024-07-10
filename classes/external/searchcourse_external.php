@@ -83,7 +83,7 @@ class searchcourse_external extends external_api {
         foreach ($rs as $record) {
             $course = (object)[
                 'id' => $record->id,
-                'name' => $record->fullname,
+                'name' => format_text($record->fullname),
             ];
 
             $count++;

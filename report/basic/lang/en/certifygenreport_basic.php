@@ -28,22 +28,15 @@
 // This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
-// Enlace principal de settings.
-$ADMIN->add('modsettings',
-    new admin_category('certifygenvalidationcmd_cat',
-        get_string('pluginname', 'certifygenvalidation_cmd')));
-// Certifygenreport_basic settings.
-$settings = new admin_settingpage(
-    'modsettingcertifygenvalidationcmd',
-    get_string('pluginnamesettings', 'certifygenvalidation_cmd'),
-    'moodle/site:config');
-if ($ADMIN->fulltree) {
-    $settings->add(new admin_setting_configcheckbox('certifygenvalidation_cmd/enabled',
-        new lang_string('enable', 'certifygenvalidation_cmd'),
-        new lang_string('enable_help', 'certifygenvalidation_cmd'), 0));
-
-    $settings->add(new admin_setting_configtext('certifygenvalidation_cmd/path',
-        new lang_string('path', 'certifygenvalidation_cmd'),
-        new lang_string('path_help', 'certifygenvalidation_cmd'), ""));
-}
-$ADMIN->add('modsettingcertifygencat', $settings);
+$string['pluginname'] = 'Basic Report';
+$string['pluginnamesettings'] = 'Basic Report Settings';
+$string['enable'] = 'Enable';
+$string['enable_help'] = 'If this plugin is enabled, you can use it to Report Unimoodle Teacher Certificates';
+$string['path'] = 'Path';
+$string['path_help'] = 'External service command path HELP';
+$string['certifygenreport_basic_settings'] = 'Basic Report Configuration';
+$string['logo'] = 'Logo';
+$string['logo_desc'] = 'On teacher\'s certifications you can add a logo';
+$string['footer'] = 'Footer';
+$string['footer_desc'] = 'On teacher\'s certifications you can add a footer';
+$string['reporttext'] = 'La universidad de Valladolid certifica que el profesor <b>{$a->name}</b> ha realizado actiivdades docentes en los siguientes cursos:';

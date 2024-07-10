@@ -41,7 +41,7 @@ use part_of_admin_tree;
 
 defined('MOODLE_INTERNAL') || die();
 
-class certifygenvalidation extends base {
+class certifygenreport extends base {
 
     /**
      * Finds all enabled plugins, the result may include missing plugins.
@@ -52,16 +52,18 @@ class certifygenvalidation extends base {
     public static function get_enabled_plugins() : array {
         global $DB;
 
-        $plugins = core_plugin_manager::instance()->get_installed_plugins('certifygenvalidation');
+        $plugins = core_plugin_manager::instance()->get_installed_plugins('certifygenreport');
         if (!$plugins) {
             return array();
         }
 //        $installed = array();
 //        foreach ($plugins as $plugin => $version) {
-//            $installed[] = 'certifygenvalidation_'.$plugin;
+//            $installed[] = 'certifygenreport_'.$plugin;
 //        }
+//
 //        list($installed, $params) = $DB->get_in_or_equal($installed, SQL_PARAMS_NAMED);
 //        $disabled = $DB->get_records_select('config_plugins', "plugin $installed AND name = 'enabled'", $params, 'plugin ASC');
+//
 //        foreach ($disabled as $conf) {
 //            if (!empty($conf->value)) {
 //                continue;
@@ -85,7 +87,7 @@ class certifygenvalidation extends base {
      */
     public static function get_manage_url(): moodle_url
     {
-        return new moodle_url('/mod/certifygen/adminmanageplugins.php', array('subtype'=>'certifygenvalidation'));
+        return new moodle_url('/mod/certifygen/adminmanageplugins.php', array('subtype'=>'certifygenreport'));
     }
 
     /**
@@ -109,6 +111,7 @@ class certifygenvalidation extends base {
         }
         $settings = new admin_settingpage($this->component, $this->displayname, 'moodle/site:config', $this->is_enabled() === false);
         include($this->full_path('settings.php')); // This may also set $settings to null.
+
         if ($settings) {
             $ADMIN->add($parentnodename, $settings);
         }
@@ -119,6 +122,6 @@ class certifygenvalidation extends base {
      */
     public function get_settings_section_name(): string
     {
-        return 'certifygenvalidation';
+        return 'certifygenreport';
     }
 }

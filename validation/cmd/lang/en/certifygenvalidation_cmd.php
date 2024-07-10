@@ -35,3 +35,4 @@ $string['path'] = 'Path';
 $string['path_help'] = 'External service command path HELP';
 $string['certifygenvalidation_cmd_settings'] = 'Configuración del CMD';
 $string['cmdnotconfigured'] = 'CMD not configured';
+$string['pluginnamesettings'] = 'CMD Validation Configuration';

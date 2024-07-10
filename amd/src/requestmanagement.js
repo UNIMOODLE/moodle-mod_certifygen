@@ -29,18 +29,62 @@ let ACTION = {
     DELETE_REQUEST: '[data-action="delete-request"]',
     SEE_COURSES: '[data-action="see-courses"]',
     EMIT: '[data-action="emit"]',
+    DOWNLOAD: '[data-action="download-certificate"]',
 };
 let SERVICES = {
     GET_TEACHER_REQUEST_VIEW_DATA: 'mod_certifygen_getteacherrequestviewdata',
     DELETE_TEACHER_REQUEST: 'mod_certifygen_deleteteacherrequest',
     GET_COURSES_NAMES: 'mod_certifygen_getcoursesnames',
     EMIT_TEACHER_REQUEST: 'mod_certifygen_emitteacherrequest',
+    DOWNLOAD_TEACHER_CERTIFICATE: 'mod_certifygen_downloadteachercertificate',
 };
 const requestManagement = () => {
     jQuery(ACTION.CREATE_REQUEST).on('click', createRequest);
     jQuery(ACTION.DELETE_REQUEST).on('click', deleteRequest);
     jQuery(ACTION.SEE_COURSES).on('click', seeCourses);
     jQuery(ACTION.EMIT).on('click', emitCertificate);
+    jQuery(ACTION.DOWNLOAD).on('click', downloadCertificate);
+};
+
+const downloadCertificate = async(event) => {
+    let id = parseInt(event.currentTarget.getAttribute('data-id'));
+    let name = event.currentTarget.getAttribute('data-name');
+
+    // Modal estas seguro que quieres enviar el certiifcado?.
+    const stringkeys = [
+        {key: 'downloadcertificate_title', component: 'mod_certifygen'},
+        {key: 'downloadcertificate_body', component: 'mod_certifygen', param: name},
+        {key: 'confirm', component: 'mod_certifygen'},
+        {key: 'downloadcertificate_error', component: 'mod_certifygen'}
+    ];
+    let langStrings = await getStrings(stringkeys);
+
+    let modal = await ModalFactory.create({
+        title: langStrings[0],
+        body: langStrings[1],
+        type: ModalFactory.types.SAVE_CANCEL
+    });
+    modal.setSaveButtonText(langStrings[2]);
+    modal.getRoot().on(ModalEvents.save, () => {
+        let request = {
+            methodname: SERVICES.DOWNLOAD_TEACHER_CERTIFICATE,
+            args: {
+                id
+            }
+        };
+        modal.destroy();
+        Ajax.call([request])[0].done(function(response) {
+            if (response.result === true) {
+                window.open(response.url, "_blank");
+            } else {
+                Notification.alert('Error', response.message, langStrings[2]);
+            }
+        }).fail(Notification.exception);
+    });
+    modal.getRoot().on(ModalEvents.hidden, () => {
+        modal.destroy();
+    });
+    modal.show();
 };
 const emitCertificate = async (event) => {
     let id = event.currentTarget.getAttribute('data-id');
@@ -91,10 +135,10 @@ const emitCertificate = async (event) => {
     }).fail(Notification.exception);
 };
 const seeCourses = async (event) => {
-    let id = event.currentTarget.getAttribute('data-id');
+    let name = event.currentTarget.getAttribute('data-name');
     let coursesids = event.currentTarget.getAttribute('data-courses');
     const stringkeys = [
-        {key: 'seecoursestitle', component: 'mod_certifygen', param: id},
+        {key: 'seecoursestitle', component: 'mod_certifygen', param: name},
     ];
     let langStrings = await getStrings(stringkeys);
     let request = {

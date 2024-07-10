@@ -39,3 +39,4 @@ $string['appID'] = 'Application ID';
 $string['appID_help'] = 'This is the application identifier. <span class="bold">It is required in all the requests.</span>';
 $string['certifygenvalidation_csv_settings'] = 'CSV settings';
 $string['csvnotconfigured'] = 'CSV not configured';
+$string['pluginnamesettings'] = 'CSV Validation Configuration';

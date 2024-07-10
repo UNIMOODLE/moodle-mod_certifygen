@@ -59,6 +59,7 @@ class certifygenvalidation_csv implements ICertificateValidation
             $params = $this->create_params_sendFile($file);
             $conection = new soapconnection();
             $result = $conection->call($this->configuration->get_wsdl(), 'iniciarProcesoFirma', $params);
+            error_log(__FUNCTION__ . ' result: '.var_export($result, true));
             if (!isset($result->{'resultadoInicioProcesoFirma'})) {
                 $haserror = true;
                 $message = 'response_not_valid';
@@ -205,36 +206,37 @@ class certifygenvalidation_csv implements ICertificateValidation
     }
 
     /**
-     * @param int $courseid
-     * @param int $validationid
      * @param string $code
      * @return int
      */
-    public function getState(int $courseid, int $validationid, string $code): int {
+    public function getState(string $code): int {
+        error_log(__FUNCTION__ . ' code: '.var_export($code, true));
         // TODO: primero llamar al serivico, y actualizar en db.
-        $validation = new certifygen_validations($validationid);
+        $output = ['status' => 'ok', 'error' => false, 'message' => ''];
         try {
             $params = $this->create_params_getStatus($code);
             $conection = new soapconnection();
             $result = $conection->call($this->configuration->get_querywsdl(), 'consultaEstadoPeticion', $params);
+            error_log(__FUNCTION__ . ' result: '.var_export($result, true));
             if (!isset($result->{'resultadoConsultaEstadoPeticion'})) {
-                $haserror = true;
-                $message = 'response_not_valid';
+                $output['haserror'] = true;
+                $output['message'] = 'response_not_valid';
                 error_log(__FUNCTION__. ' ' . __LINE__ . ' resultadoConsultaEstadoPeticion key not exists ');
             } else {
                 $result = $result->{'resultadoConsultaEstadoPeticion'};
                 if (!isset($result->{'resultado'})) {
-                    $haserror = true;
-                    $message = 'resultado_not_exists_in_response';
+                    $output['haserror'] = true;
+                    $output['message'] = 'resultado_not_exists_in_response';
                 } else if ($result->{'resultado'} == 'KO') {
-                    $haserror = true;
                     if (!isset($result->{'error'})) {
-                        $haserror = true;
-                        $message = 'error_not_exists_in_response';
+                        $output['haserror'] = true;
+                        $output['message'] = 'error_not_exists_in_response';
                     } else {
                         $error = $result->{'error'};
                         error_log(__FUNCTION__ . ' Result error: '.var_export($error, true));
                         $message = $error->{'codError'} . ' - ' . $error->{'descError'};
+                        $output['haserror'] = true;
+                        $output['message'] = $message;
                     }
                 } else {
                     // TODO: ok. coger el estado y si es distinto, guardar en db.
@@ -242,16 +244,18 @@ class certifygenvalidation_csv implements ICertificateValidation
             }
         }
         catch ( SoapFault $e ) {
-            $haserror = true;
+            $output['haserror'] = true;
+            $output['message'] = $e->getMessage();
             error_log(__FUNCTION__ . ' SoapFault error: '.var_export($e->getMessage(), true));
         }
         catch (Exception $e) {
-            $haserror = true;
+            $output['haserror'] = true;
+            $output['message'] = $e->getMessage();
             error_log(__FUNCTION__ . ' error: '.var_export($e->getMessage(), true));
 //            $connection = new SoapFault('client', 'Could not connect to the service');
         }
 
-        return $validation->get('status');
+        return $output;
     }
 
     /**
@@ -273,6 +277,7 @@ class certifygenvalidation_csv implements ICertificateValidation
      */
     public function getFile(int $courseid, int $validationid, string $code)
     {
+        error_log(__FUNCTION__ . ' code: '.var_export($code, true));
         // Guardar en moodledata moemntaneamente.
         try {
             $params = $this->create_params_getFileContent($code);
@@ -372,12 +377,14 @@ class certifygenvalidation_csv implements ICertificateValidation
      * @return array
      */
     public function revoke(string $code) : array {
+        error_log(__FUNCTION__ . ' code: '.var_export($code, true));
         try {
             $message = '';
             $haserror = false;
             $params = $this->create_params_revoke($code);
             $conection = new soapconnection();
             $result = $conection->call($this->configuration->get_wsdl(), 'anularPeticion', $params);
+            error_log(__FUNCTION__ . ' result: '.var_export($result, true));
             if (!isset($result->{'resultadoAnularPeticion'})) {
                 $haserror = true;
                 $message = 'response_not_valid';

@@ -1,5 +1,6 @@
 {
     "plugintypes": {
-        "certifygenvalidation": "mod\/certifygen\/validation"
+        "certifygenvalidation": "mod\/certifygen\/validation",
+        "certifygenreport": "mod\/certifygen\/report"
     }
 }

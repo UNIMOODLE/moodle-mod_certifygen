@@ -83,7 +83,7 @@ class searchcategory_external extends external_api {
         foreach ($rs as $record) {
             $category = (object)[
                 'id' => $record->id,
-                'name' => $record->name,
+                'name' => format_text($record->name),
             ];
 
             $count++;

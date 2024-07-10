@@ -96,6 +96,7 @@ class modelform extends dynamic_form {
         }
         $mform->addGroup($elements, 'template_group', get_string('template', 'coursecertificate'),
             html_writer::div('', 'w-100'), false);
+        $mform->hideIf('template_group', 'type', 'noteq', certifygen_model::TYPE_ACTIVITY);
 
         // Timeondemmand.
         $mform->addElement('text', 'timeondemmand',
@@ -116,6 +117,13 @@ class modelform extends dynamic_form {
         if (!empty($types)) {
             $mform->addElement('select', 'validation', get_string('validation', 'mod_certifygen'), $types);
             $mform->setType('validation', PARAM_RAW);
+        }
+        // Report (only for system context).
+        $types = mod_certifygen_get_report();
+        if (!empty($types)) {
+            $mform->addElement('select', 'report', get_string('report', 'mod_certifygen'), $types);
+            $mform->setType('report', PARAM_RAW);
+            $mform->hideIf('report', 'type', 'eq', certifygen_model::TYPE_ACTIVITY);
         }
         $mform->addElement('hidden', 'modelid', 0);
         $mform->setType('modelid', PARAM_INT);
@@ -163,6 +171,7 @@ class modelform extends dynamic_form {
                     'mode' => $model->get('mode'),
                     'type' => $model->get('type'),
                     'templateid' => $model->get('templateid'),
+                    'report' => $model->get('report'),
                     'modelname' => $model->get('name'),
                     'timeondemmand' => $model->get('timeondemmand'),
                     'langs' => $model->get('langs'),

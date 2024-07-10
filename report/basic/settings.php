@@ -13,12 +13,16 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU".
+//
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
- * @package   certifygenvalidation_cmd
+ * @package    certifygenreport_basic
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
@@ -30,20 +34,38 @@ defined('MOODLE_INTERNAL') || die();
 
 // Enlace principal de settings.
 $ADMIN->add('modsettings',
-    new admin_category('certifygenvalidationcmd_cat',
-        get_string('pluginname', 'certifygenvalidation_cmd')));
+    new admin_category('certifygenreport_basic_cat',
+        get_string('pluginname', 'certifygenreport_basic')));
+
 // Certifygenreport_basic settings.
 $settings = new admin_settingpage(
-    'modsettingcertifygenvalidationcmd',
-    get_string('pluginnamesettings', 'certifygenvalidation_cmd'),
+    'modsettingcertifygenreportbasic',
+    get_string('pluginnamesettings', 'certifygenreport_basic'),
     'moodle/site:config');
 if ($ADMIN->fulltree) {
-    $settings->add(new admin_setting_configcheckbox('certifygenvalidation_cmd/enabled',
-        new lang_string('enable', 'certifygenvalidation_cmd'),
-        new lang_string('enable_help', 'certifygenvalidation_cmd'), 0));
 
-    $settings->add(new admin_setting_configtext('certifygenvalidation_cmd/path',
-        new lang_string('path', 'certifygenvalidation_cmd'),
-        new lang_string('path_help', 'certifygenvalidation_cmd'), ""));
+    // Habilitar.
+    $settings->add(new admin_setting_configcheckbox('certifygenreport_basic/enabled',
+        new lang_string('enable', 'certifygenreport_basic'),
+        new lang_string('enable_help', 'certifygenreport_basic'), 0));
+
+    // Logo.
+    $name = new lang_string('logo', 'certifygenreport_basic');
+    $desc = new lang_string('logo_desc', 'certifygenreport_basic');
+    $setting = new admin_setting_configstoredfile('certifygenreport_basic/logo',
+        $name,
+        $desc, 'logo', 0, ['accepted_types' => ['image']]);
+    $settings->add($setting);
+
+    // Footer.
+    $name = new lang_string('footer', 'certifygenreport_basic');
+    $desc = new lang_string('footer_desc', 'certifygenreport_basic');
+    $setting = new admin_setting_confightmleditor('certifygenreport_basic/footer',
+        $name,
+        $desc, '');
+    $settings->add($setting);
+    $settings->add($setting);
+
+
 }
 $ADMIN->add('modsettingcertifygencat', $settings);

@@ -51,7 +51,7 @@ class modellist_table extends table_sql {
         // Define the titles of columns to show in header.
         $headers = array(
             get_string('modelname', 'mod_certifygen'),
-            get_string('template', 'mod_certifygen'),
+            get_string('templatereport', 'mod_certifygen'),
             get_string('lastupdate', 'mod_certifygen'),
             get_string('type', 'mod_certifygen'),
             '', '', '');
@@ -108,7 +108,9 @@ class modellist_table extends table_sql {
      * @throws coding_exception
      */
     final function col_template($values) : string {
-//        return template::instance($values->templateid)->get_name();
+        if (empty($values->get('templateid'))) {
+            return get_string('pluginname', $values->get('report'));
+        }
         return template::instance($values->get('templateid'))->get_name();
     }
 

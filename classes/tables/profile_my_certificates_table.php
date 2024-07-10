@@ -112,7 +112,7 @@ class profile_my_certificates_table extends table_sql {
      */
     function col_seecourses(stdClass $row): string
     {
-        return '<span class="likelink" data-id="' . $row->id . '" data-action="see-courses" data-courses="' . $row->courses . '">'
+        return '<span class="likelink" data-name="' . $row->name . '" data-action="see-courses" data-courses="' . $row->courses . '">'
             . get_string('seecourses', 'mod_certifygen') . '</span>';
     }
     /**
@@ -140,71 +140,13 @@ class profile_my_certificates_table extends table_sql {
      */
     function col_download(stdClass $row): string
     {
-        if ($row->status != certifygen_teacherrequests::STATUS_FINISHED_OK) {
-            return '';
+        $status = $row->status;
+        if (is_null($status)) {
+            $status = certifygen_teacherrequests::STATUS_NOT_STARTED;
         }
-        return 'TODO segun report plugin';
-        // No validation plugin associated.
-        $link = new moodle_url('/mod/certifygen/certificateview.php',
-            ['code' => $row->code, 'templateid' => $row->templateid]);
-        if (empty($row->validation)) {
-            return '<a href="' . $link->out() . '">' . get_string('download') . '</a>';
-        }
-        // Validation plugin associated.
-        if ($row->status == certifygen_validations::STATUS_FINISHED_OK) {
-            $validationpluginclass = $row->validation . '\\' . $row->validation;
-            if (get_config($row->validation, 'enable') === '1') {
-                /** @var ICertificateValidation $subplugin */
-                $subplugin = new $validationpluginclass();
-                $url = $subplugin->getFileUrl($this->courseid, $row->validationid, $row->code.'.pdf');
-                if (!empty($url)) {
-                    return '<a href="' . $url . '">' . get_string('download') . '</a>';
-                }
-            }
-        }
-        return '-';
-        global $DB;
-
-        $lang = explode('_', $row->code);
-        $lang = $lang[1];
-        $code = $DB->get_field('tool_certificate_issues', 'code', ['id' => $row->issueid]);
-        $link = new moodle_url('/mod/certifygen/certificateview.php', ['code' => $code, 'preview' => true, 'templateid' => $row->templateid]);
-        $status = certifygen_validations::STATUS_NOT_STARTED;
-        $id = 0;
-        if (isset($row->issueid)) {
-            $validation = certifygen_validations::get_record(['userid' => $row->userid, 'issueid' => $row->issueid]);
-            if ($validation) {
-                $id = $validation->get('id');
-                $status = $validation->get('status');
-            }
-        }
-
-        if ($this->is_downloading()) {
-            return $link->out();
-        } else if ($status == certifygen_validations::STATUS_NOT_STARTED
-            || $status == certifygen_validations::STATUS_FINISHED_ERROR) {
-            return '<span data-courseid="' . $row->courseid . '" data-modelid="' . $this->modelid . '" data-id="'. $id .
-                '" data-action="emit-certificate" data-userid="'. $row->userid .'" class="btn btn-primary"
-                href='. $link->out().'>'.get_string('emit', 'mod_certifygen').'</span>';
-        } else if ($status == certifygen_validations::STATUS_FINISHED_OK) {
-            $validationplugin = $this->model->get('validation');
-            $validationrecords = certifygen_validations::get_records(['modelid' => $this->model->get('id'), 'userid' => $row->userid]);
-            $validationrecord = null;
-            foreach ($validationrecords as $record) {
-                if ($record->get('lang') != $lang) {
-                    continue;
-                }
-                $validationrecord = $record;
-            }
-            $validationpluginclass = $validationplugin . '\\' . $validationplugin;
-            if (get_config($validationplugin, 'enable') === '1') {
-                /** @var ICertificateValidation $subplugin */
-                $subplugin = new $validationpluginclass();
-                $url = $subplugin->getFileUrl($this->courseid, $validationrecord->get('id'), $code.'.pdf');
-                if (!empty($url)) {
-                    return '<a href="' . $url . '">' . get_string('download') . '</a>';
-                }
-            }
+        if ($status == certifygen_teacherrequests::STATUS_FINISHED_OK) {
+            return '<span data-id="'. $row->id . '" data-action="download-certificate" data-name="' . $row->name . '" 
+            data-userid="'. $row->userid .'" class="btn btn-primary">' . get_string('download') . '</span>';
         }
         return '';
     }

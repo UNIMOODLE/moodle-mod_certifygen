@@ -128,7 +128,16 @@ class emitcertificate_external extends external_api {
                 $result['result'] = false;
                 $result['message'] = 'File not found';
             } else {
-                $certifygenfile = new certifygen_file($file, $userid, $lang, $modelid, $course, $validation->get('id'));
+                $certifygenfile = new certifygen_file($file, $userid, $lang, $modelid, $validation->get('id'));
+                $data = [
+                    'lang' => $lang,
+                    'user_id' => $userid,
+                    'user_fullname' => fullname($user),
+                    'courseid' => $courseid,
+                    'course_fullname' => $course->fullname,
+                    'course_shortname' => $course->shortname,
+                ];
+                $certifygenfile->set_metadata($data);
                 // Step 4: Call to validation plugin.
                 $validationplugin = $certifygenmodel->get('validation');
                 $validationpluginclass = $validationplugin . '\\' . $validationplugin;
@@ -139,16 +148,16 @@ class emitcertificate_external extends external_api {
                     /** @var ICertificateValidation $subplugin */
                     $subplugin = new $validationpluginclass();
                     $response = $subplugin->sendFile($certifygenfile);
-//                    if ($response['haserror']) {
-//                        if (!array_key_exists('message', $result)) {
-//                            $result['message'] = 'validation_plugin_send_file_error';
-//                        }
-//                        $validation->set('status', certifygen_validations::STATUS_FINISHED_ERROR);
-//                        $validation->save();
-//                    } else {
-//                        $validation->set('status', certifygen_validations::STATUS_FINISHED_OK);
-//                        $validation->save();
-//                    }
+                    if ($response['haserror']) {
+                        if (!array_key_exists('message', $result)) {
+                            $result['message'] = 'validation_plugin_send_file_error';
+                        }
+                        $validation->set('status', certifygen_validations::STATUS_FINISHED_ERROR);
+                        $validation->save();
+                    } else {
+                        $validation->set('status', certifygen_validations::STATUS_FINISHED_OK);
+                        $validation->save();
+                    }
                 } else {
                     $result['result'] = false;
                     $result['message'] = 'plugin_not_enabled';

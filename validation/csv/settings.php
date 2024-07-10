@@ -28,21 +28,34 @@
 // This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
-$settings->add(new admin_setting_configcheckbox('certifygenvalidation_csv/enabled',
-    new lang_string('enable', 'certifygenvalidation_csv'),
-    new lang_string('enable_help', 'certifygenvalidation_csv'), 0));
+// Enlace principal de settings.
+$ADMIN->add('modsettings',
+    new admin_category('certifygenvalidation_csv_cat',
+        get_string('pluginname', 'certifygenvalidation_csv')));
+
+// Certifygenreport_basic settings.
+$settings = new admin_settingpage(
+    'modsettingcertifygenvalidationcsv',
+    get_string('pluginnamesettings', 'certifygenvalidation_csv'),
+    'moodle/site:config');
+if ($ADMIN->fulltree) {
+    $settings->add(new admin_setting_configcheckbox('certifygenvalidation_csv/enabled',
+        new lang_string('enable', 'certifygenvalidation_csv'),
+        new lang_string('enable_help', 'certifygenvalidation_csv'), 0));
 
 // FirmaCatalogService?wsdl
-$settings->add(new admin_setting_configtext('certifygenvalidation_csv/firmacatalogservicewsdl',
-    new lang_string('firmacatalogservicewsdl', 'certifygenvalidation_csv'),
-    new lang_string('firmacatalogservicewsdl_help', 'certifygenvalidation_csv'), ""));
+    $settings->add(new admin_setting_configtext('certifygenvalidation_csv/firmacatalogservicewsdl',
+        new lang_string('firmacatalogservicewsdl', 'certifygenvalidation_csv'),
+        new lang_string('firmacatalogservicewsdl_help', 'certifygenvalidation_csv'), ""));
 
 // FirmaQueryCatalogService?wsdl
-$settings->add(new admin_setting_configtext('certifygenvalidation_csv/firmaquerycatalogservicewsdl',
-    new lang_string('firmaquerycatalogservicewsdl', 'certifygenvalidation_csv'),
-    new lang_string('firmaquerycatalogservicewsdl_help', 'certifygenvalidation_csv'), ""));
+    $settings->add(new admin_setting_configtext('certifygenvalidation_csv/firmaquerycatalogservicewsdl',
+        new lang_string('firmaquerycatalogservicewsdl', 'certifygenvalidation_csv'),
+        new lang_string('firmaquerycatalogservicewsdl_help', 'certifygenvalidation_csv'), ""));
 
 // AppId.
-$settings->add(new admin_setting_configtext('certifygenvalidation_csv/appID',
-    new lang_string('appID', 'certifygenvalidation_csv'),
-    new lang_string('appID_help', 'certifygenvalidation_csv'), ""));
+    $settings->add(new admin_setting_configtext('certifygenvalidation_csv/appID',
+        new lang_string('appID', 'certifygenvalidation_csv'),
+        new lang_string('appID_help', 'certifygenvalidation_csv'), ""));
+}
+$ADMIN->add('modsettingcertifygencat', $settings);

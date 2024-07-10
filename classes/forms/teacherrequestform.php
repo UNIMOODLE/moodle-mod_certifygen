@@ -86,7 +86,7 @@ class teacherrequestform extends dynamic_form {
             'multiple' => true,
             'valuehtmlcallback' => function($courseid) : string {
                 $course = get_course($courseid);
-                return $course->fullname;
+                return format_text($course->fullname);
             }
         ];
         $mform->addElement('autocomplete', 'courses',
@@ -136,7 +136,6 @@ class teacherrequestform extends dynamic_form {
         $data->userid = $formdata['userid'];
         $data->modelid = $formdata['modelid'];
         $data->name = $formdata['name'];
-
         certifygen_teacherrequests::manage_teacherrequests($id, $data);
     }
 

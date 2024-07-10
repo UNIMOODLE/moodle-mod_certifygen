@@ -32,26 +32,26 @@
 namespace mod_certifygen\external;
 
 use coding_exception;
+use context_system;
 use core\invalid_persistent_exception;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
-use mod_certifygen\certifygen_file;
 use mod_certifygen\interfaces\ICertificateReport;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_teacherrequests;
-use mod_certifygen\persistents\certifygen_validations;
+use moodle_url;
 
-class emitteacherrequest_external extends external_api {
+class downloadteachercertificate_external extends external_api {
     /**
      * Describes the external function parameters.
      *
      * @return external_function_parameters
      */
-    public static function emitteacherrequest_parameters(): external_function_parameters {
+    public static function downloadteachercertificate_parameters(): external_function_parameters {
         return new external_function_parameters(
             [
                 'id' => new external_value(PARAM_INT, 'id'),
@@ -66,66 +66,55 @@ class emitteacherrequest_external extends external_api {
      * @throws invalid_parameter_exception
      * @throws invalid_persistent_exception
      */
-    public static function emitteacherrequest(int $id): array {
+    public static function downloadteachercertificate(int $id): array {
 
         self::validate_parameters(
-            self::emitteacherrequest_parameters(), ['id' => $id]
+            self::downloadteachercertificate_parameters(), ['id' => $id]
         );
-        $result = ['result' => true, 'message' => 'OK'];
 
-        // Step 1: Change status to in progress.
-        $teacherrequest = new certifygen_teacherrequests($id);
-        $teacherrequest->set('status', certifygen_teacherrequests::STATUS_IN_PROGRESS);
-        $teacherrequest->save();
+        $result = ['result' => true, 'message' => 'OK', 'url' => ''];
+
         try {
-            $certifygenmodel = new certifygen_model($teacherrequest->get('modelid'));
-            $reportplugin = $certifygenmodel->get('report');
-            $reportpluginclass = $reportplugin . '\\' . $reportplugin;
-            /** @var ICertificateReport $subplugin */
-            $subplugin = new $reportpluginclass();
-            $result = $subplugin->createFile($teacherrequest);
-            if (!$result['result']) {
+            // Step 1: verified status finished.
+            $trequest = new certifygen_teacherrequests($id);
+            if (is_null($trequest)) {
+                $result = ['result' => false, 'message' => 'notfound', 'url' => ''];
                 return $result;
             }
-            $file = $result['file'];
-            $userid = $teacherrequest->get('userid');
-            $lang = $teacherrequest->get('lang');
-            $modelid = $teacherrequest->get('modelid');
-            $certifygenfile = new certifygen_file($file, $userid, $lang, $modelid, $id);
-            $data = [
-                'lang' => $lang,
-                'user_id' => $userid,
-                'user_fullname' => fullname($certifygenfile->get_user()),
-            ];
-            $certifygenfile->set_metadata($data);
-            // Step 3: Call to validation plugin.
-            $certifygenmodel = new certifygen_model($teacherrequest->get('modelid'));
+            // Step 2: call to getfile from validationplugin.
+            $certifygenmodel = new certifygen_model($trequest->get('modelid'));
             $validationplugin = $certifygenmodel->get('validation');
-            $validationpluginclass = $validationplugin . '\\' . $validationplugin;
+            $code = ICertificateReport::FILE_NAME_STARTSWITH . $trequest->get('id').'.pdf';
             if (empty($validationplugin)) {
-                $teacherrequest->set('status', certifygen_validations::STATUS_FINISHED_OK);
-                $teacherrequest->save();
-            } else if (get_config($validationplugin, 'enabled') === '1') {
-                /** @var ICertificateValidation $subplugin */
-                $subplugin = new $validationpluginclass();
-                $response = $subplugin->sendFile($certifygenfile);
-                if ($response['haserror']) {
-                    if (!array_key_exists('message', $result)) {
-                        $result['message'] = 'validation_plugin_send_file_error';
-                    }
-                    $teacherrequest->set('status', certifygen_validations::STATUS_FINISHED_ERROR);
-                    $teacherrequest->save();
+                // Get file from moodledata.
+                $fs = get_file_storage();
+                $contextid = context_system::instance()->id;
+                $file = $fs->get_file($contextid, ICertificateReport::FILE_COMPONENT,
+                    ICertificateReport::FILE_AREA, (int) $trequest->get('id'), ICertificateReport::FILE_PATH,
+                    $code);
+                if (empty($file)) {
+                    $result = ['result' => false, 'message' => 'file not found.', 'url' => ''];
+                    return $result;
+                }
+                $result['url'] = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(),
+                    $file->get_itemid(), $file->get_filepath(), $file->get_filename())->out();
+                if (empty($result['url'])) {
+                    $result = ['result' => false, 'message' => 'file not found. url empty', 'url' => ''];
+                }
+            } else {
+                $validationpluginclass = $validationplugin . '\\' . $validationplugin;
+                if (get_config($validationplugin, 'enabled') === '1') {
+                    /** @var ICertificateValidation $subplugin */
+                    $subplugin = new $validationpluginclass();
+                    $result['url'] = $subplugin->getFileUrl(0, $trequest->get('id'), $code);
                 } else {
-                    $teacherrequest->set('status', certifygen_validations::STATUS_FINISHED_OK);
-                    $teacherrequest->save();
+                    $result['result'] = false;
+                    $result['message'] = 'plugin_not_enabled';
                 }
             }
         } catch (moodle_exception $e) {
-            error_log(__FUNCTION__ . ' ' . ' error: '.var_export($e->getMessage(), true));
             $result['result'] = false;
             $result['message'] = $e->getMessage();
-            $teacherrequest->set('status', certifygen_teacherrequests::STATUS_FINISHED_ERROR);
-            $teacherrequest->save();
         }
         return $result;
     }
@@ -134,11 +123,12 @@ class emitteacherrequest_external extends external_api {
      *
      * @return external_single_structure
      */
-    public static function emitteacherrequest_returns(): external_single_structure {
+    public static function downloadteachercertificate_returns(): external_single_structure {
         return new external_single_structure(
             [
                 'result' => new external_value(PARAM_BOOL, 'model deleted'),
                 'message' => new external_value(PARAM_RAW, 'meesage'),
+                'url' => new external_value(PARAM_RAW, 'certificate url'),
             ]
         );
     }

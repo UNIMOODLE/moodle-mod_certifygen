@@ -57,25 +57,6 @@ if ($ADMIN->fulltree) {
             $options
         ));
     }
-
-    // Logo.
-    $name = new lang_string('logo', 'mod_certifygen');
-    $desc = new lang_string('logo_desc', 'mod_certifygen');
-    $setting = new admin_setting_configstoredfile('mod_certifygen/logo',
-        $name,
-        $desc, 'logo', 0, ['accepted_types' => ['image']]);
-    $settings->add($setting);
-
-    // Footer.
-    $name = new lang_string('footer', 'mod_certifygen');
-    $desc = new lang_string('footer_desc', 'mod_certifygen');
-    $setting = new admin_setting_confightmleditor('mod_certifygen/footer',
-        $name,
-        $desc, '');
-    $settings->add($setting);
-    $settings->add($setting);
-
-
 }
 $ADMIN->add('modsettingcertifygencat', $settings);
 
@@ -91,10 +72,11 @@ $teacherrequestreportsettings = new admin_externalpage('certifygenteacherrequest
     '/mod/certifygen/teacherrequestreport.php',  'mod/certifygen:viewcontextcertificates', $module->is_enabled() === false);
 $ADMIN->add('modsettingcertifygencat', $teacherrequestreportsettings);
 
-$ADMIN->add('modsettingcertifygencat',
-    new admin_category('certifygenvalidationplugins',
-        get_string('managecertifygenvalidationplugins', 'mod_certifygen'),
-        $module->is_enabled() === false));
+//// Validation plugins settings.
+//$ADMIN->add('modsettingcertifygencat',
+//    new admin_category('certifygenvalidationplugins',
+//        get_string('managecertifygenvalidationplugins', 'mod_certifygen'),
+//        $module->is_enabled() === false));
 
 //$subpluginssettings = new admin_externalpage('certifygenvalidation',
 //    get_string('managecertifygenvalidationplugins', 'mod_certifygen'),
@@ -106,11 +88,14 @@ $ADMIN->add('modsettingcertifygencat',
 unset($settings);
 
 
-
-
 foreach (core_plugin_manager::instance()->get_plugins_of_type('certifygenvalidation') as $plugin) {
     /** @var \mod_certifygen\plugininfo\certifygenvalidation $plugin */
-    $plugin->load_settings($ADMIN, 'certifygenvalidationplugins', $hassiteconfig);
+    $plugin->load_settings($ADMIN, 'certifygenvalidationplugins', true);
+}
+
+foreach (core_plugin_manager::instance()->get_plugins_of_type('certifygenreport') as $plugin) {
+    /** @var \mod_certifygen\plugininfo\certifygenreport $plugin */
+    $plugin->load_settings($ADMIN, 'certifygenreportplugins', true);
 }
 // TinyMCE does not have standard settings page.
 $settings = null;

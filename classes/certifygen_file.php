@@ -14,15 +14,16 @@ class certifygen_file {
     private stdClass $course;
     private int $userid;
     private int $modelid;
-    private int $validationid;
+    private int $validationid; // validationid or teacherrequestid.
     private string $lang;
+    private array $metadata;
 
     /**
      * @throws coding_exception
      */
-    public function __construct(stored_file $file, int $userid, string $lang, int $modelid, stdClass $course, int $validationid) {
+    public function __construct(stored_file $file, int $userid, string $lang, int $modelid, int $validationid) {
         $this->file = $file;
-        $this->course = $course;
+//        $this->course = $course;
         $this->userid = $userid;
         $this->lang = $lang;
         $this->modelid = $modelid;
@@ -33,9 +34,9 @@ class certifygen_file {
      * @return stdClass
      * @throws dml_exception
      */
-    public function get_course() : stdClass {
-        return $this->course;
-    }
+//    public function get_course() : stdClass {
+//        return $this->course;
+//    }
     /**
      * @return int
      */
@@ -58,17 +59,25 @@ class certifygen_file {
     }
 
     /**
+     * @param array $data
+     * @return void
+     */
+    public function set_metadata(array $data) : void {
+        $this->metadata = $data;
+    }
+    /**
      * @return array
      * @throws dml_exception
      */
     public function get_metadata() : array {
-        return [
-            'userid' => $this->userid,
-            'courseid' => $this->course->id,
-            'coursefullname' => $this->get_course()->fullname,
-            'lang' => $this->lang,
-            'contentfile' => $this->file->get_content(),
-            'modelid' => $this->modelid
-        ];
+        return $this->metadata;
+//        return [
+//            'userid' => $this->userid,
+//            'courseid' => $this->course->id,
+//            'coursefullname' => $this->get_course()->fullname,
+//            'lang' => $this->lang,
+//            'contentfile' => $this->file->get_content(),
+//            'modelid' => $this->modelid
+//        ];
     }
 }

@@ -29,17 +29,14 @@ namespace certifygenvalidation_cmd;
 
 use coding_exception;
 use context_course;
-use core\invalid_persistent_exception;
 use core\session\exception;
 use dml_exception;
 use file_exception;
 use mod_certifygen\certifygen_file;
 use mod_certifygen\interfaces\ICertificateValidation;
-use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 use moodle_url;
 use pdf;
-use stdClass;
 use stored_file;
 use stored_file_creation_exception;
 
@@ -64,12 +61,13 @@ class certifygenvalidation_cmd implements ICertificateValidation
         // Recupera los parámetros
         $filename = escapeshellarg($file->get_file()->get_filename());
         $userid = escapeshellarg($file->get_user()->id);
-        $data = [
-            'user_id' => $userid,
-            'user_fullname' => fullname($file->get_user()),
-            'course_fullname' => $file->get_course()->fullname,
-            'course_shortname' => $file->get_course()->shortname,
-        ];
+//        $data = [
+//            'user_id' => $userid,
+//            'user_fullname' => fullname($file->get_user()),
+//            'course_fullname' => $file->get_course()->fullname,
+//            'course_shortname' => $file->get_course()->shortname,
+//        ];
+        $data = $file->get_metadata();
         $datajson = json_encode($data);
         // Construye el comando
         $command = "$path $filename '$datajson'";
@@ -80,27 +78,25 @@ class certifygenvalidation_cmd implements ICertificateValidation
         exec($command, $output, $return_var);
 
         $haserror = false;
+        $message = 'ok';
         // Muestra la salida del comando
         if ($return_var !== 0) {
             $haserror = true;
-            error_log(__FUNCTION__ . " Error ejecutando el comando. Código de salida: ".var_export($return_var, true));
+            $message = " Error ejecutando el comando. Código de salida: " . $return_var;
         } else {
             if (!empty($output)) {
                 try {
                     $this->save_file_on_moodledata($file, $output[0]);
-                    $status = certifygen_validations::STATUS_FINISHED_OK;
                 } catch (moodle_exception $e) {
                     error_log(__FUNCTION__ . '-CMD e: '.var_export($e->getMessage(), true));
-                    $status = certifygen_validations::STATUS_FINISHED_ERROR;
+                    $haserror = true;
+                    $message = $e->getMessage();
                 }
-                // Save new status:
-                $validation = new certifygen_validations($file->get_validationid());
-                $validation->set('status', $status);
-                $validation->save();
             }
         }
         return [
-            'haserror' => $haserror
+            'haserror' => $haserror,
+            'message' => $message
         ];
     }
 
@@ -160,13 +156,13 @@ class certifygenvalidation_cmd implements ICertificateValidation
      * @param string $code
      * @return int
      */
-    public function getState(int $courseid, int $validationid, string $code): int
-    {
-        if (is_null($this->getFile($courseid, $validationid, $code))) {
-            return certifygen_validations::STATUS_FINISHED_ERROR;
-        }
-        return certifygen_validations::STATUS_FINISHED_OK;
-    }
+//    public function getState(int $courseid, int $validationid, string $code): int
+//    {
+//        if (is_null($this->getFile($courseid, $validationid, $code))) {
+//            return certifygen_validations::STATUS_FINISHED_ERROR;
+//        }
+//        return certifygen_validations::STATUS_FINISHED_OK;
+//    }
 
     /**
      * @param int $courseid
@@ -178,7 +174,10 @@ class certifygenvalidation_cmd implements ICertificateValidation
     {
         $code = self::FILE_NAME_STARTSWITH . $code . '.pdf';
         $fs = get_file_storage();
-        $contextid = context_course::instance($courseid)->id;
+        $contextid = \context_system::instance()->id;
+        if (!empty($courseid)) {
+            $contextid = context_course::instance($courseid)->id;
+        }
         return $fs->get_file($contextid, self::FILE_COMPONENT,
             self::FILE_AREA, $validationid, self::FILE_PATH, $code);
     }

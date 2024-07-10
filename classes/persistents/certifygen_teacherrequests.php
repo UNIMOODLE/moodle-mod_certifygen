@@ -58,6 +58,9 @@ class certifygen_teacherrequests extends persistent {
      */
     public static function manage_teacherrequests(int $id, stdClass $data) : self {
 
+        $courses = explode(',', $data->courses);
+        asort($courses);
+        $data->courses = implode(',', $courses);
         $validation = new self($id, $data);
         if (empty($id)) {
             $validation->create();
@@ -98,5 +101,39 @@ class certifygen_teacherrequests extends persistent {
         WHERE tr.userid = :userid
         ORDER BY tr.timemodified DESC ";
         return $DB->get_records_sql($sql, $params, $start, $pagesize);
+    }
+
+    /**
+     * @param int $userid
+     * @param string $courses
+     * @param string $lang
+     * @param int $modelid
+     * @return false|mixed
+     * @throws dml_exception
+     */
+    public static function get_request_by_data(int $userid, string $courses, string $lang, int $modelid, string $name) {
+        global $DB;
+        $comparename = $DB->sql_compare_text('ct.name');
+        $comparenameplaceholder = $DB->sql_compare_text(':name');
+        $comparelang = $DB->sql_compare_text('ct.lang');
+        $comparelangplaceholder = $DB->sql_compare_text(':lang');
+        $comparecourses = $DB->sql_compare_text('ct.courses');
+        $comparecoursesplaceholder = $DB->sql_compare_text(':courses');
+
+        $params = [
+            'userid' => $userid,
+            'courses' => $courses,
+            'lang' => $lang,
+            'modelid' => $modelid,
+            'name' => $name,
+        ];
+        $sql = "SELECT ct.* 
+                FROM {certifygen_teacherrequests} ct
+                WHERE {$comparelang} = {$comparelangplaceholder} 
+                    AND {$comparecourses} = {$comparecoursesplaceholder} 
+                    AND {$comparename} = {$comparenameplaceholder} 
+                    AND ct.userid = :userid
+                    AND ct.modelid = :modelid ";
+        return $DB->get_record_sql($sql, $params);
     }
 }
