@@ -12,6 +12,7 @@ The plugin has been tested on the following versions:
 ## Requirements ##
 
 * User configuration and REST Web Services
+* User for web service must have 'report/completion:view' capability.
 
 ## Languages ##
 

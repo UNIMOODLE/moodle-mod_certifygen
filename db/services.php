@@ -33,6 +33,7 @@ use mod_certifygen\external\deletemodel_external;
 use mod_certifygen\external\emitcertificate_external;
 use mod_certifygen\external\downloadcertificate_external;
 use mod_certifygen\external\get_courses_as_teacher_external;
+use mod_certifygen\external\get_courses_as_student_external;
 use mod_certifygen\external\get_json_teacher_certificate_external;
 use mod_certifygen\external\get_pdf_teacher_certificate_external;
 use mod_certifygen\external\getmycertificatedata_external;
@@ -40,7 +41,6 @@ use mod_certifygen\external\getmodellisttable_external;
 use mod_certifygen\external\searchcategory_external;
 use mod_certifygen\external\searchcourse_external;
 use mod_certifygen\external\revokecertificate_external;
-//use mod_certifygen\external\get_students_certificates_table_external;
 use mod_certifygen\external\get_id_instance_certificate_external;
 use mod_certifygen\external\get_json_certificate_external;
 use mod_certifygen\external\get_pdf_certificate_external;
@@ -199,13 +199,13 @@ $functions = [
 //        'type' => 'read',
 //        'capabilities' => 'mod/certifygen:manage',
 //    ],
-//    'mod_certifygen_getCoursesAsStudent' => [
-//        'classname' => getCoursesAsStudent_external::class,
-//        'methodname' => 'getCoursesAsStudent',
-//        'description' => 'get Courses As Student',
-//        'type' => 'read',
-//        'capabilities' => 'mod/certifygen:manage',
-//    ],
+    'mod_certifygen_get_courses_as_student' => [
+        'classname' => get_courses_as_student_external::class,
+        'methodname' => 'get_courses_as_student',
+        'description' => 'get Courses As Student',
+        'type' => 'read',
+        'capabilities' => 'mod/certifygen:manage',
+    ],
     'mod_certifygen_get_courses_as_teacher' => [
         'classname' => get_courses_as_teacher_external::class,
         'methodname' => 'get_courses_as_teacher',
@@ -252,14 +252,13 @@ $services = [
             'mod_certifygen_get_json_certificate',
             'mod_certifygen_get_id_instance_certificate',
             'mod_certifygen_get_courses_as_teacher',
+            'mod_certifygen_get_courses_as_student',
             'mod_certifygen_get_json_teacher_certificate',
             'mod_certifygen_get_pdf_teacher_certificate',
 //            'mod_certifygen_getPdfTeaching',
 //            'mod_certifygen_getJsonTeaching',
 //            'mod_certifygen_getPdfStudentCourseCompleted',
 //            'mod_certifygen_getJsonStudentCourseCompleted',
-//            'mod_certifygen_getCoursesAsStudent',
-//            'mod_certifygen_getCoursesAsTeacher',
         ]
     ]
 ];
