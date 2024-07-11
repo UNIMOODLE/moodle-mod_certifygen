@@ -79,7 +79,7 @@ class revokecertificate_external extends external_api {
         self::validate_parameters(
             self::revokecertificate_parameters(), ['issueid' => $issueid, 'userid' => $userid, 'modelid' => $modelid]
         );
-        $result = ['result' => true, 'message' => 'OK'];
+        $result = ['result' => true, 'message' => get_string('ok', 'mod_certifygen')];
 
         // Step 1: Find validation id..
         $data = [
