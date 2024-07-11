@@ -38,6 +38,7 @@ use external_function_parameters;
 use external_single_structure;
 use external_multiple_structure;
 use external_value;
+use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_context;
 use mod_certifygen\persistents\certifygen_model;
 
@@ -116,6 +117,9 @@ class get_courses_as_student_external extends external_api {
             foreach ($enrolments as $enrolment) {
                 $coursecontext = \context_course::instance($enrolment->ctxinstance);
                 if (has_capability('moodle/course:managegroups', $coursecontext, $userid)) {
+                    continue;
+                }
+                if (!certifygen::get_record(['course' => $enrolment->ctxinstance])) {
                     continue;
                 }
 //                $coursefullname = format_text($enrolment->fullname);

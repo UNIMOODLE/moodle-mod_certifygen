@@ -134,4 +134,19 @@ class mod_certifygen_generator extends testing_module_generator {
         $context = new certifygen_context(0, (object)$data);
         return $context->create();
     }
+    /**
+     * @param int $modelid
+     * @return certifygen_context
+     * @throws \core\invalid_persistent_exception
+     * @throws coding_exception
+     */
+    public function assign_model_coursecontext(int $modelid, string $contextids) {
+        $data = [
+            'modelid' => $modelid,
+            'contextids' => $contextids,
+            'type' => certifygen_context::CONTEXT_TYPE_COURSE,
+        ];
+        $context = new certifygen_context(0, (object)$data);
+        return $context->create();
+    }
 }
