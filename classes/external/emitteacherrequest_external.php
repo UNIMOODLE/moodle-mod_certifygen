@@ -71,7 +71,7 @@ class emitteacherrequest_external extends external_api {
         self::validate_parameters(
             self::emitteacherrequest_parameters(), ['id' => $id]
         );
-        $result = ['result' => true, 'message' => 'OK'];
+        $result = ['result' => true, 'message' => get_string('ok', 'mod_certifygen')];
 
         // Step 1: Change status to in progress.
         $teacherrequest = new certifygen_teacherrequests($id);
@@ -80,6 +80,11 @@ class emitteacherrequest_external extends external_api {
         try {
             $certifygenmodel = new certifygen_model($teacherrequest->get('modelid'));
             $reportplugin = $certifygenmodel->get('report');
+            if (empty($reportplugin)) {
+                $result['result'] = false;
+                $result['message'] = 'report plugin must be set on the model';
+                return $result;
+            }
             $reportpluginclass = $reportplugin . '\\' . $reportplugin;
             /** @var ICertificateReport $subplugin */
             $subplugin = new $reportpluginclass();
@@ -112,6 +117,7 @@ class emitteacherrequest_external extends external_api {
                 if ($response['haserror']) {
                     if (!array_key_exists('message', $result)) {
                         $result['message'] = 'validation_plugin_send_file_error';
+                        $result['result'] = false;
                     }
                     $teacherrequest->set('status', certifygen_validations::STATUS_FINISHED_ERROR);
                     $teacherrequest->save();
@@ -120,6 +126,7 @@ class emitteacherrequest_external extends external_api {
                     $teacherrequest->save();
                 }
             }
+            unset($result['file']);
         } catch (moodle_exception $e) {
             error_log(__FUNCTION__ . ' ' . ' error: '.var_export($e->getMessage(), true));
             $result['result'] = false;
@@ -138,9 +145,8 @@ class emitteacherrequest_external extends external_api {
         return new external_single_structure(
             [
                 'result' => new external_value(PARAM_BOOL, 'model deleted'),
-                'message' => new external_value(PARAM_RAW, 'meesage'),
+                'message' => new external_value(PARAM_RAW, 'meesage', VALUE_OPTIONAL),
             ]
         );
     }
-
 }

@@ -78,7 +78,7 @@ class mod_certifygen_generator extends testing_module_generator {
             'timeondemmand' => 0,
             'langs' => 'en,es',
             'validation' => '',
-            'report' => '',
+            'report' => 'certifygenreport_basic',
 
         ];
         $model = new certifygen_model(0, (object)$data);
@@ -99,11 +99,11 @@ class mod_certifygen_generator extends testing_module_generator {
         $data = [
             'name' => 'test1',
             'modelid' => $modelid,
-            'status' => certifygen_teacherrequests::STATUS_IN_PROGRESS,
+            'status' => certifygen_teacherrequests::STATUS_NOT_STARTED,
             'lang' => 'es',
             'courses' => $courses,
             'langs' => 'en,es',
-            'userid' => $userid,
+            'userid' => $userid
         ];
         $trequest = new certifygen_teacherrequests(0, (object)$data);
         return $trequest->create();

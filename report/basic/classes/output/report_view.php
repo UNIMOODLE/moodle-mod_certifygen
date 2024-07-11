@@ -87,6 +87,9 @@ class report_view implements \renderable, \templatable
         $filename = get_config('certifygenreport_basic', 'logo');
         $logo = $fs->get_file($context->id, self::REPORT_COMPONENT, self::REPORT_FILEAREA, 0,
             '/', $filename);
+        if (!$logo) {
+            return '';
+        }
         $img_base64_encoded =  'data:image/png;base64, ' . base64_encode($logo->get_content());
         return  '@' . preg_replace('#^data:image/[^;]+;base64,#', '', $img_base64_encoded) . '">';
     }
