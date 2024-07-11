@@ -134,7 +134,7 @@ class activity_view implements renderable, templatable {
         }
         $activityteachertable->baseurl = new moodle_url('/mod/certifygen/view.php', $paramsurl);
         ob_start();
-        $activityteachertable->out($this->pagesize, true);
+        $activityteachertable->out($this->pagesize, $this->isteacher);
         $out1 = ob_get_contents();
         ob_end_clean();
         return $out1;

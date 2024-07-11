@@ -96,6 +96,7 @@ class activityteacher_table extends table_sql {
             get_string('date'),
             '',
             '',
+            '',
         ];
 
         $this->define_headers($headers);

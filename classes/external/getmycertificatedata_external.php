@@ -78,7 +78,8 @@ class getmycertificatedata_external extends external_api {
     public static function getmycertificatedata(int $modelid, int $courseid, int $cmid, string $lang): array {
         global $PAGE, $DB;
         self::validate_parameters(
-            self::getmycertificatedata_parameters(), ['modelid' => $modelid, 'courseid' => $courseid, 'cmid' => $cmid, 'lang' => $lang]
+            self::getmycertificatedata_parameters(), ['modelid' => $modelid, 'courseid' => $courseid, 'cmid' => $cmid,
+                'lang' => $lang]
         );
         $PAGE->set_context(context_system::instance());
         $model = new certifygen_model($modelid);
@@ -88,9 +89,9 @@ class getmycertificatedata_external extends external_api {
             $certifygenmodel = $DB->get_record('certifygen_model', ['id' => $certifygen->modelid], '*', MUST_EXIST);
             $view = new activity_view($courseid, $certifygenmodel->templateid, $cm, $lang);
         } else {
-//            $url = new moodle_url('/mod/certifygen/courselink.php', ['id' => $courseid]);
-//            $view = new mycertificates_view($model, $courseid, $url, $lang);
-            $view = new profile_my_certificates_view();
+//            $view = new profile_my_certificates_view();
+            // Creo q este caso no se usa en este serivicio. mando error para controlarlo.
+            throw new moodle_exception('cmid must be greater than 0.');
         }
         
         $output = $PAGE->get_renderer('mod_certifygen');
@@ -106,12 +107,9 @@ class getmycertificatedata_external extends external_api {
     public static function getmycertificatedata_returns(): external_single_structure {
         return new external_single_structure(
             [
-                'table' => new external_value(PARAM_RAW, 'table html', VALUE_OPTIONAL),
+                'table' => new external_value(PARAM_RAW, 'table html'),
                 'form' => new external_value(PARAM_RAW, 'form html', VALUE_OPTIONAL),
                 'isstudent' => new external_value(PARAM_BOOL, 'user is student', VALUE_OPTIONAL),
-                'userid' => new external_value(PARAM_INT, 'user id', VALUE_OPTIONAL),
-                'mycertificates' => new external_value(PARAM_BOOL, 'user id', VALUE_OPTIONAL),
-                'title' => new external_value(PARAM_RAW, 'page title', VALUE_OPTIONAL),
             ]
         );
     }

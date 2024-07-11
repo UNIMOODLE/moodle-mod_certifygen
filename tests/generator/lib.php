@@ -43,6 +43,7 @@ class mod_certifygen_generator extends testing_module_generator {
      */
     public function create_model(int $type, int $mode, int $templateid, string $validation, string $report) {
 
+        $this->install_language_package('es');
         $data = [
             'name' => 'Modelo 1',
             'type' => $type,
@@ -67,6 +68,7 @@ class mod_certifygen_generator extends testing_module_generator {
      */
     public function create_model_by_name(string $name, int $templateid) {
 
+        $this->install_language_package('es');
         $data = [
             'name' => $name,
             'type' => certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
@@ -91,6 +93,8 @@ class mod_certifygen_generator extends testing_module_generator {
      * @throws coding_exception
      */
     public function create_teacher_request(int $modelid, string $courses, int $userid) {
+
+        $this->install_language_package('es');
         $data = [
             'name' => 'test1',
             'modelid' => $modelid,
@@ -102,5 +106,15 @@ class mod_certifygen_generator extends testing_module_generator {
         ];
         $trequest = new certifygen_teacherrequests(0, (object)$data);
         return $trequest->create();
+    }
+
+    /**
+     * @param string $langcode
+     * @return void
+     * @throws moodle_exception
+     */
+    public function install_language_package(string $langcode) {
+        $controller = new \tool_langimport\controller();
+        $controller->install_languagepacks($langcode);
     }
 }

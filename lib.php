@@ -78,7 +78,7 @@ function certifygen_supports(string $feature): ?bool
  * @throws coding_exception
  * @throws invalid_persistent_exception
  */
-function certifygen_add_instance(stdClass $data, mod_certifygen_mod_form $mform): int
+function certifygen_add_instance(stdClass $data, $mform = null): int
 {
     global $USER;
 
