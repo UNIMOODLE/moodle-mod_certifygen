@@ -28,7 +28,7 @@
 
 namespace mod_certifygen\tables;
 global $CFG;
-require "$CFG->libdir/tablelib.php";
+require_once("$CFG->libdir/tablelib.php");
 
 use coding_exception;
 use dml_exception;
