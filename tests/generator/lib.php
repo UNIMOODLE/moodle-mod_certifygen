@@ -17,6 +17,7 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+use mod_certifygen\persistents\certifygen_context;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_teacherrequests;
 
@@ -116,5 +117,21 @@ class mod_certifygen_generator extends testing_module_generator {
     public function install_language_package(string $langcode) {
         $controller = new \tool_langimport\controller();
         $controller->install_languagepacks($langcode);
+    }
+
+    /**
+     * @param int $modelid
+     * @return certifygen_context
+     * @throws \core\invalid_persistent_exception
+     * @throws coding_exception
+     */
+    public function assign_model_systemcontext(int $modelid) {
+        $data = [
+            'modelid' => $modelid,
+            'contextids' => '',
+            'type' => certifygen_context::CONTEXT_TYPE_SYSTEM,
+        ];
+        $context = new certifygen_context(0, (object)$data);
+        return $context->create();
     }
 }

@@ -84,6 +84,8 @@ class getteacherrequestviewdata_external extends external_api {
             [
                 'userid' => new external_value(PARAM_INT, 'model deleted'),
                 'table' => new external_value(PARAM_RAW, 'table data'),
+                'title' => new external_value(PARAM_RAW, 'title', VALUE_OPTIONAL),
+                'mycertificates' => new external_value(PARAM_BOOL, 'table data', VALUE_OPTIONAL),
             ]
         );
     }
