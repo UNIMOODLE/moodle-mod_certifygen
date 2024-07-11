@@ -31,30 +31,32 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-use mod_certifygen\external\deletemodel_external;
-use mod_certifygen\external\emitcertificate_external;
-use mod_certifygen\external\revokecertificate_external;
-use mod_certifygen\external\searchcategory_external;
-use mod_certifygen\persistents\certifygen_model;
-use mod_certifygen\persistents\certifygen_validations;
+
+namespace tests;
+
+use advanced_testcase;
+use mod_certifygen\external\searchcourse_external;
 
 global $CFG;
-require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot.'/lib/externallib.php');
+require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
+require_once($CFG->dirroot . '/lib/externallib.php');
 
-class searchcategory_external_test extends advanced_testcase {
+class searchcourse_external_test extends advanced_testcase
+{
 
     /**
      * Test set up.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         $this->resetAfterTest();
     }
 
     /**
      * @return void
      */
-    public function test_searchcategory(): void {
+    public function test_searchcourse(): void
+    {
         // Create user and enrol as teacher.
         $user = $this->getDataGenerator()->create_user(
             ['username' => 'test_user_2', 'firstname' => 'test',
@@ -63,16 +65,19 @@ class searchcategory_external_test extends advanced_testcase {
         // Login as user.
         $this->setUser($user);
 
-        self::getDataGenerator()->create_category(['name' => 'Primaria 1']);
-        self::getDataGenerator()->create_category(['name' => 'Primaria 2']);
-        self::getDataGenerator()->create_category(['name' => 'ESO 1']);
-        $result = searchcategory_external::searchcategory('Prim');
+        $cat = self::getDataGenerator()->create_category();
+        self::getDataGenerator()->create_course(['fullname' => 'Matemáticas 1', 'category' => $cat->id]);
+        self::getDataGenerator()->create_course(['fullname' => 'Matemáticas 2', 'category' => $cat->id]);
+        $course = self::getDataGenerator()->create_course(['fullname' => 'Biologia', 'category' => $cat->id]);
+        $result = searchcourse_external::searchcourse('Bi');
 
         // Tests.
         self::assertIsArray($result);
         self::assertArrayHasKey('list', $result);
         self::assertArrayHasKey('maxusersperpage', $result);
         self::assertArrayHasKey('overflow', $result);
-        self::assertCount(2, $result['list']);
+        self::assertCount(1, $result['list']);
+        self::assertArrayHasKey($course->id, $result['list']);
+        self::assertIsObject($result['list'][$course->id]);
     }
 }
