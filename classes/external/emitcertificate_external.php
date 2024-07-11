@@ -87,7 +87,7 @@ class emitcertificate_external extends external_api {
             self::emitcertificate_parameters(), ['id' => $id, 'instanceid' => $instanceid, 'modelid' => $modelid, 'lang' => $lang, 'userid' => $userid, 'courseid' => $courseid]
         );
 
-        $result = ['result' => true, 'message' => 'OK'];
+        $result = ['result' => true, 'message' => get_string('ok', 'mod_certifygen')];
 
         // Step 1: Change status to in progress.
         $data = [

@@ -144,3 +144,4 @@ $string['chooseuserprofilefield'] = 'Choose user profile field';
 $string['userfield'] = 'User field';
 $string['userfield_desc'] = 'This field is only used on web services to identify the user. If nothing is selected, it will be used id from user table.';
 $string['report'] = 'Report';
+$string['ok'] = 'OK';

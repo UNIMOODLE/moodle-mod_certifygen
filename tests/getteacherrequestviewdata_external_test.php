@@ -54,7 +54,7 @@ class getteacherrequestviewdata_external_test extends advanced_testcase {
      * @return void
      * @throws invalid_parameter_exception
      */
-    public function test_getmycertificatedata(): void {
+    public function test_getteacherrequestviewdata(): void {
 
         // Create template.
         $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
@@ -120,7 +120,7 @@ class getteacherrequestviewdata_external_test extends advanced_testcase {
      * @throws invalid_parameter_exception
      * @throws moodle_exception
      */
-    public function test_getmycertificatedata_with_data(): void {
+    public function test_getteacherrequestviewdata_with_data(): void {
 
         // Create template.
         $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
