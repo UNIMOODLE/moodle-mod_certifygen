@@ -87,13 +87,13 @@ class downloadcertificate_external extends external_api {
                 'courseid' => $courseid]
         );
 
-        $result = ['result' => true, 'message' => 'OK', 'url' => '', 'codetag' => ''];
+        $result = ['result' => true, 'message' => 'OK', 'url' => ''];
 
         try {
             // Step 1: verified status finished.
             $validation = new certifygen_validations($validationid);
             if (is_null($validation)) {
-                $result = ['result' => false, 'message' => 'notfound', 'url' => '', 'codetag' => ''];
+                $result = ['result' => false, 'message' => 'notfound', 'url' => ''];
                 return $result;
             }
             // Step 2: call to getfile from validationplugin.
@@ -103,7 +103,7 @@ class downloadcertificate_external extends external_api {
                 $result['url'] = certifygen::get_user_certificate_file_url($instanceid, $certifygenmodel->get('templateid'),
                     $validation->get('userid'), $courseid, $validation->get('lang'));
                 if (empty($result['url'])) {
-                    $result = ['result' => false, 'message' => 'file not found. url empty', 'url' => '', 'codetag' => ''];
+                    $result = ['result' => false, 'message' => 'file not found. url empty', 'url' => ''];
                     return $result;
                 }
             } else {
@@ -135,7 +135,6 @@ class downloadcertificate_external extends external_api {
             [
                 'result' => new external_value(PARAM_BOOL, 'file url created'),
                 'url' => new external_value(PARAM_RAW, 'file url'),
-                'codetag' => new external_value(PARAM_RAW, 'codetag url'),
                 'message' => new external_value(PARAM_RAW, 'meesage'),
             ]
         );

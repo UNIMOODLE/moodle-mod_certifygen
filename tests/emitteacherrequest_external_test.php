@@ -61,6 +61,7 @@ class emitteacherrequest_external_test extends advanced_testcase {
         $model = $modgenerator->create_model_by_name(
             certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
             $certificate1->get_id(),
+            certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
         );
         $modgenerator->assign_model_systemcontext($model->get('id'));
 

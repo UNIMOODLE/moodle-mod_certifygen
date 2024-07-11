@@ -67,18 +67,18 @@ class mod_certifygen_generator extends testing_module_generator {
      * @throws \core\invalid_persistent_exception
      * @throws coding_exception
      */
-    public function create_model_by_name(string $name, int $templateid) {
+    public function create_model_by_name(string $name, int $templateid, int $type) {
 
         $this->install_language_package('es');
         $data = [
             'name' => $name,
-            'type' => certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
+            'type' => $type,
             'mode' => certifygen_model::MODE_UNIQUE,
             'templateid' => $templateid,
             'timeondemmand' => 0,
             'langs' => 'en,es',
             'validation' => '',
-            'report' => 'certifygenreport_basic',
+            'report' => $type == certifygen_model::TYPE_ACTIVITY ? '' : 'certifygenreport_basic',
 
         ];
         $model = new certifygen_model(0, (object)$data);
