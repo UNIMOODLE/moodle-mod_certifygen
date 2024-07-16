@@ -128,6 +128,7 @@ class get_id_instance_certificate_external extends external_api {
 //                    $courseshortname = format_text($enrolment->shortname);
                     $courseshortname = strip_tags($courseshortname);
                     $course = [
+                        'id' => $enrolment->ctxinstance,
                         'shortname' => $courseshortname,
                         'fullname' => $coursefullname,
                         'categoryid' => $enrolment->category,
