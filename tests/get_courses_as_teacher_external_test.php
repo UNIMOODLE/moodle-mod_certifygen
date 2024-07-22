@@ -71,6 +71,7 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
         $result = get_courses_as_teacher_external::get_courses_as_teacher($user1->id, '', '');
         $this->assertIsArray($result);
         $this->assertArrayHasKey('courses', $result);
+        $this->assertArrayHasKey('models', $result);
         $this->assertIsArray($result['courses']);
         $this->assertCount(1, $result['courses']);
         $this->assertArrayHasKey('id', $result['courses'][0]);
@@ -126,6 +127,7 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
         $result = get_courses_as_teacher_external::get_courses_as_teacher(0, $dni, '');
         $this->assertIsArray($result);
         $this->assertArrayHasKey('courses', $result);
+        $this->assertArrayHasKey('models', $result);
         $this->assertIsArray($result['courses']);
         $this->assertCount(1, $result['courses']);
         $this->assertArrayHasKey('id', $result['courses'][0]);
@@ -179,6 +181,7 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
         $result = get_courses_as_teacher_external::get_courses_as_teacher($user1->id, '', 'en');
         $this->assertIsArray($result);
         $this->assertArrayHasKey('courses', $result);
+        $this->assertArrayHasKey('models', $result);
         $this->assertIsArray($result['courses']);
         $this->assertCount(1, $result['courses']);
         $this->assertArrayHasKey('id', $result['courses'][0]);

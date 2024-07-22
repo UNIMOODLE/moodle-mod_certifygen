@@ -145,12 +145,30 @@ class get_courses_as_teacher_external extends external_api {
                     'shortname' => $courseshortname,
                     'fullname' => $coursefullname,
                     'categoryid' => $enrolment->category,
-//                    'reporttypes'   => $reporttypes,
                 ];
             }
             $results['courses'] = $courses;
+
+            // System context models.
+            [$modelids, $langs] = certifygen_context::get_system_context_modelids_and_langs();
+            $models = [];
+            foreach ($modelids as $modelid => $modelname) {
+                $model = new certifygen_model($modelid);
+                $models[] = [
+                    'id' => $modelid,
+                    'name' => $model->get('name'),
+                    'mode' => $model->get('mode'),
+                    'timeondemmand' => $model->get('timeondemmand'),
+                    'type' => $model->get('type'),
+                    'templateid' => $model->get('templateid'),
+                    'langs' => $model->get('langs'),
+                    'validation' => $model->get('validation'),
+                ];
+            }
+            $results['models'] = $models;
         } catch (\moodle_exception $e) {
-            $haserror = true;$results['error']['code'] = $e->getCode();
+            $haserror = true;
+            $results['error']['code'] = $e->getCode();
             $results['error']['message'] = $e->getMessage();
         }
         if (!$haserror) {
@@ -172,17 +190,23 @@ class get_courses_as_teacher_external extends external_api {
                             'shortname'   => new external_value(PARAM_RAW, 'Course shortname', VALUE_OPTIONAL),
                             'fullname' => new external_value(PARAM_RAW, 'Course fullname', VALUE_OPTIONAL),
                             'categoryid' => new external_value(PARAM_INT, 'Course category id', VALUE_OPTIONAL),
-//                            'reporttypes' => new external_multiple_structure(
-//                                new external_single_structure(
-//                                    [
-//                                        'type'   => new external_value(PARAM_INT, 'model type', VALUE_OPTIONAL),
-//                                        'modelid'   => new external_value(PARAM_INT, 'model id', VALUE_OPTIONAL),
-//                                        'issueid'   => new external_value(PARAM_INT, 'issue id', VALUE_OPTIONAL),
-//                                    ], 'courses list')
-//                                , '', VALUE_OPTIONAL),
                         ],
                         'courses list', VALUE_OPTIONAL)
                 , '', VALUE_OPTIONAL),
+                'models' => new external_multiple_structure(
+                    new external_single_structure(
+                        [
+                            'id' => new external_value(PARAM_INT, 'Instance id', VALUE_OPTIONAL),
+                            'name' => new external_value(PARAM_RAW, 'Model name', VALUE_OPTIONAL),
+                            'mode' => new external_value(PARAM_INT, 'Model mode', VALUE_OPTIONAL),
+                            'timeondemmand' => new external_value(PARAM_INT, 'Model timeondemmand', VALUE_OPTIONAL),
+                            'type' => new external_value(PARAM_INT, 'Model type', VALUE_OPTIONAL),
+                            'templateid' => new external_value(PARAM_INT, 'Model template id', VALUE_OPTIONAL),
+                            'langs' => new external_value(PARAM_RAW, 'Model langs', VALUE_OPTIONAL),
+                            'validation' => new external_value(PARAM_RAW, 'Model validation', VALUE_OPTIONAL),
+                        ],
+                        'courses list', VALUE_OPTIONAL)
+                    , '', VALUE_OPTIONAL),
                 'teacher' => new external_single_structure (
                     [
                         'fullname' => new external_value(PARAM_RAW, 'User fullname', VALUE_OPTIONAL),
