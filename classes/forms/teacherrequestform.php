@@ -86,7 +86,9 @@ class teacherrequestform extends dynamic_form {
             'multiple' => true,
             'valuehtmlcallback' => function($courseid) : string {
                 $course = get_course($courseid);
-                return format_text($course->fullname);
+                $formated = format_text($course->fullname);
+                $formated = strip_tags($formated);
+                return $formated;
             }
         ];
         $mform->addElement('autocomplete', 'courses',

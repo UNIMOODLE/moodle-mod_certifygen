@@ -67,6 +67,11 @@ class modelform extends dynamic_form {
         $mform->setType('modelname', PARAM_RAW);
         $mform->addRule('modelname', get_string('required'), 'required');
 
+        // Model idnumber.
+        $mform->addElement('text', 'modelidnumber',
+            get_string('modelidnumber', 'mod_certifygen'), ['size' => '70']);
+        $mform->setType('modelidnumber', PARAM_RAW);
+
         // Model mode.
         $mform->addElement('select', 'mode',
             get_string('mode', 'mod_certifygen'), mod_certifygen_get_modes());
@@ -168,6 +173,7 @@ class modelform extends dynamic_form {
             $model = new certifygen_model($this->_ajaxformdata['id']);
             $this->set_data([
                     'modelid' => $this->_ajaxformdata['id'],
+                    'modelidnumber' => $model->get('idnumber'),
                     'mode' => $model->get('mode'),
                     'type' => $model->get('type'),
                     'templateid' => $model->get('templateid'),

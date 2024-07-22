@@ -15,8 +15,12 @@ class certifygen_validations extends persistent {
     public const TABLE = 'certifygen_validations';
     public const STATUS_NOT_STARTED = 1;
     public const STATUS_IN_PROGRESS = 2;
-    public const STATUS_FINISHED_OK = 3;
-    public const STATUS_FINISHED_ERROR = 4;
+    public const STATUS_VALIDATION_OK = 3;
+    public const STATUS_VALIDATION_ERROR = 4;
+    public const STATUS_STORAGE_OK = 5;
+    public const STATUS_STORAGE_ERROR = 6;
+    public const STATUS_ERROR = 7;
+    public const STATUS_FINISHED = 8;
 
     /**
      * Define properties

@@ -146,7 +146,7 @@ class activityteacher_table extends table_sql {
         if (is_null($row->cstatus)) {
             $status = certifygen_validations::STATUS_NOT_STARTED;
         }
-        if ($status == certifygen_validations::STATUS_FINISHED_OK) {
+        if ($status == certifygen_validations::STATUS_FINISHED) {
             return '<span class="likelink" data-action="revoke-certificate" data-username="'. $row->firstname. ' '
                 . $row->lastname .'" data-issueid="'. $row->issueid.'" data-modelid="'. $this->modelid
                 .'" data-courseid="'. $this->courseid.'" data-userid="'. $row->id.'" data-cmid="'.  $this->cmid .'"
@@ -206,9 +206,14 @@ class activityteacher_table extends table_sql {
         if (is_null($row->cstatus)) {
             $status = certifygen_validations::STATUS_NOT_STARTED;
         }
-        if ($status == certifygen_validations::STATUS_FINISHED_OK) {
+        if ($status == certifygen_validations::STATUS_FINISHED) {
+//            return '<span data-courseid="' . $row->courseid . '" data-instanceid="' . $this->instanceid . '" data-modelid="' . $this->modelid . '"
+//            data-id="'. $row->validationid . '" data-action="download-certificate" data-userid="'. $row->id .'"
+//            data-code="'. $row->code .'" data-lang="'. $this->lang .'" data-langstring="'. $this->langstring .'"  data-cmid="'. $this->cmid .'"
+//            class="btn btn-primary">' . get_string('download') . '</span>';
+
             return '<span data-courseid="' . $row->courseid . '" data-instanceid="' . $this->instanceid . '" data-modelid="' . $this->modelid . '" 
-            data-id="'. $row->validationid . '" data-action="download-certificate" data-userid="'. $row->id .'" 
+            data-id="'. $row->validationid . '" data-action="" data-userid="'. $row->id .'" 
             data-code="'. $row->code .'" data-lang="'. $this->lang .'" data-langstring="'. $this->langstring .'"  data-cmid="'. $this->cmid .'" 
             class="btn btn-primary">' . get_string('download') . '</span>';
         }
@@ -223,14 +228,15 @@ class activityteacher_table extends table_sql {
      */
     function col_emit($row): string
     {
+
         $status = $row->cstatus;
-        $id = $row->id;
+        $id = $row->validationid;
         if (is_null($row->cstatus)) {
             $status = certifygen_validations::STATUS_NOT_STARTED;
             $id = 0;
         }
 
-        if ($status == certifygen_validations::STATUS_NOT_STARTED || $status == certifygen_validations::STATUS_FINISHED_ERROR) {
+        if ($status == certifygen_validations::STATUS_NOT_STARTED) {
             return '<span data-courseid="' . $row->courseid . '" data-modelid="' . $this->modelid . '" data-id="'. $id .
                 '" data-action="emit-certificate" data-userid="'. $row->id .'" data-lang="'. $this->lang .'" 
                 data-langstring="'. $this->langstring .'"  data-cmid="'. $this->cmid .'" data-instanceid="'. $this->instanceid .'" class="btn btn-primary"

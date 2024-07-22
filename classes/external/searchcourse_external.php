@@ -83,9 +83,8 @@ class searchcourse_external extends external_api {
         foreach ($rs as $record) {
             $course = (object)[
                 'id' => $record->id,
-                'name' => format_text($record->fullname),
+                'name' => strip_tags(format_text($record->fullname)),
             ];
-
             $count++;
 
             if ($count <= $CFG->maxusersperpage) {

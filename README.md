@@ -44,6 +44,17 @@ to complete the installation from the command line.
 
 ### certifygenvalidation_cmd ###
 ### certifygenvalidation_csv ###
+
+### Tasks ###
+
+## Check status ##
+There is a task, checkstatus, that is recomended to enable it when the validation subplugin used does not validate inmediately the certificate.
+This task verify the status of the certificate on the external aplication used by the validation subplugin.
+
+## Check file ##
+There is a task, checkfile, that is recomended to enable it when the validation subplugin used does not receive inmediately the certificate.
+This task get the certificate from the external aplication used by the validation subplugin.
+
    
 ## Database Tables ##
 

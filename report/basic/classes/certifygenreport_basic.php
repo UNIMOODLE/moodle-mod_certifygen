@@ -31,7 +31,6 @@ require_once($CFG->dirroot . '/lib/pdflib.php');
 
 use certifygenreport_basic\output\report_view;
 use mod_certifygen\interfaces\ICertificateReport;
-use mod_certifygen\persistents\certifygen_teacherrequests;
 
 class certifygenreport_basic implements ICertificateReport
 {
@@ -96,17 +95,17 @@ class certifygenreport_basic implements ICertificateReport
                 'filename' => self::FILE_NAME_STARTSWITH . $teacherrequest->get('id') . '.pdf',
                 'filepath' => self::FILE_PATH,
             ];
-            $file = $fs->create_file_from_string($filerecord, $res);
+            $file = $fs->get_file($filerecord['contextid'], $filerecord['component'], $filerecord['filearea'], $filerecord['itemid'],
+                $filerecord['filepath'], $filerecord['filename']);
+            if (!$file) {
+                $file = $fs->create_file_from_string($filerecord, $res);
+            }
             $result['result'] = true;
             $result['file'] = $file;
-            $teacherrequest->set('status', certifygen_teacherrequests::STATUS_FINISHED_OK);
-            $teacherrequest->save();
         } catch (moodle_exception $e) {
             error_log(__FUNCTION__ . ' ' . ' error: '.var_export($e->getMessage(), true));
             $result['result'] = false;
             $result['message'] = $e->getMessage();
-            $teacherrequest->set('status', certifygen_teacherrequests::STATUS_FINISHED_ERROR);
-            $teacherrequest->save();
         }
 
         return $result;

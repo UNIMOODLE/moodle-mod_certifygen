@@ -99,6 +99,15 @@ class emitcertificate_external extends external_api {
             'issueid' => null,
             'usermodified' => $USER->id,
         ];
+        if ($id > 0) {
+            $validation  = new certifygen_validations($id);
+            if ($validation->get('status') != certifygen_validations::STATUS_NOT_STARTED
+            && $validation->get('status') != certifygen_validations::STATUS_ERROR) {
+                $result['result'] = false;
+                $result['message'] = 'Certificate can not be emitted again';
+                return $result;
+            }
+        }
         $validation = certifygen_validations::manage_validation($id, (object) $data);
         try {
             // Step 2: Generate issue.
@@ -142,7 +151,7 @@ class emitcertificate_external extends external_api {
                 $validationplugin = $certifygenmodel->get('validation');
                 $validationpluginclass = $validationplugin . '\\' . $validationplugin;
                 if (empty($validationplugin)) {
-                    $validation->set('status', certifygen_validations::STATUS_FINISHED_OK);
+                    $validation->set('status', certifygen_validations::STATUS_VALIDATION_OK);
                     $validation->save();
                 } else if (get_config($validationplugin, 'enabled') === '1') {
                     /** @var ICertificateValidation $subplugin */
@@ -152,16 +161,16 @@ class emitcertificate_external extends external_api {
                         if (!array_key_exists('message', $result)) {
                             $result['message'] = 'validation_plugin_send_file_error';
                         }
-                        $validation->set('status', certifygen_validations::STATUS_FINISHED_ERROR);
+                        $validation->set('status', certifygen_validations::STATUS_VALIDATION_ERROR);
                         $validation->save();
-                    } else {
-                        $validation->set('status', certifygen_validations::STATUS_FINISHED_OK);
+                    } else if (!$subplugin->checkStatus()) {
+                        $validation->set('status', certifygen_validations::STATUS_VALIDATION_OK);
                         $validation->save();
                     }
                 } else {
                     $result['result'] = false;
                     $result['message'] = 'plugin_not_enabled';
-                    $validation->set('status', certifygen_validations::STATUS_FINISHED_ERROR);
+                    $validation->set('status', certifygen_validations::STATUS_ERROR);
                     $validation->save();
                 }
             }
@@ -169,7 +178,7 @@ class emitcertificate_external extends external_api {
             error_log(__FUNCTION__ . ' ' . ' error: '.var_export($e->getMessage(), true));
             $result['result'] = false;
             $result['message'] = $e->getMessage();
-            $validation->set('status', certifygen_validations::STATUS_FINISHED_ERROR);
+            $validation->set('status', certifygen_validations::STATUS_ERROR);
             $validation->save();
         }
         return $result;

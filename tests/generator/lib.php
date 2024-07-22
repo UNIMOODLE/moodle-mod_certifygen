@@ -47,6 +47,7 @@ class mod_certifygen_generator extends testing_module_generator {
         $this->install_language_package('es');
         $data = [
             'name' => 'Modelo 1',
+            'idnumber' => '',
             'type' => $type,
             'mode' => $mode,
             'templateid' => $templateid,
@@ -72,6 +73,7 @@ class mod_certifygen_generator extends testing_module_generator {
         $this->install_language_package('es');
         $data = [
             'name' => $name,
+            'idnumber' => '',
             'type' => $type,
             'mode' => certifygen_model::MODE_UNIQUE,
             'templateid' => $templateid,

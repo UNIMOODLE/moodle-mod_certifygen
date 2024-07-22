@@ -55,6 +55,9 @@ class certifygen_model extends persistent {
             'name' => [
                 'type' => PARAM_TEXT,
             ],
+            'idnumber' => [
+                'type' => PARAM_TEXT,
+            ],
             'type' => [
                 'type' => PARAM_INT,
             ],
@@ -100,6 +103,7 @@ class certifygen_model extends persistent {
         global $USER;
         $modeldata = [
             'name' => $data->modelname,
+            'idnumber' => $data->modelidnumber,
             'type' => $data->type,
             'mode' => $data->mode,
             'templateid' => $data->templateid ?? 0,

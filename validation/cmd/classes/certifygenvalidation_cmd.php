@@ -34,6 +34,7 @@ use dml_exception;
 use file_exception;
 use mod_certifygen\certifygen_file;
 use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 use moodle_url;
 use pdf;
@@ -170,7 +171,7 @@ class certifygenvalidation_cmd implements ICertificateValidation
      * @param string $code
      * @return stored_file
      */
-    public function getFile(int $courseid, int $validationid, string $code)
+    public function getFile(int $courseid, int $validationid, int $teacherrequestid, string $code)
     {
         $code = self::FILE_NAME_STARTSWITH . $code . '.pdf';
         $fs = get_file_storage();
@@ -225,6 +226,32 @@ class certifygenvalidation_cmd implements ICertificateValidation
         if ($enabled && !empty($pathenabled)) {
             return true;
         }
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function checkStatus(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @param int $validationid
+     * @param int $teacherrequestid
+     * @return int
+     */
+    public function getStatus(int $validationid, int $teacherrequestid): int
+    {
+        return certifygen_validations::STATUS_IN_PROGRESS;
+    }
+
+    /**
+     * @return bool
+     */
+    public function checkfile(): bool
+    {
         return false;
     }
 }

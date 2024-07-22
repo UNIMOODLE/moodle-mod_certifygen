@@ -29,16 +29,19 @@
 namespace certifygenvalidation_csv;
 global $CFG;
 require_once $CFG->libdir . '/soaplib.php';
+require_once $CFG->libdir . '/pdflib.php';
 
+use certifygenvalidation_csv\persistents\certifygenvalidationcsv;
 use coding_exception;
-use context_course;
-use core\invalid_persistent_exception;
 use core\session\exception;
 use mod_certifygen\certifygen_file;
 use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\persistents\certifygen;
+use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
+use moodle_url;
+use pdf;
 use SoapFault;
-use stdClass;
 use stored_file;
 
 class certifygenvalidation_csv implements ICertificateValidation
@@ -46,55 +49,83 @@ class certifygenvalidation_csv implements ICertificateValidation
     private csv_configuration $configuration;
 
     /**
+     * @param csv_configuration $configuration
+     */
+    public function __construct()
+    {
+        $this->configuration = new csv_configuration();
+    }
+
+
+    /**
      * @throws exception
      */
     public function sendFile(certifygen_file $file): array
     {
-        $haserror = false;
-        $message = '';
-        if (!$this->is_enabled()) {
-            throw new exception('csvnotconfigured', 'certifygenvalidation_csv');
+        global $USER;
+
+        $params = $this->create_params_sendFile($file);
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'http://pru.sede.uva.es/FirmaCatalogService',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => $params,
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/xml'
+            ),
+        ));
+        $response = curl_exec($curl);
+        if (curl_errno($curl)) {
+            return [
+                'haserror' => true,
+                'message' => curl_error($curl),
+            ];
         }
-        try {
-            $params = $this->create_params_sendFile($file);
-            $conection = new soapconnection();
-            $result = $conection->call($this->configuration->get_wsdl(), 'iniciarProcesoFirma', $params);
-            error_log(__FUNCTION__ . ' result: '.var_export($result, true));
-            if (!isset($result->{'resultadoInicioProcesoFirma'})) {
-                $haserror = true;
-                $message = 'response_not_valid';
-            } else {
-                $result = $result->{'resultadoInicioProcesoFirma'};
-                if (!isset($result->{'resultado'})) {
-                    $haserror = true;
-                    $message = 'resultado_not_exists_in_response';
-                } else if ($result->{'resultado'} == 'KO') {
-                    $haserror = true;
-                    if (!isset($result->{'error'})) {
-                        $haserror = true;
-                        $message = 'error_not_exists_in_response';
-                    } else {
-                        $error = $result->{'error'};
-                        $message = $error->{'codError'} . ' - ' . $error->{'descError'};
-                    }
-                } else {
-                    // TODO: ok.
-                }
-            }
+        $xml = simplexml_load_string($response, null, null, 'http://schemas.xmlsoap.org/soap/envelope/');
+        $ns = $xml->getNamespaces(true);
+        $soap = $xml->children($ns['soap']);
+        $res = $soap->Body->children($ns['ns2']);
+        $iniciarProcesoFirmaResponse = $res->iniciarProcesoFirmaResponse->children();
+        $iniciarProcesoFirmaResponsechildren = $iniciarProcesoFirmaResponse->children();
+        $resultado = (string) $iniciarProcesoFirmaResponsechildren->resultado;
+        if ($resultado === 'KO') {
+            $codError = (string) $iniciarProcesoFirmaResponsechildren->error->children()->codError;
+            $descError = (string) $iniciarProcesoFirmaResponsechildren->error->children()->descError;
+            return [
+                'haserror' => true,
+                'message' => $codError . ' - ' . $descError,
+            ];
         }
-        catch ( SoapFault $e ) {
-            $haserror = true;
-            error_log(__FUNCTION__ . ' SoapFault error: '.var_export($e->getMessage(), true));
+        // Se obtiene idExpediente;
+        $idExpediente = (string) $iniciarProcesoFirmaResponsechildren->idExpediente;
+        $validationid = 0;
+        $teacherrequestid = 0;
+        if ($file->get_model_type() == certifygen_model::TYPE_ACTIVITY) {
+            $validationid = $file->get_validationid();
+        } else {
+            $teacherrequestid = $file->get_validationid();
         }
-        catch (Exception $e) {
-            $haserror = true;
-            error_log(__FUNCTION__ . ' error: '.var_export($e->getMessage(), true));
-//            $connection = new SoapFault('client', 'Could not connect to the service');
-        }
+        $token = str_replace('.pdf', '', $file->get_file()->get_filename());
+        $data = [
+            'validationid' => $validationid,
+            'teacherrequestid' => $teacherrequestid,
+            'applicationid' => $idExpediente,
+            'token' => $token,
+            'usermodified' => $USER->id,
+        ];
+        $cv = new certifygenvalidationcsv(0, (object)$data);
+        $cv->save();
+        curl_close($curl);
 
         return [
-            'haserror' => $haserror,
-            'message' => $message,
+            'haserror' => false,
+            'message' => 'asdasd',
         ];
     }
 
@@ -102,90 +133,63 @@ class certifygenvalidation_csv implements ICertificateValidation
      * @param certifygen_file $file
      * @return array[]
      */
-    private function create_params_sendFile(certifygen_file $file) : array {
+    private function create_params_sendFile(certifygen_file $file) : string {
 
         $token = str_replace('.pdf', '', $file->get_file()->get_filename());
-        $params['asunto'] = 'prueba elena';
-        // TODO: ----Valor que nos indica si hay que hacer la llamada al servicio de avisos cada vez que un firmante
-        // realice alguna de las operaciones indicada en el parámetro “avisoEstadoFinFirma” dentro de la firma de un token-versión.
-        $params['avisos'] = [
-            'avisoFinFirmante' => 'false',
-//            'avisoEstadoFinFirma' => 'RECHAZADO;FIRMADO;VISTOBUENO',// obligatorio si avisoFinFirmante true
-            'avisoFinCircuito' => 'false',
-//            'avisoEstadoFinCircuito' => 'RECHAZADO;FIRMADO;CADUCADO', // obligatorio si avisoFinCircuito true
-            'avisoURL' => 'https://moodle410.test', // wsdl
-//            'avisoURL' => 'https://moodle410.test/webservice/rest/server.php?wstoken=cd5b110ca1acdcbc28f25abf4f649738&wsfunction=mod_certifygen_notify_certification&moodlewsrestformat=json&userid=123&idinstance=2&datos=asdasd',
-        ];
-        //        $params['cuerpo'] = ''; // Opcional.
-        $file = [
-            'nombre' => $file->get_file()->get_filename(),
-            'descripcion' => $file->get_file()->get_filename(),
-            'datos' => $file->get_file()->get_contenthash(),
-//            'datos' => utf8_encode($file->get_file()->get_contenthash()),
-//            'Datos' => $file->get_file()->get_content(),
-        ];
-        $params['documentosFirma'] = [$file];
-        $params['firmaSello'] = 'Universidad'; // ","Universidad",”Rector”,”Secretario”.
-        $params['firmanTodos'] = "true"; //-Indica si el circuito es de tipo “Normal” o “Solidario”, según
-        $params['idAplicacion'] = $this->configuration->get_appid();
-        $params['identificador'] = [
-            'token' => $token,// TODO: -Identificador de un expediente dentro de la aplicación que invoca al servicio.
-            'version' => 1,// TODO: --Valor que nos indica la versión del expediente dentro de la aplicación que invoca al servicio.
-        ];
-        $params['remitente'] = 'Universidad de Valladolid';
-        // Indica si el proceso de firma se realiza “en Cascada” o
-        //“Paralelo”, según RF04. Posibles valores:
-        // CASCADA: El circuito de firma es según el orden de
-        //envío de los firmantes.
-        // PARALELO: No importa el orden de firma.
-        //-Campo de texto.
-        //-Campo obligatorio.
-        $params['secuenciaFirma'] = 'CASCADA';
-        $params['sustituye'] = "true"; // TODO: ---Indica si los documentos de la nueva versión del token sustituyen a los de la anterior o los complementa.
-        // Obligatorio si firmaSello es vacio
-        // -Listado del tipo de firma separados por ‘;’ que tendrá cada
-        //uno de los firmantes indicados en el parámetro “firmantes”. Se
-        //indicará un ‘0’ si se quiere que el firmante firme la petición y
-        //un ‘1’ si se quiere que el firmante dé el visto bueno.
-        //-Si sólo llega un valor se tendrá en cuenta dicho para como
-        //tipo de firma de todos los firmantes.
-        //-Si llegan varios valores, el número de valores
-//        $params['tipoFirma'] = '';
-
-
-        // - Lista de los estados separados por el carácter ‘;’ para los
-        //que el aplicativo invocante quiere que se le avise cuando el
-        //firmante termina una de las operaciones indicadas dentro de
-        //esta lista.
-        //-Estados aceptados “RECHAZADO”, “FIRMADO”,
-        //“VISTOBUENO”.
-        //-Campo obligatorio si avisoFinFirma es “true”.
-//        $params['avisoEstadoFinFirma'] = 'false';
-        // -Valor que nos indica si hay que hacer la llamada al servicio
-        //de avisos cuando se acabe la firma de un token-versión.
-        //-Campo de texto.
-        //-Valores "true" o "false".
-//        $params['avisoFinCircuito'] = 'false';
-        // - Lista de los estados separados por el carácter ‘;’ para los
-        //que el aplicativo invocante quiere que se le avise si al terminar
-        //el circuito de firma la petición está en alguno de ellos.
-        //-Estados aceptados “RECHAZADO”, “FIRMADO”,
-        //“CADUCADO”.
-        //-Campo obligatorio si avisoEstadoFinCircuito es “true”.
-//        $params['avisoEstadoFinCircuito'] = 'RECHAZADO;FIRMADO;CADUCADO';
-        // - URL a la que invocar en el caso de que avisoFinFirma o
-        //avisoFinCircuito sea true. En dicha URL deberá existir una
-        //implementación de un wsdl específico.
-//        $params['avisoURL'] = '';
-        // -Listado de los firmantes de los documentos. Cada firmante se
-        //indica mediante su Documento de identificación (NIF o NIE) o
-        //el código del cargo que ocupa. Los firmantes van separados
-        //por el carácter ‘;’.
-        //-Campo de texto.
-        //-Campo obligatorio, si firmaSello=” “.
-//        $params['firmantes'] = '';
-        $params = ['request' => $params];
-        return ['inicioProcesoFirma' => $params];
+        $avisourl = (new moodle_url('/'))->out();
+        $base64 = base64_encode($file->get_file()->get_content());
+        $xml = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fir="http://firma.ws.producto.com/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <fir:iniciarProcesoFirma>
+         <!--Optional:-->
+         <request>
+            <!--Optional:-->
+            <asunto>Peticion certificado</asunto>
+            <!--Optional:-->
+            <avisos>
+               <!--Optional:-->
+               <avisoEstadoFinCircuito>prueba elena</avisoEstadoFinCircuito>
+               <!--Optional:-->
+               <avisoFinCircuito>false</avisoFinCircuito>
+               <avisoFinFirmante>false</avisoFinFirmante>
+               <!--Optional:-->
+               <avisoURL>'. $avisourl .'</avisoURL>
+            </avisos>
+            <!--Optional:-->
+            <!--Zero or more repetitions:-->
+            <documentosFirma>
+               <!--Optional:-->
+               <descripcion>' . $token . '</descripcion>
+               <!--Optional:-->
+               <nombre>' . $file->get_file()->get_filename() . '</nombre>
+               <!--Optional:-->
+               <datos>' . $base64 . '</datos>
+            </documentosFirma>
+            <!--Zero or more repetitions:-->
+            <!--Optional:-->
+            <firmaSello>UNIVERSIDAD</firmaSello>
+            <firmanTodos>true</firmanTodos>
+            <!--Optional:-->
+            <idAplicacion>MOODLE</idAplicacion>
+            <!--Optional:-->
+            <identificador>
+               <!--Optional:-->               
+               <token>' . $token . '</token>
+               <version>1</version>
+            </identificador>
+            <!--Optional:-->
+            <remitente>Universidad de Valladolid</remitente>
+            <!--Optional:-->
+            <!--Optional:-->
+            <secuenciaFirma>CASCADA</secuenciaFirma>
+            <sustituye>true</sustituye>
+            <!--Optional:-->
+         </request>
+      </fir:iniciarProcesoFirma>
+   </soapenv:Body>
+</soapenv:Envelope>';
+        return $xml;
     }
 
     /**
@@ -207,65 +211,41 @@ class certifygenvalidation_csv implements ICertificateValidation
 
     /**
      * @param string $code
-     * @return int
-     */
-    public function getState(string $code): int {
-        error_log(__FUNCTION__ . ' code: '.var_export($code, true));
-        // TODO: primero llamar al serivico, y actualizar en db.
-        $output = ['status' => 'ok', 'error' => false, 'message' => ''];
-        try {
-            $params = $this->create_params_getStatus($code);
-            $conection = new soapconnection();
-            $result = $conection->call($this->configuration->get_querywsdl(), 'consultaEstadoPeticion', $params);
-            error_log(__FUNCTION__ . ' result: '.var_export($result, true));
-            if (!isset($result->{'resultadoConsultaEstadoPeticion'})) {
-                $output['haserror'] = true;
-                $output['message'] = 'response_not_valid';
-                error_log(__FUNCTION__. ' ' . __LINE__ . ' resultadoConsultaEstadoPeticion key not exists ');
-            } else {
-                $result = $result->{'resultadoConsultaEstadoPeticion'};
-                if (!isset($result->{'resultado'})) {
-                    $output['haserror'] = true;
-                    $output['message'] = 'resultado_not_exists_in_response';
-                } else if ($result->{'resultado'} == 'KO') {
-                    if (!isset($result->{'error'})) {
-                        $output['haserror'] = true;
-                        $output['message'] = 'error_not_exists_in_response';
-                    } else {
-                        $error = $result->{'error'};
-                        error_log(__FUNCTION__ . ' Result error: '.var_export($error, true));
-                        $message = $error->{'codError'} . ' - ' . $error->{'descError'};
-                        $output['haserror'] = true;
-                        $output['message'] = $message;
-                    }
-                } else {
-                    // TODO: ok. coger el estado y si es distinto, guardar en db.
-                }
-            }
-        }
-        catch ( SoapFault $e ) {
-            $output['haserror'] = true;
-            $output['message'] = $e->getMessage();
-            error_log(__FUNCTION__ . ' SoapFault error: '.var_export($e->getMessage(), true));
-        }
-        catch (Exception $e) {
-            $output['haserror'] = true;
-            $output['message'] = $e->getMessage();
-            error_log(__FUNCTION__ . ' error: '.var_export($e->getMessage(), true));
-//            $connection = new SoapFault('client', 'Could not connect to the service');
-        }
-
-        return $output;
-    }
-
-    /**
-     * @param string $code
      * @return array[]
      */
-    private function create_params_getFileContent(string $code) : array {
+    private function create_params_getFileContent(string $code) : string {
+        $params = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fir="http://firma.ws.producto.com/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <fir:obtenerContenidoDocumento>
+         <!--Optional:-->
+         <request>
+            <!--Optional:-->
+            <idAplicacion>' . $this->configuration->get_appid() . '</idAplicacion>
+            <!--Optional:-->
+            <identificador>
+               <!--Optional:-->
+               <token>' . $code . '</token>
+               <version>1</version>
+            </identificador>
+         </request>
+      </fir:obtenerContenidoDocumento>
+   </soapenv:Body>
+</soapenv:Envelope>';
+        return $params;
+//        $params = [
+//            'idAplicacion' => $this->configuration->get_appid(),
+//            'identificador' => $code,
+//        ];
+//        return ['obtenerContenidoDocumento' => $params];
+
+        $identificador = [
+            'token' => $code,
+            'version' => 1,
+        ];
         $params = [
             'idAplicacion' => $this->configuration->get_appid(),
-            'identificador' => $code,
+            'identificador' => $identificador,
         ];
         return ['obtenerContenidoDocumento' => $params];
     }
@@ -275,82 +255,128 @@ class certifygenvalidation_csv implements ICertificateValidation
      * @param string $code
      * @return stored_file
      */
-    public function getFile(int $courseid, int $validationid, string $code)
+    public function getFile(int $courseid, int $validationid, int $teacherrequestid, string $code)
     {
-        error_log(__FUNCTION__ . ' code: '.var_export($code, true));
-        // Guardar en moodledata moemntaneamente.
+        if ($teacherrequestid) {
+            $params = ['teacherrequestid' => $teacherrequestid];
+        } else {
+            $params = ['validationid' => $validationid];
+        }
+
         try {
-            $params = $this->create_params_getFileContent($code);
-            $conection = new soapconnection();
-            $result = $conection->call($this->configuration->get_querywsdl(), 'obtenerContenidoDocumento', $params);
-            if (!isset($result->{'resultadoObtenerContenidoDocumento'})) {
-                $haserror = true;
-                $message = 'response_not_valid';
-                error_log(__FUNCTION__. ' ' . __LINE__ . ' resultadoObtenerContenidoDocumento key not exists ');
-            } else {
-                $result = $result->{'resultadoObtenerContenidoDocumento'};
-                if (!isset($result->{'resultado'})) {
-                    $haserror = true;
-                    $message = 'resultado_not_exists_in_response';
-                } else if ($result->{'resultado'} == 'KO') {
-                    $haserror = true;
-                    if (!isset($result->{'error'})) {
-                        $haserror = true;
-                        $message = 'error_not_exists_in_response';
-                    } else {
-                        $error = $result->{'error'};
-                        error_log(__FUNCTION__ . ' Result error: '.var_export($error, true));
-                        $message = $error->{'codError'} . ' - ' . $error->{'descError'};
-                    }
-                } else {
-                    // TODO: ok. guardar en moodledata moemntaneamente el fichero.
-                    $docs = $result->{'docsPeticion'};
-                    foreach ($docs as $doc) {
-                        if (!empty($result->{'documentos'})) {
-                            foreach ($result->{'documentos'} as $documento) {
-                                // Solo obtengo nombre y descripcion!  comprobar...
-                                error_log(__FUNCTION__ . ' ' . __LINE__ . 'documento: '.var_export($documento, true));
-                            }
-                        }
-                    }
-                }
+            $teacherrequest = certifygenvalidationcsv::get_record($params);
+            if (!$teacherrequest) {
+                throw new \moodle_exception('certifygenvalidationcsvnotfound', 'certifygen');
             }
+            $code = $teacherrequest->get('token');
+            $params = $this->create_params_getFileContent($code);
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'http://pru.sede.uva.es/FirmaQueryCatalogService',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $params,
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/xml'
+                ),
+            ));
+            $response = curl_exec($curl);
+            if (curl_errno($curl)) {
+                return [
+                    'haserror' => true,
+                    'message' => curl_error($curl),
+                ];
+            }
+            $xml = simplexml_load_string($response, null, null, 'http://schemas.xmlsoap.org/soap/envelope/');
+            $ns = $xml->getNamespaces(true);
+            $soap = $xml->children($ns['soap']);
+            $res = $soap->Body->children($ns['ns2']);
+            $obtenerContenidoDocumentoResponse = $res->obtenerContenidoDocumentoResponse->children();
+            $obtenerContenidoDocumentoResponsechildren = $obtenerContenidoDocumentoResponse->children();
+            $resultado = (string) $obtenerContenidoDocumentoResponsechildren->resultado;
+            if ($resultado === 'KO') {
+                $codError = (string) $obtenerContenidoDocumentoResponsechildren->error->children()->codError;
+                $descError = (string) $obtenerContenidoDocumentoResponsechildren->error->children()->descError;
+                return [
+                    'haserror' => true,
+                    'message' => $codError . ' - ' . $descError,
+                ];
+            }
+            $docspeticion = $obtenerContenidoDocumentoResponsechildren->docsPeticion;
+            $docspeticiondocumentos = $docspeticion->documentos;
+            $datos = (string) $docspeticiondocumentos->datos;
+            $datos = base64_decode($datos);
+            return $this->create_file_from_content($datos, $validationid, $teacherrequestid, $code);
         }
         catch ( SoapFault $e ) {
             $haserror = true;
-            error_log(__FUNCTION__ . ' SoapFault error: '.var_export($e->getMessage(), true));
+            error_log(__FUNCTION__ . ' ' . __LINE__ .  ' SoapFault error: '.var_export($e->getMessage(), true));
         }
         catch (Exception $e) {
             $haserror = true;
-            error_log(__FUNCTION__ . ' error: '.var_export($e->getMessage(), true));
+            error_log(__FUNCTION__ . ' ' . __LINE__ .  ' error: '.var_export($e->getMessage(), true));
 //            $connection = new SoapFault('client', 'Could not connect to the service');
         }
-//        $fs = get_file_storage();
-//        $contextid = context_course::instance($courseid)->id;
-//        return $fs->get_file($contextid, self::FILE_COMPONENT,
-//            self::FILE_AREA, $validationid, self::FILE_PATH, $code);
+        return null;
     }
 
     /**
-     * @param stdClass $data
-     * @return bool
+     * @param string $content
+     * @param int $validationid
+     * @param int $teacherrequestid
+     * @param string $code
+     * @return void
+     * @throws \dml_exception
+     * @throws \file_exception
+     * @throws \stored_file_creation_exception
      * @throws coding_exception
      */
-//    public function deleteRecord(stdClass $data): bool {
-//        $csv = new persistent\csv($data->modelid);
-//        return $csv->delete();
-//    }
+    public function create_file_from_content(string $content, int $validationid, int $teacherrequestid, string $code) {
+        // Create a Pdf file.
+        $doc = new pdf();
+        $doc->SetTitle('Certifygen certificate');
+        $doc->SetAuthor('UNIMOODLE ');
+        $doc->SetCreator('mod_certifygen');
+        $doc->SetKeywords('Moodle, PDF, Certifygen, Unimoodle');
+        $doc->SetSubject('This has been generated by mod_certifygen');
+        $doc->SetMargins(15, 30);
+        $doc->AddPage();
+        $doc->writeHTML($content);
 
-    /**
-     * @throws coding_exception
-     * @throws invalid_persistent_exception
-     */
-//    public function addRecord(stdClass $data): int {
-//        $csv = new persistent\csv(0, $data);
-//        $csv->create();
-//        return $csv->get('id');
-//
-//    }
+        // Get pdf content.
+        if ($validationid) {
+            $itemid = $validationid;
+            $cv = new certifygen_validations($validationid);
+            $cert = new certifygen($cv->get('certifygenid'));
+            $context = \context_course::instance($cert->get('course'));
+        } else {
+            $itemid = $teacherrequestid;
+            $context = \context_system::instance();
+        }
+        $pdfcontent = $doc->Output(self::FILE_NAME_STARTSWITH . $code, 'S');
+
+        // Save pdf on moodledata.
+        $fs = get_file_storage();
+        $filerecord = [
+            'contextid' => $context->id,
+            'component' => self::FILE_COMPONENT,
+            'filearea' => self::FILE_AREA_VALIDATED,
+            'itemid' => $itemid,
+            'filepath' => self::FILE_PATH,
+            'filename' => self::FILE_NAME_STARTSWITH . $code . '.pdf'
+        ];
+
+        if ($file = $fs->get_file($filerecord['contextid'], $filerecord['component'], $filerecord['filearea'], $filerecord['itemid'],
+            $filerecord['filepath'], $filerecord['filename'])) {
+            $file->delete();
+        }
+        return $fs->create_file_from_string($filerecord, $pdfcontent);
+    }
 
     /**
      * @return bool
@@ -362,14 +388,70 @@ class certifygenvalidation_csv implements ICertificateValidation
 
     /**
      * @param string $code
-     * @return array[]
+     * @return string
      */
-    private function create_params_revoke(string $code) : array {
+    private function create_params_revoke(string $code) : string {
+        return '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fir="http://firma.ws.producto.com/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <fir:anularPeticion>
+         <!--Optional:-->
+         <request>
+            <!--Optional:-->
+            <idAplicacion>' . $this->configuration->get_appid() . '</idAplicacion>
+            <!--Optional:-->
+            <identificador>
+               <!--Optional:-->
+               <token>' . $code . '</token>
+               <version>1</version>
+            </identificador>
+         </request>
+      </fir:anularPeticion>
+   </soapenv:Body>
+</soapenv:Envelope>';
         $params = [
             'idAplicacion' => $this->configuration->get_appid(),
-            'identificador' => $code,
+            'identificador' => [
+                'token' => $code,
+                'version' => 1,
+            ],
         ];
         return ['anularPeticion' => $params];
+    }
+
+    /**
+     * @param certifygenvalidationcsv $csvvalidation
+     * @return array[]
+     * @throws coding_exception
+     */
+    private function create_params_status(certifygenvalidationcsv $csvvalidation) : string {
+//        $params = [
+//            'idAplicacion' => $this->configuration->get_appid(),
+//            'identificador' => [
+//                'token' => $csvvalidation->get('token'),
+//                'version' => 1,
+//            ],
+//        ];
+//        return ['consultaEstadoPeticion' => $params];
+        $params = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fir="http://firma.ws.producto.com/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <fir:consultaEstadoPeticion>
+         <!--Optional:-->
+         <request>
+            <!--Optional:-->
+            <idAplicacion>' . $this->configuration->get_appid() . '</idAplicacion>
+            <!--Zero or more repetitions:-->
+            <identificadores>
+               <!--Optional:-->
+               <token>'. $csvvalidation->get('token') . '</token>
+               <version>1</version>
+            </identificadores>
+         </request>
+      </fir:consultaEstadoPeticion>
+   </soapenv:Body>
+</soapenv:Envelope>';
+        return $params;
     }
 
     /**
@@ -377,41 +459,52 @@ class certifygenvalidation_csv implements ICertificateValidation
      * @return array
      */
     public function revoke(string $code) : array {
-        error_log(__FUNCTION__ . ' code: '.var_export($code, true));
         try {
             $message = '';
             $haserror = false;
             $params = $this->create_params_revoke($code);
-            $conection = new soapconnection();
-            $result = $conection->call($this->configuration->get_wsdl(), 'anularPeticion', $params);
-            error_log(__FUNCTION__ . ' result: '.var_export($result, true));
-            if (!isset($result->{'resultadoAnularPeticion'})) {
-                $haserror = true;
-                $message = 'response_not_valid';
-            } else {
-                $result = $result->{'resultadoAnularPeticion'};
-                if (!isset($result->{'resultado'})) {
-                    $haserror = true;
-                    $message = 'resultado_not_exists_in_response';
-                } else if ($result->{'resultado'} == 'KO') {
-                    $haserror = true;
-                    if (!isset($result->{'resultado'})) {
-                        $haserror = true;
-                        $message = 'resultado_not_exists_in_response';
-                    } else {
-                        $error = $result->{'error'};
-                        $message = $error->{'codError'} . ' - ' . $error->{'descError'};
-                    }
-                }
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'http://pru.sede.uva.es/FirmaCatalogService',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $params,
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/xml'
+                ),
+            ));
+            $response = curl_exec($curl);
+            if (curl_errno($curl)) {
+                return [
+                    'haserror' => true,
+                    'message' => curl_error($curl),
+                ];
+            }
+            $xml = simplexml_load_string($response, null, null, 'http://schemas.xmlsoap.org/soap/envelope/');
+            $ns = $xml->getNamespaces(true);
+            $soap = $xml->children($ns['soap']);
+            $res = $soap->Body->children($ns['ns2']);
+            $anularPeticionResponse = $res->anularPeticionResponse->children();
+            $anularPeticionResponsechildren = $anularPeticionResponse->children();
+            $resultado = (string) $anularPeticionResponsechildren->resultado;
+            if ($resultado === 'KO') {
+                $codError = (string) $anularPeticionResponsechildren->error->children()->codError;
+                $descError = (string) $anularPeticionResponsechildren->error->children()->descError;
+                throw new \moodle_exception('getstatuserror', 'certifygenvalidation_csv', '', null, $codError . ' - ' . $descError);
             }
         }
         catch ( SoapFault $e ) {
             $haserror = true;
-            error_log(__FUNCTION__ . ' SoapFault error: '.var_export($e->getMessage(), true));
+            error_log(__FUNCTION__ .  ' ' . __LINE__ . ' SoapFault error: '.var_export($e->getMessage(), true));
         }
         catch (Exception $e) {
             $haserror = true;
-            error_log(__FUNCTION__ . ' error: '.var_export($e->getMessage(), true));
+            error_log(__FUNCTION__ . ' ' . __LINE__ .  ' error: '.var_export($e->getMessage(), true));
 //            $connection = new SoapFault('client', 'Could not connect to the service');
         }
         return [
@@ -436,8 +529,109 @@ class certifygenvalidation_csv implements ICertificateValidation
      */
     public function is_enabled(): bool
     {
-        return false; // TODO: de moemnto no lo habilitamos.
-        $this->configuration = new csv_configuration();
         return $this->configuration->is_enabled();
+    }
+
+    /**
+     * @return bool
+     */
+    public function checkStatus(): bool
+    {
+        return true;
+    }
+
+    /**
+     * @param int $validationid
+     * @param int $teacherrequestid
+     * @return int
+     * @throws \moodle_exception
+     * @throws coding_exception
+     */
+    public function getStatus(int $validationid = 0, int $teacherrequestid = 0): int
+    {
+        if ($validationid) {
+            $params = ['validationid' => $validationid];
+        } else {
+            $params = ['teacherrequestid' => $teacherrequestid];
+        }
+        $csvvalidation = certifygenvalidationcsv::get_record($params);
+        if (!$csvvalidation) {
+            throw new \moodle_exception('validationid/teacherrequestidnotfound', 'certifygenvalidation_csv');
+        }
+        try {
+            $message = '';
+            $haserror = false;
+            $params = $this->create_params_status($csvvalidation);
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'http://pru.sede.uva.es/FirmaQueryCatalogService',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $params,
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/xml'
+                ),
+            ));
+
+            $response = curl_exec($curl);
+            if (curl_errno($curl)) {
+                return [
+                    'haserror' => true,
+                    'message' => curl_error($curl),
+                ];
+            }
+            curl_close($curl);
+
+            $xml = simplexml_load_string($response, null, null, 'http://schemas.xmlsoap.org/soap/envelope/');
+            $ns = $xml->getNamespaces(true);
+            $soap = $xml->children($ns['soap']);
+            $res = $soap->Body->children($ns['ns2']);
+            $iniciarProcesoFirmaResponse = $res->consultaEstadoPeticionResponse->children();
+            $iniciarProcesoFirmaResponsechildren = $iniciarProcesoFirmaResponse->children();
+            $resultado = (string) $iniciarProcesoFirmaResponsechildren->resultado;
+            if ($resultado === 'KO') {
+                $codError = (string) $iniciarProcesoFirmaResponsechildren->error->children()->codError;
+                $descError = (string) $iniciarProcesoFirmaResponsechildren->error->children()->descError;
+                throw new \moodle_exception('getstatuserror', 'certifygenvalidation_csv', '', null, $codError . ' - ' . $descError);
+            }
+            // Se obtiene idExpediente;
+            $peticiones = $iniciarProcesoFirmaResponsechildren->peticiones;
+            $estado = '';
+            foreach ($peticiones as $peticion) {
+                $estado =  (string) $peticion->estadoCircuito;
+            }
+
+            if ($estado == 'FIRMADO') {
+                return certifygen_validations::STATUS_VALIDATION_OK;
+            } else if ($estado == 'RECHAZADO') {
+                return certifygen_validations::STATUS_VALIDATION_ERROR;
+            }
+            return certifygen_validations::STATUS_IN_PROGRESS;
+        }
+        catch ( SoapFault $e ) {
+            $haserror = true;
+            error_log(__FUNCTION__ .  ' ' . __LINE__ . ' SoapFault error: '.var_export($e->getMessage(), true));
+        }
+        catch (Exception $e) {
+            $haserror = true;
+            error_log(__FUNCTION__ . ' ' . __LINE__ .  ' error: '.var_export($e->getMessage(), true));
+        }
+        return [
+            'haserror' => $haserror,
+            'message' => $message,
+        ];
+    }
+
+    /**
+     * @return bool
+     */
+    public function checkfile(): bool
+    {
+        return true;
     }
 }

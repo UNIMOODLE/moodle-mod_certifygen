@@ -96,43 +96,53 @@ const emitCertificate = async (event) => {
         {key: 'confirm', component: 'mod_certifygen'},
         {key: 'errortitle', component: 'mod_certifygen'},
     ];
-    getStrings(stringkeys).then((langStrings) => {
-        return ModalFactory.create({
-            title: langStrings[0],
-            body: langStrings[1],
-            type: ModalFactory.types.SAVE_CANCEL
-        }).then(modal => {
-            modal.getRoot().on(ModalEvents.hidden, () => {
-                modal.destroy();
-            });
-            modal.getRoot().on(ModalEvents.save, () => {
-                let request = {
-                    methodname: SERVICES.EMIT_TEACHER_REQUEST,
-                    args: {id}
-                };
-                Ajax.call([request])[0].done(function(response) {
-                    if (response.result == 1) {
-                        // Recargar tabla.
-                        reloadTeacherRequestTable(userid);
-                    } else {
-                        // Mostrar mensaje error.
-                        return ModalFactory.create({
-                            title: langStrings[0],
-                            body: response.message,
-                            type: ModalFactory.types.CANCEL
-                        }).then(modal => {
-                            modal.getRoot().on(ModalEvents.hidden, () => {
-                                modal.destroy();
+    Templates.render(TEMPLATES.LOADING, {visible: true}).done(function(html) {
+        let identifier = jQuery(REGION.ROOT);
+        identifier.append(html);
+        getStrings(stringkeys).then((langStrings) => {
+            return ModalFactory.create({
+                title: langStrings[0],
+                body: langStrings[1],
+                type: ModalFactory.types.SAVE_CANCEL
+            }).then(modal => {
+                modal.getRoot().on(ModalEvents.hidden, () => {
+                    modal.destroy();
+                });
+                modal.getRoot().on(ModalEvents.cancel, () => {
+                    identifier.find('.overlay-icon-container').remove();
+                });
+                modal.getRoot().on(ModalEvents.save, () => {
+                    let request = {
+                        methodname: SERVICES.EMIT_TEACHER_REQUEST,
+                        args: {id}
+                    };
+                    Ajax.call([request])[0].done(function(response) {
+                        identifier.html(html);
+                        if (response.result == 1) {
+                            // Recargar tabla.
+                            reloadTeacherRequestTable(userid);
+                        } else {
+                            // Mostrar mensaje error.
+                            return ModalFactory.create({
+                                title: langStrings[3],
+                                body: response.message,
+                                type: ModalFactory.types.CANCEL
+                            }).then(modal => {
+                                modal.getRoot().on(ModalEvents.hidden, () => {
+                                    identifier.find('.overlay-icon-container').remove();
+                                    modal.destroy();
+                                });
+                                modal.show();
                             });
-                        });
-                    }
-                }).fail(Notification.exception);
+                        }
+                    }).fail(Notification.exception);
+                });
+                return modal;
             });
-            return modal;
-        });
-    }).done(function(modal) {
-        modal.show();
-    }).fail(Notification.exception);
+        }).done(function(modal) {
+            modal.show();
+        }).fail(Notification.exception);
+    });
 };
 const seeCourses = async (event) => {
     let name = event.currentTarget.getAttribute('data-name');
@@ -242,7 +252,7 @@ const reloadTeacherRequestTable = (userid) => {
         };
         Ajax.call([request])[0].done(function(data) {
             Templates.render(TEMPLATES.TEACHER_REQUEST, data).then((html, js) => {
-                identifier.html(html);
+                identifier.replaceWith(html);
                 Templates.runTemplateJS(js);
             }).fail(Notification.exception);
         }).fail(Notification.exception);

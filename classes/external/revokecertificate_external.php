@@ -114,7 +114,7 @@ class revokecertificate_external extends external_api {
             $result['result'] = false;
             $result['message'] = $e->getMessage();
             if (!is_null($validation)) {
-                $validation->set('status', certifygen_validations::STATUS_FINISHED_ERROR);
+                $validation->set('status', certifygen_validations::STATUS_ERROR);
                 $validation->save();
             }
         }

@@ -32,6 +32,7 @@
 namespace mod_certifygen\external;
 
 use coding_exception;
+use context_system;
 use core\invalid_persistent_exception;
 use external_api;
 use external_function_parameters;
@@ -68,6 +69,8 @@ class emitteacherrequest_external extends external_api {
      */
     public static function emitteacherrequest(int $id): array {
 
+        global $PAGE;
+        $PAGE->set_context(context_system::instance());
         self::validate_parameters(
             self::emitteacherrequest_parameters(), ['id' => $id]
         );
@@ -90,6 +93,8 @@ class emitteacherrequest_external extends external_api {
             $subplugin = new $reportpluginclass();
             $result = $subplugin->createFile($teacherrequest);
             if (!$result['result']) {
+                $teacherrequest->set('status', certifygen_teacherrequests::STATUS_ERROR);
+                $teacherrequest->save();
                 return $result;
             }
             $file = $result['file'];
@@ -108,21 +113,22 @@ class emitteacherrequest_external extends external_api {
             $validationplugin = $certifygenmodel->get('validation');
             $validationpluginclass = $validationplugin . '\\' . $validationplugin;
             if (empty($validationplugin)) {
-                $teacherrequest->set('status', certifygen_validations::STATUS_FINISHED_OK);
+                $teacherrequest->set('status', certifygen_validations::STATUS_VALIDATION_OK);
                 $teacherrequest->save();
             } else if (get_config($validationplugin, 'enabled') === '1') {
                 /** @var ICertificateValidation $subplugin */
                 $subplugin = new $validationpluginclass();
                 $response = $subplugin->sendFile($certifygenfile);
                 if ($response['haserror']) {
-                    if (!array_key_exists('message', $result)) {
+                    $result['result'] = false;
+                    $result['message'] = $response['message'];
+                    if (!array_key_exists('message', $response)) {
                         $result['message'] = 'validation_plugin_send_file_error';
-                        $result['result'] = false;
                     }
-                    $teacherrequest->set('status', certifygen_validations::STATUS_FINISHED_ERROR);
+                    $teacherrequest->set('status', certifygen_validations::STATUS_VALIDATION_ERROR);
                     $teacherrequest->save();
-                } else {
-                    $teacherrequest->set('status', certifygen_validations::STATUS_FINISHED_OK);
+                } else if (!$subplugin->checkStatus()) {
+                    $teacherrequest->set('status', certifygen_validations::STATUS_VALIDATION_OK);
                     $teacherrequest->save();
                 }
             }
@@ -131,7 +137,7 @@ class emitteacherrequest_external extends external_api {
             error_log(__FUNCTION__ . ' ' . ' error: '.var_export($e->getMessage(), true));
             $result['result'] = false;
             $result['message'] = $e->getMessage();
-            $teacherrequest->set('status', certifygen_teacherrequests::STATUS_FINISHED_ERROR);
+            $teacherrequest->set('status', certifygen_teacherrequests::STATUS_ERROR);
             $teacherrequest->save();
         }
         return $result;

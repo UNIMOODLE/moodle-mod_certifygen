@@ -36,6 +36,8 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
+use mod_certifygen\interfaces\ICertificateReport;
+use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_teacherrequests;
 use moodle_exception;
@@ -66,8 +68,32 @@ class deleteteacherrequest_external extends external_api {
         );
         $result = ['result' => true, 'message' => 'OK'];
         try {
+            $candelete = true;
             $request = new certifygen_teacherrequests($id);
-            $request->delete();
+            $model = new certifygen_model($request->get('modelid'));
+            $validationplugin = $model->get('validation');
+            if (!empty($validationplugin) && $request->get('status') != certifygen_teacherrequests::STATUS_NOT_STARTED) {
+                $validationpluginclass = $validationplugin . '\\' . $validationplugin;
+                if (get_config($validationplugin, 'enabled') === '1') {
+                    /** @var ICertificateValidation $subplugin */
+                    $subplugin = new $validationpluginclass();
+                    if ($subplugin->canRevoke()) {
+                        $code = ICertificateReport::FILE_NAME_STARTSWITH . $id;
+                        $output = $subplugin->revoke($code);
+                        if ($output['haserror']) {
+                            $candelete = false;
+                            $result['result'] = false;
+                            $result['message'] = $output['message'];
+                        }
+                    }
+                } else {
+                    $result['result'] = false;
+                    $result['message'] = 'plugin_not_enabled';
+                }
+            }
+            if ($candelete) {
+                $request->delete();
+            }
         } catch (moodle_exception $e) {
             $result['result'] = false;
             $result['message'] = $e->getMessage();

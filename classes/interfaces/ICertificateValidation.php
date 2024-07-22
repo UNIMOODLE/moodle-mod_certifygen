@@ -29,19 +29,34 @@
 namespace mod_certifygen\interfaces;
 
 use mod_certifygen\certifygen_file;
-use stored_file;
 
 interface ICertificateValidation {
     const FILE_COMPONENT = 'mod_certifygen';
     const FILE_AREA = 'certifygenvalidation';
+    const FILE_AREA_VALIDATED = 'certifygenvalidationvalidated';
     const FILE_PATH = '/';
     const FILE_NAME_STARTSWITH = 'certifygenvalidation_';
 
     public function is_enabled(): bool;
     public function sendFile(certifygen_file $file): array;
 //    public function getState(int $courseid, int $validationid, string $code): int;
-    public function getFile(int $courseid, int $validationid, string $code);
+    public function getFile(int $courseid, int $validationid, int $teacherrequestid, string $code);
     public function getFileUrl(int $courseid, int $validationid, string $code): string;
     public function canRevoke(): bool;
+
+    /**
+     * This method is called by checkstatus task to check if the certificate status has changed.
+     * Return true if validation plugin does not return the certificate validated inmediately on sendFile function.
+     * @return bool
+     */
+    public function checkStatus(): bool;
+    /**
+     * This method is called by checkfIle task to check if the certificate file is already on external app.
+     * Return true if validation plugin must be called to obtain the certificate file.
+     * @return bool
+     */
+    public function checkfile(): bool;
+
+    public function getStatus(int $validationid, int $teacherrequestid): int;
 }
 

@@ -142,7 +142,7 @@ class get_pdf_teacher_certificate_external extends external_api {
             }
             // Ask again in case status has changed.
             $trequest = new certifygen_teacherrequests($id);
-            if ((int)$trequest->get('status') === certifygen_teacherrequests::STATUS_FINISHED_OK) {
+            if ((int)$trequest->get('status') === certifygen_teacherrequests::STATUS_FINISHED) {
                 // Get file.
                 $validationplugin = $certifygenmodel->get('validation');
                 $validationpluginclass = $validationplugin . '\\' . $validationplugin;

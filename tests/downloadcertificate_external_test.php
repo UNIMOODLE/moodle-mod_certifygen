@@ -119,7 +119,7 @@ class downloadcertificate_external_test extends advanced_testcase {
         self::assertArrayHasKey('message', $result);
         self::assertTrue($result['result']);
         self::assertEquals(get_string('ok', 'mod_certifygen'), $result['message']);
-        self::assertEquals(certifygen_validations::STATUS_FINISHED_OK, $validation->get('status'));
+        self::assertEquals(certifygen_validations::STATUS_VALIDATION_OK, $validation->get('status'));
         self::assertEquals($fileurl, $result['url']);
     }
 }
