@@ -163,7 +163,7 @@ class get_courses_as_student_external_test extends advanced_testcase {
                 'required' => 1, 'visible' => 1, 'locked' => 0, 'datatype' => 'text', 'defaultdata' => null]);
 
         // Configure the platform.
-        set_config('userfield', $field->id, 'mod_certifygen');
+        set_config('userfield', 'profile_' . $field->id, 'mod_certifygen');
 
         // Create user.
         $dni = '123456789P';
@@ -228,6 +228,98 @@ class get_courses_as_student_external_test extends advanced_testcase {
         $this->assertArrayHasKey('fullname', $result['student']);
         $this->assertEquals($user1->id, $result['student']['id']);
         $this->assertEquals(fullname($user1), $result['student']['fullname']);
+    }
+    public function test_get_courses_as_student_by_userfield_username(): void {
+
+        // Configure the platform.
+        set_config('userfield', 'username', 'mod_certifygen');
+
+        // Create user.
+        $field = 'test_user_1';
+        $user1 = $this->getDataGenerator()->create_user(
+            ['username' => $field, 'firstname' => 'test',
+                'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+        $id = (int) $user1->id;
+        // Create courses.
+        $course1 = self::getDataGenerator()->create_course();
+        $course2 = self::getDataGenerator()->create_course();
+
+        // Enrol user in course1 as student
+        self::getDataGenerator()->enrol_user($user1->id, $course1->id, 'student');
+
+        // Enrol user in course2 as editingteacher
+        self::getDataGenerator()->enrol_user($user1->id, $course2->id, 'editingteacher');
+
+        // Create template.
+        $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
+        $certificate1 = $templategenerator->create_template((object)['name' => 'Certificate 1']);
+
+        // Create model.
+        $modgenerator = $this->getDataGenerator()->get_plugin_generator('mod_certifygen');
+        $model = $modgenerator->create_model_by_name(
+            'modelo actividad 1',
+            $certificate1->get_id(),
+            certifygen_model::TYPE_ACTIVITY
+        );
+
+        // Create activity.
+        $data = [
+            'name' => 'certifygen 1',
+            'course' => $course1->id,
+            'modelid' => $model->get('id'),
+        ];
+        $this->getDataGenerator()->create_module('certifygen', $data);
+
+        // Now model is associated to course context.
+        $modgenerator->assign_model_coursecontext($model->get('id'), $course1->id);
+
+        // Tests.
+        $result = get_courses_as_student_external::get_courses_as_student(0, $field, '');
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('courses', $result);
+        $this->assertIsArray($result['courses']);
+        $this->assertCount(1, $result['courses']);
+        $this->assertArrayHasKey('id', $result['courses'][0]);
+        $this->assertArrayHasKey('shortname', $result['courses'][0]);
+        $this->assertArrayHasKey('fullname', $result['courses'][0]);
+        $this->assertArrayHasKey('categoryid', $result['courses'][0]);
+        $this->assertArrayHasKey('completed', $result['courses'][0]);
+        $this->assertArrayHasKey('modellist', $result['courses'][0]);
+        $this->assertEquals($course1->id, $result['courses'][0]['id']);
+        $this->assertEquals($course1->shortname, $result['courses'][0]['shortname']);
+        $this->assertEquals($course1->fullname, $result['courses'][0]['fullname']);
+        $this->assertEquals($course1->category, $result['courses'][0]['categoryid']);
+        $this->assertEquals(false, $result['courses'][0]['completed']);
+        $this->assertEquals($model->get('id'), $result['courses'][0]['modellist']);
+        $this->assertArrayHasKey('student', $result);
+        $this->assertArrayHasKey('id', $result['student']);
+        $this->assertArrayHasKey('fullname', $result['student']);
+        $this->assertEquals($user1->id, $result['student']['id']);
+        $this->assertEquals(fullname($user1), $result['student']['fullname']);
+
+        // Tests.
+        $result = get_courses_as_student_external::get_courses_as_student($id, $field, '');
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('courses', $result);
+        $this->assertArrayHasKey('student', $result);
+
+        // Tests.
+        $result = get_courses_as_student_external::get_courses_as_student($id + 1, $field, '');
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('error', $result);
+        $this->assertIsArray($result['error']);
+        $this->assertArrayHasKey('code', $result['error']);
+        $this->assertArrayHasKey('message', $result['error']);
+        $this->assertEquals('userfield_and_userid_sent', $result['error']['code']);
+
+        // Tests.
+        $result = get_courses_as_student_external::get_courses_as_student(0, 'profile_3', '');
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('error', $result);
+        $this->assertIsArray($result['error']);
+        $this->assertArrayHasKey('code', $result['error']);
+        $this->assertArrayHasKey('message', $result['error']);
+        $this->assertEquals('user_not_found', $result['error']['code']);
     }
     /**
      * @return void

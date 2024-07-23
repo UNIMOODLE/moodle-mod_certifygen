@@ -157,7 +157,7 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
                 'required' => 1, 'visible' => 1, 'locked' => 0, 'datatype' => 'text', 'defaultdata' => null]);
 
         // Configure the platform.
-        set_config('userfield', $field->id, 'mod_certifygen');
+        set_config('userfield',  'profile_' . $field->id, 'mod_certifygen');
 
         // Create user.
         $dni = '123456789P';
@@ -278,7 +278,7 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
                 'required' => 1, 'visible' => 1, 'locked' => 0, 'datatype' => 'text', 'defaultdata' => null]);
 
         // Configure the platform.
-        set_config('userfield', $field->id, 'mod_certifygen');
+        set_config('userfield',  'profile_' . $field->id, 'mod_certifygen');
 
         // Create user.
         $dni = '123456789P';

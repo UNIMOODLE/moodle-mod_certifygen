@@ -43,20 +43,23 @@ $settings = new admin_settingpage('modsettingcertifygen', get_string('pluginname
 if ($ADMIN->fulltree) {
     // Userfield.
     $customfields = \availability_profile\condition::get_custom_profile_fields();
-    $options = [0 => get_string('chooseuserprofilefield', 'mod_certifygen')];
+    $options = [
+        '' => get_string('chooseuserfield', 'mod_certifygen'),
+        'username' => get_string('username'),
+        'idnumber' => get_string('idnumber'),
+        'email' => get_string('email'),
+    ];
     foreach ($customfields as $customfield) {
         if ($customfield->datatype == 'text') {
-            $options[$customfield->id] = $customfield->name;
+            $options[ 'profile_' . $customfield->id] = $customfield->name;
         }
     }
-    if (count($options) > 1) {
-        $settings->add(new admin_setting_configselect('mod_certifygen/userfield',
-            new lang_string('userfield', 'mod_certifygen'),
-            new lang_string('userfield_desc', 'mod_certifygen'),
-            0,
-            $options
-        ));
-    }
+    $settings->add(new admin_setting_configselect('mod_certifygen/userfield',
+        new lang_string('userfield', 'mod_certifygen'),
+        new lang_string('userfield_desc', 'mod_certifygen'),
+        '',
+        $options
+    ));
 }
 $ADMIN->add('modsettingcertifygencat', $settings);
 
