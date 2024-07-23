@@ -81,9 +81,9 @@ class activityteacher_table extends table_sql {
         $validationplugin = $this->model->get('validation');
         $this->canrevoke = false;
         $context = \context_course::instance($courseid);
-        if (has_capability('moodle/course:managegroups', $context)) {
+        if (has_capability('moodle/course:managegroups', $context) && empty($validationplugin)) {
             $this->canrevoke = true;
-        } else if (!empty($validationplugin)) {
+        } else if (has_capability('moodle/course:managegroups', $context) && !empty($validationplugin)) {
             $validationpluginclass = $validationplugin . '\\' . $validationplugin;
             $subplugin = new $validationpluginclass();
             $this->canrevoke = $subplugin->canrevoke();
