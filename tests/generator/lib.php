@@ -19,7 +19,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 use mod_certifygen\persistents\certifygen_context;
 use mod_certifygen\persistents\certifygen_model;
-use mod_certifygen\persistents\certifygen_teacherrequests;
+use mod_certifygen\persistents\certifygen_validations;
 
 /**
  * @package    mod_certifygen
@@ -91,7 +91,7 @@ class mod_certifygen_generator extends testing_module_generator {
      * @param int $modelid
      * @param string $courses
      * @param int $userid
-     * @return certifygen_teacherrequests
+     * @return certifygen_validations
      * @throws \core\invalid_persistent_exception
      * @throws coding_exception
      */
@@ -101,13 +101,14 @@ class mod_certifygen_generator extends testing_module_generator {
         $data = [
             'name' => 'test1',
             'modelid' => $modelid,
-            'status' => certifygen_teacherrequests::STATUS_NOT_STARTED,
+            'status' => certifygen_validations::STATUS_NOT_STARTED,
             'lang' => 'es',
             'courses' => $courses,
             'langs' => 'en,es',
-            'userid' => $userid
+            'userid' => $userid,
+            'certifygenid' => 0,
         ];
-        $trequest = new certifygen_teacherrequests(0, (object)$data);
+        $trequest = new certifygen_validations(0, (object)$data);
         return $trequest->create();
     }
 

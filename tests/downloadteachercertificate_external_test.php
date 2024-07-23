@@ -36,7 +36,7 @@ use mod_certifygen\external\downloadteachercertificate_external;
 use mod_certifygen\external\emitteacherrequest_external;
 use mod_certifygen\interfaces\ICertificateReport;
 use mod_certifygen\persistents\certifygen_model;
-use mod_certifygen\persistents\certifygen_teacherrequests;
+use mod_certifygen\persistents\certifygen_validations;
 
 global $CFG;
 require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
@@ -86,9 +86,9 @@ class downloadteachercertificate_external_test extends advanced_testcase {
 
         // Emit certificate.
         emitteacherrequest_external::emitteacherrequest($teacherrequest->get('id'));
-        $teacherrequest = new certifygen_teacherrequests($teacherrequest->get('id'));
+        $teacherrequest = new certifygen_validations($teacherrequest->get('id'));
         $contextid = context_system::instance()->id;
-        self::assertEquals(certifygen_teacherrequests::STATUS_VALIDATION_OK, $teacherrequest->get('status'));
+        self::assertEquals(certifygen_validations::STATUS_VALIDATION_OK, $teacherrequest->get('status'));
         $filename = ICertificateReport::FILE_NAME_STARTSWITH . $teacherrequest->get('id') . '.pdf';
         $fileurl = moodle_url::make_pluginfile_url($contextid, ICertificateReport::FILE_COMPONENT,
             ICertificateReport::FILE_AREA, $teacherrequest->get('id'), ICertificateReport::FILE_PATH,

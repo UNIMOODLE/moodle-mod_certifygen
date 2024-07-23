@@ -15,9 +15,6 @@ import ModalFactory from 'core/modal_factory';
 import ModalEvents from 'core/modal_events';
 import Notification from 'core/notification';
 
-let REGION = {
-    ROOT: '[data-region="activity-view"]',
-};
 let TEMPLATES = {
     LOADING: 'core/overlay_loading',
     ACTIVITY_TABLE: 'mod_certifygen/activity',
@@ -151,46 +148,53 @@ const emitCertificate = async(event) => {
         {key: 'confirm', component: 'mod_certifygen'},
         {key: 'emitcertificate_error', component: 'mod_certifygen'}
     ];
-    let langStrings = await getStrings(stringkeys);
-
-    let modal = await ModalFactory.create({
-        title: langStrings[0],
-        body: langStrings[1],
-        type: ModalFactory.types.SAVE_CANCEL
+    Templates.render(TEMPLATES.LOADING, {visible: true}).done(async function(html) {
+        let identifier = jQuery('[data-region="activity-view"]');
+        identifier.append(html);
+        let langStrings = await getStrings(stringkeys);
+        let modal = await ModalFactory.create({
+            title: langStrings[0],
+            body: langStrings[1],
+            type: ModalFactory.types.SAVE_CANCEL
+        });
+        modal.setSaveButtonText(langStrings[2]);
+        modal.getRoot().on(ModalEvents.save, () => {
+            let request = {
+                methodname: SERVICES.EMIT_CERTIFICATE,
+                args: {
+                    id,
+                    instanceid,
+                    modelid,
+                    lang,
+                    userid,
+                    courseid,
+                }
+            };
+            Ajax.call([request])[0].done(function(response) {
+                modal.destroy();
+                if (response.result === true) {
+                    studentsReloadTable(modelid, courseid, cmid, lang);
+                } else {
+                    Notification.alert('Error', response.message, langStrings[2]);
+                }
+                identifier.find('.overlay-icon-container').remove();
+            }).fail(Notification.exception);
+        });
+        modal.getRoot().on(ModalEvents.hidden, () => {
+            modal.destroy();
+        });
+        modal.getRoot().on(ModalEvents.cancel, () => {
+            identifier.find('.overlay-icon-container').remove();
+        });
+        modal.show();
     });
-    modal.setSaveButtonText(langStrings[2]);
-    modal.getRoot().on(ModalEvents.save, () => {
-        let request = {
-            methodname: SERVICES.EMIT_CERTIFICATE,
-            args: {
-                id,
-                instanceid,
-                modelid,
-                lang,
-                userid,
-                courseid,
-            }
-        };
-        modal.destroy();
-        Ajax.call([request])[0].done(function(response) {
-            if (response.result === true) {
-                studentsReloadTable(modelid, courseid, cmid, lang);
-            } else {
-                Notification.alert('Error', response.message, langStrings[2]);
-            }
-        }).fail(Notification.exception);
-    });
-    modal.getRoot().on(ModalEvents.hidden, () => {
-        modal.destroy();
-    });
-    modal.show();
 };
 const studentsReloadTable = (modelid, courseid, cmid, lang) => {
     modelid = parseInt(modelid);
     courseid = parseInt(courseid);
     cmid = parseInt(cmid);
     Templates.render(TEMPLATES.LOADING, {visible: true}).done(function(html) {
-        let identifier = jQuery(REGION.ROOT);
+        let identifier = jQuery('[data-region="activity-view"]');
         identifier.append(html);
         let request = {
             methodname: SERVICES.GET_MYCERTIFICATE_TABLE_DATA,
@@ -198,10 +202,11 @@ const studentsReloadTable = (modelid, courseid, cmid, lang) => {
         };
         Ajax.call([request])[0].done(function(data) {
             Templates.render(TEMPLATES.ACTIVITY_TABLE, data).then(function(html, js) {
-                identifier.html(html);
+                identifier.replaceWith(html);
                 Templates.runTemplateJS(js);
             }).fail(Notification.exception);
         }).fail((error) => {
+            identifier.find('.overlay-icon-container').remove();
             Notification.alert('Error', error.message, 'cancel');
         });
     });

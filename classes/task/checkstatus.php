@@ -37,7 +37,6 @@ namespace mod_certifygen\task;
 use core\task\scheduled_task;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
-use mod_certifygen\persistents\certifygen_teacherrequests;
 use mod_certifygen\persistents\certifygen_validations;
 
 class checkstatus extends scheduled_task
@@ -56,33 +55,6 @@ class checkstatus extends scheduled_task
      */
     public function execute()
     {
-        $validations = certifygen_teacherrequests::get_records(['status' => certifygen_validations::STATUS_IN_PROGRESS]);
-        foreach ($validations as $validation) {
-            try {
-                $model = new certifygen_model($validation->get('modelid'));
-                $validationplugin = $model->get('validation');
-                if (empty($validationplugin)) {
-                    continue;
-                }
-                $validationpluginclass = $validationplugin . '\\' . $validationplugin;
-                if (get_config($validationplugin, 'enabled') === '0') {
-                    continue;
-                }
-                /** @var ICertificateValidation $subplugin */
-                $subplugin = new $validationpluginclass();
-                if (!$subplugin->checkStatus()) {
-                    continue;
-                }
-                $newstatus = $subplugin->getStatus(0, $validation->get('id'));
-                if ($newstatus != $validation->get('status')) {
-                    $validation->set('status', $newstatus);
-                    $validation->save();
-                }
-            } catch (\moodle_exception $e) {
-                error_log(__FUNCTION__ . 'e: '.var_export($e->getMessage(), true));
-            }
-        }
-
         $validations = certifygen_validations::get_records(['status' => certifygen_validations::STATUS_IN_PROGRESS]);
         foreach ($validations as $validation) {
             try {

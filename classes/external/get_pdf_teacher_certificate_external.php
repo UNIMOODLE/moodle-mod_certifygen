@@ -34,14 +34,11 @@ namespace mod_certifygen\external;
 
 use external_api;
 use external_function_parameters;
-use external_multiple_structure;
 use external_single_structure;
 use external_value;
 use mod_certifygen\interfaces\ICertificateReport;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
-use certifygenfilter;
-use mod_certifygen\persistents\certifygen_teacherrequests;
 use mod_certifygen\persistents\certifygen_validations;
 
 global $CFG;
@@ -121,7 +118,7 @@ class get_pdf_teacher_certificate_external extends external_api {
                 return $result;
             }
             // Check if request exists.
-            $trequest = certifygen_teacherrequests::get_request_by_data($userid, $courses, $lang, $modelid, $name);
+            $trequest = certifygen_validations::get_request_by_data_for_teachers($userid, $courses, $lang, $modelid, $name);
             $id = 0;
             if ($trequest) {
                 $id = $trequest->id;
@@ -130,19 +127,20 @@ class get_pdf_teacher_certificate_external extends external_api {
                 $data = [
                     'name' => $name,
                     'modelid' => $modelid,
-                    'status' => certifygen_teacherrequests::STATUS_IN_PROGRESS,
+                    'status' => certifygen_validations::STATUS_IN_PROGRESS,
                     'lang' => $lang,
                     'courses' => $courses,
                     'userid' => $userid,
+                    'certifygenid' => 0,
                 ];
-                $trequest = certifygen_teacherrequests::manage_teacherrequests($id, (object) $data);
+                $trequest = certifygen_validations::manage_validation($id, (object) $data);
                 $id = $trequest->get('id');
                 // Emit teacher request.
                 $output = emitteacherrequest_external::emitteacherrequest($id);
             }
             // Ask again in case status has changed.
-            $trequest = new certifygen_teacherrequests($id);
-            if ((int)$trequest->get('status') === certifygen_teacherrequests::STATUS_FINISHED) {
+            $trequest = new certifygen_validations($id);
+            if ((int)$trequest->get('status') === certifygen_validations::STATUS_FINISHED) {
                 // Get file.
                 $validationplugin = $certifygenmodel->get('validation');
                 $validationpluginclass = $validationplugin . '\\' . $validationplugin;
@@ -175,7 +173,7 @@ class get_pdf_teacher_certificate_external extends external_api {
             return $result;
         }
         $certificate = [
-            'teacherrequestid' => $id,
+            'validationid' => $id,
             'status' => $trequest->get('status'),
             'file' => $file->get_contenthash(),
             'reporttype' => $certifygenmodel->get('type'),
@@ -192,7 +190,7 @@ class get_pdf_teacher_certificate_external extends external_api {
         return new external_single_structure([
             'certificate' => new external_single_structure(
                 [
-                    'teacherrequestid'   => new external_value(PARAM_INT, 'Teacher request id'),
+                    'validationid'   => new external_value(PARAM_INT, 'Valiation id'),
                     'status'   => new external_value(PARAM_INT, 'Teacher request status'),
                     'file' => new external_value(PARAM_CLEANFILE, 'certificate'),
                     'reporttype' => new external_value(PARAM_INT, 'model type'),

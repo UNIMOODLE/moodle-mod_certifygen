@@ -104,17 +104,10 @@ class certifygenvalidation_csv implements ICertificateValidation
         }
         // Se obtiene idExpediente;
         $idExpediente = (string) $iniciarProcesoFirmaResponsechildren->idExpediente;
-        $validationid = 0;
-        $teacherrequestid = 0;
-        if ($file->get_model_type() == certifygen_model::TYPE_ACTIVITY) {
-            $validationid = $file->get_validationid();
-        } else {
-            $teacherrequestid = $file->get_validationid();
-        }
+        $validationid = $file->get_validationid();
         $token = str_replace('.pdf', '', $file->get_file()->get_filename());
         $data = [
             'validationid' => $validationid,
-            'teacherrequestid' => $teacherrequestid,
             'applicationid' => $idExpediente,
             'token' => $token,
             'usermodified' => $USER->id,
@@ -255,15 +248,10 @@ class certifygenvalidation_csv implements ICertificateValidation
      * @param string $code
      * @return stored_file
      */
-    public function getFile(int $courseid, int $validationid, int $teacherrequestid, string $code)
+    public function getFile(int $courseid, int $validationid, string $code)
     {
-        if ($teacherrequestid) {
-            $params = ['teacherrequestid' => $teacherrequestid];
-        } else {
-            $params = ['validationid' => $validationid];
-        }
-
         try {
+            $params = ['validationid' => $validationid];
             $teacherrequest = certifygenvalidationcsv::get_record($params);
             if (!$teacherrequest) {
                 throw new \moodle_exception('certifygenvalidationcsvnotfound', 'certifygen');
@@ -311,7 +299,7 @@ class certifygenvalidation_csv implements ICertificateValidation
             $docspeticiondocumentos = $docspeticion->documentos;
             $datos = (string) $docspeticiondocumentos->datos;
             $datos = base64_decode($datos);
-            return $this->create_file_from_content($datos, $validationid, $teacherrequestid, $code);
+            return $this->create_file_from_content($datos, $validationid, $code);
         }
         catch ( SoapFault $e ) {
             $haserror = true;
@@ -328,7 +316,6 @@ class certifygenvalidation_csv implements ICertificateValidation
     /**
      * @param string $content
      * @param int $validationid
-     * @param int $teacherrequestid
      * @param string $code
      * @return void
      * @throws \dml_exception
@@ -336,7 +323,7 @@ class certifygenvalidation_csv implements ICertificateValidation
      * @throws \stored_file_creation_exception
      * @throws coding_exception
      */
-    public function create_file_from_content(string $content, int $validationid, int $teacherrequestid, string $code) {
+    public function create_file_from_content(string $content, int $validationid, string $code) {
         // Create a Pdf file.
         $doc = new pdf();
         $doc->SetTitle('Certifygen certificate');
@@ -349,13 +336,12 @@ class certifygenvalidation_csv implements ICertificateValidation
         $doc->writeHTML($content);
 
         // Get pdf content.
-        if ($validationid) {
-            $itemid = $validationid;
-            $cv = new certifygen_validations($validationid);
+        $itemid = $validationid;
+        $cv = new certifygen_validations($validationid);
+        if (!empty($cv->get('certifygenid'))) {
             $cert = new certifygen($cv->get('certifygenid'));
             $context = \context_course::instance($cert->get('course'));
         } else {
-            $itemid = $teacherrequestid;
             $context = \context_system::instance();
         }
         $pdfcontent = $doc->Output(self::FILE_NAME_STARTSWITH . $code, 'S');
@@ -495,7 +481,8 @@ class certifygenvalidation_csv implements ICertificateValidation
             if ($resultado === 'KO') {
                 $codError = (string) $anularPeticionResponsechildren->error->children()->codError;
                 $descError = (string) $anularPeticionResponsechildren->error->children()->descError;
-                throw new \moodle_exception('getstatuserror', 'certifygenvalidation_csv', '', null, $codError . ' - ' . $descError);
+                error_log(__FUNCTION__ . ' error: '.var_export($descError, true));
+                throw new \moodle_exception('revokeerror', 'certifygenvalidation_csv', '', null, $codError . ' - ' . $descError);
             }
         }
         catch ( SoapFault $e ) {
@@ -542,21 +529,16 @@ class certifygenvalidation_csv implements ICertificateValidation
 
     /**
      * @param int $validationid
-     * @param int $teacherrequestid
      * @return int
      * @throws \moodle_exception
      * @throws coding_exception
      */
-    public function getStatus(int $validationid = 0, int $teacherrequestid = 0): int
+    public function getStatus(int $validationid): int
     {
-        if ($validationid) {
-            $params = ['validationid' => $validationid];
-        } else {
-            $params = ['teacherrequestid' => $teacherrequestid];
-        }
+        $params = ['validationid' => $validationid];
         $csvvalidation = certifygenvalidationcsv::get_record($params);
         if (!$csvvalidation) {
-            throw new \moodle_exception('validationid/teacherrequestidnotfound', 'certifygenvalidation_csv');
+            throw new \moodle_exception('validationidnotfound', 'certifygenvalidation_csv');
         }
         try {
             $message = '';
@@ -597,6 +579,7 @@ class certifygenvalidation_csv implements ICertificateValidation
             if ($resultado === 'KO') {
                 $codError = (string) $iniciarProcesoFirmaResponsechildren->error->children()->codError;
                 $descError = (string) $iniciarProcesoFirmaResponsechildren->error->children()->descError;
+                error_log(__FUNCTION__ . ' error: '.var_export($descError, true));
                 throw new \moodle_exception('getstatuserror', 'certifygenvalidation_csv', '', null, $codError . ' - ' . $descError);
             }
             // Se obtiene idExpediente;

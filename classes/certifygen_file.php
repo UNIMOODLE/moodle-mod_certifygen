@@ -48,7 +48,7 @@ class certifygen_file {
     private stdClass $course;
     private int $userid;
     private int $modelid;
-    private int $validationid; // validationid or teacherrequestid.
+    private int $validationid;
     private string $lang;
     private array $metadata;
 

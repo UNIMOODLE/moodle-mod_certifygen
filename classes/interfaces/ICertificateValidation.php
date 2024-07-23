@@ -35,12 +35,12 @@ interface ICertificateValidation {
     const FILE_AREA = 'certifygenvalidation';
     const FILE_AREA_VALIDATED = 'certifygenvalidationvalidated';
     const FILE_PATH = '/';
-    const FILE_NAME_STARTSWITH = 'certifygenvalidation_';
+    const FILE_NAME_STARTSWITH = 'local_elena_23072024_' . 'certifygenvalidation_';
 
     public function is_enabled(): bool;
     public function sendFile(certifygen_file $file): array;
 //    public function getState(int $courseid, int $validationid, string $code): int;
-    public function getFile(int $courseid, int $validationid, int $teacherrequestid, string $code);
+    public function getFile(int $courseid, int $validationid, string $code);
     public function getFileUrl(int $courseid, int $validationid, string $code): string;
     public function canRevoke(): bool;
 
@@ -57,6 +57,6 @@ interface ICertificateValidation {
      */
     public function checkfile(): bool;
 
-    public function getStatus(int $validationid, int $teacherrequestid): int;
+    public function getStatus(int $validationid): int;
 }
 

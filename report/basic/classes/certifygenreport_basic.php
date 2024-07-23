@@ -31,6 +31,7 @@ require_once($CFG->dirroot . '/lib/pdflib.php');
 
 use certifygenreport_basic\output\report_view;
 use mod_certifygen\interfaces\ICertificateReport;
+use mod_certifygen\persistents\certifygen_validations;
 
 class certifygenreport_basic implements ICertificateReport
 {
@@ -44,12 +45,12 @@ class certifygenreport_basic implements ICertificateReport
     }
 
     /**
-     * @param \mod_certifygen\persistents\certifygen_teacherrequests $teacherrequest
+     * @param certifygen_validations $teacherrequest
      * @return array
      * @throws coding_exception
      * @throws dml_exception
      */
-    public function createFile(\mod_certifygen\persistents\certifygen_teacherrequests $teacherrequest): array
+    public function createFile(certifygen_validations $teacherrequest): array
     {
         global $PAGE;
         $courselist = [];

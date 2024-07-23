@@ -39,7 +39,7 @@ use invalid_parameter_exception;
 use mod_certifygen\interfaces\ICertificateReport;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
-use mod_certifygen\persistents\certifygen_teacherrequests;
+use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 
 class deleteteacherrequest_external extends external_api {
@@ -69,10 +69,10 @@ class deleteteacherrequest_external extends external_api {
         $result = ['result' => true, 'message' => 'OK'];
         try {
             $candelete = true;
-            $request = new certifygen_teacherrequests($id);
+            $request = new certifygen_validations($id);
             $model = new certifygen_model($request->get('modelid'));
             $validationplugin = $model->get('validation');
-            if (!empty($validationplugin) && $request->get('status') != certifygen_teacherrequests::STATUS_NOT_STARTED) {
+            if (!empty($validationplugin) && $request->get('status') != certifygen_validations::STATUS_NOT_STARTED) {
                 $validationpluginclass = $validationplugin . '\\' . $validationplugin;
                 if (get_config($validationplugin, 'enabled') === '1') {
                     /** @var ICertificateValidation $subplugin */

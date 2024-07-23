@@ -42,7 +42,7 @@ use invalid_parameter_exception;
 use mod_certifygen\interfaces\ICertificateReport;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
-use mod_certifygen\persistents\certifygen_teacherrequests;
+use mod_certifygen\persistents\certifygen_validations;
 use moodle_url;
 
 class downloadteachercertificate_external extends external_api {
@@ -76,7 +76,7 @@ class downloadteachercertificate_external extends external_api {
 
         try {
             // Step 1: verified status finished.
-            $trequest = new certifygen_teacherrequests($id);
+            $trequest = new certifygen_validations($id);
             if (is_null($trequest)) {
                 $result = ['result' => false, 'message' => 'notfound', 'url' => ''];
                 return $result;

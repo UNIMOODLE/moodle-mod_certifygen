@@ -14,10 +14,6 @@ class certifygenvalidationcsv extends persistent
                 'type' => PARAM_INT,
                 'default' => 0
             ],
-            'teacherrequestid' => [
-                'type' => PARAM_INT,
-                'default' => 0
-            ],
             'applicationid' => [
                 'type' => PARAM_RAW,
             ],

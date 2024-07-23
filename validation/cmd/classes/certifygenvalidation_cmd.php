@@ -171,7 +171,7 @@ class certifygenvalidation_cmd implements ICertificateValidation
      * @param string $code
      * @return stored_file
      */
-    public function getFile(int $courseid, int $validationid, int $teacherrequestid, string $code)
+    public function getFile(int $courseid, int $validationid, string $code)
     {
         $code = self::FILE_NAME_STARTSWITH . $code . '.pdf';
         $fs = get_file_storage();
@@ -239,10 +239,9 @@ class certifygenvalidation_cmd implements ICertificateValidation
 
     /**
      * @param int $validationid
-     * @param int $teacherrequestid
      * @return int
      */
-    public function getStatus(int $validationid, int $teacherrequestid): int
+    public function getStatus(int $validationid): int
     {
         return certifygen_validations::STATUS_IN_PROGRESS;
     }

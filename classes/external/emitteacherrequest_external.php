@@ -43,7 +43,6 @@ use mod_certifygen\certifygen_file;
 use mod_certifygen\interfaces\ICertificateReport;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
-use mod_certifygen\persistents\certifygen_teacherrequests;
 use mod_certifygen\persistents\certifygen_validations;
 
 class emitteacherrequest_external extends external_api {
@@ -77,8 +76,8 @@ class emitteacherrequest_external extends external_api {
         $result = ['result' => true, 'message' => get_string('ok', 'mod_certifygen')];
 
         // Step 1: Change status to in progress.
-        $teacherrequest = new certifygen_teacherrequests($id);
-        $teacherrequest->set('status', certifygen_teacherrequests::STATUS_IN_PROGRESS);
+        $teacherrequest = new certifygen_validations($id);
+        $teacherrequest->set('status', certifygen_validations::STATUS_IN_PROGRESS);
         $teacherrequest->save();
         try {
             $certifygenmodel = new certifygen_model($teacherrequest->get('modelid'));
@@ -93,7 +92,7 @@ class emitteacherrequest_external extends external_api {
             $subplugin = new $reportpluginclass();
             $result = $subplugin->createFile($teacherrequest);
             if (!$result['result']) {
-                $teacherrequest->set('status', certifygen_teacherrequests::STATUS_ERROR);
+                $teacherrequest->set('status', certifygen_validations::STATUS_ERROR);
                 $teacherrequest->save();
                 return $result;
             }
@@ -137,7 +136,7 @@ class emitteacherrequest_external extends external_api {
             error_log(__FUNCTION__ . ' ' . ' error: '.var_export($e->getMessage(), true));
             $result['result'] = false;
             $result['message'] = $e->getMessage();
-            $teacherrequest->set('status', certifygen_teacherrequests::STATUS_ERROR);
+            $teacherrequest->set('status', certifygen_validations::STATUS_ERROR);
             $teacherrequest->save();
         }
         return $result;

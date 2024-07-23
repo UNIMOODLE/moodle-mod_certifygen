@@ -42,7 +42,7 @@ $preview = optional_param('preview', false, PARAM_BOOL);
 require_login();
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url(new moodle_url('/mod/certifygen/certificateview.php', ['code' => $issuecode]));
-$lang = certifygen_validations::get_lang_by_code($issuecode);
+$lang = certifygen_validations::get_lang_by_code_for_activities($issuecode);
 //$lang = explode('_', $issuecode);
 if ($preview) {
     $templateid = required_param('templateid', PARAM_INT);

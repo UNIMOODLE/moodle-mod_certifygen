@@ -28,9 +28,7 @@
 
 namespace mod_certifygen\interfaces;
 
-use mod_certifygen\certifygen_file;
-use mod_certifygen\persistents\certifygen_teacherrequests;
-use stored_file;
+use mod_certifygen\persistents\certifygen_validations;
 
 interface ICertificateReport {
     const FILE_COMPONENT = 'mod_certifygen';
@@ -39,6 +37,6 @@ interface ICertificateReport {
     const FILE_NAME_STARTSWITH = 'VVBNcertifygenreport_';
 
     public function is_enabled(): bool;
-    public function createFile(certifygen_teacherrequests $trequest): array;
+    public function createFile(certifygen_validations $trequest): array;
 }
 

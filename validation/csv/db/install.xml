@@ -7,7 +7,6 @@
         <FIELDS>
           <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
           <FIELD NAME="validationid" TYPE="int" LENGTH="20" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-          <FIELD NAME="teacherrequestid" TYPE="int" LENGTH="20" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
           <FIELD NAME="applicationid" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="External application identifier"/>
           <FIELD NAME="token" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
           <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>

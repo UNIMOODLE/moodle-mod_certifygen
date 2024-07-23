@@ -40,17 +40,11 @@ use context_system;
 use core\invalid_persistent_exception;
 use core_form\dynamic_form;
 use dml_exception;
-use html_writer;
-use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_context;
-use mod_certifygen\persistents\certifygen_model;
-use mod_certifygen\persistents\certifygen_teacherrequests;
+use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 use moodle_url;
-use tool_certificate\certificate;
-use MoodleQuickForm;
-use tool_certificate\permission;
-use function get_string_manager;
+use stdClass;
 
 class teacherrequestform extends dynamic_form {
 
@@ -129,16 +123,17 @@ class teacherrequestform extends dynamic_form {
     {
         $formdata = (array) $this->get_data();
         $id = $formdata['id'];
-        $data = new \stdClass();
+        $data = new stdClass();
         if ($id === 0) {
-            $data->status = certifygen_teacherrequests::STATUS_NOT_STARTED;
+            $data->status = certifygen_validations::STATUS_NOT_STARTED;
         }
         $data->lang = $formdata['lang_' . $formdata['modelid']];
         $data->courses = implode(',', $formdata['courses']);
         $data->userid = $formdata['userid'];
         $data->modelid = $formdata['modelid'];
         $data->name = $formdata['name'];
-        certifygen_teacherrequests::manage_teacherrequests($id, $data);
+        $data->certifygenid = 0;
+        certifygen_validations::manage_validation($id, $data);
     }
 
     /**
@@ -151,7 +146,7 @@ class teacherrequestform extends dynamic_form {
             'userid' => $this->_ajaxformdata['userid'],
         ];
         if ((int)$data['id'] > 0) {
-            $teacherrequest = new certifygen_teacherrequests($data['id']);
+            $teacherrequest = new certifygen_validations($data['id']);
             $data['lang'] = $teacherrequest->get('lang');
             $data['courses'] = $teacherrequest->get('courses');
             $data['name'] = $teacherrequest->get('name');

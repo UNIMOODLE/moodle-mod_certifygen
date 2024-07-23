@@ -31,11 +31,8 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-use mod_certifygen\external\deletemodel_external;
-use mod_certifygen\external\emitcertificate_external;
 use mod_certifygen\external\emitteacherrequest_external;
 use mod_certifygen\persistents\certifygen_model;
-use mod_certifygen\persistents\certifygen_teacherrequests;
 use mod_certifygen\persistents\certifygen_validations;
 
 global $CFG;
@@ -76,9 +73,9 @@ class emitteacherrequest_external_test extends advanced_testcase {
 
         // Create teacherrequest.
         $teacherrequest = $modgenerator->create_teacher_request($model->get('id'), $course->id, $teacher->id);
-        self::assertEquals(certifygen_teacherrequests::STATUS_NOT_STARTED, $teacherrequest->get('status'));
+        self::assertEquals(certifygen_validations::STATUS_NOT_STARTED, $teacherrequest->get('status'));
         $result = emitteacherrequest_external::emitteacherrequest($teacherrequest->get('id'));
-        $teacherrequest = new certifygen_teacherrequests($teacherrequest->get('id'));
+        $teacherrequest = new certifygen_validations($teacherrequest->get('id'));
 
         // Tests.
         self::assertIsArray($result);

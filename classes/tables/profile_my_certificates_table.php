@@ -36,11 +36,8 @@ require_once($CFG->libdir . '/tablelib.php');
 
 use coding_exception;
 use dml_exception;
-use mod_certifygen\interfaces\ICertificateValidation;
-use mod_certifygen\persistents\certifygen_teacherrequests;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
-use moodle_url;
 use stdClass;
 use table_sql;
 
@@ -142,9 +139,9 @@ class profile_my_certificates_table extends table_sql {
     {
         $status = $row->status;
         if (is_null($status)) {
-            $status = certifygen_teacherrequests::STATUS_NOT_STARTED;
+            $status = certifygen_validations::STATUS_NOT_STARTED;
         }
-        if ($status == certifygen_teacherrequests::STATUS_FINISHED) {
+        if ($status == certifygen_validations::STATUS_FINISHED) {
 //            return '<span data-id="'. $row->id . '" data-action="download-certificate" data-name="' . $row->name . '"
 //            data-userid="'. $row->userid .'" class="btn btn-primary">' . get_string('download') . '</span>';
 
@@ -167,9 +164,9 @@ class profile_my_certificates_table extends table_sql {
      */
     public function query_db($pagesize, $useinitialsbar = true): void
     {
-        $total = certifygen_teacherrequests::count_my_requests($this->userid);
+        $total = certifygen_validations::count_my_requests_as_teachers($this->userid);
         $this->pagesize($pagesize, $total);
-        $this->rawdata = certifygen_teacherrequests::get_my_requests($this->userid, $this->get_page_start(),
+        $this->rawdata = certifygen_validations::get_my_requests_as_teacher($this->userid, $this->get_page_start(),
             $this->get_page_size());
 
         // Set initial bars.

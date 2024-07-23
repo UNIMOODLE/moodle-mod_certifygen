@@ -29,6 +29,16 @@ class certifygen_validations extends persistent {
      */
     protected static function define_properties(): array {
         return [
+            'name' => [
+                'type' => PARAM_TEXT,
+                'default' => NULL,
+                'null' => NULL_ALLOWED,
+            ],
+            'courses' => [
+                'type' => PARAM_TEXT,
+                'default' => NULL,
+                'null' => NULL_ALLOWED,
+            ],
             'certifygenid' => [
                 'type' => PARAM_INT,
                 'default' => 0,
@@ -64,6 +74,12 @@ class certifygen_validations extends persistent {
      * @throws invalid_persistent_exception
      */
     public static function manage_validation(int $id, stdClass $data) : self {
+        if (!empty($data->courses)) {
+            // Order courses by id.
+            $courses = explode(',', $data->courses);
+            asort($courses);
+            $data->courses = implode(',', $courses);
+        }
         $validation = new self($id, $data);
         if (empty($id)) {
             $validation->create();
@@ -78,7 +94,7 @@ class certifygen_validations extends persistent {
      * @return string
      * @throws dml_exception
      */
-    public static function get_lang_by_code(string $code) : string {
+    public static function get_lang_by_code_for_activities(string $code) : string {
 
         global $DB;
         $params = [
@@ -111,5 +127,76 @@ class certifygen_validations extends persistent {
             }
         }
         return null;
+    }
+
+    /**
+     * @param int $userid
+     * @return string
+     */
+    public static function count_my_requests_as_teachers(int $userid) : string {
+
+        $params = [
+            'userid' => $userid,
+            'certifygenid' => 0,
+        ];
+
+        return self::count_records($params);
+    }
+
+    /**
+     * @param int $userid
+     * @param int $start
+     * @param int $pagesize
+     * @return certifygen_validations[]
+     * @throws dml_exception
+     */
+    public static function get_my_requests_as_teacher(int $userid, int $start, int $pagesize) {
+        global $DB;
+        $params = [
+            'userid' => $userid,
+            'certifygenid' => 0,
+        ];
+        $sql = "SELECT tr.id, tr.name, tr.modelid, tr.status, tr.lang, tr.courses, tr.userid, m.validation, m.report
+        FROM {certifygen_model} m 
+        INNER JOIN {certifygen_validations} tr ON tr.modelid = m.id
+        WHERE tr.userid = :userid
+        AND tr.certifygenid = :certifygenid
+        ORDER BY tr.timemodified DESC ";
+        return $DB->get_records_sql($sql, $params, $start, $pagesize);
+    }
+    /**
+     * @param int $userid
+     * @param string $courses
+     * @param string $lang
+     * @param int $modelid
+     * @return false|mixed
+     * @throws dml_exception
+     */
+    public static function get_request_by_data_for_teachers(int $userid, string $courses, string $lang, int $modelid, string $name) {
+        global $DB;
+        $comparename = $DB->sql_compare_text('ct.name');
+        $comparenameplaceholder = $DB->sql_compare_text(':name');
+        $comparelang = $DB->sql_compare_text('ct.lang');
+        $comparelangplaceholder = $DB->sql_compare_text(':lang');
+        $comparecourses = $DB->sql_compare_text('ct.courses');
+        $comparecoursesplaceholder = $DB->sql_compare_text(':courses');
+
+        $params = [
+            'userid' => $userid,
+            'courses' => $courses,
+            'lang' => $lang,
+            'modelid' => $modelid,
+            'name' => $name,
+            'certifygenid' => 0,
+        ];
+        $sql = "SELECT ct.* 
+                FROM {certifygen_validations} ct
+                WHERE {$comparelang} = {$comparelangplaceholder} 
+                    AND {$comparecourses} = {$comparecoursesplaceholder} 
+                    AND {$comparename} = {$comparenameplaceholder} 
+                    AND ct.userid = :userid
+                    AND ct.certifygenid = :certifygenid
+                    AND ct.modelid = :modelid ";
+        return $DB->get_record_sql($sql, $params);
     }
 }

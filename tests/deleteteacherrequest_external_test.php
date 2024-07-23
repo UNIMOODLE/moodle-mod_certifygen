@@ -34,7 +34,7 @@
 
 use mod_certifygen\external\deleteteacherrequest_external;
 use mod_certifygen\persistents\certifygen_model;
-use mod_certifygen\persistents\certifygen_teacherrequests;
+use mod_certifygen\persistents\certifygen_validations;
 
 global $CFG;
 require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
@@ -74,14 +74,14 @@ class deleteteacherrequest_external_test extends advanced_testcase
 
         // Tests teacher request exists.
         $this->assertTrue($trequest->get('id') > 0);
-        $count = certifygen_teacherrequests::count_records();
+        $count = certifygen_validations::count_my_requests_as_teachers($user->id);
         $this->assertEquals(1, $count);
 
         // Delete teacher request.
         deleteteacherrequest_external::deleteteacherrequest($trequest->get('id'));
 
         // Tests teacher request not exists.
-        $count = certifygen_teacherrequests::count_records();
+        $count = certifygen_validations::count_my_requests_as_teachers($user->id);
         $this->assertEquals(0, $count);
 
     }

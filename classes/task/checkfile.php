@@ -38,9 +38,7 @@ use core\task\scheduled_task;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
-use mod_certifygen\persistents\certifygen_teacherrequests;
 use mod_certifygen\persistents\certifygen_validations;
-use tool_certificate\external\issues;
 
 class checkfile extends scheduled_task
 {
@@ -58,34 +56,6 @@ class checkfile extends scheduled_task
      */
     public function execute()
     {
-        $validations = certifygen_teacherrequests::get_records(['status' => certifygen_validations::STATUS_VALIDATION_OK]);
-        foreach ($validations as $validation) {
-            try {
-                $model = new certifygen_model($validation->get('modelid'));
-                $validationplugin = $model->get('validation');
-                if (empty($validationplugin)) {
-                    continue;
-                }
-                $validationpluginclass = $validationplugin . '\\' . $validationplugin;
-                if (get_config($validationplugin, 'enabled') === '0') {
-                    continue;
-                }
-                /** @var ICertificateValidation $subplugin */
-                $subplugin = new $validationpluginclass();
-                if (!$subplugin->checkFile()) {
-                    continue;
-                }
-                $newfile = $subplugin->getFile(0, 0, $validation->get('id'), '');
-                if ($newfile) {
-                    $status = certifygen_validations::STATUS_FINISHED;
-                    $validation->set('status', $status);
-                    $validation->save();
-                }
-            } catch (\moodle_exception $e) {
-                error_log(__FUNCTION__ . ' e: '.var_export($e->getMessage(), true));
-                continue;
-            }
-        }
         $validations = certifygen_validations::get_records(['status' => certifygen_validations::STATUS_VALIDATION_OK]);
         foreach ($validations as $validation) {
             try {
