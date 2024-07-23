@@ -48,6 +48,7 @@ $PAGE->set_url(new moodle_url('/mod/certifygen/teacherrequestreport.php'));
 $form = new \mod_certifygen\forms\searchforuserform();
 
 echo $OUTPUT->header();
+echo $OUTPUT->heading(get_string('teachercertificates', 'mod_certifygen'), 2, 'mb-5');
 echo $form->display();
 if ($data = $form->get_data()) {
     $output = $PAGE->get_renderer('mod_certifygen');

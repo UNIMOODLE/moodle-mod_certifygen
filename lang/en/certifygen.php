@@ -152,3 +152,4 @@ $string['report'] = 'Report';
 $string['ok'] = 'OK';
 $string['checkstatustask'] = 'Check status';
 $string['checkfiletask'] = 'Check file';
+$string['teachercertificates'] = 'Teacher\'s certificates';
