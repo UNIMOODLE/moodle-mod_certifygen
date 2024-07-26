@@ -122,7 +122,7 @@ class certifygenvalidation_cmd implements ICertificateValidation
         $doc->writeHTML($content);
 
         // Get pdf content.
-        $pdfcontent = $doc->Output(self::FILE_NAME_STARTSWITH . $file->get_file()->get_filename(), 'S');
+        $pdfcontent = $doc->Output($file->get_file()->get_filename(), 'S');
 
         // Save pdf on moodledata.
         $fs = get_file_storage();
@@ -147,7 +147,7 @@ class certifygenvalidation_cmd implements ICertificateValidation
             'filearea' => self::FILE_AREA,
             'itemid' => $validationid,
             'filepath' => self::FILE_PATH,
-            'filename' => self::FILE_NAME_STARTSWITH . $filename
+            'filename' => $filename
         ];
     }
 
@@ -173,7 +173,7 @@ class certifygenvalidation_cmd implements ICertificateValidation
      */
     public function getFile(int $courseid, int $validationid, string $code)
     {
-        $code = self::FILE_NAME_STARTSWITH . $code . '.pdf';
+        $code = $code . '.pdf';
         $fs = get_file_storage();
         $contextid = \context_system::instance()->id;
         if (!empty($courseid)) {
@@ -241,7 +241,7 @@ class certifygenvalidation_cmd implements ICertificateValidation
      * @param int $validationid
      * @return int
      */
-    public function getStatus(int $validationid): int
+    public function getStatus(int $validationid, string $code): int
     {
         return certifygen_validations::STATUS_IN_PROGRESS;
     }

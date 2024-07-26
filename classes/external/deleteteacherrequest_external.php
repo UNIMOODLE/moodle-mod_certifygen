@@ -78,8 +78,8 @@ class deleteteacherrequest_external extends external_api {
                     /** @var ICertificateValidation $subplugin */
                     $subplugin = new $validationpluginclass();
                     if ($subplugin->canRevoke()) {
-                        $code = ICertificateReport::FILE_NAME_STARTSWITH . $id;
-                        $output = $subplugin->revoke($code);
+//                        $code = ICertificateReport::FILE_NAME_STARTSWITH . $id;
+                        $output = $subplugin->revoke($request->get('code'));
                         if ($output['haserror']) {
                             $candelete = false;
                             $result['result'] = false;

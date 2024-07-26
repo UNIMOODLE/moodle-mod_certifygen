@@ -34,7 +34,7 @@ interface ICertificateReport {
     const FILE_COMPONENT = 'mod_certifygen';
     const FILE_AREA = 'certifygenreport';
     const FILE_PATH = '/';
-    const FILE_NAME_STARTSWITH = 'VVBNcertifygenreport_';
+//    const FILE_NAME_STARTSWITH = 'VVBNcertifygenreport_';
 
     public function is_enabled(): bool;
     public function createFile(certifygen_validations $trequest): array;

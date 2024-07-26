@@ -207,14 +207,9 @@ class activityteacher_table extends table_sql {
             $status = certifygen_validations::STATUS_NOT_STARTED;
         }
         if ($status == certifygen_validations::STATUS_FINISHED) {
-//            return '<span data-courseid="' . $row->courseid . '" data-instanceid="' . $this->instanceid . '" data-modelid="' . $this->modelid . '"
-//            data-id="'. $row->validationid . '" data-action="download-certificate" data-userid="'. $row->id .'"
-//            data-code="'. $row->code .'" data-lang="'. $this->lang .'" data-langstring="'. $this->langstring .'"  data-cmid="'. $this->cmid .'"
-//            class="btn btn-primary">' . get_string('download') . '</span>';
-
-            return '<span data-courseid="' . $row->courseid . '" data-instanceid="' . $this->instanceid . '" data-modelid="' . $this->modelid . '" 
-            data-id="'. $row->validationid . '" data-action="" data-userid="'. $row->id .'" 
-            data-code="'. $row->code .'" data-lang="'. $this->lang .'" data-langstring="'. $this->langstring .'"  data-cmid="'. $this->cmid .'" 
+            return '<span data-courseid="' . $row->courseid . '" data-instanceid="' . $this->instanceid . '" data-modelid="' . $this->modelid . '"
+            data-id="'. $row->validationid . '" data-action="download-certificate" data-userid="'. $row->id .'"
+            data-code="'. $row->code .'" data-lang="'. $this->lang .'" data-langstring="'. $this->langstring .'"  data-cmid="'. $this->cmid .'"
             class="btn btn-primary">' . get_string('download') . '</span>';
         }
         return '';

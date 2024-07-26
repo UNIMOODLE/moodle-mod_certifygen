@@ -74,11 +74,14 @@ class checkfile extends scheduled_task
                     continue;
                 }
                 $certi = new certifygen($validation->get('certifygenid'));
-                global $DB;
-                $code = $DB->get_field('tool_certificate_issues', 'code',
-                    ['userid' => $validation->get('userid'),
-                        'id' => $validation->get('issueid')]);
-                $newfile = $subplugin->getFile($certi->get('course'), $validation->get('id'), 0, $code);
+                $code = $validation->get('code');
+                if (!empty($validation->get('certifygenid'))) {
+                    global $DB;
+                    $code = $DB->get_field('tool_certificate_issues', 'code',
+                        ['userid' => $validation->get('userid'),
+                            'id' => $validation->get('issueid')]);
+                }
+                $newfile = $subplugin->getFile($certi->get('course'), $validation->get('id'), $code);
                 if ($newfile) {
                     $status = certifygen_validations::STATUS_FINISHED;
                     $validation->set('status', $status);

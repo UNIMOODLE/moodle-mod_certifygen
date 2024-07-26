@@ -111,7 +111,11 @@ class downloadcertificate_external extends external_api {
                 if (get_config($validationplugin, 'enabled') === '1') {
                     /** @var ICertificateValidation $subplugin */
                     $subplugin = new $validationpluginclass();
-                    $result['url'] = $subplugin->getFileUrl($courseid, $validationid, $code);
+                    $result['url'] = $subplugin->getFileUrl($courseid, $validationid, $code.'.pdf');
+                    if (empty($result['url'])) {
+                        $result['result'] = false;
+                        $result['message'] = 'empty_url';
+                    }
                 } else {
                     $result['result'] = false;
                     $result['message'] = 'plugin_not_enabled';

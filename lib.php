@@ -364,7 +364,8 @@ function mod_certifygen_pluginfile(
 
     // Make sure the filearea is one of those used by the plugin.
     if ($filearea !== ICertificateValidation::FILE_AREA &&
-        $filearea !== ICertificateReport::FILE_AREA
+        $filearea !== ICertificateReport::FILE_AREA &&
+        $filearea !== ICertificateValidation::FILE_AREA_VALIDATED
         && $filearea !== 'issues') {
         return false;
     }

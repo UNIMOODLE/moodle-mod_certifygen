@@ -57,7 +57,7 @@ class certifygenreport_basic implements ICertificateReport
         $courses = $teacherrequest->get('courses');
         $courses = explode(',', $courses);
         foreach ($courses as $courseid) {
-            $courselist[] = ['course' => format_text(get_course($courseid)->fullname)];
+            $courselist[] = ['course' => strip_tags(format_text(get_course($courseid)->fullname))];
         }
         try {
             // Step 2: Create pdf.
@@ -85,7 +85,8 @@ class certifygenreport_basic implements ICertificateReport
                     }
                 }
             }
-            $res = $doc->Output(ICertificateReport::FILE_NAME_STARTSWITH . $teacherrequest->get('id') .'_'.time().'.pdf', 'S');
+//            $res = $doc->Output(ICertificateReport::FILE_NAME_STARTSWITH . $teacherrequest->get('id') .'_'.time().'.pdf', 'S');
+            $res = $doc->Output($teacherrequest->get('code') .'_'.time().'.pdf', 'S');
             $fs = get_file_storage();
             $context = \context_system::instance();
             $filerecord = [
@@ -93,7 +94,7 @@ class certifygenreport_basic implements ICertificateReport
                 'component' => self::FILE_COMPONENT,
                 'filearea' => self::FILE_AREA,
                 'itemid' => $teacherrequest->get('id'),
-                'filename' => self::FILE_NAME_STARTSWITH . $teacherrequest->get('id') . '.pdf',
+                'filename' => $teacherrequest->get('code') . '.pdf',
                 'filepath' => self::FILE_PATH,
             ];
             $file = $fs->get_file($filerecord['contextid'], $filerecord['component'], $filerecord['filearea'], $filerecord['itemid'],

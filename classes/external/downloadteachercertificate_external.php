@@ -84,7 +84,8 @@ class downloadteachercertificate_external extends external_api {
             // Step 2: call to getfile from validationplugin.
             $certifygenmodel = new certifygen_model($trequest->get('modelid'));
             $validationplugin = $certifygenmodel->get('validation');
-            $code = ICertificateReport::FILE_NAME_STARTSWITH . $trequest->get('id').'.pdf';
+//            $code = ICertificateReport::FILE_NAME_STARTSWITH . $trequest->get('id').'.pdf';
+            $code = $trequest->get('code').'.pdf';
             if (empty($validationplugin)) {
                 // Get file from moodledata.
                 $fs = get_file_storage();
@@ -107,6 +108,10 @@ class downloadteachercertificate_external extends external_api {
                     /** @var ICertificateValidation $subplugin */
                     $subplugin = new $validationpluginclass();
                     $result['url'] = $subplugin->getFileUrl(0, $trequest->get('id'), $code);
+                    if (empty($result['url'])) {
+                        $result['result'] = false;
+                        $result['message'] = 'empty_url';
+                    }
                 } else {
                     $result['result'] = false;
                     $result['message'] = 'plugin_not_enabled';

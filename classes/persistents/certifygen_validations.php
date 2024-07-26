@@ -21,6 +21,7 @@ class certifygen_validations extends persistent {
     public const STATUS_STORAGE_ERROR = 6;
     public const STATUS_ERROR = 7;
     public const STATUS_FINISHED = 8;
+    public const TEACHER_REQUEST_CODE_STARTSWITH = 'TR';
 
     /**
      * Define properties
@@ -35,6 +36,11 @@ class certifygen_validations extends persistent {
                 'null' => NULL_ALLOWED,
             ],
             'courses' => [
+                'type' => PARAM_TEXT,
+                'default' => NULL,
+                'null' => NULL_ALLOWED,
+            ],
+            'code' => [
                 'type' => PARAM_TEXT,
                 'default' => NULL,
                 'null' => NULL_ALLOWED,
@@ -80,6 +86,9 @@ class certifygen_validations extends persistent {
             asort($courses);
             $data->courses = implode(',', $courses);
         }
+        if (!$id && !empty($data->courses)) {
+            $data->code = self::generate_code($data->userid);
+        }
         $validation = new self($id, $data);
         if (empty($id)) {
             $validation->create();
@@ -87,6 +96,49 @@ class certifygen_validations extends persistent {
             $validation->update();
         }
         return $validation;
+    }
+
+    /**
+     * Generates a unique 10-digit code of random numbers and firstname, lastname initials if userid is passed as parameter.
+     *
+     * @param int|null $userid
+     * @return string
+     */
+    public static function generate_code($userid = null) {
+        global $DB;
+        $uniquecodefound = false;
+        $user = $userid ? $DB->get_record('user', ['id' => $userid]) : null;
+        $code = self::generate_code_string($user);
+        while (!$uniquecodefound) {
+            if (!$DB->record_exists('tool_certificate_issues', ['code' => $code])) {
+                $uniquecodefound = true;
+            } else {
+                $code = self::generate_code_string($user);
+            }
+        }
+        return self::TEACHER_REQUEST_CODE_STARTSWITH . $code;
+    }
+
+    /**
+     * Generates a 10-digit code of random numbers and firstname, lastname initials if userid is passed as parameter.
+     *
+     * @param \stdClass|null $user
+     * @return string
+     */
+    private static function generate_code_string(\stdClass $user = null): string {
+        $code = '';
+        for ($i = 1; $i <= 10; $i++) {
+            $code .= mt_rand(0, 9);
+        }
+        if ($user) {
+            foreach ([$user->firstname, $user->lastname] as $item) {
+                $initial = \core_text::substr(\core_text::strtoupper(\core_text::specialtoascii($item)), 0, 1);
+                $code .= preg_match('/[A-Z0-9]/', $initial) ? $initial : \core_text::strtoupper(random_string(1));
+            }
+        } else {
+            $code .= \core_text::strtoupper(random_string(2));
+        }
+        return $code;
     }
 
     /**
@@ -198,5 +250,22 @@ class certifygen_validations extends persistent {
                     AND ct.certifygenid = :certifygenid
                     AND ct.modelid = :modelid ";
         return $DB->get_record_sql($sql, $params);
+    }
+
+    /**
+     * @param certifygen_validations $validation
+     * @return bool|mixed|null
+     * @throws coding_exception
+     * @throws dml_exception
+     */
+    public static function get_certificate_code(certifygen_validations $validation) {
+        $code = $validation->get('code');
+        if (!empty($validation->get('certifygenid'))) {
+            global $DB;
+            $code = $DB->get_field('tool_certificate_issues', 'code',
+                ['userid' => $validation->get('userid'),
+                    'id' => $validation->get('issueid')]);
+        }
+        return $code;
     }
 }

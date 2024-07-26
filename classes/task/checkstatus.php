@@ -72,7 +72,8 @@ class checkstatus extends scheduled_task
                 if (!$subplugin->checkStatus()) {
                     continue;
                 }
-                $newstatus = $subplugin->getStatus($validation->get('id'), 0);
+                $code = certifygen_validations::get_certificate_code($validation);
+                $newstatus = $subplugin->getStatus($validation->get('id'), $code);
                 if ($newstatus != $validation->get('status')) {
                     $validation->set('status', $newstatus);
                     $validation->save();

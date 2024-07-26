@@ -142,10 +142,7 @@ class profile_my_certificates_table extends table_sql {
             $status = certifygen_validations::STATUS_NOT_STARTED;
         }
         if ($status == certifygen_validations::STATUS_FINISHED) {
-//            return '<span data-id="'. $row->id . '" data-action="download-certificate" data-name="' . $row->name . '"
-//            data-userid="'. $row->userid .'" class="btn btn-primary">' . get_string('download') . '</span>';
-
-            return '<span data-id="'. $row->id . '" data-action="" data-name="' . $row->name . '" 
+            return '<span data-id="'. $row->id . '" data-action="download-certificate" data-name="' . $row->name . '"
             data-userid="'. $row->userid .'" class="btn btn-primary">' . get_string('download') . '</span>';
         }
         return '';

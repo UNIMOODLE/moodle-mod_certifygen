@@ -89,7 +89,8 @@ class downloadteachercertificate_external_test extends advanced_testcase {
         $teacherrequest = new certifygen_validations($teacherrequest->get('id'));
         $contextid = context_system::instance()->id;
         self::assertEquals(certifygen_validations::STATUS_VALIDATION_OK, $teacherrequest->get('status'));
-        $filename = ICertificateReport::FILE_NAME_STARTSWITH . $teacherrequest->get('id') . '.pdf';
+//        $filename = ICertificateReport::FILE_NAME_STARTSWITH . $teacherrequest->get('id') . '.pdf';
+        $filename = $teacherrequest->get('code') . '.pdf';
         $fileurl = moodle_url::make_pluginfile_url($contextid, ICertificateReport::FILE_COMPONENT,
             ICertificateReport::FILE_AREA, $teacherrequest->get('id'), ICertificateReport::FILE_PATH,
             $filename)->out();

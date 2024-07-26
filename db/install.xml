@@ -62,6 +62,7 @@
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="name" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Mandatory for system context models"/>
                 <FIELD NAME="courses" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Mandatory for system context. List of course ids separated by commas"/>
+                <FIELD NAME="code" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Teacher's certificate code. It will be the file name."/>
                 <FIELD NAME="certifygenid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="issueid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
