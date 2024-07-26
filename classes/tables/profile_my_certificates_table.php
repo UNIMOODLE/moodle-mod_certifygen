@@ -36,6 +36,7 @@ require_once($CFG->libdir . '/tablelib.php');
 
 use coding_exception;
 use dml_exception;
+use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 use stdClass;
@@ -57,13 +58,14 @@ class profile_my_certificates_table extends table_sql {
         $uniqueid = 'profile-my-certificates-view';
         parent::__construct($uniqueid);
         // Define the list of columns to show.
-        $columns = ['name', 'status', 'lang', 'seecourses', 'emit', 'download', 'delete'];
+        $columns = ['name', 'status', 'date',  'lang', 'seecourses', 'emit', 'download', 'delete'];
         $this->define_columns($columns);
 
         // Define the titles of columns to show in header.
         $headers = [
             get_string('name', 'mod_certifygen'),
             get_string('status', 'mod_certifygen'),
+            get_string('date'),
             get_string('language'),
             '',
             '',
@@ -81,6 +83,18 @@ class profile_my_certificates_table extends table_sql {
     function col_name(stdClass $row): string
     {
         return $row->name;
+    }
+
+    /**
+     * @param $row
+     * @return string
+     */
+    function col_date(stdClass $row): string
+    {
+        if (empty($row->timecreated)) {
+            return '';
+        }
+        return date('d/m/y', $row->timecreated);
     }
 
     /**
@@ -118,12 +132,29 @@ class profile_my_certificates_table extends table_sql {
      */
     function col_emit(stdClass $row): string
     {
+        // Emit.
         if (empty($row->validation)) {
             return '';
         }
         if ($row->status == certifygen_validations::STATUS_NOT_STARTED) {
             return '<span class="likelink" data-userid="' . $row->userid . '" data-id="' . $row->id . '" data-action="emit">' .
                 get_string('emit', 'mod_certifygen') . '</span>';
+        }
+        // Re-emit.
+        if ($row->status == certifygen_validations::STATUS_FINISHED
+        && $row->mode == certifygen_model::MODE_PERIODIC) {
+            $today = time();
+            $mindays = $row->timeondemmand;
+            $dif = $today - $row->timecreated;
+            $difindays = abs($dif / (60 * 60 * 24));
+
+            error_log(__FUNCTION__ . ' row: '. var_export($row, true));
+            error_log(__FUNCTION__ . ' difindays: ' . var_export($difindays, true));
+            error_log(__FUNCTION__ . ' timeondemmand: ' . var_export($row->timeondemmand, true));
+            if ($difindays > (int)$row->timeondemmand) {
+                return '<span class="likelink" data-userid="' . $row->userid . '" data-id="' . $row->id . '" data-action="reemit">' .
+                    get_string('reemit', 'mod_certifygen') . '</span>';
+            }
         }
         return '';
     }

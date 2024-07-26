@@ -79,6 +79,14 @@ class modelform extends dynamic_form {
         $mform->addHelpButton('mode', 'mode', 'mod_certifygen');
         $mform->addRule('mode', get_string('required'), 'required');
 
+        // Timeondemmand.
+        $mform->addElement('text', 'timeondemmand',
+            get_string('timeondemmand', 'mod_certifygen'));
+        $mform->setType('timeondemmand', PARAM_INT);
+        $mform->addHelpButton('timeondemmand', 'timeondemmand', 'mod_certifygen');
+        $mform->hideIf('timeondemmand', 'mode', 'eq', certifygen_model::MODE_UNIQUE);
+        $mform->setDefault('timeondemmand', 30);
+
         // Model type.
         $mform->addElement('select', 'type',
             get_string('type', 'mod_certifygen'), mod_certifygen_get_types());
@@ -102,13 +110,6 @@ class modelform extends dynamic_form {
         $mform->addGroup($elements, 'template_group', get_string('template', 'coursecertificate'),
             html_writer::div('', 'w-100'), false);
         $mform->hideIf('template_group', 'type', 'noteq', certifygen_model::TYPE_ACTIVITY);
-
-        // Timeondemmand.
-        $mform->addElement('text', 'timeondemmand',
-            get_string('timeondemmand', 'mod_certifygen'));
-        $mform->setType('timeondemmand', PARAM_INT);
-        $mform->addHelpButton('timeondemmand', 'timeondemmand', 'mod_certifygen');
-        $mform->hideIf('timeondemmand', 'mode', 'eq', certifygen_model::MODE_UNIQUE);
 
         // Langs
         $langs = get_string_manager()->get_list_of_translations();
