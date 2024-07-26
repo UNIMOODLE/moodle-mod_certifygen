@@ -179,8 +179,7 @@ class activityteacher_table extends table_sql {
         if (empty($row->code)) {
             return '';
         }
-        $url = new moodle_url('/admin/tool/certificate/index.php', ['code' => $row->code]);
-        return '<a href="' . $url->out() . '">' . $row->code . '</a>';
+        return $row->code;
     }
     /**
      * @param $row
