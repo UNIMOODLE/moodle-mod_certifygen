@@ -31,15 +31,15 @@
 
 namespace mod_certifygen\external;
 
-use external_api;
-use external_function_parameters;
-use external_single_structure;
-use external_value;
-use invalid_parameter_exception;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_value;
 use mod_certifygen\interfaces\ICertificateReport;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
+use invalid_parameter_exception;
 use moodle_exception;
 
 class deleteteacherrequest_external extends external_api {
