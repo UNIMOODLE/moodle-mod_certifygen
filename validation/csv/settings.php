@@ -29,7 +29,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 // Enlace principal de settings.
-$ADMIN->add('modsettings',
+$ADMIN->add('modsettingcertifygencat',
     new admin_category('certifygenvalidation_csv_cat',
         get_string('pluginname', 'certifygenvalidation_csv')));
 
@@ -58,4 +58,4 @@ if ($ADMIN->fulltree) {
         new lang_string('appID', 'certifygenvalidation_csv'),
         new lang_string('appID_help', 'certifygenvalidation_csv'), ""));
 }
-$ADMIN->add('modsettingcertifygencat', $settings);
+//$ADMIN->add('modsettingcertifygencat', $settings);

@@ -33,7 +33,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 // Enlace principal de settings.
-$ADMIN->add('modsettings',
+$ADMIN->add('modsettingcertifygencat',
     new admin_category('certifygenreport_basic_cat',
         get_string('pluginname', 'certifygenreport_basic')));
 
@@ -68,4 +68,4 @@ if ($ADMIN->fulltree) {
 
 
 }
-$ADMIN->add('modsettingcertifygencat', $settings);
+//$ADMIN->add('modsettingcertifygencat', $settings);
