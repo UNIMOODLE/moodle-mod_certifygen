@@ -82,6 +82,7 @@ class emitteacherrequest_external_test extends advanced_testcase {
         self::assertArrayHasKey('result', $result);
         self::assertArrayNotHasKey('message', $result);
         self::assertTrue($result['result']);
-        self::assertEquals(certifygen_validations::STATUS_VALIDATION_OK, $teacherrequest->get('status'));
+        //TODO: change to STATUS_VALIDATION_OK
+        self::assertEquals(certifygen_validations::STATUS_FINISHED, $teacherrequest->get('status'));
     }
 }

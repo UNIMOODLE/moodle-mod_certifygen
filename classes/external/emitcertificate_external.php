@@ -151,6 +151,7 @@ class emitcertificate_external extends external_api {
                 $validationplugin = $certifygenmodel->get('validation');
                 $validationpluginclass = $validationplugin . '\\' . $validationplugin;
                 if (empty($validationplugin)) {
+                    // TODO: change to STATUS_VALIDATION_OK
                     $validation->set('status', certifygen_validations::STATUS_FINISHED);
                     $validation->save();
                 } else if (get_config($validationplugin, 'enabled') === '1') {
