@@ -68,10 +68,14 @@ class mod_certifygen_mod_form extends moodleform_mod {
             $elements[] = $mform->createElement('static', 'managemodels', '',
                 $OUTPUT->action_link($manageurl, get_string('modelsmanager', 'mod_certifygen')));
         }
-        $mform->addGroup($elements, 'models_group', get_string('model', 'mod_certifygen'),
+        $mform->addGroup($elements, 'models_group',
+            get_string('model', 'mod_certifygen'),
             html_writer::div('', 'w-100'), false);
+        $mform->addRule('models_group', get_string('required'), 'required');
+        $rules = [];
+        $rules['modelid'][] = [null, 'required', null, 'client'];
+        $mform->addGroupRule('models_group', $rules);
 //
-        $modelid = 0;
         if (!is_null($this->get_instance())) {
             $certifygen = new certifygen($this->get_instance());
             $modelid = $certifygen->get('modelid');
