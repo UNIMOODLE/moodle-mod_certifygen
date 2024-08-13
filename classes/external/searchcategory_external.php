@@ -71,7 +71,7 @@ class searchcategory_external extends external_api {
         $context = context_system::instance();
         self::validate_context($context);
 
-        $likename = $DB->sql_like('name', ':name');
+        $likename = $DB->sql_like('name', ':name', false, true);
         $sql = "SELECT id, name
               FROM {course_categories} c
              WHERE $likename";

@@ -63,8 +63,10 @@ class searchcategory_external_test extends advanced_testcase {
         // Login as user.
         $this->setUser($user);
 
-        self::getDataGenerator()->create_category(['name' => 'Primaria 1']);
-        self::getDataGenerator()->create_category(['name' => 'Primaria 2']);
+        $name1 = 'Primaria 1';
+        $category1 = self::getDataGenerator()->create_category(['name' => $name1]);
+        $name2 = 'primaria 2';
+        $category2 = self::getDataGenerator()->create_category(['name' => $name2]);
         self::getDataGenerator()->create_category(['name' => 'ESO 1']);
         $result = searchcategory_external::searchcategory('Prim');
 
@@ -74,5 +76,8 @@ class searchcategory_external_test extends advanced_testcase {
         self::assertArrayHasKey('maxusersperpage', $result);
         self::assertArrayHasKey('overflow', $result);
         self::assertCount(2, $result['list']);
+
+        self::assertEquals($name1, $result['list'][$category1->id]->name);
+        self::assertEquals($name2, $result['list'][$category2->id]->name);
     }
 }
