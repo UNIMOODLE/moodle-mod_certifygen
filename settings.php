@@ -88,17 +88,17 @@ $ADMIN->add('modsettingcertifygencat', $teacherrequestreportsettings);
 //    $module->is_enabled() === false);
 //$ADMIN->add('certifygenvalidationplugins', $subpluginssettings);
 
-unset($settings);
+//unset($settings);
 
 
 foreach (core_plugin_manager::instance()->get_plugins_of_type('certifygenvalidation') as $plugin) {
     /** @var \mod_certifygen\plugininfo\certifygenvalidation $plugin */
-    $plugin->load_settings($ADMIN, 'certifygenvalidationplugins', true);
+    $plugin->load_settings($ADMIN, 'modsettingcertifygencat', true);
 }
 
 foreach (core_plugin_manager::instance()->get_plugins_of_type('certifygenreport') as $plugin) {
     /** @var \mod_certifygen\plugininfo\certifygenreport $plugin */
-    $plugin->load_settings($ADMIN, 'certifygenreportplugins', true);
+    $plugin->load_settings($ADMIN, 'modsettingcertifygencat', $hassiteconfig);
 }
 // TinyMCE does not have standard settings page.
 $settings = null;
