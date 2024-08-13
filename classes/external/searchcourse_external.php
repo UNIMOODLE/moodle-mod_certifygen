@@ -71,7 +71,7 @@ class searchcourse_external extends external_api {
         $context = context_system::instance();
         self::validate_context($context);
 
-        $likename = $DB->sql_like('c.fullname', ':fullname');
+        $likename = $DB->sql_like('c.fullname', ':fullname', false, true);
         $sql = "SELECT id, fullname
               FROM {course} c
              WHERE $likename";

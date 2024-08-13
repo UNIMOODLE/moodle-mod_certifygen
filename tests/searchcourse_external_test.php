@@ -68,16 +68,22 @@ class searchcourse_external_test extends advanced_testcase
         $cat = self::getDataGenerator()->create_category();
         self::getDataGenerator()->create_course(['fullname' => 'Matemáticas 1', 'category' => $cat->id]);
         self::getDataGenerator()->create_course(['fullname' => 'Matemáticas 2', 'category' => $cat->id]);
-        $course = self::getDataGenerator()->create_course(['fullname' => 'Biologia', 'category' => $cat->id]);
-        $result = searchcourse_external::searchcourse('Bi');
+        $name = 'Biologia';
+        $course = self::getDataGenerator()->create_course(['fullname' => $name, 'category' => $cat->id]);
+        $name2 = 'biologia 5';
+        $course2 = self::getDataGenerator()->create_course(['fullname' => $name2, 'category' => $cat->id]);
 
+        $result = searchcourse_external::searchcourse('bi');
         // Tests.
         self::assertIsArray($result);
         self::assertArrayHasKey('list', $result);
         self::assertArrayHasKey('maxusersperpage', $result);
         self::assertArrayHasKey('overflow', $result);
-        self::assertCount(1, $result['list']);
+        self::assertCount(2, $result['list']);
         self::assertArrayHasKey($course->id, $result['list']);
+        self::assertArrayHasKey($course2->id, $result['list']);
         self::assertIsObject($result['list'][$course->id]);
+        self::assertEquals($name2, $result['list'][$course2->id]->name);
+        self::assertEquals($name, $result['list'][$course->id]->name);
     }
 }
