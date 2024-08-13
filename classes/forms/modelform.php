@@ -102,7 +102,7 @@ class modelform extends dynamic_form {
         $manageurl = new moodle_url('/admin/tool/certificate/manage_templates.php');
         $elements = [$mform->createElement('select', 'templateid', get_string('template', 'mod_certifygen'), $templateoptions)];
         $mform->setType('templateid', PARAM_INT);
-        error_log(__FUNCTION__ . ' ' . var_export($templates, true));
+
         // Adding "Manage templates" link if user has capabilities to manage templates.
         if ($canmanagetemplates && !empty($templates)) {
             $elements[] = $mform->createElement('static', 'managetemplates', '',
