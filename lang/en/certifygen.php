@@ -154,3 +154,5 @@ $string['ok'] = 'OK';
 $string['checkstatustask'] = 'Check status';
 $string['checkfiletask'] = 'Check file';
 $string['teachercertificates'] = 'Teacher\'s certificates';
+$string['chooseatemplate'] = 'Choose a template';
+$string['managetemplates'] = 'Manage templates';

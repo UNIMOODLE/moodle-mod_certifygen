@@ -98,16 +98,17 @@ class modelform extends dynamic_form {
         // Templateid
         $templates = mod_certifygen_get_templates();
         $canmanagetemplates = permission::can_manage_anywhere();
-        $templateoptions = ['' => get_string('chooseatemplate', 'coursecertificate')] + $templates;
+        $templateoptions = ['' => get_string('chooseatemplate', 'mod_certifygen')] + $templates;
         $manageurl = new moodle_url('/admin/tool/certificate/manage_templates.php');
-        $elements = [$mform->createElement('select', 'templateid', get_string('template', 'coursecertificate'), $templateoptions)];
+        $elements = [$mform->createElement('select', 'templateid', get_string('template', 'mod_certifygen'), $templateoptions)];
         $mform->setType('templateid', PARAM_INT);
+        error_log(__FUNCTION__ . ' ' . var_export($templates, true));
         // Adding "Manage templates" link if user has capabilities to manage templates.
         if ($canmanagetemplates && !empty($templates)) {
             $elements[] = $mform->createElement('static', 'managetemplates', '',
-                $OUTPUT->action_link($manageurl, get_string('managetemplates', 'coursecertificate')));
+                $OUTPUT->action_link($manageurl, get_string('managetemplates', 'mod_certifygen')));
         }
-        $mform->addGroup($elements, 'template_group', get_string('template', 'coursecertificate'),
+        $mform->addGroup($elements, 'template_group', get_string('template', 'mod_certifygen'),
             html_writer::div('', 'w-100'), false);
         $mform->hideIf('template_group', 'type', 'noteq', certifygen_model::TYPE_ACTIVITY);
 

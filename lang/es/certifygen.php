@@ -154,3 +154,5 @@ $string['ok'] = 'OK';
 $string['checkstatustask'] = 'Comprobar estado de los certificados';
 $string['checkfiletask'] = 'Comprobar archivos';
 $string['teachercertificates'] = 'Certificados  de profesores';
+$string['chooseatemplate'] = 'Elige una plantilla';
+$string['managetemplates'] = 'Gestionar plantillas';
