@@ -57,7 +57,8 @@ class certifygenreport_basic implements ICertificateReport
         $courses = $teacherrequest->get('courses');
         $courses = explode(',', $courses);
         foreach ($courses as $courseid) {
-            $courselist[] = ['course' => strip_tags(format_text(get_course($courseid)->fullname))];
+            //$courselist[] = ['course' => strip_tags(format_text(get_course($courseid)->fullname))];
+            $courselist[] = ['courseid' => $courseid];
         }
         try {
             // Step 2: Create pdf.
@@ -73,10 +74,14 @@ class certifygenreport_basic implements ICertificateReport
             } else {
                 // Course blocks.
                 $numblocks = (int) (count($courselist) / report_view::MAX_NUMBER_COURSES);
+                $showendtext = false; // only on last page, true.
                 for($i = 0; $i <= $numblocks; $i++) {
+                    if ($i == $numblocks) {
+                        $showendtext = true;
+                    }
                     $offset = $i * report_view::MAX_NUMBER_COURSES;
                     $coursespagelist = array_slice($courselist, $offset, report_view::MAX_NUMBER_COURSES);
-                    $view = new report_view($teacherrequest->get('userid'), $coursespagelist, $i==0);
+                    $view = new report_view($teacherrequest->get('userid'), $coursespagelist, $i==0, $showendtext);
                     $content = $renderer->render($view);
                     //    $doc->writeHTML($content, true, false, true); // no es necesario.
                     $doc->writeHTML($content);

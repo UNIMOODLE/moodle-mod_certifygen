@@ -39,4 +39,16 @@ $string['logo'] = 'Logo';
 $string['logo_desc'] = 'On teacher\'s certifications you can add a logo';
 $string['footer'] = 'Footer';
 $string['footer_desc'] = 'On teacher\'s certifications you can add a footer';
-$string['reporttext'] = 'La universidad de Valladolid certifica que el profesor <b>{$a->name}</b> ha realizado actiivdades docentes en los siguientes cursos:';
+$string['and'] = 'and';
+$string['reporttext'] = 'Certificado de uso del Campus Virtual de la Universidad de XXXXX emitido para el profesor {$a->teacher}  >> de acuerdo con el método automático de clasificación de uso de cursos referido al final del presente documento1';
+$string['courseinfo'] = 'El curso/asignatura {$a->coursename} {$a->coursedetails},
+impartido por el profesor {$a->teachers}, es de tipo {$a->type}.';
+$string['courseinfopl'] = 'El curso/asignatura {$a->coursename} {$a->coursedetails},
+impartido por los profesores {$a->teachers}, es de tipo {$a->type}.';
+$string['coursetypedesc'] ='Si TIPO=Inactivo >>“Se detecta un uso bajo del Campus Virtual por parte de los profesores y/o los alumnos. Se recomienda aumentar el uso del Campus Virtual, con la incorporación adicional de recursos que los alumnos consulten y/o actividades en las que participen de forma más activa.”<br> 
+Si TIPO=Con entregas >> “Se emplea el Campus Virtual fundamentalmente para canalizar la entrega de tareas y como repositorio. Se recomienda aprovechar más los mecanismos de realimentación y el libro de calificaciones del campus virtual, para mejorar la comunicación con los alumnos orientada a la evaluación formativa, así como valorar una mayor incorporación de actividades participativas.” <br>
+Si TIPO= Repositorio >>“Se emplea el Campus Virtual fundamentalmente como repositorio. Se recomienda aprovechar mejor los módulos de actividades del campus virtual, para canalizar la entrega de tareas y mejorar los mecanismos comunicación con los alumnos.”';
+$string['cdetail_1'] = 'perteneciente a la categoría {$a->name}';
+$string['cdetail_2'] = 'con fecha de inicio en el Campus Virtual {$a->date}';
+$string['cdetail_3'] = 'con fecha de cierre en el Campus Virtual {$a->date}';
+$string['cannotusealgorith_nostudents'] = 'There are no students in course';
