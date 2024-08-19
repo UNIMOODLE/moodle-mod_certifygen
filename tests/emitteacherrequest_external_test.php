@@ -49,6 +49,9 @@ class emitteacherrequest_external_test extends advanced_testcase {
     }
     public function test_emitteacherrequest(): void {
 
+        // Create course.
+        $course = self::getDataGenerator()->create_course();
+
         // Create template.
         $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
         $certificate1 = $templategenerator->create_template((object)['name' => 'Certificate 1']);
@@ -60,16 +63,17 @@ class emitteacherrequest_external_test extends advanced_testcase {
             $certificate1->get_id(),
             certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
         );
-        $modgenerator->assign_model_systemcontext($model->get('id'));
-
-        // Create course.
-        $course = self::getDataGenerator()->create_course();
+        $modgenerator->assign_model_coursecontext($model->get('id'), $course->id);
 
         // Create user and enrol as teacher.
         $teacher = $this->getDataGenerator()->create_user(
             ['username' => 'test_user_1', 'firstname' => 'test',
                 'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
         $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'editingteacher');
+        $student = $this->getDataGenerator()->create_user(
+            ['username' => 'test_user_2', 'firstname' => 'test',
+                'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
+        $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
 
         // Create teacherrequest.
         $teacherrequest = $modgenerator->create_teacher_request($model->get('id'), $course->id, $teacher->id);

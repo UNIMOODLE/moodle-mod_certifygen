@@ -22,6 +22,7 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+import jQuery from 'jquery';
 import Ajax from 'core/ajax';
 import {render as renderTemplate} from 'core/templates';
 import {get_string as getString} from 'core/str';
@@ -45,10 +46,12 @@ export async function transport(selector, query, callback, failure) {
         }
 
     } else {
+        let userid = jQuery(selector).attr('userid');
         const request = {
-            methodname: 'mod_certifygen_searchcourse',
+            methodname: 'mod_certifygen_searchmycourses',
             args: {
-                query: query
+                query: query,
+                userid: userid
             }
         };
 

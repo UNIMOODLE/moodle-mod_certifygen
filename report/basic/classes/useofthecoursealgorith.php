@@ -189,9 +189,9 @@ class useofthecoursealgorith {
         try {
             $sql = "SELECT COUNT(*)  
                     FROM {course_modules} cm
-                    LEFT JOIN {modules} ON mdl_modules.id = cm.module
+                    LEFT JOIN {modules} m ON m.id = cm.module
                     WHERE cm.course = :courseid
-                    AND mdl_modules.name IN ('resource','url','label','page', 'book', 'folder','glossary','scorm', 'data')
+                    AND m.name IN ('resource','url','label','page', 'book', 'folder','glossary','scorm', 'data')
                     AND cm.visible=1";
 
             $this->resources = $DB->count_records_sql($sql, ['courseid' => $this->courseid]);
@@ -199,6 +199,7 @@ class useofthecoursealgorith {
         } catch (\moodle_exception $e) {
             error_log(__FUNCTION__ . ' error: '. $e->getMessage(), true);
             $this->resources = 0;
+            $this->resourceslevel = self::LOW;
         }
     }
 
@@ -213,8 +214,8 @@ class useofthecoursealgorith {
             FROM {logstore_standard_log} logs 
             WHERE logs.action='viewed'
             AND logs.component IN ('mod_resource','mod_url','mod_label','mod_page', 'mod_book', 'mod_folder','mod_glossary','mod_scorm','mod_data')
-            AND logs.timecreated>:startdate
-            AND logs.timecreated<:enddate
+            AND logs.timecreated > :startdate
+            AND logs.timecreated < :enddate
             AND logs.courseid = :courseid
             GROUP BY logs.userid,logs.courseid";
 

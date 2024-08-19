@@ -40,6 +40,7 @@ use mod_certifygen\external\getmycertificatedata_external;
 use mod_certifygen\external\getmodellisttable_external;
 use mod_certifygen\external\searchcategory_external;
 use mod_certifygen\external\searchcourse_external;
+use mod_certifygen\external\searchmycourses_external;
 use mod_certifygen\external\revokecertificate_external;
 use mod_certifygen\external\get_id_instance_certificate_external;
 use mod_certifygen\external\get_json_certificate_external;
@@ -149,6 +150,15 @@ $functions = [
         'classname' => searchcourse_external::class,
         'methodname' => 'searchcourse',
         'description' => 'Search course',
+        'type' => 'read',
+        'capabilities' => 'mod/certifygen:manage',
+        'ajax' => true,
+        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
+    'mod_certifygen_searchmycourses' => [
+        'classname' => searchmycourses_external::class,
+        'methodname' => 'searchmycourses',
+        'description' => 'Search my courses',
         'type' => 'read',
         'capabilities' => 'mod/certifygen:manage',
         'ajax' => true,

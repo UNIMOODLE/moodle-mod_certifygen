@@ -45,7 +45,6 @@ class certifygen_context extends persistent {
     public const TABLE = 'certifygen_context';
     public const CONTEXT_TYPE_COURSE = 1;
     public const CONTEXT_TYPE_CATEGORY = 2;
-    public const CONTEXT_TYPE_SYSTEM = 3;
 
     /**
      * Define properties
@@ -101,8 +100,20 @@ class certifygen_context extends persistent {
      */
     public static function exists_system_context_model() : bool {
         global $DB;
-        $cont = $DB->count_records(self::TABLE, ['type' => self::CONTEXT_TYPE_SYSTEM]);
-        return $cont > 0;
+        $contexts = [
+            certifygen_model::TYPE_TEACHER_COURSE_USED,
+            certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
+        ];
+        list($insql, $inparams) = $DB->get_in_or_equal($contexts, SQL_PARAMS_NAMED);
+        $sql = "SELECT count(*) as total
+        FROM {certifygen_model} m
+        INNER JOIN {certifygen_context} c ON c.modelid = m.id
+        WHERE m.type $insql AND c.contextids <> ''";
+
+        $result = $DB->get_records_sql($sql, $inparams);
+        $result = reset($result);
+
+        return $result->total > 0;
     }
     /**
      * @throws moodle_exception
@@ -224,11 +235,17 @@ class certifygen_context extends persistent {
         global $DB;
         $modelids = [];
         $langs = [];
+        $contexts = [
+            certifygen_model::TYPE_TEACHER_COURSE_USED,
+            certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
+        ];
+        list($insql, $inparams) = $DB->get_in_or_equal($contexts, SQL_PARAMS_NAMED);
         $sql = "SELECT m.id as modelid, m.name, m.langs
         FROM {certifygen_model} m
         INNER JOIN {certifygen_context} c ON c.modelid = m.id
-        WHERE c.type = :type";
-        $contexts = $DB->get_records_sql($sql, ['type' => self::CONTEXT_TYPE_SYSTEM]);
+        WHERE m.type $insql ";
+
+        $contexts = $DB->get_records_sql($sql, $inparams);
         $langstrings = get_string_manager()->get_list_of_translations();
         foreach ($contexts as $context) {
             $modelids[$context->modelid] = $context->name;
