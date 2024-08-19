@@ -77,9 +77,7 @@ class associatecontextform extends dynamic_form {
             }
         ];
         $mform->addElement('autocomplete', 'categorycontext', get_string('categorycontext', 'mod_certifygen'), [], $options)->setHiddenLabel(true);
-        $mform->hideIf('categorycontext', 'ctype', 'in',
-            [certifygen_context::CONTEXT_TYPE_COURSE, certifygen_context::CONTEXT_TYPE_SYSTEM]);
-//        $mform->hideIf('categorycontext', 'ctype', 'eq', 'system');
+        $mform->hideIf('categorycontext', 'ctype', 'eq', certifygen_context::CONTEXT_TYPE_COURSE);
 
         // Select for courses.
         $options = [
@@ -91,11 +89,7 @@ class associatecontextform extends dynamic_form {
             }
         ];
         $mform->addElement('autocomplete', 'coursecontext', get_string('coursecontext', 'mod_certifygen'), [], $options)->setHiddenLabel(true);
-        $mform->hideIf('coursecontext', 'ctype', 'in',
-            [certifygen_context::CONTEXT_TYPE_CATEGORY, certifygen_context::CONTEXT_TYPE_SYSTEM]);
-//        $mform->hideIf('coursecontext', 'ctype', 'in', ['category', 'system']);
-//        $mform->hideIf('coursecontext', 'ctype', 'eq', 'category');
-//        $mform->hideIf('coursecontext', 'ctype', 'eq', 'system');
+        $mform->hideIf('coursecontext', 'ctype', 'eq', certifygen_context::CONTEXT_TYPE_CATEGORY);
     }
 
     /**
@@ -127,14 +121,15 @@ class associatecontextform extends dynamic_form {
 
         $formdata = $this->get_data();
 
-        $type = certifygen_context::CONTEXT_TYPE_SYSTEM;
+        $type = certifygen_context::CONTEXT_TYPE_COURSE;
         $contextids = [];
         if ($formdata->ctype == certifygen_context::CONTEXT_TYPE_COURSE) {
-            $type = certifygen_context::CONTEXT_TYPE_COURSE;
             $contextids = array_values($formdata->coursecontext);
         } else if ($formdata->ctype == certifygen_context::CONTEXT_TYPE_CATEGORY) {
             $type = certifygen_context::CONTEXT_TYPE_CATEGORY;
             $contextids = array_values($formdata->categorycontext);
+        } else {
+            // TODO: throw error.
         }
         $data = [
             'id' => $formdata->id ?? 0,
@@ -143,7 +138,13 @@ class associatecontextform extends dynamic_form {
             'contextids' => implode(',', $contextids),
 
         ];
-        return certifygen_context::save_model_object((object) $data)->get('id');
+        if (!empty($data['contextids'])) {
+            return certifygen_context::save_model_object((object) $data)->get('id');
+        } else {
+            $modelcontext = new certifygen_context($formdata->id);
+            $modelcontext->delete();
+            return 0;
+        }
     }
 
     /**
@@ -160,10 +161,11 @@ class associatecontextform extends dynamic_form {
             $data['id'] = $this->_ajaxformdata['id'];
             $data['ctype'] = $modelcontext->get('type');
             if ($modelcontext->get('type') == certifygen_context::CONTEXT_TYPE_CATEGORY) {
-                $data['ctype'] = 'category';
                 $data['categorycontext'] = explode(',', $modelcontext->get('contextids'));
             } else if ($modelcontext->get('type') == certifygen_context::CONTEXT_TYPE_COURSE) {
                 $data['coursecontext'] = explode(',', $modelcontext->get('contextids'));
+            } else {
+                $data['coursecontext'] = [];
             }
         }
         $this->set_data($data);

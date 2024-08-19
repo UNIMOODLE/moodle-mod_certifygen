@@ -128,15 +128,15 @@ class mod_certifygen_generator extends testing_module_generator {
      * @throws \core\invalid_persistent_exception
      * @throws coding_exception
      */
-    public function assign_model_systemcontext(int $modelid) {
-        $data = [
-            'modelid' => $modelid,
-            'contextids' => '',
-            'type' => certifygen_context::CONTEXT_TYPE_SYSTEM,
-        ];
-        $context = new certifygen_context(0, (object)$data);
-        return $context->create();
-    }
+//    public function assign_model_systemcontext(int $modelid) {
+//        $data = [
+//            'modelid' => $modelid,
+//            'contextids' => '',
+//            'type' => certifygen_context::CONTEXT_TYPE_SYSTEM,
+//        ];
+//        $context = new certifygen_context(0, (object)$data);
+//        return $context->create();
+//    }
     /**
      * @param int $modelid
      * @return certifygen_context

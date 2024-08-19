@@ -74,14 +74,14 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
         $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
         $certificate1 = $templategenerator->create_template((object)['name' => 'Certificate 1']);
 
-        // Create model.
+        // Create model and assign context.
         $modgenerator = $this->getDataGenerator()->get_plugin_generator('mod_certifygen');
         $model = $modgenerator->create_model_by_name(
             certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
             $certificate1->get_id(),
             certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
         );
-        $modgenerator->assign_model_systemcontext($model->get('id'));
+        $modgenerator->assign_model_coursecontext($model->get('id'), $course1->id . ',' . $course2->id);
 
         // Tests.
         $result = get_courses_as_teacher_external::get_courses_as_teacher($user1->id, '', '');

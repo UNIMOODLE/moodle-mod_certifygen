@@ -122,6 +122,8 @@ class getteacherrequestviewdata_external_test extends advanced_testcase {
      * @throws moodle_exception
      */
     public function test_getteacherrequestviewdata_with_data(): void {
+        // Create course.
+        $course = self::getDataGenerator()->create_course();
 
         // Create template.
         $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
@@ -134,10 +136,7 @@ class getteacherrequestviewdata_external_test extends advanced_testcase {
             $certificate1->get_id(),
             certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
         );
-        $modgenerator->assign_model_systemcontext($model->get('id'));
-
-        // Create course.
-        $course = self::getDataGenerator()->create_course();
+        $modgenerator->assign_model_coursecontext($model->get('id'), $course->id);
 
         // Create user and enrol as teacher.
         $teacher = $this->getDataGenerator()->create_user(

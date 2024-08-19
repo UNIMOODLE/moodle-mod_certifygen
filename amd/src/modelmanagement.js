@@ -61,9 +61,7 @@ const AssignContext = (e) => {
     // Listen to events if you want to execute something on form submit. Event detail will contain everything the process()
     // function returned:
     modalCForm.addEventListener(modalCForm.events.FORM_SUBMITTED, (result) => {
-        if (id === '0') {
-            mainElement.setAttribute('data-id', result.detail);
-        }
+        mainElement.setAttribute('data-id', result.detail);
     });
     // Show the form.
     modalCForm.show();

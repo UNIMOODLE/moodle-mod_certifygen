@@ -185,7 +185,6 @@ function mod_certifygen_get_context_types() : array {
     return [
         certifygen_context::CONTEXT_TYPE_COURSE => get_string('course'),
         certifygen_context::CONTEXT_TYPE_CATEGORY => get_string('category'),
-        certifygen_context::CONTEXT_TYPE_SYSTEM => get_string('system', 'mod_certifygen'),
     ];
 }
 /**

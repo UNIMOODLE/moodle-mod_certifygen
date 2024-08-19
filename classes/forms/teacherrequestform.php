@@ -76,8 +76,9 @@ class teacherrequestform extends dynamic_form {
 
         // Course list.
         $options = [
-            'ajax' => 'mod_certifygen/form_course_selector',
+            'ajax' => 'mod_certifygen/form_mycourses_selector',
             'multiple' => true,
+            'userid' => (int)$this->_ajaxformdata['userid'],
             'valuehtmlcallback' => function($courseid) : string {
                 $course = get_course($courseid);
                 $formated = format_text($course->fullname);
