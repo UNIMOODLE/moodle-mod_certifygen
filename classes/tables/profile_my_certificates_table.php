@@ -126,16 +126,15 @@ class profile_my_certificates_table extends table_sql {
         return '<span class="likelink" data-name="' . $row->name . '" data-action="see-courses" data-courses="' . $row->courses . '">'
             . get_string('seecourses', 'mod_certifygen') . '</span>';
     }
+
     /**
-     * @param $row
+     * @param stdClass $row
      * @return string
+     * @throws coding_exception
      */
     function col_emit(stdClass $row): string
     {
         // Emit.
-        if (empty($row->validation)) {
-            return '';
-        }
         if ($row->status == certifygen_validations::STATUS_NOT_STARTED) {
             return '<span class="likelink" data-userid="' . $row->userid . '" data-id="' . $row->id . '" data-action="emit">' .
                 get_string('emit', 'mod_certifygen') . '</span>';
@@ -144,13 +143,8 @@ class profile_my_certificates_table extends table_sql {
         if ($row->status == certifygen_validations::STATUS_FINISHED
         && $row->mode == certifygen_model::MODE_PERIODIC) {
             $today = time();
-            $mindays = $row->timeondemmand;
             $dif = $today - $row->timecreated;
             $difindays = abs($dif / (60 * 60 * 24));
-
-            error_log(__FUNCTION__ . ' row: '. var_export($row, true));
-            error_log(__FUNCTION__ . ' difindays: ' . var_export($difindays, true));
-            error_log(__FUNCTION__ . ' timeondemmand: ' . var_export($row->timeondemmand, true));
             if ($difindays > (int)$row->timeondemmand) {
                 return '<span class="likelink" data-userid="' . $row->userid . '" data-id="' . $row->id . '" data-action="reemit">' .
                     get_string('reemit', 'mod_certifygen') . '</span>';

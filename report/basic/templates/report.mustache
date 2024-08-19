@@ -47,15 +47,18 @@
         <header>
             <img src="{{logosrc}}" alt="Logo configurad" width="100" height="100"/>
         </header>
-        <div>
+        <div class="mt-6 mb-6">
             {{#hastext}}
                 <p>{{{text}}}</p>
             {{/hastext}}
-            <ul>
+            <ul class="basicreport-list">
                 {{#list}}
                     <li> {{course}} </li>
                 {{/list}}
             </ul>
+            {{#hasendtext}}
+                <div class="basicreport-legend">{{{endtext}}}</div>
+            {{/hasendtext}}
         </div>
         <footer>
             {{{ footer }}}
@@ -65,16 +68,10 @@
 
 <style>
 
-    [data-region="activity-view"].student .c0 {
-        display: none;
+    .basicreport-list li {
+        margin-bottom: 1em;
     }
-    [data-region="activity-view"] .likelink {
-        cursor: pointer;
-        color: #0f6cbf;
-        text-decoration: none;
-    }
-    [data-region="activity-view"] .likelink:hover {
-        color: #094478;
-        text-decoration: underline;
+    .basicreport-legend {
+        font-size: 0.8em;
     }
 </style>
