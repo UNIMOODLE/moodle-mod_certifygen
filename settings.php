@@ -37,6 +37,12 @@ $ADMIN->add('modsettings',
     new admin_category('modsettingcertifygencat',
         get_string('modulename', 'certifygen'),
   $module->is_enabled() === false));
+// Category in General Site Settings.
+$ADMIN->add('root',
+    new admin_category('certifygencat',
+        get_string('modulenameplural', 'certifygen'),
+        $module->is_enabled() === false),
+        'location');
 
 // Certifygen settings.
 $settings = new admin_settingpage('modsettingcertifygen', get_string('pluginnamesettings', 'mod_certifygen'), 'moodle/site:config');
@@ -67,13 +73,13 @@ $ADMIN->add('modsettingcertifygencat', $settings);
 $modelsmanagersettings = new admin_externalpage('certifygenmodelsmanager',
     get_string('modelsmanager', 'mod_certifygen'),
     '/mod/certifygen/modelmanager.php',  'moodle/site:config', $module->is_enabled() === false);
-$ADMIN->add('modsettingcertifygencat', $modelsmanagersettings);
+$ADMIN->add('certifygencat', $modelsmanagersettings);
 
 // See teacher requests.
 $teacherrequestreportsettings = new admin_externalpage('certifygenteacherrequestreport',
     get_string('certifygenteacherrequestreport', 'mod_certifygen'),
     '/mod/certifygen/teacherrequestreport.php',  'mod/certifygen:viewcontextcertificates', $module->is_enabled() === false);
-$ADMIN->add('modsettingcertifygencat', $teacherrequestreportsettings);
+$ADMIN->add('certifygencat', $teacherrequestreportsettings);
 
 //// Validation plugins settings.
 //$ADMIN->add('modsettingcertifygencat',

@@ -33,7 +33,7 @@
 // This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Unimoodle certifygen';
+$string['pluginname'] = 'Certifygen certificate';
 $string['pluginadministration'] = 'Unimoodle certifygen module administration';
 $string['pluginnamesettings'] = 'Unimoodle certifygen Settings';
 $string['certifygen:addinstance'] = 'Add a new unimoodle certifygen instance';
@@ -52,8 +52,8 @@ $string['mode_2'] = 'Recurrent';
 $string['templateid'] = 'Template';
 $string['templateid_help'] = 'Select the template you want to use.';
 $string['introduction'] = 'Introduction';
-$string['modulename'] = 'Unimoodle Certifygen';
-$string['modulenameplural'] = 'Unimoodle Certifygens';
+$string['modulename'] = 'Certifygen certificate';
+$string['modulenameplural'] = 'Certifygen certificates';
 $string['name'] = 'Name';
 $string['modelname'] = 'Model name';
 $string['modelidnumber'] = 'Idnumber';
