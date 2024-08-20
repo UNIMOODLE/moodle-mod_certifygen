@@ -41,6 +41,7 @@ use external_value;
 use invalid_parameter_exception;
 use mod_certifygen\certifygen_file;
 use mod_certifygen\interfaces\ICertificateReport;
+use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
@@ -112,9 +113,23 @@ class emitteacherrequest_external extends external_api {
             $validationplugin = $certifygenmodel->get('validation');
             $validationpluginclass = $validationplugin . '\\' . $validationplugin;
             if (empty($validationplugin)) {
-                // TODO: change to STATUS_VALIDATION_OK
-                $teacherrequest->set('status', certifygen_validations::STATUS_FINISHED);
+                $teacherrequest->set('status', certifygen_validations::STATUS_VALIDATION_OK);
                 $teacherrequest->save();
+                // Save on repository plugin.
+                $repositoryplugin = $certifygenmodel->get('repository');
+                $repositorypluginclass = $repositoryplugin . '\\' . $repositoryplugin;
+                /** @var ICertificateRepository $subplugin */
+                $subplugin = new $repositorypluginclass();
+                $response = $subplugin->saveFile($certifygenfile->get_file());
+                if (!$response['haserror']) {
+                    $teacherrequest->set('status', certifygen_validations::STATUS_FINISHED);
+                    $teacherrequest->save();
+                } else {
+                    $teacherrequest->set('status', certifygen_validations::STATUS_STORAGE_ERROR);
+                    $teacherrequest->save();
+                    $result['result'] = false;
+                    $result['message'] = $response['message'];
+                }
             } else if (get_config($validationplugin, 'enabled') === '1') {
                 /** @var ICertificateValidation $subplugin */
                 $subplugin = new $validationpluginclass();

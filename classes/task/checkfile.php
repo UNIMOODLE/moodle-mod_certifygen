@@ -82,6 +82,7 @@ class checkfile extends scheduled_task
                             'id' => $validation->get('issueid')]);
                 }
                 $newfile = $subplugin->getFile($certi->get('course'), $validation->get('id'), $code);
+                //TODO: save on repository plugin.
                 if ($newfile) {
                     $status = certifygen_validations::STATUS_FINISHED;
                     $validation->set('status', $status);

@@ -33,6 +33,7 @@
                 <FIELD NAME="langs" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Languages list seprated by commas."/>
                 <FIELD NAME="validation" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Type of validator used"/>
                 <FIELD NAME="report" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Certificate report subplugin"/>
+                <FIELD NAME="repository" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Certificate repository subplugin"/>
                 <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>

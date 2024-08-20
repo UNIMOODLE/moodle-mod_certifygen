@@ -100,5 +100,9 @@ foreach (core_plugin_manager::instance()->get_plugins_of_type('certifygenreport'
     /** @var \mod_certifygen\plugininfo\certifygenreport $plugin */
     $plugin->load_settings($ADMIN, 'modsettingcertifygencat', $hassiteconfig);
 }
+foreach (core_plugin_manager::instance()->get_plugins_of_type('certifygenrepository') as $plugin) {
+    /** @var \mod_certifygen\plugininfo\certifygenrepository $plugin */
+    $plugin->load_settings($ADMIN, 'modsettingcertifygencat', $hassiteconfig);
+}
 // TinyMCE does not have standard settings page.
 $settings = null;

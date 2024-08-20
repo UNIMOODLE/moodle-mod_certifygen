@@ -34,6 +34,7 @@ use core\invalid_persistent_exception;
 use core_user\output\myprofile\tree;
 use mod_certifygen\forms\certificatestablefiltersform;
 use mod_certifygen\interfaces\ICertificateReport;
+use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_context;
@@ -259,6 +260,32 @@ function mod_certifygen_get_report() : array {
 //    return $all;
     return $enabled;
 }
+/**
+ * Get certifygen model repository subplugins
+ * @return array
+ * @throws coding_exception
+ */
+function mod_certifygen_get_repositories() : array {
+
+//    $all[''] = get_string('selectreport', 'mod_certifygen');
+    $enabled = [];
+    foreach (core_plugin_manager::instance()->get_plugins_of_type('certifygenrepository') as $plugin) {
+        $reportplugin = $plugin->component;
+        $reportpluginclass = $reportplugin . '\\' . $reportplugin;
+        /** @var ICertificateRepository $subplugin */
+        $subplugin = new $reportpluginclass();
+        if ($subplugin->is_enabled()) {
+            $enabled[$plugin->component] = get_string('pluginname', $plugin->component);
+//            $all[$plugin->component] = get_string('pluginname', $plugin->component);
+        }
+    }
+//    if (empty($enabled)) {
+//        return [];
+//    }
+//
+//    return $all;
+    return $enabled;
+}
 
 /**
  * Get certifygen templates available by tool_certificate
@@ -364,6 +391,7 @@ function mod_certifygen_pluginfile(
     // Make sure the filearea is one of those used by the plugin.
     if ($filearea !== ICertificateValidation::FILE_AREA &&
         $filearea !== ICertificateReport::FILE_AREA &&
+        $filearea !== ICertificateRepository::FILE_AREA &&
         $filearea !== ICertificateValidation::FILE_AREA_VALIDATED
         && $filearea !== 'issues') {
         return false;

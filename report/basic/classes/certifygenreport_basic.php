@@ -41,7 +41,11 @@ class certifygenreport_basic implements ICertificateReport
      */
     public function is_enabled(): bool
     {
-        return true;
+        $enabled = (int) get_config('certifygenreport_basic', 'enabled');
+        if ($enabled) {
+            return true;
+        }
+        return false;
     }
 
     /**
