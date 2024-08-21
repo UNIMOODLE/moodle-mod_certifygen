@@ -37,6 +37,7 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use certifygenfilter;
+require_once($CFG->dirroot . '/mod/certifygen/externalcompatibility.php');
 
 global $CFG;
 require_once($CFG->dirroot.'/mod/certifygen/lib.php');

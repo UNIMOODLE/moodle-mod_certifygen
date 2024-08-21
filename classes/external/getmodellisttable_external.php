@@ -40,6 +40,7 @@ use moodle_url;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
+require_once($CFG->dirroot . '/mod/certifygen/externalcompatibility.php');
 class getmodellisttable_external extends external_api {
     /**
      * Describes the external function parameters.

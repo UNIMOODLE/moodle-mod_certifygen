@@ -44,6 +44,7 @@ use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_url;
+require_once($CFG->dirroot . '/mod/certifygen/externalcompatibility.php');
 
 class downloadteachercertificate_external extends external_api {
     /**

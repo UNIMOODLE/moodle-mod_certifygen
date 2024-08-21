@@ -36,6 +36,7 @@ use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
+require_once($CFG->dirroot . '/mod/certifygen/externalcompatibility.php');
 
 class notify_certification_external extends external_api {
     /**

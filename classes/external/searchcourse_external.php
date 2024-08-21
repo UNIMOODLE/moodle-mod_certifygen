@@ -31,6 +31,7 @@ use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
 use restricted_context_exception;
+require_once($CFG->dirroot . '/mod/certifygen/externalcompatibility.php');
 
 /**
  * @package    mod_certifygen

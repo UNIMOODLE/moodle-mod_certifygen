@@ -41,6 +41,7 @@ use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_context;
 use mod_certifygen\persistents\certifygen_model;
 use certifygenfilter;
+require_once($CFG->dirroot . '/mod/certifygen/externalcompatibility.php');
 
 global $CFG;
 require_once($CFG->dirroot.'/user/lib.php');

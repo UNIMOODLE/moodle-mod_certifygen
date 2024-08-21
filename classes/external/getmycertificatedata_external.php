@@ -49,6 +49,7 @@ use external_single_structure;
 use external_value;
 use moodle_exception;
 use moodle_url;
+require_once($CFG->dirroot . '/mod/certifygen/externalcompatibility.php');
 
 class getmycertificatedata_external extends external_api {
     /**

@@ -40,6 +40,7 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use moodle_exception;
+require_once($CFG->dirroot . '/mod/certifygen/externalcompatibility.php');
 
 class getteacherrequestviewdata_external extends external_api {
     /**
