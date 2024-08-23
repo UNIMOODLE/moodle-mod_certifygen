@@ -30,6 +30,8 @@ use external_multiple_structure;
 use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
+use mod_certifygen\persistents\certifygen_context;
+use mod_certifygen\persistents\certifygen_model;
 use restricted_context_exception;
 
 /**
@@ -49,7 +51,8 @@ class searchmycourses_external extends external_api {
     public static function searchmycourses_parameters(): external_function_parameters {
         return new external_function_parameters([
             'query' => new external_value(PARAM_RAW, 'The search query', VALUE_REQUIRED),
-            'userid' => new external_value(PARAM_INT, 'The search query', VALUE_REQUIRED),
+            'userid' => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
+            'modelid' => new external_value(PARAM_INT, 'modelid', VALUE_REQUIRED),
         ]);
     }
 
@@ -61,30 +64,59 @@ class searchmycourses_external extends external_api {
      * @throws invalid_parameter_exception
      * @throws restricted_context_exception
      */
-    public static function searchmycourses(string $query, int $userid): array {
+    public static function searchmycourses(string $query, int $userid, int $modelid): array {
         global $DB, $CFG;
 
         $params = external_api::validate_parameters(self::searchmycourses_parameters(), [
             'query' => $query,
             'userid' => $userid,
+            'modelid' => $modelid,
         ]);
         $query = clean_param($params['query'], PARAM_TEXT);
         // Validate context.
         $context = context_system::instance();
         self::validate_context($context);
-
+        $params = [
+            'fullname' => '%' . $query . '%',
+            'userid' => $userid
+        ];
+        $modelcontext = certifygen_context::get_record(['modelid' => $modelid]);
+        $wherecategory = $wherecourse = '';
+        if ((int)$modelcontext->get('type') === certifygen_context::CONTEXT_TYPE_COURSE) {
+            $courseids = $modelcontext->get('contextids');
+            $courseids = explode(',', $courseids);
+            [$insql, $inparams] = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'param');
+            if (!empty($courseids)) {
+                $wherecourse = " AND c.id $insql";
+                $params = array_merge($params, $inparams);
+            }
+        } else if ((int)$modelcontext->get('type') === certifygen_context::CONTEXT_TYPE_CATEGORY) {
+            $categoryids = $modelcontext->get('contextids');
+            $categoryids = explode(',', $categoryids);
+            $allcids = $categoryids;
+            foreach ($categoryids as $categoryid) {
+                $category = \core_course_category::get($categoryid);
+                $ids = $category->get_all_children_ids();
+                foreach ($ids as $id) {
+                    if (!in_array($id, $allcids)) {
+                        $allcids[] = $id;
+                    }
+                }
+            }
+            if (!empty($allcids)) {
+                [$insql, $inparams] = $DB->get_in_or_equal($allcids, SQL_PARAMS_NAMED, 'param');
+                $params = array_merge($params, $inparams);
+                $wherecategory = " AND c.category $insql";
+            }
+        }
         $likename = $DB->sql_like('c.fullname', ':fullname', false, true);
         $sql = "SELECT c.id, c.fullname
                     FROM  {user_enrolments} ue 
                     INNER JOIN {enrol} e ON e.id = ue.enrolid
                     INNER JOIN {course} c ON c.id = e.courseid
                     WHERE ue.userid = :userid 
-                    AND $likename";
-
-        $params = [
-            'fullname' => '%' . $query . '%',
-            'userid' => $userid
-        ];
+                    AND $likename
+                    $wherecourse $wherecategory";
 
         $rs = $DB->get_recordset_sql($sql, $params);
         $count = 0;
