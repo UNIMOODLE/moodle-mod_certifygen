@@ -22,6 +22,7 @@ namespace mod_certifygen\external;
 
 use coding_exception;
 use context_system;
+use core_course_category;
 use dml_exception;
 use external_api;
 use external_description;
@@ -30,6 +31,7 @@ use external_multiple_structure;
 use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
+use moodle_exception;
 use restricted_context_exception;
 
 /**
@@ -58,7 +60,7 @@ class searchcategory_external extends external_api {
      * @throws coding_exception
      * @throws dml_exception
      * @throws invalid_parameter_exception
-     * @throws restricted_context_exception
+     * @throws restricted_context_exception|moodle_exception
      */
     public static function searchcategory(string $query): array {
         global $DB, $CFG;
@@ -81,9 +83,17 @@ class searchcategory_external extends external_api {
         $list = [];
 
         foreach ($rs as $record) {
+            $category1 = core_course_category::get($record->id);
+            $parentids = $category1->get_parents();
+            $name = '';
+            foreach ($parentids as $parentid) {
+                $parent = core_course_category::get($parentid);
+                $name .= ' / ' . $parent ->get_formatted_name();
+            }
+            $name .= ' / ' . $category1 ->get_formatted_name();
             $category = (object)[
                 'id' => $record->id,
-                'name' => strip_tags(format_text($record->name)),
+                'name' => strip_tags(format_text($name)),
             ];
 
             $count++;
