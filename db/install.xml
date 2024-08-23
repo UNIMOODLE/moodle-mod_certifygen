@@ -33,7 +33,7 @@
                 <FIELD NAME="langs" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Languages list seprated by commas."/>
                 <FIELD NAME="validation" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Type of validator used"/>
                 <FIELD NAME="report" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Certificate report subplugin"/>
-                <FIELD NAME="repository" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Certificate repository subplugin"/>
+                <FIELD NAME="repository" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Certificate repository subplugin"/>
                 <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -77,6 +77,20 @@
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for certifygen_context"/>
                 <KEY NAME="fk_model" TYPE="foreign" FIELDS="modelid" REFTABLE="certifygen_model" REFFIELDS="id"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="certifygen_repository" COMMENT="Stores certificate url">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="validationid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="certificate user"/>
+                <FIELD NAME="url" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="certificate url"/>
+                <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for certifygen_template"/>
             </KEYS>
         </TABLE>
     </TABLES>

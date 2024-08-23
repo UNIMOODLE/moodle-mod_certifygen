@@ -18,17 +18,39 @@
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 /**
- * @package   certifygenrepository_localrepository
+ * @package   certifygenrepository_onedrive
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// This line protects the file from being accessed by a URL directly.
-defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Certifygen Local Repository';
-$string['pluginnamesettings'] = 'Local Repository Settings';
-$string['enable'] = 'Enable';
-$string['enable_help'] = 'This repository saves the certificates on moodledata';
+namespace mod_certifygen\persistents;
+
+use core\persistent;
+
+class certifygen_repository extends persistent
+{
+    /**
+     * Define properties
+     *
+     * @return array[]
+     */
+    protected static function define_properties(): array {
+        return [
+            'validation' => [
+                'type' => PARAM_INT,
+            ],
+            'userid' => [
+                'type' => PARAM_INT,
+            ],
+            'url' => [
+                'type' => PARAM_TEXT,
+            ],
+            'usermodified' => [
+                'type' => PARAM_INT,
+            ],
+        ];
+    }
+}

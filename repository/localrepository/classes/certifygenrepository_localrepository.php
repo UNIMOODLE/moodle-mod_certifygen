@@ -28,6 +28,7 @@
 namespace certifygenrepository_localrepository;
 
 use context_system;
+use dml_exception;
 use mod_certifygen\certifygen;
 use mod_certifygen\interfaces\ICertificateReport;
 use mod_certifygen\interfaces\ICertificateRepository;
@@ -43,7 +44,7 @@ class certifygenrepository_localrepository implements ICertificateRepository
      * @param certifygen_validations $validation
      * @return string
      * @throws \coding_exception
-     * @throws \dml_exception
+     * @throws dml_exception
      */
     public function getFileUrl(certifygen_validations $validation): string
     {
@@ -102,12 +103,24 @@ class certifygenrepository_localrepository implements ICertificateRepository
         return $result;
     }
 
+    /**
+     * @return bool
+     * @throws dml_exception
+     */
     public function is_enabled(): bool
     {
         $enabled = (int) get_config('certifygenrepository_localrepository', 'enabled');
         if ($enabled) {
             return true;
         }
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function saveFileUrl(): bool
+    {
         return false;
     }
 }

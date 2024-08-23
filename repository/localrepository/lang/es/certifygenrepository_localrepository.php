@@ -28,7 +28,7 @@
 // This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Repositorio Local';
+$string['pluginname'] = 'Certifygen Repositorio Local';
 $string['pluginnamesettings'] = 'Configuración del Repositorio Local';
 $string['enable'] = 'Habilitar';
 $string['enable_help'] = 'Este repositorio guarda en el moodledata los certificados.';

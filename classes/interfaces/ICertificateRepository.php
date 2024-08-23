@@ -36,7 +36,10 @@ interface ICertificateRepository {
     const FILE_AREA = 'certifygenrepository';
     const FILE_PATH = '/';
     public function is_enabled(): bool;
+    // Returl url so that user can download the certificate.
     public function getFileUrl(certifygen_validations $trequest): string;
     public function saveFile(stored_file $file): array;
+    // Saves file url on db.
+    public function saveFileUrl(): bool;
 }
 

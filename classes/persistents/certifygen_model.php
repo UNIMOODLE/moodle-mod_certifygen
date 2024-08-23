@@ -90,7 +90,7 @@ class certifygen_model extends persistent {
             'repository' => [
                 'type' => PARAM_TEXT,
                 'default' => NULL,
-                'null' => NULL_ALLOWED,
+                'null' => NULL_NOT_ALLOWED,
             ],
             'usermodified' => [
                 'type' => PARAM_INT,

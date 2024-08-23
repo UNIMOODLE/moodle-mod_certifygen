@@ -13,12 +13,13 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+//
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 /**
- * @package   certifygenrepository_localrepository
+ * @package    certifygenrepository_onedrive
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
@@ -26,9 +27,6 @@
  */
 
 // This line protects the file from being accessed by a URL directly.
-defined('MOODLE_INTERNAL') || die();
+use mod_certifygen\interfaces\ICertificateRepository;
 
-$string['pluginname'] = 'Certifygen Local Repository';
-$string['pluginnamesettings'] = 'Local Repository Settings';
-$string['enable'] = 'Enable';
-$string['enable_help'] = 'This repository saves the certificates on moodledata';
+defined('MOODLE_INTERNAL') || die();

@@ -241,7 +241,6 @@ function mod_certifygen_get_validation() : array {
  */
 function mod_certifygen_get_report() : array {
 
-//    $all[''] = get_string('selectreport', 'mod_certifygen');
     $enabled = [];
     foreach (core_plugin_manager::instance()->get_plugins_of_type('certifygenreport') as $plugin) {
         $reportplugin = $plugin->component;
@@ -250,14 +249,8 @@ function mod_certifygen_get_report() : array {
         $subplugin = new $reportpluginclass();
         if ($subplugin->is_enabled()) {
             $enabled[$plugin->component] = get_string('pluginname', $plugin->component);
-//            $all[$plugin->component] = get_string('pluginname', $plugin->component);
         }
     }
-//    if (empty($enabled)) {
-//        return [];
-//    }
-//
-//    return $all;
     return $enabled;
 }
 /**
@@ -267,7 +260,6 @@ function mod_certifygen_get_report() : array {
  */
 function mod_certifygen_get_repositories() : array {
 
-//    $all[''] = get_string('selectreport', 'mod_certifygen');
     $enabled = [];
     foreach (core_plugin_manager::instance()->get_plugins_of_type('certifygenrepository') as $plugin) {
         $reportplugin = $plugin->component;
@@ -276,14 +268,9 @@ function mod_certifygen_get_repositories() : array {
         $subplugin = new $reportpluginclass();
         if ($subplugin->is_enabled()) {
             $enabled[$plugin->component] = get_string('pluginname', $plugin->component);
-//            $all[$plugin->component] = get_string('pluginname', $plugin->component);
         }
     }
-//    if (empty($enabled)) {
-//        return [];
-//    }
-//
-//    return $all;
+
     return $enabled;
 }
 

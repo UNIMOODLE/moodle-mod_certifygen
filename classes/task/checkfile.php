@@ -35,9 +35,11 @@
 namespace mod_certifygen\task;
 
 use core\task\scheduled_task;
+use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
+use mod_certifygen\persistents\certifygen_repository;
 use mod_certifygen\persistents\certifygen_validations;
 
 class checkfile extends scheduled_task
@@ -82,10 +84,33 @@ class checkfile extends scheduled_task
                             'id' => $validation->get('issueid')]);
                 }
                 $newfile = $subplugin->getFile($certi->get('course'), $validation->get('id'), $code);
-                //TODO: save on repository plugin.
                 if ($newfile) {
-                    $status = certifygen_validations::STATUS_FINISHED;
-                    $validation->set('status', $status);
+                    // Save on repository plugin.
+                    $repositoryplugin = $model->get('repository');
+                    $repositorypluginclass = $repositoryplugin . '\\' . $repositoryplugin;
+                    /** @var ICertificateRepository $subplugin */
+                    $subplugin = new $repositorypluginclass();
+                    $response = $subplugin->saveFile($newfile);
+                    if (!$response['haserror']) {
+                        $validation->set('status', certifygen_validations::STATUS_FINISHED);
+                        $validation->save();
+                        if ($subplugin->saveFileUrl()) {
+                            $url = $subplugin->getFileUrl();
+                            $data = [
+                                'validationid' => $validation->get('id'),
+                                'userid' => $validation->get('userid'),
+                                'url' => $url
+                            ];
+                            // Save url.
+                            $repository = new certifygen_repository(0, (object) $data);
+                            $repository->save();
+                        }                        
+                    } else {
+                        $validation->set('status', certifygen_validations::STATUS_STORAGE_ERROR);
+                        $validation->save();
+                    }
+                } else {
+                    $validation->set('status', certifygen_validations::STATUS_STORAGE_ERROR);
                     $validation->save();
                 }
             } catch (\moodle_exception $e) {
