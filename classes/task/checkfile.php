@@ -76,35 +76,38 @@ class checkfile extends scheduled_task
                     continue;
                 }
                 $certi = new certifygen($validation->get('certifygenid'));
-                $code = $validation->get('code');
-                if (!empty($validation->get('certifygenid'))) {
-                    global $DB;
-                    $code = $DB->get_field('tool_certificate_issues', 'code',
-                        ['userid' => $validation->get('userid'),
-                            'id' => $validation->get('issueid')]);
-                }
+                $code = certifygen_validations::get_certificate_code($validation);
                 $newfile = $subplugin->getFile($certi->get('course'), $validation->get('id'), $code);
-                if ($newfile) {
+                if (array_key_exists('file', $newfile)) {
                     // Save on repository plugin.
                     $repositoryplugin = $model->get('repository');
                     $repositorypluginclass = $repositoryplugin . '\\' . $repositoryplugin;
                     /** @var ICertificateRepository $subplugin */
                     $subplugin = new $repositorypluginclass();
-                    $response = $subplugin->saveFile($newfile);
+                    $response = $subplugin->saveFile($newfile['file']);
                     if (!$response['haserror']) {
-                        $validation->set('status', certifygen_validations::STATUS_FINISHED);
+                        $validation->set('status', certifygen_validations::STATUS_VALIDATION_OK);
                         $validation->save();
+                        $status = certifygen_validations::STATUS_FINISHED;
                         if ($subplugin->saveFileUrl()) {
-                            $url = $subplugin->getFileUrl();
-                            $data = [
-                                'validationid' => $validation->get('id'),
-                                'userid' => $validation->get('userid'),
-                                'url' => $url
-                            ];
-                            // Save url.
-                            $repository = new certifygen_repository(0, (object) $data);
-                            $repository->save();
-                        }                        
+                            $url = $subplugin->getFileUrl($validation);
+                            if (!empty($url)) {
+                                $data = [
+                                    'validationid' => $validation->get('id'),
+                                    'userid' => $validation->get('userid'),
+                                    'url' => $url,
+                                    'usermodified' => $validation->get('userid'), // should be cron user.
+                                ];
+                                // Save url.
+                                $repository = new certifygen_repository(0, (object) $data);
+                                $repository->save();
+                            } else {
+                                $status = certifygen_validations::STATUS_REPOSITORY_ERROR;
+                            }
+                        }
+                        // Save status.
+                        $validation->set('status', $status);
+                        $validation->save();
                     } else {
                         $validation->set('status', certifygen_validations::STATUS_STORAGE_ERROR);
                         $validation->save();
@@ -115,6 +118,8 @@ class checkfile extends scheduled_task
                 }
             } catch (\moodle_exception $e) {
                 error_log(__FUNCTION__ . ' e: '.var_export($e->getMessage(), true));
+                $validation->set('status', certifygen_validations::STATUS_STORAGE_ERROR);
+                $validation->save();
                 continue;
             }
         }

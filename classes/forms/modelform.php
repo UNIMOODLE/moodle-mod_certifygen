@@ -187,6 +187,7 @@ class modelform extends dynamic_form {
                     'type' => $model->get('type'),
                     'templateid' => $model->get('templateid'),
                     'report' => $model->get('report'),
+                    'repository' => $model->get('repository'),
                     'modelname' => $model->get('name'),
                     'timeondemmand' => $model->get('timeondemmand'),
                     'langs' => $model->get('langs'),

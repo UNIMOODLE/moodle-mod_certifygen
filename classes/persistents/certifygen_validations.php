@@ -21,6 +21,7 @@ class certifygen_validations extends persistent {
     public const STATUS_STORAGE_ERROR = 6;
     public const STATUS_ERROR = 7;
     public const STATUS_FINISHED = 8;
+    public const STATUS_REPOSITORY_ERROR = 9;
     public const TEACHER_REQUEST_CODE_STARTSWITH = 'TR';
 
     /**

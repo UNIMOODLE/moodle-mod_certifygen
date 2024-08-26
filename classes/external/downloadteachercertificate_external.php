@@ -32,19 +32,15 @@
 namespace mod_certifygen\external;
 
 use coding_exception;
-use context_system;
 use core\invalid_persistent_exception;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
-use mod_certifygen\interfaces\ICertificateReport;
 use mod_certifygen\interfaces\ICertificateRepository;
-use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-use moodle_url;
 
 class downloadteachercertificate_external extends external_api {
     /**

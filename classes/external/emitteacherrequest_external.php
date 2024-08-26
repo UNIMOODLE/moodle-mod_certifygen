@@ -88,6 +88,7 @@ class emitteacherrequest_external extends external_api {
                 $result['message'] = 'report plugin must be set on the model';
                 return $result;
             }
+            // Step 2: Create certificate file.
             $reportpluginclass = $reportplugin . '\\' . $reportplugin;
             /** @var ICertificateReport $subplugin */
             $subplugin = new $reportpluginclass();
@@ -108,6 +109,7 @@ class emitteacherrequest_external extends external_api {
                 'user_fullname' => fullname($certifygenfile->get_user()),
             ];
             $certifygenfile->set_metadata($data);
+
             // Step 3: Call to validation plugin.
             $certifygenmodel = new certifygen_model($teacherrequest->get('modelid'));
             $validationplugin = $certifygenmodel->get('validation');

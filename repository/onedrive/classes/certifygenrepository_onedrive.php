@@ -52,6 +52,27 @@ class certifygenrepository_onedrive implements ICertificateRepository
             return '';
         }
         return $this->url;
+        // TODO igual es mejor no tener que guardar la url en db ...:
+//        $code = certifygen_validations::get_certificate_code($validation);
+//        if (empty($this->url)) {
+//            global $CFG, $USER;
+//            $result = [
+//                'result' => true,
+//                'haserror' => false,
+//                'message' => 'ok',
+//            ];
+//
+//            try {
+//                $connection = new onedriveconnection();
+//                $this->url = $connection->get_file_url();
+//            } catch (\moodle_exception $e) {
+//                $result['result'] = false;
+//                $result['haserror'] = true;
+//                $result['message'] = $e->getMessage();
+//            }
+//            return $result;
+//        }
+//        return $this->url;
     }
 
     /**
@@ -63,6 +84,7 @@ class certifygenrepository_onedrive implements ICertificateRepository
         global $CFG, $USER;
         $result = [
             'result' => true,
+            'haserror' => false,
             'message' => 'ok',
         ];
 
@@ -81,6 +103,7 @@ class certifygenrepository_onedrive implements ICertificateRepository
             //$file->delete(); //TODO: uncomment.
         } catch (\moodle_exception $e) {
             $result['result'] = false;
+            $result['haserror'] = true;
             $result['message'] = $e->getMessage();
         }
         return $result;

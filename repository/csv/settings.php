@@ -22,7 +22,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
- * @package    certifygenrepository_onedrive
+ * @package    certifygenrepository_csv
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
@@ -34,25 +34,18 @@ defined('MOODLE_INTERNAL') || die();
 
 // Main link.
 $ADMIN->add('modsettingcertifygencat',
-    new admin_category('certifygenrepository_onedrive_cat',
-        get_string('pluginname', 'certifygenrepository_onedrive')));
+    new admin_category('certifygenrepository_csv_cat',
+        get_string('pluginname', 'certifygenrepository_csv')));
 
 $settings = new admin_settingpage(
-    'modsettingcertifygenrepositoryonedrive',
-    get_string('pluginnamesettings', 'certifygenrepository_onedrive'),
+    'modsettingcertifygenrepositorycsv',
+    get_string('pluginnamesettings', 'certifygenrepository_csv'),
     'moodle/site:config');
+
 if ($ADMIN->fulltree) {
 
     // Enable.
-    $settings->add(new admin_setting_configcheckbox('certifygenrepository_onedrive/enabled',
-        new lang_string('enable', 'certifygenrepository_onedrive'),
-        new lang_string('enable_help', 'certifygenrepository_onedrive'), 0));
-    //  Onedrive folder.
-    $settings->add(new admin_setting_configtext(
-        'certifygenrepository_onedrive/folder',
-        get_string('settings_folder', 'certifygenrepository_onedrive'),
-        get_string('settings_folder_desc', 'certifygenrepository_onedrive'),
-        'certifygen_certificates',
-        PARAM_TEXT
-    ));
+    $settings->add(new admin_setting_configcheckbox('certifygenrepository_csv/enabled',
+        new lang_string('enable', 'certifygenrepository_csv'),
+        new lang_string('enable_help', 'certifygenrepository_csv'), 0));
 }

@@ -32,6 +32,7 @@ use core\persistent;
 
 class certifygen_repository extends persistent
 {
+    public const TABLE = 'certifygen_repository';
     /**
      * Define properties
      *
@@ -39,7 +40,7 @@ class certifygen_repository extends persistent
      */
     protected static function define_properties(): array {
         return [
-            'validation' => [
+            'validationid' => [
                 'type' => PARAM_INT,
             ],
             'userid' => [

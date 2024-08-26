@@ -73,6 +73,10 @@ class onedriveconnection
     public function is_enabled() : bool {
         return $this->enabled;
     }
+    public function get_file_url() : string {
+        // TODO.
+        return '';
+    }
     /**
      * Get a cached user authenticated oauth client.
      *
