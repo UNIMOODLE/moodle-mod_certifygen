@@ -184,9 +184,9 @@ class certifygen_context extends persistent {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public static function get_course_context_modelid(int $courseid) : int {
+    public static function get_course_context_modelids(int $courseid) : array {
         global $DB;
-        $modelid = 0;
+        $modelids = [];
         $contexts = $DB->get_records(self::TABLE);
         $hascontext = false;
         foreach ($contexts as $context) {
@@ -196,11 +196,10 @@ class certifygen_context extends persistent {
                 $hascontext = self::has_course_category_context($courseid, $context);
             }
             if ($hascontext) {
-                $modelid = $context->modelid;
-                break;
+                $modelids[] = $context->modelid;
             }
         }
-        return $modelid;
+        return $modelids;
     }
 
     /**

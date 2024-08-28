@@ -27,7 +27,7 @@
 
 namespace certifygenrepository_csv;
 
-use certifygenvalidation_csv\certifygenvalidation_csv;
+use certifygenvalidation_csv\certifygenvalidation_webservice;
 use certifygenvalidation_csv\csv_configuration;
 use coding_exception;
 use dml_exception;
@@ -62,7 +62,7 @@ class certifygenrepository_csv implements ICertificateRepository
      * @throws coding_exception
      */
     private function getFileUrlFromExternalService(certifygen_validations $validation, string $code) : string {
-        $validationcsv = new certifygenvalidation_csv();
+        $validationcsv = new certifygenvalidation_webservice();
         $data = $validationcsv->getFileUrlFromExternalService($validation->get('id'), $code);
         if (array_key_exists('url', $data)){
             return $data['url'];

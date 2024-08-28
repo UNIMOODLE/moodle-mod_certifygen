@@ -87,13 +87,13 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
         $result = get_courses_as_teacher_external::get_courses_as_teacher($user1->id, '', '');
         $this->assertIsArray($result);
         $this->assertArrayHasKey('courses', $result);
-        $this->assertArrayHasKey('models', $result);
         $this->assertIsArray($result['courses']);
         $this->assertCount(1, $result['courses']);
         $this->assertArrayHasKey('id', $result['courses'][0]);
         $this->assertArrayHasKey('shortname', $result['courses'][0]);
         $this->assertArrayHasKey('fullname', $result['courses'][0]);
         $this->assertArrayHasKey('categoryid', $result['courses'][0]);
+        $this->assertArrayHasKey('models', $result['courses'][0]);
         $this->assertEquals($course1->id, $result['courses'][0]['id']);
         $this->assertEquals($course1->shortname, $result['courses'][0]['shortname']);
         $this->assertEquals($course1->fullname, $result['courses'][0]['fullname']);
@@ -103,16 +103,16 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
         $this->assertArrayHasKey('fullname', $result['teacher']);
         $this->assertEquals($user1->id, $result['teacher']['id']);
         $this->assertEquals(fullname($user1), $result['teacher']['fullname']);
-        $this->assertIsArray($result['models']);
-        $this->assertCount(1, $result['models']);
-        $this->assertArrayHasKey('id', $result['models'][0]);
-        $this->assertArrayHasKey('name', $result['models'][0]);
-        $this->assertArrayHasKey('mode', $result['models'][0]);
-        $this->assertArrayHasKey('timeondemmand', $result['models'][0]);
-        $this->assertArrayHasKey('type', $result['models'][0]);
-        $this->assertArrayHasKey('templateid', $result['models'][0]);
-        $this->assertArrayHasKey('langs', $result['models'][0]);
-        $this->assertArrayHasKey('validation', $result['models'][0]);
+        $this->assertIsArray($result['courses'][0]['models']);
+        $this->assertCount(1, $result['courses'][0]['models']);
+        $this->assertArrayHasKey('id', $result['courses'][0]['models'][0]);
+        $this->assertArrayHasKey('name', $result['courses'][0]['models'][0]);
+        $this->assertArrayHasKey('mode', $result['courses'][0]['models'][0]);
+        $this->assertArrayHasKey('timeondemmand', $result['courses'][0]['models'][0]);
+        $this->assertArrayHasKey('type', $result['courses'][0]['models'][0]);
+        $this->assertArrayHasKey('templateid', $result['courses'][0]['models'][0]);
+        $this->assertArrayHasKey('langs', $result['courses'][0]['models'][0]);
+        $this->assertArrayHasKey('validation', $result['courses'][0]['models'][0]);
     }
     /**
      * @return void
@@ -153,13 +153,13 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
         $result = get_courses_as_teacher_external::get_courses_as_teacher(0, $dni, '');
         $this->assertIsArray($result);
         $this->assertArrayHasKey('courses', $result);
-        $this->assertArrayHasKey('models', $result);
         $this->assertIsArray($result['courses']);
         $this->assertCount(1, $result['courses']);
         $this->assertArrayHasKey('id', $result['courses'][0]);
         $this->assertArrayHasKey('shortname', $result['courses'][0]);
         $this->assertArrayHasKey('fullname', $result['courses'][0]);
         $this->assertArrayHasKey('categoryid', $result['courses'][0]);
+        $this->assertArrayHasKey('models', $result['courses'][0]);
         $this->assertEquals($course1->id, $result['courses'][0]['id']);
         $this->assertEquals($course1->shortname, $result['courses'][0]['shortname']);
         $this->assertEquals($course1->fullname, $result['courses'][0]['fullname']);
@@ -201,13 +201,13 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
         $result = get_courses_as_teacher_external::get_courses_as_teacher(0, $field, '');
         $this->assertIsArray($result);
         $this->assertArrayHasKey('courses', $result);
-        $this->assertArrayHasKey('models', $result);
         $this->assertIsArray($result['courses']);
         $this->assertCount(1, $result['courses']);
         $this->assertArrayHasKey('id', $result['courses'][0]);
         $this->assertArrayHasKey('shortname', $result['courses'][0]);
         $this->assertArrayHasKey('fullname', $result['courses'][0]);
         $this->assertArrayHasKey('categoryid', $result['courses'][0]);
+        $this->assertArrayHasKey('models', $result['courses'][0]);
         $this->assertEquals($course1->id, $result['courses'][0]['id']);
         $this->assertEquals($course1->shortname, $result['courses'][0]['shortname']);
         $this->assertEquals($course1->fullname, $result['courses'][0]['fullname']);
@@ -223,7 +223,6 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
         $this->assertIsArray($result);
         $this->assertArrayHasKey('courses', $result);
         $this->assertArrayHasKey('teacher', $result);
-        $this->assertArrayHasKey('models', $result);
 
         // Tests.
         $result = get_courses_as_teacher_external::get_courses_as_teacher($id + 1, $field, '');
@@ -280,13 +279,13 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
         $result = get_courses_as_teacher_external::get_courses_as_teacher($user1->id, '', 'en');
         $this->assertIsArray($result);
         $this->assertArrayHasKey('courses', $result);
-        $this->assertArrayHasKey('models', $result);
         $this->assertIsArray($result['courses']);
         $this->assertCount(1, $result['courses']);
         $this->assertArrayHasKey('id', $result['courses'][0]);
         $this->assertArrayHasKey('shortname', $result['courses'][0]);
         $this->assertArrayHasKey('fullname', $result['courses'][0]);
         $this->assertArrayHasKey('categoryid', $result['courses'][0]);
+        $this->assertArrayHasKey('models', $result['courses'][0]);
         $this->assertEquals($course1->id, $result['courses'][0]['id']);
         $this->assertEquals($course1->shortname, $result['courses'][0]['shortname']);
         $this->assertEquals($englishname, $result['courses'][0]['fullname']);

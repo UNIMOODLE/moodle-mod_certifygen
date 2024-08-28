@@ -295,33 +295,6 @@ function mod_certifygen_get_templates(int $courseid = 0) : array {
     return $templates;
 }
 
-//TODO: no se si el enlace del curso lo mantengo... ahroa q es contexto sistema... no se si tiene sentido
-/**
- * @param navigation_node $navigation
- * @param stdClass $course
- * @param context_course $context
- * @throws coding_exception|moodle_exception
- */
-//function mod_certifygen_extend_navigation_course(navigation_node $navigation, stdClass $course, context_course $context) {
-//
-//    global $USER;
-//    // Only for teachers (capability managegroups).
-//    $enrolledids = get_enrolled_users($context, 'moodle/course:managegroups', 0, 'u.id');
-//    if (!empty($enrolledids)) {
-//        $enrolledids = array_keys($enrolledids);
-//    }
-//    if (!in_array($USER->id, $enrolledids)) {
-//        return;
-//    }
-////    if (certifygen_context::has_course_context($course->id)) {
-//    if (certifygen_context::exists_system_context_model()) {
-//        $label = get_string('contextcertificatelink', 'mod_certifygen');
-//        $url = new moodle_url('/mod/certifygen/courselink.php', array('id' => $course->id));
-//        $icon = new pix_icon('t/edit', $label);
-//        $navigation->add($label, $url, navigation_node::TYPE_SYSTEM, null, null, $icon);
-//    }
-//}
-
 /**
  * @param tree $tree
  * @param $user

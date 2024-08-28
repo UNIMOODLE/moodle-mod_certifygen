@@ -102,7 +102,7 @@ class checkfile extends scheduled_task
                                 $repository = new certifygen_repository(0, (object) $data);
                                 $repository->save();
                             } else {
-                                $status = certifygen_validations::STATUS_REPOSITORY_ERROR;
+                                $status = certifygen_validations::STATUS_STORAGE_ERROR;
                             }
                         }
                         // Save status.
