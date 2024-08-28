@@ -44,6 +44,7 @@ use external_value;
 use invalid_parameter_exception;
 use mod_certifygen\certifygen;
 use mod_certifygen\certifygen_file;
+use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
@@ -82,7 +83,6 @@ class downloadcertificate_external extends external_api {
      * @throws invalid_persistent_exception
      */
     public static function downloadcertificate(int $validationid, int $instanceid, int $modelid, string $code, int $courseid): array {
-
         self::validate_parameters(
             self::downloadcertificate_parameters(), ['id' => $validationid, 'instanceid' => $instanceid, 'modelid' => $modelid, 'code' => $code,
                 'courseid' => $courseid]
@@ -97,30 +97,25 @@ class downloadcertificate_external extends external_api {
                 $result = ['result' => false, 'message' => 'notfound', 'url' => ''];
                 return $result;
             }
-            // Step 2: call to getfile from validationplugin.
-            $certifygenmodel = new certifygen_model($modelid);
-            $validationplugin = $certifygenmodel->get('validation');
-            if (empty($validationplugin)) {
-                $result['url'] = certifygen::get_user_certificate_file_url($instanceid, $certifygenmodel->get('templateid'),
-                    $validation->get('userid'), $courseid, $validation->get('lang'));
+            if ($validation->get('status') != certifygen_validations::STATUS_FINISHED) {
+                $result = ['result' => false, 'message' => 'statusnotfinished', 'url' => ''];
+                return $result;
+            }
+            // Step 2: call to getfile from repositoryplugin.
+            $certifygenmodel = new certifygen_model($validation->get('modelid'));
+            $repositoryplugin = $certifygenmodel->get('repository');
+            $repositorypluginclass = $repositoryplugin . '\\' . $repositoryplugin;
+            if (get_config($repositoryplugin, 'enabled') === '1') {
+                /** @var ICertificateRepository $subplugin */
+                $subplugin = new $repositorypluginclass();
+                $result['url'] = $subplugin->getFileUrl($validation);
                 if (empty($result['url'])) {
-                    $result = ['result' => false, 'message' => 'file not found. url empty', 'url' => ''];
-                    return $result;
+                    $result['result'] = false;
+                    $result['message'] = 'empty_url';
                 }
             } else {
-                $validationpluginclass = $validationplugin . '\\' . $validationplugin;
-                if (get_config($validationplugin, 'enabled') === '1') {
-                    /** @var ICertificateValidation $subplugin */
-                    $subplugin = new $validationpluginclass();
-                    $result['url'] = $subplugin->getFileUrl($courseid, $validationid, $code.'.pdf');
-                    if (empty($result['url'])) {
-                        $result['result'] = false;
-                        $result['message'] = 'empty_url';
-                    }
-                } else {
-                    $result['result'] = false;
-                    $result['message'] = 'plugin_not_enabled';
-                }
+                $result['result'] = false;
+                $result['message'] = 'plugin_not_enabled';
             }
         } catch (moodle_exception $e) {
             $result['result'] = false;

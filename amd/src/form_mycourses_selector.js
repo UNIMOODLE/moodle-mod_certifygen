@@ -46,12 +46,15 @@ export async function transport(selector, query, callback, failure) {
         }
 
     } else {
+
         let userid = jQuery(selector).attr('userid');
+        let modelid = jQuery('.mform select[name="modelid"]').val();
         const request = {
             methodname: 'mod_certifygen_searchmycourses',
             args: {
                 query: query,
-                userid: userid
+                userid: userid,
+                modelid: modelid,
             }
         };
 

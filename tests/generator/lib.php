@@ -55,6 +55,7 @@ class mod_certifygen_generator extends testing_module_generator {
             'langs' => 'en,es',
             'validation' => $validation,
             'report' => $report,
+            'repository' => 'certifygenrepository_localrepository',
 
         ];
         $model = new certifygen_model(0,  (object)$data);
@@ -71,6 +72,9 @@ class mod_certifygen_generator extends testing_module_generator {
     public function create_model_by_name(string $name, int $templateid, int $type) {
 
         $this->install_language_package('es');
+
+        // Configure the platform.
+        set_config('enabled',  1, 'certifygenrepository_localrepository');
         $data = [
             'name' => $name,
             'idnumber' => '',
@@ -81,6 +85,7 @@ class mod_certifygen_generator extends testing_module_generator {
             'langs' => 'en,es',
             'validation' => '',
             'report' => $type == certifygen_model::TYPE_ACTIVITY ? '' : 'certifygenreport_basic',
+            'repository' => 'certifygenrepository_localrepository',
 
         ];
         $model = new certifygen_model(0, (object)$data);

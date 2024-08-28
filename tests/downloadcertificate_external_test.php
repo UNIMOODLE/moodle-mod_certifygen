@@ -104,13 +104,14 @@ class downloadcertificate_external_test extends advanced_testcase {
         $validation = certifygen_validations::get_record($data);
         self::assertFalse($validation);
         emitcertificate_external::emitcertificate(0, $cm->instance, $model->get('id'), $lang, $student->id, $course->id);
+
+        // Now validation record exists.
         $validation = certifygen_validations::get_record($data);
-        $issue = certifygen::get_issues_for_course_by_lang($lang, $certificate1->get_id(), $course->id,
-            'mod_certifygen', $student->id, '', '', 0, 0, '');
-        $issue = reset($issue);
-        $fileurl = certifygen::get_user_certificate_file_url($cm->instance, $certificate1->get_id(), $student->id, $course->id, $lang);
+        $code = certifygen_validations::get_certificate_code($validation);
+        $localrepository = new certifygenrepository_localrepository\certifygenrepository_localrepository();
+        $fileurl = $localrepository->getFileUrl($validation);
         $result = downloadcertificate_external::downloadcertificate($validation->get('id'), $cm->instance,
-            $model->get('id'), $issue->code, $course->id);
+            $model->get('id'), $code, $course->id);
 
         // Tests.
         self::assertIsArray($result);
@@ -119,7 +120,6 @@ class downloadcertificate_external_test extends advanced_testcase {
         self::assertArrayHasKey('message', $result);
         self::assertTrue($result['result']);
         self::assertEquals(get_string('ok', 'mod_certifygen'), $result['message']);
-        // TODO: change to STATUS_VALIDATION_OK
         self::assertEquals(certifygen_validations::STATUS_FINISHED, $validation->get('status'));
         self::assertEquals($fileurl, $result['url']);
     }

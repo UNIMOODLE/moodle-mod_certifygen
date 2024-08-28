@@ -44,6 +44,7 @@ use external_value;
 use invalid_parameter_exception;
 use mod_certifygen\certifygen;
 use mod_certifygen\certifygen_file;
+use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
@@ -152,9 +153,23 @@ class emitcertificate_external extends external_api {
                 $validationplugin = $certifygenmodel->get('validation');
                 $validationpluginclass = $validationplugin . '\\' . $validationplugin;
                 if (empty($validationplugin)) {
-                    // TODO: change to STATUS_VALIDATION_OK
-                    $validation->set('status', certifygen_validations::STATUS_FINISHED);
+                    $validation->set('status', certifygen_validations::STATUS_VALIDATION_OK);
                     $validation->save();
+                    // Save on repository plugin.
+                    $repositoryplugin = $certifygenmodel->get('repository');
+                    $repositorypluginclass = $repositoryplugin . '\\' . $repositoryplugin;
+                    /** @var ICertificateRepository $subplugin */
+                    $subplugin = new $repositorypluginclass();
+                    $response = $subplugin->saveFile($certifygenfile->get_file());
+                    if (!$response['haserror']) {
+                        $validation->set('status', certifygen_validations::STATUS_FINISHED);
+                        $validation->save();
+                    } else {
+                        $validation->set('status', certifygen_validations::STATUS_STORAGE_ERROR);
+                        $validation->save();
+                        $result['result'] = false;
+                        $result['message'] = $response['message'];
+                    }
                 } else if (get_config($validationplugin, 'enabled') === '1') {
                     /** @var ICertificateValidation $subplugin */
                     $subplugin = new $validationpluginclass();

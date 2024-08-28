@@ -77,7 +77,7 @@ class searchcategory_external_test extends advanced_testcase {
         self::assertArrayHasKey('overflow', $result);
         self::assertCount(2, $result['list']);
 
-        self::assertEquals($name1, $result['list'][$category1->id]->name);
-        self::assertEquals($name2, $result['list'][$category2->id]->name);
+        self::assertEquals(' / ' . $name1, $result['list'][$category1->id]->name);
+        self::assertEquals(' / ' . $name2, $result['list'][$category2->id]->name);
     }
 }

@@ -125,13 +125,20 @@ class modelform extends dynamic_form {
             $mform->addElement('select', 'validation', get_string('validation', 'mod_certifygen'), $types);
             $mform->setType('validation', PARAM_RAW);
         }
-        // Report (only for system context).
+
+        // Report (only for teacher model type).
         $types = mod_certifygen_get_report();
-        if (!empty($types)) {
-            $mform->addElement('select', 'report', get_string('report', 'mod_certifygen'), $types);
-            $mform->setType('report', PARAM_RAW);
-            $mform->hideIf('report', 'type', 'eq', certifygen_model::TYPE_ACTIVITY);
-        }
+        $mform->addElement('select', 'report', get_string('report', 'mod_certifygen'), $types);
+        $mform->setType('report', PARAM_RAW);
+        $mform->hideIf('report', 'type', 'eq', certifygen_model::TYPE_ACTIVITY);
+
+        // Repository
+        $types = mod_certifygen_get_repositories();
+        $mform->addElement('select', 'repository', get_string('repository', 'mod_certifygen'), $types);
+        $mform->setType('repository', PARAM_RAW);
+        $mform->addRule('repository', get_string('required'), 'required');
+
+        // Hidden elements.
         $mform->addElement('hidden', 'modelid', 0);
         $mform->setType('modelid', PARAM_INT);
     }
@@ -180,6 +187,7 @@ class modelform extends dynamic_form {
                     'type' => $model->get('type'),
                     'templateid' => $model->get('templateid'),
                     'report' => $model->get('report'),
+                    'repository' => $model->get('repository'),
                     'modelname' => $model->get('name'),
                     'timeondemmand' => $model->get('timeondemmand'),
                     'langs' => $model->get('langs'),

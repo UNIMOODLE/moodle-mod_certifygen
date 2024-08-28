@@ -79,9 +79,7 @@ class reemitcertificate_external extends external_api {
 
         try {
             // Step 1: Copy data from the old validation id.
-            error_log(__FUNCTION__ . ' ' . ' id: '.var_export($id, true));
             $oldvalidation  = new certifygen_validations($id);
-            error_log(__FUNCTION__ . ' ' . ' oldvalidation: '.var_export($oldvalidation, true));
             $data = [
                 'name' => $oldvalidation->get('name'),
                 'courses' => $oldvalidation->get('courses'),
@@ -98,12 +96,9 @@ class reemitcertificate_external extends external_api {
             // Create a new one.
             $validation = certifygen_validations::manage_validation(0, (object) $data);
             // Emit the new one.
-            error_log(__FUNCTION__ . ' ' . ' validation: '.var_export($validation, true));
             $certifygen= new certifygen($validation->get('certifygenid'));
             $result = emitcertificate_external::emitcertificate($validation->get('id'), $validation->get('certifygenid'),
                 $validation->get('modelid'), $validation->get('lang'), $validation->get('userid'), $certifygen->get('course'));
-            error_log(__FUNCTION__ . ' ' . ' result: '.var_export($result, true));
-
         } catch (moodle_exception $e) {
             error_log(__FUNCTION__ . ' ' . ' error: '.var_export($e->getMessage(), true));
             $result['result'] = false;

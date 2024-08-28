@@ -36,6 +36,7 @@ namespace tests;
 
 use advanced_testcase;
 use mod_certifygen\external\searchmycourses_external;
+use mod_certifygen\persistents\certifygen_model;
 
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
@@ -69,11 +70,24 @@ class searchmycourses_external_test extends advanced_testcase
         self::getDataGenerator()->create_course(['fullname' => 'Matemáticas 1', 'category' => $cat->id]);
         self::getDataGenerator()->create_course(['fullname' => 'Matemáticas 2', 'category' => $cat->id]);
         $name = 'Biologia';
-        self::getDataGenerator()->create_course(['fullname' => $name, 'category' => $cat->id]);
+        $course1 = self::getDataGenerator()->create_course(['fullname' => $name, 'category' => $cat->id]);
         $name2 = 'biologia 5';
-        self::getDataGenerator()->create_course(['fullname' => $name2, 'category' => $cat->id]);
+        $course2 = self::getDataGenerator()->create_course(['fullname' => $name2, 'category' => $cat->id]);
 
-        $result = searchmycourses_external::searchmycourses('bi', $user->id);
+        // Create template.
+        $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
+        $certificate1 = $templategenerator->create_template((object)['name' => 'Certificate 1']);
+
+        // Create model and assign context.
+        $modgenerator = $this->getDataGenerator()->get_plugin_generator('mod_certifygen');
+        $model = $modgenerator->create_model_by_name(
+            certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
+            $certificate1->get_id(),
+            certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
+        );
+        $modgenerator->assign_model_coursecontext($model->get('id'), $course1->id . ',' . $course2->id);
+        $result = searchmycourses_external::searchmycourses('bi', $user->id, $model->get('id'));
+
         // Tests.
         self::assertIsArray($result);
         self::assertArrayHasKey('list', $result);
@@ -104,7 +118,20 @@ class searchmycourses_external_test extends advanced_testcase
         self::getDataGenerator()->enrol_user($user->id, $course->id);
         self::getDataGenerator()->enrol_user($user->id, $course2->id);
 
-        $result = searchmycourses_external::searchmycourses('biol', $user->id);
+        // Create template.
+        $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
+        $certificate1 = $templategenerator->create_template((object)['name' => 'Certificate 1']);
+
+        // Create model and assign context.
+        $modgenerator = $this->getDataGenerator()->get_plugin_generator('mod_certifygen');
+        $model = $modgenerator->create_model_by_name(
+            certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
+            $certificate1->get_id(),
+            certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
+        );
+        $modgenerator->assign_model_coursecontext($model->get('id'), $course->id . ',' . $course2->id);
+
+        $result = searchmycourses_external::searchmycourses('biol', $user->id, $model->get('id'));
         // Tests.
         self::assertIsArray($result);
         self::assertArrayHasKey('list', $result);

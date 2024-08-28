@@ -26,7 +26,6 @@
 import Ajax from 'core/ajax';
 import {render as renderTemplate} from 'core/templates';
 import {get_string as getString} from 'core/str';
-
 /**
  * Load the list of categories matching the query and render the selector labels for them.
  *
@@ -37,7 +36,7 @@ import {get_string as getString} from 'core/str';
  */
 export async function transport(selector, query, callback, failure) {
 
-    if (query.length <4) {
+    if (query.length < 1) {
         try {
             const msg = await getString('writealmost3characters', 'mod_certifygen');
             callback(msg);

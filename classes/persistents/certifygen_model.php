@@ -87,6 +87,11 @@ class certifygen_model extends persistent {
                 'default' => NULL,
                 'null' => NULL_ALLOWED,
             ],
+            'repository' => [
+                'type' => PARAM_TEXT,
+                'default' => NULL,
+                'null' => NULL_NOT_ALLOWED,
+            ],
             'usermodified' => [
                 'type' => PARAM_INT,
             ],
@@ -111,6 +116,7 @@ class certifygen_model extends persistent {
             'langs' => empty($data->langs) ? NULL : implode(',', $data->langs),
             'validation' => empty($data->validation) ? NULL : $data->validation,
             'report' => empty($data->report) ? NULL : $data->report,
+            'repository' => $data->repository,
             'usermodified' => $USER->id,
             'timecreated' => time(),
             'timemodified' => time(),
@@ -130,31 +136,6 @@ class certifygen_model extends persistent {
         }
 
     }
-
-    /**
-     * @param int $limitfrom
-     * @param int $limitnum
-     * @return int
-     * @throws dml_exception
-     */
-//    public static function count_context_models(int $limitfrom = 0, int $limitnum = 0) : int {
-//        global $DB;
-//
-//        return $DB->count_records('certifygen_model', ['type' => self::TYPE_TEACHER]);
-//    }
-
-    /**
-     * @param int $limitfrom
-     * @param int $limitnum
-     * @param string $sort
-     * @return array
-     * @throws dml_exception
-     */
-//    public static function get_context_models(int $limitfrom = 0, int $limitnum = 0, string $sort = '') : array {
-//        global $DB;
-//
-//        return $DB->get_records('certifygen_model', ['type' => self::TYPE_TEACHER], $sort, '*', $limitfrom, $limitnum);
-//    }
 
     /**
      * @return array

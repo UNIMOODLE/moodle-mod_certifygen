@@ -34,6 +34,7 @@ use core\invalid_persistent_exception;
 use core_user\output\myprofile\tree;
 use mod_certifygen\forms\certificatestablefiltersform;
 use mod_certifygen\interfaces\ICertificateReport;
+use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_context;
@@ -240,7 +241,6 @@ function mod_certifygen_get_validation() : array {
  */
 function mod_certifygen_get_report() : array {
 
-//    $all[''] = get_string('selectreport', 'mod_certifygen');
     $enabled = [];
     foreach (core_plugin_manager::instance()->get_plugins_of_type('certifygenreport') as $plugin) {
         $reportplugin = $plugin->component;
@@ -249,14 +249,28 @@ function mod_certifygen_get_report() : array {
         $subplugin = new $reportpluginclass();
         if ($subplugin->is_enabled()) {
             $enabled[$plugin->component] = get_string('pluginname', $plugin->component);
-//            $all[$plugin->component] = get_string('pluginname', $plugin->component);
         }
     }
-//    if (empty($enabled)) {
-//        return [];
-//    }
-//
-//    return $all;
+    return $enabled;
+}
+/**
+ * Get certifygen model repository subplugins
+ * @return array
+ * @throws coding_exception
+ */
+function mod_certifygen_get_repositories() : array {
+
+    $enabled = [];
+    foreach (core_plugin_manager::instance()->get_plugins_of_type('certifygenrepository') as $plugin) {
+        $reportplugin = $plugin->component;
+        $reportpluginclass = $reportplugin . '\\' . $reportplugin;
+        /** @var ICertificateRepository $subplugin */
+        $subplugin = new $reportpluginclass();
+        if ($subplugin->is_enabled()) {
+            $enabled[$plugin->component] = get_string('pluginname', $plugin->component);
+        }
+    }
+
     return $enabled;
 }
 
@@ -280,33 +294,6 @@ function mod_certifygen_get_templates(int $courseid = 0) : array {
     }
     return $templates;
 }
-
-//TODO: no se si el enlace del curso lo mantengo... ahroa q es contexto sistema... no se si tiene sentido
-/**
- * @param navigation_node $navigation
- * @param stdClass $course
- * @param context_course $context
- * @throws coding_exception|moodle_exception
- */
-//function mod_certifygen_extend_navigation_course(navigation_node $navigation, stdClass $course, context_course $context) {
-//
-//    global $USER;
-//    // Only for teachers (capability managegroups).
-//    $enrolledids = get_enrolled_users($context, 'moodle/course:managegroups', 0, 'u.id');
-//    if (!empty($enrolledids)) {
-//        $enrolledids = array_keys($enrolledids);
-//    }
-//    if (!in_array($USER->id, $enrolledids)) {
-//        return;
-//    }
-////    if (certifygen_context::has_course_context($course->id)) {
-//    if (certifygen_context::exists_system_context_model()) {
-//        $label = get_string('contextcertificatelink', 'mod_certifygen');
-//        $url = new moodle_url('/mod/certifygen/courselink.php', array('id' => $course->id));
-//        $icon = new pix_icon('t/edit', $label);
-//        $navigation->add($label, $url, navigation_node::TYPE_SYSTEM, null, null, $icon);
-//    }
-//}
 
 /**
  * @param tree $tree
@@ -364,6 +351,7 @@ function mod_certifygen_pluginfile(
     // Make sure the filearea is one of those used by the plugin.
     if ($filearea !== ICertificateValidation::FILE_AREA &&
         $filearea !== ICertificateReport::FILE_AREA &&
+        $filearea !== ICertificateRepository::FILE_AREA &&
         $filearea !== ICertificateValidation::FILE_AREA_VALIDATED
         && $filearea !== 'issues') {
         return false;
