@@ -75,9 +75,13 @@ class checkfile extends scheduled_task
                 if (!$subplugin->checkFile()) {
                     continue;
                 }
-                $certi = new certifygen($validation->get('certifygenid'));
                 $code = certifygen_validations::get_certificate_code($validation);
-                $newfile = $subplugin->getFile($certi->get('course'), $validation->get('id'), $code);
+                $course = 0;
+                if (!empty($validation->get('certifygenid'))) {
+                    $certi = new certifygen($validation->get('certifygenid'));
+                    $course = $certi->get('course');
+                }
+                $newfile = $subplugin->getFile($course, $validation->get('id'), $code);
                 if (array_key_exists('file', $newfile)) {
                     // Save on repository plugin.
                     $repositoryplugin = $model->get('repository');

@@ -38,7 +38,7 @@ interface ICertificateValidation {
 
     public function is_enabled(): bool;
     public function sendFile(certifygen_file $file): array;
-    public function getFile(int $courseid, int $validationid, string $code);
+    public function getFile(int $courseid, int $validationid): array;
     public function getFileUrl(int $courseid, int $validationid, string $code): string;
     public function canRevoke(): bool;
 

@@ -268,9 +268,11 @@ class certifygenvalidation_csv implements ICertificateValidation
      * @throws coding_exception
      * @throws moodle_exception
      */
-    public function getFile(int $courseid, int $validationid, string $code)
+    public function getFile(int $courseid, int $validationid) : array
     {
         try {
+            $validation = new certifygen_validations($validationid);
+            $code = certifygen_validations::get_certificate_code($validation);
             $params = ['validationid' => $validationid];
             $teacherrequest = certifygenvalidationcsv::get_record($params);
             $message = 'Something went wrong';
