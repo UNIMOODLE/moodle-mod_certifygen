@@ -38,6 +38,8 @@ global $CFG, $PAGE, $DB, $COURSE, $USER, $OUTPUT;
 
 require_login();
 
+require_capability('mod/certifygen:manage', context_system::instance());
+
 $PAGE->set_url('/mod/certifygen/modelmanager.php');
 $context = context_system::instance();
 $PAGE->set_context($context);
