@@ -45,6 +45,7 @@ use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
+require_once($CFG->dirroot . '/mod/certifygen/externalcompatibility.php');
 
 class emitteacherrequest_external extends external_api {
     /**

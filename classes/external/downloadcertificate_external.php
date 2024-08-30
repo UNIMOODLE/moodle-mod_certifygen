@@ -50,6 +50,7 @@ use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use mod_certifygen\template;
 use moodle_exception;
+require_once($CFG->dirroot . '/mod/certifygen/externalcompatibility.php');
 
 class downloadcertificate_external extends external_api {
     /**

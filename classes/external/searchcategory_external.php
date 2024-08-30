@@ -34,6 +34,9 @@ use invalid_parameter_exception;
 use moodle_exception;
 use restricted_context_exception;
 
+require_once($CFG->dirroot . '/mod/certifygen/externalcompatibility.php');
+
+
 /**
  * @package    mod_certifygen
  * * @copyright  2024 Proyecto UNIMOODLE

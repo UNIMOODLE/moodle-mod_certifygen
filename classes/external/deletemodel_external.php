@@ -38,6 +38,7 @@ use external_value;
 use invalid_parameter_exception;
 use mod_certifygen\persistents\certifygen_model;
 use moodle_exception;
+require_once($CFG->dirroot . '/mod/certifygen/externalcompatibility.php');
 
 class deletemodel_external extends external_api {
     /**

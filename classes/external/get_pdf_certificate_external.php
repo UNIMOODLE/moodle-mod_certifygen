@@ -39,6 +39,7 @@ use external_value;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
+require_once($CFG->dirroot . '/mod/certifygen/externalcompatibility.php');
 
 global $CFG;
 require_once($CFG->dirroot.'/user/lib.php');

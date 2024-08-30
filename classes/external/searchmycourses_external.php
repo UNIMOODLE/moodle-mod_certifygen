@@ -33,6 +33,7 @@ use invalid_parameter_exception;
 use mod_certifygen\persistents\certifygen_context;
 use mod_certifygen\persistents\certifygen_model;
 use restricted_context_exception;
+require_once($CFG->dirroot . '/mod/certifygen/externalcompatibility.php');
 
 /**
  * @package    mod_certifygen
