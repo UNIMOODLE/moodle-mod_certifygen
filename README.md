@@ -42,9 +42,16 @@ to complete the installation from the command line.
 ## CLI Executions ##
 ## Subplugins ##
 
-### certifygenvalidation_cmd ###
-### certifygenvalidation_csv ###
-### certifygenreport_basic ###
+### certifygenvalidation ###
+* certifygenvalidation_cmd 
+* certifygenvalidation_csv 
+* certifygenvalidation_webservice 
+### certifygenreport ###
+* certifygenreport_basic 
+### certifygenrepository ###
+* certifygenrepository_localrepository 
+* certifygenrepository_onedrive 
+
 
 ### Tasks ###
 
