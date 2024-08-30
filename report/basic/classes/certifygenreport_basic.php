@@ -30,8 +30,11 @@ global $CFG;
 require_once($CFG->dirroot . '/lib/pdflib.php');
 
 use certifygenreport_basic\output\report_view;
+use context_system;
 use mod_certifygen\interfaces\ICertificateReport;
 use mod_certifygen\persistents\certifygen_validations;
+use moodle_url;
+use pdf;
 
 class certifygenreport_basic implements ICertificateReport
 {
@@ -66,9 +69,15 @@ class certifygenreport_basic implements ICertificateReport
         }
         try {
             // Step 2: Create pdf.
-            $doc = new \pdf();
-            $doc->setPrintHeader(false);
+            $doc = new pdf();
+            $image_file = $this->get_logo_url();
+            if (!empty($image_file)) {
+                $doc->setHeaderData($image_file, 8, 'Unimoodle Certifygen', '');
+            } else {
+                $doc->setPrintHeader(false);
+            }
             $doc->setPrintFooter(true);
+
             $doc->AddPage();
             $renderer = $PAGE->get_renderer('certifygenreport_basic');
             if (count($courselist) <= report_view::MAX_NUMBER_COURSES) {
@@ -87,17 +96,16 @@ class certifygenreport_basic implements ICertificateReport
                     $coursespagelist = array_slice($courselist, $offset, report_view::MAX_NUMBER_COURSES);
                     $view = new report_view($teacherrequest->get('userid'), $coursespagelist, $i==0, $showendtext);
                     $content = $renderer->render($view);
-                    //    $doc->writeHTML($content, true, false, true); // no es necesario.
                     $doc->writeHTML($content);
                     if ($i < $numblocks) {
                         $doc->AddPage();
                     }
                 }
             }
-//            $res = $doc->Output(ICertificateReport::FILE_NAME_STARTSWITH . $teacherrequest->get('id') .'_'.time().'.pdf', 'S');
-            $res = $doc->Output($teacherrequest->get('code') .'_'.time().'.pdf', 'S');
+           $res = $doc->Output($teacherrequest->get('code') .'_'.time().'.pdf', 'S');
+            //$res = $doc->Output($teacherrequest->get('code') .'_'.time().'.pdf', 'D');
             $fs = get_file_storage();
-            $context = \context_system::instance();
+            $context = context_system::instance();
             $filerecord = [
                 'contextid' => $context->id,
                 'component' => self::FILE_COMPONENT,
@@ -120,5 +128,36 @@ class certifygenreport_basic implements ICertificateReport
         }
 
         return $result;
+    }
+
+    /**
+     * @return string
+     * @throws dml_exception
+     */
+    public function get_logo_url() : string {
+        global $CFG;
+        try {
+            $fs = get_file_storage();
+            $context = context_system::instance();
+            $filename = get_config('certifygenreport_basic', 'logo');
+            if (empty($filename)) {
+                return '';
+            }
+            $logo = $fs->get_file($context->id, report_view::REPORT_COMPONENT, report_view::REPORT_FILEAREA, 0,
+                '/', $filename);
+            if (!$logo) {
+                return '';
+            }
+            // Lo guardamos en el repo.
+            $url = '/mod/certifygen/report/basic/pix' . $filename;
+            if (file_exists($CFG->dirroot . $url)) {
+                unlink($url);
+            }
+            $logo->copy_content_to($CFG->dirroot . $url);
+
+        } catch ( \moodle_exception $exception) {
+            $url = '';
+        }
+        return $url;
     }
 }

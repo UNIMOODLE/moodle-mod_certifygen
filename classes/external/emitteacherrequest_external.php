@@ -114,7 +114,6 @@ class emitteacherrequest_external extends external_api {
             $certifygenmodel = new certifygen_model($teacherrequest->get('modelid'));
             $validationplugin = $certifygenmodel->get('validation');
             $validationpluginclass = $validationplugin . '\\' . $validationplugin;
-            error_log(__FUNCTION__ . ' ' . __LINE__);
             if (empty($validationplugin)) {
                 $teacherrequest->set('status', certifygen_validations::STATUS_VALIDATION_OK);
                 $teacherrequest->save();
@@ -137,7 +136,6 @@ class emitteacherrequest_external extends external_api {
                 /** @var ICertificateValidation $subplugin */
                 $subplugin = new $validationpluginclass();
                 $response = $subplugin->sendFile($certifygenfile);
-                error_log(__FUNCTION__ . ' ' . __LINE__ . ' resp: '.var_export($response, true));
                 if ($response['haserror']) {
                     $result['result'] = false;
                     $result['message'] = $response['message'];
