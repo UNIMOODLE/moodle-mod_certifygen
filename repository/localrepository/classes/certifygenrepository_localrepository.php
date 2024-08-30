@@ -58,12 +58,6 @@ class certifygenrepository_localrepository implements ICertificateRepository
 
         $fs = get_file_storage();
         $contextid = context_system::instance()->id;
-        error_log(__FUNCTION__ . ' contextid: '.var_export($contextid, true));
-        error_log(__FUNCTION__ . ' itemid: '.var_export($itemid, true));
-        error_log(__FUNCTION__ . ' code: '.var_export($code, true));
-        error_log(__FUNCTION__ . ' comp: '.var_export(ICertificateReport::FILE_COMPONENT, true));
-        error_log(__FUNCTION__ . ' area: '.var_export(ICertificateReport::FILE_AREA, true));
-        error_log(__FUNCTION__ . ' path: '.var_export(ICertificateReport::FILE_PATH, true));
         $file = $fs->get_file($contextid, ICertificateReport::FILE_COMPONENT,
             ICertificateRepository::FILE_AREA, $itemid,  ICertificateRepository::FILE_PATH, $code);
         if (empty($file)) {
