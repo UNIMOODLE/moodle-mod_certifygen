@@ -84,6 +84,7 @@ $string['status'] = 'Estado';
 $string['mycertificates'] = 'Mis Certificados de Unimoodle Certifygen';
 $string['deletemodeltitle'] = 'Borrando Modelo';
 $string['deletemodelbody'] = '¿Está seguro que quieres borrar el modelo llamado "{$a}"?';
+$string['cannotdeletemodelcertemited'] = 'El modelo no se puede borrar. Hay certificados asociados emitidos.';
 $string['confirm'] = 'Confirmar';
 $string['errortitle'] = 'Error';
 $string['model'] = 'Modelo';

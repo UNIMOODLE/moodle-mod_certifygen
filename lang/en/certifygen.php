@@ -84,6 +84,7 @@ $string['status'] = 'Status';
 $string['mycertificates'] = 'My Unimoodle Certifygen Certificates';
 $string['deletemodeltitle'] = 'Deleting Model';
 $string['deletemodelbody'] = 'Are you sure, you want to delete model called "{$a}"?';
+$string['cannotdeletemodelcertemited'] = 'Model can not be deleted. There already are certifies emitted';
 $string['confirm'] = 'Confirm';
 $string['errortitle'] = 'Error';
 $string['model'] = 'Model';

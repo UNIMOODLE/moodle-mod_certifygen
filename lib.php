@@ -493,3 +493,26 @@ function mod_certifygen_validate_user_parameters_for_ws(int $userid, string $use
     }
     return $results;
 }
+
+/**
+ * @param int $modelid
+ * @return bool
+ * @throws coding_exception
+ * @throws dml_exception
+ */
+function mod_certifygen_are_there_any_certificate_emited(int $modelid) : bool {
+    global $DB;
+
+    if (!$modelid) {
+        return false;
+    }
+
+    [$insql, $inparams] = $DB->get_in_or_equal(certifygen_validations::STATUS_NOT_STARTED, SQL_PARAMS_NAMED, 'param', false);
+    [$modelsql, $modelparams] = $DB->get_in_or_equal($modelid, SQL_PARAMS_NAMED, 'modelid');
+    $params = array_merge($inparams, $modelparams);
+    $inparams['modelid'] = $modelid;
+    $select = " status  $insql";
+    $select .= " AND modelid $modelsql";
+    $num = certifygen_validations::count_records_select($select, $params);
+    return $num > 0;
+}

@@ -145,6 +145,7 @@ const DeleteModel = (event) => {
                             body: response.message,
                             type: ModalFactory.types.CANCEL
                         }).then(modal => {
+                            modal.show();
                             modal.getRoot().on(ModalEvents.hidden, () => {
                                 modal.destroy();
                             });
