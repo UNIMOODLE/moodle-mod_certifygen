@@ -159,14 +159,7 @@ class get_pdf_teacher_certificate_external extends external_api {
                 $validationplugin = $certifygenmodel->get('validation');
                 $validationpluginclass = $validationplugin . '\\' . $validationplugin;
                 $code = $trequest->get('code') . '.pdf';
-                if (empty($validationplugin)) {
-                    // Get file from moodledata.
-//                    $code = ICertificateReport::FILE_NAME_STARTSWITH . $trequest->get('id') . '.pdf';
-                    $fs = get_file_storage();
-                    $contextid = \context_system::instance()->id;
-                    $file = $fs->get_file($contextid, ICertificateReport::FILE_COMPONENT,
-                        ICertificateReport::FILE_AREA, $trequest->get('id'), ICertificateReport::FILE_PATH, $code);
-                } else if (get_config($validationplugin, 'enabled') === '1') {
+                if (get_config($validationplugin, 'enabled') === '1') {
                     /** @var ICertificateValidation $subplugin */
                     $subplugin = new $validationpluginclass();
                     $fileresult = $subplugin->getFile(0, $trequest->get('id'), $code);

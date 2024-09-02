@@ -90,7 +90,7 @@ class activityteacher_table extends table_sql {
         } else if (has_capability('moodle/course:managegroups', $context) && !empty($validationplugin)) {
             $validationpluginclass = $validationplugin . '\\' . $validationplugin;
             $subplugin = new $validationpluginclass();
-            $this->canrevoke = $subplugin->canrevoke();
+            $this->canrevoke = $subplugin->canRevoke($course->id);
         }
         // Define the titles of columns to show in header.
         $headers = [
@@ -145,7 +145,7 @@ class activityteacher_table extends table_sql {
     {
         global $USER;
         if ($USER->id != $row->id
-            && !has_capability('mod/certifygen:managecertificates', $this->context, $USER->id)) {
+            && !has_capability('mod/certifygen:canmanagecertificates', $this->context, $USER->id)) {
             return '';
         }
         if (!$this->canrevoke) {
@@ -234,7 +234,7 @@ class activityteacher_table extends table_sql {
         global $USER;
 
         if ($USER->id != $row->id
-        && !has_capability('mod/certifygen:managecertificates', $this->context, $USER->id)) {
+        && !has_capability('mod/certifygen:canmanagecertificates', $this->context, $USER->id)) {
             return '';
         }
 

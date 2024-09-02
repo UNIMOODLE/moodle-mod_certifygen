@@ -154,6 +154,7 @@ class modelform extends dynamic_form {
         if (!$cemited) {
             $mform->addElement('select', 'validation', get_string('validation', 'mod_certifygen'), $types);
             $mform->setType('validation', PARAM_RAW);
+            $mform->addRule('validation', get_string('required'), 'required');
         } else {
             $typestring = $types[$model->get('validation')];
             $html = get_string('validation', 'mod_certifygen') . ' : ' . $typestring;

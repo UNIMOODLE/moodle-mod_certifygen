@@ -317,7 +317,7 @@ class certifygenvalidation_electronic implements ICertificateValidation
     /**
      * @return bool
      */
-    public function canRevoke(): bool
+    public function canRevoke(int $courseid): bool
     {
         return false;
     }

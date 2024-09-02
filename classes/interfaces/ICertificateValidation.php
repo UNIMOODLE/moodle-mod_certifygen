@@ -40,7 +40,7 @@ interface ICertificateValidation {
     public function sendFile(certifygen_file $file): array;
     public function getFile(int $courseid, int $validationid): array;
     public function getFileUrl(int $courseid, int $validationid, string $code): string;
-    public function canRevoke(): bool;
+    public function canRevoke(int $courseid): bool;
 
     /**
      * This method is called by checkstatus task to check if the certificate status has changed.

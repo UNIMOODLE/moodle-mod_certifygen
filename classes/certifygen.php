@@ -38,6 +38,10 @@ use coding_exception;
 use context_course;
 use core_course\customfield\course_handler;
 use dml_exception;
+use mod_certifygen\interfaces\ICertificateRepository;
+use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\persistents\certifygen_model;
+use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 use stdClass;
 use tool_certificate\certificate;
@@ -440,5 +444,60 @@ class certifygen {
                     AND c.id = :courseid $where";
 
         return $DB->count_records_sql($sql, $params);
+    }
+
+    /**
+     * @param certifygen_validations $validation
+     * @param certifygen_file $certifygenfile
+     * @param certifygen_model $certifygenmodel
+     * @return array
+     * @throws coding_exception
+     * @throws dml_exception
+     */
+    public static function start_emit_certificate_proccess(certifygen_validations $validation, certifygen_file $certifygenfile, certifygen_model $certifygenmodel) : array {
+        $result = ['result' => true, 'message' => get_string('ok', 'mod_certifygen')];
+
+        // Step 4: Call to validation plugin.
+        $validationplugin = $certifygenmodel->get('validation');
+        $validationpluginclass = $validationplugin . '\\' . $validationplugin;
+        if (get_config($validationplugin, 'enabled') === '1') {
+            /** @var ICertificateValidation $subplugin */
+            $subplugin = new $validationpluginclass();
+            $response = $subplugin->sendFile($certifygenfile);
+            if ($response['haserror']) {
+                if (!array_key_exists('message', $response)) {
+                    $result['message'] = 'validation_plugin_send_file_error';
+                }
+                $validation->set('status', certifygen_validations::STATUS_VALIDATION_ERROR);
+                $validation->save();
+            } else if (!$subplugin->checkStatus()) {
+                $validation->set('status', certifygen_validations::STATUS_VALIDATION_OK);
+                $validation->save();
+            }
+        } else {
+            $result['result'] = false;
+            $result['message'] = 'plugin_not_enabled';
+            $validation->set('status', certifygen_validations::STATUS_ERROR);
+            $validation->save();
+        }
+        // Step 5: Call to repository plugin.
+        if ($validation->get('status') === certifygen_validations::STATUS_VALIDATION_OK) {
+            // Save on repository plugin.
+            $repositoryplugin = $certifygenmodel->get('repository');
+            $repositorypluginclass = $repositoryplugin . '\\' . $repositoryplugin;
+            /** @var ICertificateRepository $subplugin */
+            $subplugin = new $repositorypluginclass();
+            $response = $subplugin->saveFile($response['newfile']);
+            if (!$response['haserror']) {
+                $validation->set('status', certifygen_validations::STATUS_FINISHED);
+                $validation->save();
+            } else {
+                $validation->set('status', certifygen_validations::STATUS_STORAGE_ERROR);
+                $validation->save();
+                $result['result'] = false;
+                $result['message'] = $response['message'];
+            }
+        }
+        return $result;
     }
 }

@@ -33,7 +33,7 @@ namespace certifygenvalidation_webservice\external;
 
 
 use certifygenfilter;
-use certifygenvalidation_webservice\certifygenvalidation_webservice;
+use certifygenvalidation_webservice\certifygenvalidation_none;
 use external_api;
 use external_function_parameters;
 use external_multiple_structure;
@@ -79,7 +79,7 @@ class get_user_requests_external extends external_api {
             $context = \context_system::instance();
             require_capability('mod/certifygen:manage', $context);
             // Is plugin enabled?
-            $wsplugin = new certifygenvalidation_webservice();
+            $wsplugin = new certifygenvalidation_none();
             if (!$wsplugin->is_enabled()) {
                 return ['error' => [
                     'message' => 'ws validation plugin not enabled',

@@ -18,7 +18,7 @@
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 /**
- * @package   certifygenvalidation_webservice
+ * @package   certifygenvalidation_none
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
@@ -26,12 +26,12 @@
  */
 
 
-namespace certifygenvalidation_webservice;
+namespace certifygenvalidation_none;
 global $CFG;
 require_once $CFG->libdir . '/soaplib.php';
 require_once $CFG->libdir . '/pdflib.php';
 
-use certifygenvalidation_webservice\persistents\certifygenvalidationwebservice;
+use certifygenvalidation_none\persistents\certifygenvalidationwebservice;
 use coding_exception;
 use context_course;
 use context_system;
@@ -45,7 +45,7 @@ use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 use stored_file_creation_exception;
 
-class certifygenvalidation_webservice implements ICertificateValidation
+class certifygenvalidation_none implements ICertificateValidation
 {
 
     /**
@@ -55,12 +55,25 @@ class certifygenvalidation_webservice implements ICertificateValidation
     public function sendFile(certifygen_file $file): array
     {
         try {
-            // No tiene sentido enviar el fichero a ninguna parte
+            // Change context.
+            $fs = get_file_storage();
+            $context = context_system::instance();
+            $filerecord = [
+                'contextid' => $context->id,
+                'component' => self::FILE_COMPONENT,
+                'filearea' => self::FILE_AREA_VALIDATED,
+                'itemid' => $file->get_validationid(),
+                'filepath' => self::FILE_PATH,
+                'filename' => $file->get_file()->get_filename()
+            ];
+            $newfile = $fs->create_file_from_storedfile($filerecord, $file->get_file());
+            // Change status.
             $validation = new certifygen_validations($file->get_validationid());
             $validation->set('status', certifygen_validations::STATUS_IN_PROGRESS);
             return [
                 'haserror' => false,
                 'message' => 'ok',
+                'newfile' => $newfile,
             ];
         } catch(moodle_exception $e) {
             return [
@@ -72,51 +85,37 @@ class certifygenvalidation_webservice implements ICertificateValidation
     }
 
     /**
+     *
+     *
      * @param int $courseid
      * @param int $validationid
-     * @param string $code
      * @return array
      */
     public function getFile(int $courseid, int $validationid) : array
     {
-        $result = ['error' => [], 'message' => 'ok'];
-        try {
-            $validation = new certifygen_validations($validationid);
-            $code = certifygen_validations::get_certificate_code($validation);
-            $fs = get_file_storage();
-            $contextid = context_system::instance()->id;
-            if (!empty($courseid)) {
-                $contextid = context_course::instance($courseid)->id;
-            }
-            $file =  $fs->get_file($contextid, self::FILE_COMPONENT,
-                self::FILE_AREA, $validationid, self::FILE_PATH, $code . '.pdf');
-            if (!$file) {
-                $result['error']['code'] = 'file_not_found';
-                $result['error']['message'] = 'file_not_found';
-                return $result;
-            }
-            $result['file'] = $file;
-        } catch(moodle_exception $exception) {
-            $result['error']['code'] = $exception->getCode();
-            $result['error']['message'] = $exception->getMessage();
-        }
-        return $result;
+        return ['error' => [], 'message' => 'ok'];
     }
 
     /**
+     * @param int $courseid
      * @return bool
+     * @throws coding_exception
      */
     public function canRevoke(int $courseid): bool
     {
-        return false;
+        if ($courseid) {
+            return has_capability('tool/certificate:issue', context_course::instance($courseid));
+        } else {
+            return true;
+        }
     }
 
     /**
+     * No es necesario hacer nada, ya que el servicio revoke llama al tool_certificate.
      * @param string $code
      * @return array
      */
     public function revoke(string $code) : array {
-        //TODO.
         return [
             'haserror' => false,
             'message' => '',
@@ -173,7 +172,7 @@ class certifygenvalidation_webservice implements ICertificateValidation
      */
     public function is_enabled(): bool
     {
-        return (int)get_config('certifygenvalidation_webservice', 'enabled');
+        return (int)get_config('certifygenvalidation_none', 'enabled');
     }
 
     /**
@@ -181,7 +180,7 @@ class certifygenvalidation_webservice implements ICertificateValidation
      */
     public function checkStatus(): bool
     {
-        return true;
+        return false;
     }
 
     /**
@@ -192,7 +191,7 @@ class certifygenvalidation_webservice implements ICertificateValidation
      */
     public function getStatus(int $validationid, string $code): int
     {
-        return certifygen_validations::STATUS_IN_PROGRESS;
+        return certifygen_validations::STATUS_VALIDATION_OK;
     }
 
     /**
@@ -200,37 +199,6 @@ class certifygenvalidation_webservice implements ICertificateValidation
      */
     public function checkfile(): bool
     {
-        return true;
-    }
-
-    /**
-     * @param int $validationid
-     * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws file_exception
-     * @throws stored_file_creation_exception
-     */
-    public function save_file_moodledata(int $validationid) {
-        $validation = new certifygen_validations($validationid);
-        $code = certifygen_validations::get_certificate_code($validation);
-        // Search for original certificate.
-        $filerecord =  [
-            'contextid' => context_system::instance()->id,
-            'component' => self::FILE_COMPONENT,
-            'filearea' => self::FILE_AREA,
-            'itemid' => $validationid,
-            'filepath' => self::FILE_PATH,
-            'filename' => $code . '.pdf'
-        ];
-        $fs = get_file_storage();
-        $original = $fs->get_file(context_system::instance()->id,
-            self::FILE_COMPONENT,
-            'certifygenreport',
-            $validationid,
-            self::FILE_PATH,
-            $code . '.pdf'
-        );
-        $fs->create_file_from_storedfile($filerecord, $original);
+        return false;
     }
 }

@@ -70,16 +70,13 @@ class downloadcertificate_external extends external_api {
     }
 
     /**
-     * @param int $instanceid
      * @param int $validationid
+     * @param int $instanceid
      * @param int $modelid
-     * @param string $lang
-     * @param int $userid
+     * @param string $code
      * @param int $courseid
      * @return array
-     * @throws coding_exception
      * @throws invalid_parameter_exception
-     * @throws invalid_persistent_exception
      */
     public static function downloadcertificate(int $validationid, int $instanceid, int $modelid, string $code, int $courseid): array {
         self::validate_parameters(

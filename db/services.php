@@ -114,7 +114,7 @@ $functions = [
         'methodname' => 'revokecertificate',
         'description' => 'Delete a certificate',
         'type' => 'write',
-        'capabilities' => 'mod/certifygen:managecertificates',
+        'capabilities' => 'mod/certifygen:canmanagecertificates',
         'ajax' => true,
         'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],

@@ -65,9 +65,8 @@ class getmodellisttable_external extends external_api {
             self::getmodellisttable_parameters(), []
         );
         $context = context_system::instance();
-        self::validate_context($context);
-        require_capability('mod/certifygen:manage', $context);
         $PAGE->set_context($context);
+        require_capability('mod/certifygen:manage', $context);
         $tablelist = new modellist_table();
         $tablelist->baseurl = new moodle_url('/mod/certifygen/modelmanager.php');
         ob_start();

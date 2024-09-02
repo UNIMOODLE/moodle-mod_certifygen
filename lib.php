@@ -215,7 +215,7 @@ function mod_certifygen_get_activity_models(int $courseid) : array {
  */
 function mod_certifygen_get_validation() : array {
 
-    $all[0] = get_string('selectvalidation', 'mod_certifygen');
+    $all = [];
     $enabled = [];
     foreach (core_plugin_manager::instance()->get_plugins_of_type('certifygenvalidation') as $plugin) {
         $validationplugin = $plugin->component;

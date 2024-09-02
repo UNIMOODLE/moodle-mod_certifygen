@@ -112,7 +112,6 @@ class certifygen_context extends persistent {
 
         $result = $DB->get_records_sql($sql, $inparams);
         $result = reset($result);
-        error_log(__FUNCTION__ . ' result: '.var_export($result, true));
         return $result->total > 0;
     }
 
@@ -139,7 +138,6 @@ class certifygen_context extends persistent {
                     ";
         $result = $DB->get_records_sql($sql, ['userid' => $userid, 'shortname' => 'editingteacher']);
         $result = reset($result);
-        error_log(__FUNCTION__ . ' result: '.var_export($result, true));
         if ($result->num > 0) {
             return true;
         }

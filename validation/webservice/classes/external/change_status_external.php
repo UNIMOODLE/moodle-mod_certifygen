@@ -35,7 +35,7 @@ require_once($CFG->dirroot.'/user/lib.php');
 require_once($CFG->dirroot.'/mod/certifygen/classes/filters/certifygenfilter.php');
 require_once($CFG->dirroot.'/mod/certifygen/lib.php');
 
-use certifygenvalidation_webservice\certifygenvalidation_webservice;
+use certifygenvalidation_webservice\certifygenvalidation_none;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
@@ -114,7 +114,7 @@ class change_status_external extends external_api {
             }
 
             // Change status.
-            $ws = new certifygenvalidation_webservice();
+            $ws = new certifygenvalidation_none();
             $ws->save_file_moodledata($requestid);
             $request->set('status', certifygen_validations::STATUS_VALIDATION_OK);
             $request->save();

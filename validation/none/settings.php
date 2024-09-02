@@ -13,32 +13,34 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
-// Project implemented by the "Recovery, Transformation and Resilience Plan.
-// Funded by the European Union - Next GenerationEU".
-//
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
-// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos..
-
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 /**
- * Version File
- * @package    mod_certifygen
+ * @package   certifygenvalidation_none
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2024083004;
-$plugin->requires = 2022112802;//Moodle 4.1.2 //  2022112810; // Moodle 4.1.10+.
-$plugin->component = 'mod_certifygen';
-$plugin->cron = 0;
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = 'v0.0.1';
-$plugin->dependencies = [
-    'tool_certificate' => 2024042300,
-];
+// Enlace principal de settings.
+$ADMIN->add('modsettingcertifygencat',
+    new admin_category('certifygenvalidation_none_cat',
+        get_string('pluginname', 'certifygenvalidation_none')));
+
+// Certifygenreport_basic settings.
+$settings = new admin_settingpage(
+    'modsettingcertifygenvalidationwebservice',
+    get_string('pluginnamesettings', 'certifygenvalidation_none'),
+    'moodle/site:config');
+if ($ADMIN->fulltree) {
+    $settings->add(new admin_setting_configcheckbox('certifygenvalidation_none/enabled',
+        new lang_string('enable', 'certifygenvalidation_none'),
+        new lang_string('enable_help', 'certifygenvalidation_none'), 0));
+
+}

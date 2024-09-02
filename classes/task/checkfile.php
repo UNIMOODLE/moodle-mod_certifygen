@@ -63,9 +63,6 @@ class checkfile extends scheduled_task
             try {
                 $model = new certifygen_model($validation->get('modelid'));
                 $validationplugin = $model->get('validation');
-                if (empty($validationplugin)) {
-                    continue;
-                }
                 $validationpluginclass = $validationplugin . '\\' . $validationplugin;
                 if (get_config($validationplugin, 'enabled') === '0') {
                     continue;

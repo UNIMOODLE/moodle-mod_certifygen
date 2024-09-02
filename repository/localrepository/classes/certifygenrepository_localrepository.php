@@ -50,16 +50,14 @@ class certifygenrepository_localrepository implements ICertificateRepository
     {
         $code = certifygen_validations::get_certificate_code($validation);
         $code .= '.pdf';
-        if (!empty($validation->get('certifygenid'))) {
-            $itemid = (int) $validation->get('issueid');
-        } else {
-            $itemid = (int) $validation->get('id');
-        }
-
-        $fs = get_file_storage();
         $contextid = context_system::instance()->id;
+        $itemid = (int) $validation->get('id');
+        $fs = get_file_storage();
         $file = $fs->get_file($contextid, ICertificateReport::FILE_COMPONENT,
-            ICertificateRepository::FILE_AREA, $itemid,  ICertificateRepository::FILE_PATH, $code);
+            ICertificateRepository::FILE_AREA, $itemid,
+            ICertificateRepository::FILE_PATH,
+            $code);
+
         if (empty($file)) {
             return '';
         }

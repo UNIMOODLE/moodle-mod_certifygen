@@ -91,58 +91,7 @@ class reemitteacherrequest_external extends external_api {
                 'usermodified' => $USER->id,
             ];
             $teacherrequest = certifygen_validations::manage_validation(0, (object) $data);
-            $certifygenmodel = new certifygen_model($teacherrequest->get('modelid'));
-            $reportplugin = $certifygenmodel->get('report');
-            if (empty($reportplugin)) {
-                $result['result'] = false;
-                $result['message'] = 'report plugin must be set on the model';
-                return $result;
-            }
-            $reportpluginclass = $reportplugin . '\\' . $reportplugin;
-            /** @var ICertificateReport $subplugin */
-            $subplugin = new $reportpluginclass();
-            $result = $subplugin->createFile($teacherrequest);
-            if (!$result['result']) {
-                $teacherrequest->set('status', certifygen_validations::STATUS_ERROR);
-                $teacherrequest->save();
-                return $result;
-            }
-            $file = $result['file'];
-            $userid = $teacherrequest->get('userid');
-            $lang = $teacherrequest->get('lang');
-            $modelid = $teacherrequest->get('modelid');
-            $certifygenfile = new certifygen_file($file, $userid, $lang, $modelid, $id);
-            $data = [
-                'lang' => $lang,
-                'user_id' => $userid,
-                'user_fullname' => fullname($certifygenfile->get_user()),
-            ];
-            $certifygenfile->set_metadata($data);
-            // Step 3: Call to validation plugin.
-            $certifygenmodel = new certifygen_model($teacherrequest->get('modelid'));
-            $validationplugin = $certifygenmodel->get('validation');
-            $validationpluginclass = $validationplugin . '\\' . $validationplugin;
-            if (empty($validationplugin)) {
-                $teacherrequest->set('status', certifygen_validations::STATUS_VALIDATION_OK);
-                $teacherrequest->save();
-            } else if (get_config($validationplugin, 'enabled') === '1') {
-                /** @var ICertificateValidation $subplugin */
-                $subplugin = new $validationpluginclass();
-                $response = $subplugin->sendFile($certifygenfile);
-                if ($response['haserror']) {
-                    $result['result'] = false;
-                    $result['message'] = $response['message'];
-                    if (!array_key_exists('message', $response)) {
-                        $result['message'] = 'validation_plugin_send_file_error';
-                    }
-                    $teacherrequest->set('status', certifygen_validations::STATUS_VALIDATION_ERROR);
-                    $teacherrequest->save();
-                } else if (!$subplugin->checkStatus()) {
-                    $teacherrequest->set('status', certifygen_validations::STATUS_VALIDATION_OK);
-                    $teacherrequest->save();
-                }
-            }
-            unset($result['file']);
+            $result = emitteacherrequest_external::emitteacherrequest($teacherrequest->get('id'));
         } catch (moodle_exception $e) {
             error_log(__FUNCTION__ . ' ' . ' error: '.var_export($e->getMessage(), true));
             $result['result'] = false;
