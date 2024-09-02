@@ -51,6 +51,12 @@ class getJsonStudentCourseCompleted_external extends external_api {
             ]
         );
     }
+
+    /**
+     * @param string $dni
+     * @param int $courseid
+     * @return string[]
+     */
     public static function getJsonStudentCourseCompleted(string $dni, int $courseid): array {
         /**
          * Devuelve un json con la información necesaria para el anterior servicio para

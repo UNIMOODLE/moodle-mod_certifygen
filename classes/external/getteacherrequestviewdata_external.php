@@ -54,14 +54,10 @@ class getteacherrequestviewdata_external extends external_api {
     }
 
     /**
-     * @param int $modelid
-     * @param int $courseid
-     * @param int $cmid
+     * @param int $userid
      * @return array
-     * @throws coding_exception
      * @throws dml_exception
      * @throws invalid_parameter_exception
-     * @throws moodle_exception
      */
     public static function getteacherrequestviewdata(int $userid): array {
         global $PAGE;

@@ -71,7 +71,8 @@ class activity_view implements renderable, templatable {
     public function __construct(int $courseid, int $templateid, stdClass $cm, string $lang = "", int $pagesize = 10) {
 
         $cmcontext = context_module::instance($cm->id);
-        $this->isteacher = has_capability('mod/certifygen:manage', $cmcontext);
+        $ccontext = \context_course::instance($courseid);
+        $this->isteacher = has_capability('moodle/course:managegroups', $ccontext);
         $this->courseid = $courseid;
         $this->templateid = $templateid;
         $this->cm = $cm;

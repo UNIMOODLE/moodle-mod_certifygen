@@ -57,6 +57,14 @@ class get_json_teacher_certificate_external extends external_api {
             ]
         );
     }
+
+    /**
+     * @param int $userid
+     * @param string $userfield
+     * @param string $courses
+     * @param string $lang
+     * @return string[]
+     */
     public static function get_json_teacher_certificate(int $userid, string $userfield, string $courses, string $lang): array {
         /**
          * Devuelve un json con la información necesaria para el anterior servicio para

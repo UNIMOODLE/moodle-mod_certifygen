@@ -52,6 +52,13 @@ class getPdfStudentCourseCompleted_external extends external_api {
             ]
         );
     }
+
+    /**
+     * @param int $modelid
+     * @param string $dni
+     * @param int $courseid
+     * @return string[]
+     */
     public static function getPdfStudentCourseCompleted(int $modelid, string $dni, int $courseid): array {
         /**
          * Devuelve el PDF del certificado de que el alumno ha cursado y superado el curso

@@ -58,7 +58,7 @@ class searchcourse_external extends external_api {
      * @throws coding_exception
      * @throws dml_exception
      * @throws invalid_parameter_exception
-     * @throws restricted_context_exception
+     * @throws restricted_context_exception|\required_capability_exception
      */
     public static function searchcourse(string $query): array {
         global $DB, $CFG;
@@ -70,6 +70,7 @@ class searchcourse_external extends external_api {
         // Validate context.
         $context = context_system::instance();
         self::validate_context($context);
+        require_capability('mod/certifygen:manage', $context);
 
         $likename = $DB->sql_like('c.fullname', ':fullname', false, true);
         $sql = "SELECT id, fullname

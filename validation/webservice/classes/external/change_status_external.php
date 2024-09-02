@@ -70,6 +70,8 @@ class change_status_external extends external_api {
             self::change_status_parameters(), ['userid' => $userid, 'userfield' => $userfield, 'requestid' => $requestid]
         );
         try {
+            $context = \context_system::instance();
+            require_capability('mod/certifygen:manage', $context);
             $results = [];
             // Choose user parameter.
             $uparam = mod_certifygen_validate_user_parameters_for_ws($params['userid'], $params['userfield']);

@@ -31,6 +31,8 @@
 
 namespace mod_certifygen\external;
 global $CFG;
+
+use context_system;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
@@ -63,6 +65,8 @@ class deletemodel_external extends external_api {
         self::validate_parameters(
             self::deletemodel_parameters(), ['id' => $id]
         );
+        $context = context_system::instance();
+        require_capability('mod/certifygen:manage', $context);
         $result = ['result' => true, 'message' => 'OK'];
         try {
             $cemited = mod_certifygen_are_there_any_certificate_emited($id);

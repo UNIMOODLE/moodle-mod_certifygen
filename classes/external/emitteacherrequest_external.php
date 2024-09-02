@@ -69,7 +69,7 @@ class emitteacherrequest_external extends external_api {
      */
     public static function emitteacherrequest(int $id): array {
 
-        global $PAGE;
+        global $PAGE, $USER;
         $PAGE->set_context(context_system::instance());
         self::validate_parameters(
             self::emitteacherrequest_parameters(), ['id' => $id]

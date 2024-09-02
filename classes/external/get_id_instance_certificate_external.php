@@ -61,6 +61,12 @@ class get_id_instance_certificate_external extends external_api {
             ]
         );
     }
+
+    /**
+     * @throws \invalid_parameter_exception
+     * @throws \required_capability_exception
+     * @throws \dml_exception
+     */
     public static function get_id_instance_certificate(int $userid, string $userfield, string $lang): array {
         global $CFG;
         /**
@@ -73,7 +79,9 @@ class get_id_instance_certificate_external extends external_api {
         $params = self::validate_parameters(
             self::get_id_instance_certificate_parameters(), ['userid' => $userid, 'userfield' => $userfield, 'lang' => $lang]
         );
-        $results = ['instances' => [], 'error' => []];
+        $context = \context_system::instance();
+        require_capability('mod/certifygen:manage', $context);
+        $results = ['error' => []];
         $haserror = false;
         $instances = [];
         try {

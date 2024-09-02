@@ -306,8 +306,8 @@ function mod_certifygen_get_templates(int $courseid = 0) : array {
 function mod_certifygen_myprofile_navigation(core_user\output\myprofile\tree $tree, $user, $iscurrentuser, $course) {
 
     global $USER;
-    if (permission::can_view_list($user->id)) {
-        if ($USER->id == $user->id && certifygen_context::exists_system_context_model()) {
+    if ($USER->id == $user->id
+        && certifygen_context::can_i_see_teacherrequestlink($user->id)) {
 
             $coursedetailscategory = new core_user\output\myprofile\category('mycertifygens',
                 get_string('pluginname', 'mod_certifygen'), 'coursedetails');
@@ -318,7 +318,6 @@ function mod_certifygen_myprofile_navigation(core_user\output\myprofile\tree $tr
             $node = new core_user\output\myprofile\node('mycertifygens', 'modcertifygenmy', $link, null, $url);
             $tree->add_node($node);
         }
-    }
 }
 
 /**

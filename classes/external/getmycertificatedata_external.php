@@ -69,6 +69,7 @@ class getmycertificatedata_external extends external_api {
      * @param int $modelid
      * @param int $courseid
      * @param int $cmid
+     * @param string $lang
      * @return array
      * @throws coding_exception
      * @throws dml_exception

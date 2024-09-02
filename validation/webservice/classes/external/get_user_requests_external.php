@@ -76,6 +76,8 @@ class get_user_requests_external extends external_api {
             self::get_user_requests_parameters(), ['userid' => $userid, 'userfield' => $userfield, 'lang' => $lang]
         );
         try {
+            $context = \context_system::instance();
+            require_capability('mod/certifygen:manage', $context);
             // Is plugin enabled?
             $wsplugin = new certifygenvalidation_webservice();
             if (!$wsplugin->is_enabled()) {

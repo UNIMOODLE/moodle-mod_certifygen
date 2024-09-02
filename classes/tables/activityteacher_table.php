@@ -36,6 +36,7 @@ require_once($CFG->libdir . '/tablelib.php');
 
 use cm_info;
 use coding_exception;
+use context_course;
 use dml_exception;
 use mod_certifygen\certifygen;
 use mod_certifygen\interfaces\ICertificateValidation;
@@ -48,6 +49,7 @@ use table_sql;
 
 class activityteacher_table extends table_sql {
     private int $courseid;
+    private \context_module $context;
     private int $templateid;
     private int $cmid;
     private int $instanceid;
@@ -80,7 +82,9 @@ class activityteacher_table extends table_sql {
         $this->define_columns($columns);
         $validationplugin = $this->model->get('validation');
         $this->canrevoke = false;
-        $context = \context_course::instance($courseid);
+        $context = context_course::instance($courseid);
+        $contextmodule = \context_module::instance($cm->id);
+        $this->context = $contextmodule;
         if (has_capability('moodle/course:managegroups', $context) && empty($validationplugin)) {
             $this->canrevoke = true;
         } else if (has_capability('moodle/course:managegroups', $context) && !empty($validationplugin)) {
@@ -139,6 +143,11 @@ class activityteacher_table extends table_sql {
      */
     function col_revoke($row): string
     {
+        global $USER;
+        if ($USER->id != $row->id
+            && !has_capability('mod/certifygen:managecertificates', $this->context, $USER->id)) {
+            return '';
+        }
         if (!$this->canrevoke) {
             return '';
         }
@@ -222,6 +231,12 @@ class activityteacher_table extends table_sql {
      */
     function col_emit($row): string
     {
+        global $USER;
+
+        if ($USER->id != $row->id
+        && !has_capability('mod/certifygen:managecertificates', $this->context, $USER->id)) {
+            return '';
+        }
 
         $status = $row->cstatus;
         $id = $row->validationid;

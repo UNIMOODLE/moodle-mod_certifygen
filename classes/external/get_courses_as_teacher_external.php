@@ -64,8 +64,12 @@ class get_courses_as_teacher_external extends external_api {
 
     /**
      * @param int $userid
+     * @param string $userfield
+     * @param string $lang
      * @return array
+     * @throws \dml_exception
      * @throws \invalid_parameter_exception
+     * @throws \required_capability_exception
      */
     public static function get_courses_as_teacher(int $userid, string $userfield, string $lang): array {
         global $CFG, $DB;
@@ -94,6 +98,8 @@ class get_courses_as_teacher_external extends external_api {
         $params = self::validate_parameters(
             self::get_courses_as_teacher_parameters(), ['userid' => $userid, 'userfield' => $userfield, 'lang' => $lang]
         );
+        $context = \context_system::instance();
+        require_capability('mod/certifygen:manage', $context);
         $results = ['courses' => [], 'teacher' => [], 'error' => []];
         $haserror = false;
         $courses = [];

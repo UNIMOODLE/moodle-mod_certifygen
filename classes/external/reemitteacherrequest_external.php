@@ -62,6 +62,7 @@ class reemitteacherrequest_external extends external_api {
     /**
      * @param int $id
      * @return array
+     * @throws \dml_exception
      * @throws coding_exception
      * @throws invalid_parameter_exception
      * @throws invalid_persistent_exception

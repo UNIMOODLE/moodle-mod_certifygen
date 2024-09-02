@@ -58,7 +58,10 @@ class searchmycourses_external extends external_api {
 
     /**
      * @param string $query
+     * @param int $userid
+     * @param int $modelid
      * @return array
+     * @throws \moodle_exception
      * @throws coding_exception
      * @throws dml_exception
      * @throws invalid_parameter_exception

@@ -32,6 +32,7 @@
 namespace mod_certifygen\external;
 
 
+use context_system;
 use dml_exception;
 use external_api;
 use invalid_parameter_exception;
@@ -40,6 +41,9 @@ use moodle_url;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
+use required_capability_exception;
+use restricted_context_exception;
+
 class getmodellisttable_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -53,13 +57,17 @@ class getmodellisttable_external extends external_api {
     /**
      * @throws dml_exception
      * @throws invalid_parameter_exception
+     * @throws restricted_context_exception|required_capability_exception
      */
     public static function getmodellisttable(): array {
         global $PAGE;
         self::validate_parameters(
             self::getmodellisttable_parameters(), []
         );
-        $PAGE->set_context(\context_system::instance());
+        $context = context_system::instance();
+        self::validate_context($context);
+        require_capability('mod/certifygen:manage', $context);
+        $PAGE->set_context($context);
         $tablelist = new modellist_table();
         $tablelist->baseurl = new moodle_url('/mod/certifygen/modelmanager.php');
         ob_start();

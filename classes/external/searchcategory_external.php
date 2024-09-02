@@ -72,6 +72,7 @@ class searchcategory_external extends external_api {
         // Validate context.
         $context = context_system::instance();
         self::validate_context($context);
+        require_capability('mod/certifygen:manage', $context);
 
         $likename = $DB->sql_like('name', ':name', false, true);
         $sql = "SELECT id, name

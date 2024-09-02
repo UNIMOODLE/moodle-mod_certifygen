@@ -64,6 +64,18 @@ class get_pdf_teacher_certificate_external extends external_api {
             ]
         );
     }
+
+    /**
+     * @param int $userid
+     * @param string $userfield
+     * @param string $name
+     * @param string $courses
+     * @param int $modelid
+     * @param string $lang
+     * @return array|array[]
+     * @throws \coding_exception
+     * @throws \invalid_parameter_exception
+     */
     public static function get_pdf_teacher_certificate(int $userid, string $userfield, string $name, string $courses,
                                                        int $modelid, string $lang): array {
         /**
@@ -78,6 +90,8 @@ class get_pdf_teacher_certificate_external extends external_api {
                 'modelid' => $modelid, 'lang' => $lang]
         );
         try {
+            $context = \context_system::instance();
+            require_capability('mod/certifygen:manage', $context);
             // Choose user parameter.
             $uparam = mod_certifygen_validate_user_parameters_for_ws($params['userid'], $params['userfield']);
             if (array_key_exists('error', $uparam)) {

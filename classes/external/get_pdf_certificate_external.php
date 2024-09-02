@@ -60,6 +60,18 @@ class get_pdf_certificate_external extends external_api {
             ]
         );
     }
+
+    /**
+     * @param int $userid
+     * @param string $userfield
+     * @param int $idinstance
+     * @param string $lang
+     * @param string $customfields
+     * @return array
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \required_capability_exception
+     */
     public static function get_pdf_certificate(int $userid, string $userfield, int $idinstance, string $lang, string $customfields): array {
         /**
          * Devuelve el PDF del certificado identificado con los parámetros de entrada validando su acceso en base a
@@ -74,6 +86,8 @@ class get_pdf_certificate_external extends external_api {
             self::get_pdf_certificate_parameters(),
             ['userid' => $userid, 'userfield' => $userfield, 'idinstance' => $idinstance, 'lang' => $lang, 'customfields' => $customfields]
         );
+        $context = \context_system::instance();
+        require_capability('mod/certifygen:manage', $context);
         $result = ['file' => '', 'error' => []];
         $haserror = false;
         try {

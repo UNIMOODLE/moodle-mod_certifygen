@@ -32,12 +32,13 @@
  */
 
 use mod_certifygen\output\views\profile_my_certificates_view;
+use mod_certifygen\persistents\certifygen_context;
 
 require_once('../../config.php');
 global $CFG;
 require_once($CFG->dirroot. '/lib/formslib.php');
 require_once('lib.php');
-global $PAGE, $OUTPUT;
+global $PAGE, $OUTPUT, $USER;
 require_login();
 $context = context_system::instance();
 require_capability('mod/certifygen:viewcontextcertificates', $context);
@@ -45,14 +46,19 @@ require_capability('mod/certifygen:viewcontextcertificates', $context);
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url(new moodle_url('/mod/certifygen/teacherrequestreport.php'));
 
-$form = new \mod_certifygen\forms\searchforuserform();
-
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('teachercertificates', 'mod_certifygen'), 2, 'mb-5');
-echo $form->display();
-if ($data = $form->get_data()) {
-    $output = $PAGE->get_renderer('mod_certifygen');
-    $view = new profile_my_certificates_view($data->user);
-    echo $output->render($view);
+
+if (certifygen_context::exists_system_context_model()) {
+    $form = new \mod_certifygen\forms\searchforuserform();
+    echo $form->display();
+    if ($data = $form->get_data()) {
+        $output = $PAGE->get_renderer('mod_certifygen');
+        $view = new profile_my_certificates_view($data->user);
+        echo $output->render($view);
+    }
+} else {
+    echo $OUTPUT->notification(get_string('teacherrequestreportnomodels', 'mod_certifygen'));
 }
+
 echo $OUTPUT->footer();

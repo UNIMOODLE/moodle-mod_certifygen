@@ -32,10 +32,11 @@
  */
 
 use mod_certifygen\output\views\profile_my_certificates_view;
+use mod_certifygen\persistents\certifygen_context;
 
 require_once('../../config.php');
 require_once('lib.php');
-global $PAGE, $OUTPUT;
+global $PAGE, $OUTPUT, $USER;
 require_login();
 $context = context_system::instance();
 require_capability('mod/certifygen:viewmycontextcertificates', $context);
@@ -43,8 +44,16 @@ require_capability('mod/certifygen:viewmycontextcertificates', $context);
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url(new moodle_url('/mod/certifygen/mycertificates.php'));
 
-$output = $PAGE->get_renderer('mod_certifygen');
-$view = new profile_my_certificates_view();
 echo $OUTPUT->header();
-echo $output->render($view);
+
+if (certifygen_context::can_i_see_teacherrequestlink($USER->id)) {
+    $output = $PAGE->get_renderer('mod_certifygen');
+    $view = new profile_my_certificates_view();
+    echo $output->render($view);
+} else if (certifygen_context::exists_system_context_model()) {
+    echo $OUTPUT->notification(get_string('teacherrequestreportnomodels', 'mod_certifygen'));
+} else {
+    echo $OUTPUT->notification(get_string('mycertificatesnotaccess', 'mod_certifygen'));
+}
+
 echo $OUTPUT->footer();

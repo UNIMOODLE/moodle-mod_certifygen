@@ -62,6 +62,18 @@ class get_json_certificate_external extends external_api {
             ]
         );
     }
+
+    /**
+     * @param int $userid
+     * @param string $userfield
+     * @param int $idinstance
+     * @param string $customfields
+     * @param string $lang
+     * @return array
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \required_capability_exception
+     */
     public static function get_json_certificate(int $userid, string $userfield, int $idinstance, string $customfields, string $lang): array {
         /**
          * Devuelve un json con la información necesaria para el anterior servicio para
@@ -75,6 +87,8 @@ class get_json_certificate_external extends external_api {
             ['userid' => $userid, 'userfield' => $userfield, 'idinstance' => $idinstance,
                 'customfields' => $customfields, 'lang' => $lang]
         );
+        $context = \context_system::instance();
+        require_capability('mod/certifygen:manage', $context);
         $result = ['json' => '', 'error' => []];
         $haserror = false;
         try {
