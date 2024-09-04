@@ -173,7 +173,6 @@ function mod_certifygen_get_modes() : array {
 function mod_certifygen_get_types() : array {
     return [
         certifygen_model::TYPE_ACTIVITY => get_string('type_'. certifygen_model::TYPE_ACTIVITY, 'mod_certifygen'),
-        certifygen_model::TYPE_TEACHER_COURSE_USED => get_string('type_'. certifygen_model::TYPE_TEACHER_COURSE_USED, 'mod_certifygen'),
         certifygen_model::TYPE_TEACHER_ALL_COURSES_USED => get_string('type_'. certifygen_model::TYPE_TEACHER_ALL_COURSES_USED, 'mod_certifygen'),
     ];
 }

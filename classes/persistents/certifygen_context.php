@@ -101,7 +101,6 @@ class certifygen_context extends persistent {
     public static function exists_system_context_model() : bool {
         global $DB;
         $contexts = [
-            certifygen_model::TYPE_TEACHER_COURSE_USED,
             certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
         ];
         list($insql, $inparams) = $DB->get_in_or_equal($contexts, SQL_PARAMS_NAMED);
@@ -263,7 +262,6 @@ class certifygen_context extends persistent {
         $modelids = [];
         $langs = [];
         $contexts = [
-            certifygen_model::TYPE_TEACHER_COURSE_USED,
             certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
         ];
         list($insql, $inparams) = $DB->get_in_or_equal($contexts, SQL_PARAMS_NAMED);

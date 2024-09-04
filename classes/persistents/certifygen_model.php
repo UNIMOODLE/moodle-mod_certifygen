@@ -41,8 +41,7 @@ class certifygen_model extends persistent {
      */
     public const TABLE = 'certifygen_model';
     public const TYPE_ACTIVITY = 1;
-    public const TYPE_TEACHER_COURSE_USED = 2;
-    public const TYPE_TEACHER_ALL_COURSES_USED = 3;
+    public const TYPE_TEACHER_ALL_COURSES_USED = 2;
     public const MODE_UNIQUE = 1;
     public const MODE_PERIODIC = 2;
     /**
