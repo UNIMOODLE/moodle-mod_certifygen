@@ -124,48 +124,6 @@ class certifygenvalidation_none implements ICertificateValidation
     }
 
     /**
-     * @param int $courseid
-     * @param int $validationid
-     * @param string $code
-     * @return string
-     * @throws coding_exception
-     * @throws dml_exception
-     */
-    public function getFileUrl(int $courseid, int $validationid, string $code): string
-    {
-        $cv = new certifygen_validations($validationid);
-        $context = context_system::instance();
-        if (!empty($cv->get('certifygenid'))) {
-            $cert = new certifygen($cv->get('certifygenid'));
-            $context = context_course::instance($cert->get('course'));
-        }
-        $filerecord = [
-            'contextid' => $context->id,
-            'component' => self::FILE_COMPONENT,
-            'filearea' => self::FILE_AREA_VALIDATED,
-            'itemid' => $validationid,
-            'filepath' => self::FILE_PATH,
-            'filename' => $code . '.pdf'
-        ];
-
-        $fs = get_file_storage();
-        if ($newfile = $fs->get_file($filerecord['contextid'], $filerecord['component'], $filerecord['filearea'], $filerecord['itemid'],
-            $filerecord['filepath'], $filerecord['filename'])) {
-            $url = moodle_url::make_pluginfile_url(
-                $newfile->get_contextid(),
-                $newfile->get_component(),
-                $newfile->get_filearea(),
-                $newfile->get_itemid(),
-                $newfile->get_filepath(),
-                $newfile->get_filename(),
-                false                     // Do not force download of the file.
-            );
-            return $url->out();
-        }
-        return '';
-    }
-
-    /**
      * @return bool
      * @throws dml_exception
      */
