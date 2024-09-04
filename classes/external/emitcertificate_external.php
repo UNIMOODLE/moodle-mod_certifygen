@@ -146,6 +146,7 @@ class emitcertificate_external extends external_api {
                     'courseid' => $courseid,
                     'course_fullname' => $course->fullname,
                     'course_shortname' => $course->shortname,
+                    'filename' => str_replace('.pdf', '', $file->get_filename()),
                 ];
                 $certifygenfile->set_metadata($data);
 

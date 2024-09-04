@@ -35,7 +35,7 @@ require_once($CFG->dirroot.'/user/lib.php');
 require_once($CFG->dirroot.'/mod/certifygen/classes/filters/certifygenfilter.php');
 require_once($CFG->dirroot.'/mod/certifygen/lib.php');
 
-use certifygenvalidation_webservice\certifygenvalidation_none;
+use certifygenvalidation_webservice\certifygenvalidation_webservice;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
@@ -105,20 +105,17 @@ class change_status_external extends external_api {
                 $results['error']['message'] = 'This is not the user\'s request';
                 return $results;
             }
-
             // Request status.
             if ($request->get('status') != certifygen_validations::STATUS_IN_PROGRESS) {
                 $results['error']['code'] = 'request_status_not_in_progress';
                 $results['error']['message'] = 'The status request is not in progress';
                 return $results;
             }
-
             // Change status.
-            $ws = new certifygenvalidation_none();
+            $ws = new certifygenvalidation_webservice();
             $ws->save_file_moodledata($requestid);
             $request->set('status', certifygen_validations::STATUS_VALIDATION_OK);
             $request->save();
-
         } catch(\moodle_exception $e) {
             return ['error' => [
                 'code' => $e->getCode(),

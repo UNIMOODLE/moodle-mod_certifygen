@@ -98,18 +98,20 @@ class emitteacherrequest_external extends external_api {
                 $teacherrequest->save();
                 return $result;
             }
+            /** @var \stored_file $file */
             $file = $result['file'];
             $userid = $teacherrequest->get('userid');
             $lang = $teacherrequest->get('lang');
             $modelid = $teacherrequest->get('modelid');
             $certifygenfile = new certifygen_file($file, $userid, $lang, $modelid, $id);
+
             $data = [
                 'lang' => $lang,
                 'user_id' => $userid,
                 'user_fullname' => fullname($certifygenfile->get_user()),
+                'filename' => str_replace('.pdf', '', $file->get_filename()),
             ];
             $certifygenfile->set_metadata($data);
-
             // Step 3: Call to validation plugin.
             $result = certifygen::start_emit_certificate_proccess($teacherrequest, $certifygenfile, $certifygenmodel);
             unset($result['file']);

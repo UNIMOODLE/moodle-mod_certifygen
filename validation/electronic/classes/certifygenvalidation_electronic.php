@@ -29,6 +29,7 @@
 namespace certifygenvalidation_electronic;
 
 use coding_exception;
+use context_course;
 use context_system;
 use dml_exception;
 use mod_certifygen\certifygen_file;
@@ -46,6 +47,17 @@ require_once($CFG->dirroot.'/mod/assign/feedback/editpdf/fpdi/autoload.php');
 class certifygenvalidation_electronic implements ICertificateValidation
 {
     private const CERTIFYGENVALIDATION_ELECTRONIC_TEMP_DIRECTORY = '/mod/certifygen/validation/electronic/temp/';
+
+    /**
+     * @param certifygen_file $file
+     * @return string
+     * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
+     * @throws \setasign\Fpdi\PdfParser\Filter\FilterException
+     * @throws \setasign\Fpdi\PdfParser\PdfParserException
+     * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
+     * @throws \setasign\Fpdi\PdfReader\PdfReaderException
+     * @throws dml_exception
+     */
     private function add_certificate_signature(certifygen_file $file) {
         global $CFG;
 
@@ -152,6 +164,11 @@ class certifygenvalidation_electronic implements ICertificateValidation
     /**
      * @param certifygen_file $file
      * @return array
+     * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
+     * @throws \setasign\Fpdi\PdfParser\Filter\FilterException
+     * @throws \setasign\Fpdi\PdfParser\PdfParserException
+     * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
+     * @throws \setasign\Fpdi\PdfReader\PdfReaderException
      */
     public function sendFile(certifygen_file $file): array
     {
@@ -160,6 +177,11 @@ class certifygenvalidation_electronic implements ICertificateValidation
         try {
             $fs = get_file_storage();
             $context = context_system::instance();
+            $cv = new certifygen_validations($file->get_validationid());
+            if (!empty($cv->get('certifygenid'))) {
+                $cert = new certifygen($cv->get('certifygenid'));
+                $context = context_course::instance($cert->get('course'));
+            }
             $filerecord = [
                 'contextid' => $context->id,
                 'component' => self::FILE_COMPONENT,
@@ -205,11 +227,12 @@ class certifygenvalidation_electronic implements ICertificateValidation
             $validation = new certifygen_validations($validationid);
             $code = certifygen_validations::get_certificate_code($validation);
             $fs = get_file_storage();
-            $contextid = context_system::instance()->id;
-            if (!empty($courseid)) {
-                $contextid = \context_course::instance($courseid)->id;
+            $context = context_system::instance();
+            if (!empty($validation->get('certifygenid'))) {
+                $cert = new certifygen($validation->get('certifygenid'));
+                $context = context_course::instance($cert->get('course'));
             }
-            $file =  $fs->get_file($contextid, self::FILE_COMPONENT,
+            $file =  $fs->get_file($context->id, self::FILE_COMPONENT,
                 self::FILE_AREA, $validationid, self::FILE_PATH, $code . '.pdf');
             if (!$file) {
                 $result['error']['code'] = 'file_not_found';
@@ -247,11 +270,10 @@ class certifygenvalidation_electronic implements ICertificateValidation
     {
         $itemid = $validationid;
         $cv = new certifygen_validations($validationid);
+        $context = context_system::instance();
         if (!empty($cv->get('certifygenid'))) {
             $cert = new certifygen($cv->get('certifygenid'));
-            $context = \context_course::instance($cert->get('course'));
-        } else {
-            $context = context_system::instance();
+            $context = context_course::instance($cert->get('course'));
         }
         $filerecord = [
             'contextid' => $context->id,

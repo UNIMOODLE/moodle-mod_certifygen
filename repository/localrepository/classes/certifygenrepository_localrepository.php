@@ -27,14 +27,14 @@
 
 namespace certifygenrepository_localrepository;
 
+use coding_exception;
+use context_course;
 use context_system;
 use dml_exception;
-use mod_certifygen\certifygen;
 use mod_certifygen\interfaces\ICertificateReport;
 use mod_certifygen\interfaces\ICertificateRepository;
-use mod_certifygen\persistents\certifygen_model;
+use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_validations;
-use mod_certifygen\persistents\certifygen as certifygenpersistent;
 use moodle_url;
 use stored_file;
 
@@ -43,7 +43,7 @@ class certifygenrepository_localrepository implements ICertificateRepository
     /**
      * @param certifygen_validations $validation
      * @return string
-     * @throws \coding_exception
+     * @throws coding_exception
      * @throws dml_exception
      */
     public function getFileUrl(certifygen_validations $validation): string
@@ -51,6 +51,10 @@ class certifygenrepository_localrepository implements ICertificateRepository
         $code = certifygen_validations::get_certificate_code($validation);
         $code .= '.pdf';
         $contextid = context_system::instance()->id;
+        if (!empty($validation->get('certifygenid'))) {
+            $cert = new certifygen($validation->get('certifygenid'));
+            $contextid = context_course::instance($cert->get('course'))->id;
+        }
         $itemid = (int) $validation->get('id');
         $fs = get_file_storage();
         $file = $fs->get_file($contextid, ICertificateReport::FILE_COMPONENT,
@@ -61,9 +65,8 @@ class certifygenrepository_localrepository implements ICertificateRepository
         if (empty($file)) {
             return '';
         }
-        $url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(),
+        return moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(),
             $file->get_itemid(), $file->get_filepath(), $file->get_filename())->out();
-        return $url;
     }
 
     /**

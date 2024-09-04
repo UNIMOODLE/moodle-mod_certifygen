@@ -35,15 +35,13 @@ use certifygenvalidation_none\persistents\certifygenvalidationwebservice;
 use coding_exception;
 use context_course;
 use context_system;
-use core\session\exception;
 use dml_exception;
-use file_exception;
 use mod_certifygen\certifygen_file;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
-use stored_file_creation_exception;
+use moodle_url;
 
 class certifygenvalidation_none implements ICertificateValidation
 {
@@ -58,6 +56,11 @@ class certifygenvalidation_none implements ICertificateValidation
             // Change context.
             $fs = get_file_storage();
             $context = context_system::instance();
+            $cv = new certifygen_validations($file->get_validationid());
+            if (!empty($cv->get('certifygenid'))) {
+                $cert = new certifygen($cv->get('certifygenid'));
+                $context = context_course::instance($cert->get('course'));
+            }
             $filerecord = [
                 'contextid' => $context->id,
                 'component' => self::FILE_COMPONENT,
@@ -85,8 +88,6 @@ class certifygenvalidation_none implements ICertificateValidation
     }
 
     /**
-     *
-     *
      * @param int $courseid
      * @param int $validationid
      * @return array
@@ -132,19 +133,17 @@ class certifygenvalidation_none implements ICertificateValidation
      */
     public function getFileUrl(int $courseid, int $validationid, string $code): string
     {
-        $itemid = $validationid;
         $cv = new certifygen_validations($validationid);
+        $context = context_system::instance();
         if (!empty($cv->get('certifygenid'))) {
             $cert = new certifygen($cv->get('certifygenid'));
             $context = context_course::instance($cert->get('course'));
-        } else {
-            $context = context_system::instance();
         }
         $filerecord = [
             'contextid' => $context->id,
             'component' => self::FILE_COMPONENT,
             'filearea' => self::FILE_AREA_VALIDATED,
-            'itemid' => $itemid,
+            'itemid' => $validationid,
             'filepath' => self::FILE_PATH,
             'filename' => $code . '.pdf'
         ];

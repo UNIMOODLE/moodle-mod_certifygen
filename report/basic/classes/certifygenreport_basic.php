@@ -71,6 +71,7 @@ class certifygenreport_basic implements ICertificateReport
             // Step 2: Create pdf.
             $doc = new pdf();
             $image_file = $this->get_logo_url();
+            error_log(__FUNCTION__ . 'image_file: '.var_export($image_file, true));
             if (!empty($image_file)) {
                 $doc->setHeaderData($image_file, 8, 'Unimoodle Certifygen', '');
             } else {
@@ -143,7 +144,7 @@ class certifygenreport_basic implements ICertificateReport
             if (empty($filename)) {
                 return '';
             }
-            $logo = $fs->get_file($context->id, report_view::REPORT_COMPONENT, report_view::REPORT_FILEAREA, 0,
+            $logo = $fs->get_file($context->id, report_view::REPORT_COMPONENT, 'logo', 0,
                 '/', $filename);
             if (!$logo) {
                 return '';

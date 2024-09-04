@@ -31,5 +31,5 @@ defined('MOODLE_INTERNAL') || die();
 $string['pluginname'] = 'CSV Repository';
 $string['pluginnamesettings'] = 'CSV Repository Settings';
 $string['enable'] = 'Enable';
-$string['enable_help'] = 'This repository saves the certificates in one of the enabled repositories in the platform';
+$string['enable_help'] = 'This repository can only be used woth csv validation plugin.';
 

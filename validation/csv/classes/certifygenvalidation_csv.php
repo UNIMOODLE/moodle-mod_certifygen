@@ -33,17 +33,17 @@ require_once $CFG->libdir . '/pdflib.php';
 
 use certifygenvalidation_csv\persistents\certifygenvalidationcsv;
 use coding_exception;
+use context_course;
+use context_system;
 use core\session\exception;
 use dml_exception;
 use file_exception;
 use mod_certifygen\certifygen_file;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen;
-use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 use moodle_url;
-use pdf;
 use SoapFault;
 use stored_file;
 use stored_file_creation_exception;
@@ -53,7 +53,7 @@ class certifygenvalidation_csv implements ICertificateValidation
     private csv_configuration $configuration;
 
     /**
-     * @param csv_configuration $configuration
+     *
      */
     public function __construct()
     {
@@ -62,73 +62,88 @@ class certifygenvalidation_csv implements ICertificateValidation
 
 
     /**
-     * @throws exception
+     * @param certifygen_file $file
+     * @return array
      */
     public function sendFile(certifygen_file $file): array
     {
         global $USER;
 
-        $params = $this->create_params_sendFile($file);
-        $curl = curl_init();
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => $this->configuration->get_wsdl(),
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => $params,
-            CURLOPT_HTTPHEADER => array(
-                'Content-Type: application/xml'
-            ),
-        ));
-        $response = curl_exec($curl);
-        if (curl_errno($curl)) {
-            return [
-                'haserror' => true,
-                'message' => curl_error($curl),
+        try {
+            $params = $this->create_params_sendFile($file);
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => $this->configuration->get_wsdl(),
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $params,
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/xml'
+                ),
+            ));
+            $response = curl_exec($curl);
+            if (curl_errno($curl)) {
+                return [
+                    'haserror' => true,
+                    'message' => curl_error($curl),
+                ];
+            }
+            $xml = simplexml_load_string($response, null, null, 'http://schemas.xmlsoap.org/soap/envelope/');
+            $ns = $xml->getNamespaces(true);
+            $soap = $xml->children($ns['soap']);
+            $res = $soap->Body->children($ns['ns2']);
+            if (is_null($res)) {
+                return [
+                    'haserror' => true,
+                    'message' => get_string('csv_result_not_expected', 'certifygenvalidation_csv'),
+                ];
+            }
+            $iniciarProcesoFirmaResponse = $res->iniciarProcesoFirmaResponse->children();
+            $iniciarProcesoFirmaResponsechildren = $iniciarProcesoFirmaResponse->children();
+            $resultado = (string) $iniciarProcesoFirmaResponsechildren->resultado;
+            if ($resultado === 'KO') {
+                $codError = (string) $iniciarProcesoFirmaResponsechildren->error->children()->codError;
+                $descError = (string) $iniciarProcesoFirmaResponsechildren->error->children()->descError;
+                return [
+                    'haserror' => true,
+                    'message' => $codError . ' - ' . $descError,
+                ];
+            }
+            // Se obtiene idExpediente;
+            $idExpediente = (string) $iniciarProcesoFirmaResponsechildren->idExpediente;
+            $validationid = $file->get_validationid();
+            $token = str_replace('.pdf', '', $file->get_file()->get_filename());
+            $data = [
+                'validationid' => $validationid,
+                'applicationid' => $idExpediente,
+                'token' => $token,
+                'usermodified' => $USER->id,
             ];
-        }
-        $xml = simplexml_load_string($response, null, null, 'http://schemas.xmlsoap.org/soap/envelope/');
-        $ns = $xml->getNamespaces(true);
-        $soap = $xml->children($ns['soap']);
-        $res = $soap->Body->children($ns['ns2']);
-        $iniciarProcesoFirmaResponse = $res->iniciarProcesoFirmaResponse->children();
-        $iniciarProcesoFirmaResponsechildren = $iniciarProcesoFirmaResponse->children();
-        $resultado = (string) $iniciarProcesoFirmaResponsechildren->resultado;
-        if ($resultado === 'KO') {
-            $codError = (string) $iniciarProcesoFirmaResponsechildren->error->children()->codError;
-            $descError = (string) $iniciarProcesoFirmaResponsechildren->error->children()->descError;
-            return [
-                'haserror' => true,
-                'message' => $codError . ' - ' . $descError,
-            ];
-        }
-        // Se obtiene idExpediente;
-        $idExpediente = (string) $iniciarProcesoFirmaResponsechildren->idExpediente;
-        $validationid = $file->get_validationid();
-        $token = str_replace('.pdf', '', $file->get_file()->get_filename());
-        $data = [
-            'validationid' => $validationid,
-            'applicationid' => $idExpediente,
-            'token' => $token,
-            'usermodified' => $USER->id,
-        ];
-        $cv = new certifygenvalidationcsv(0, (object)$data);
-        $cv->save();
-        curl_close($curl);
+            $cv = new certifygenvalidationcsv(0, (object)$data);
+            $cv->save();
+            curl_close($curl);
 
-        return [
-            'haserror' => false,
-            'message' => 'asdasd',
-        ];
+            return [
+                'haserror' => false,
+                'message' => 'ok',
+            ];
+        } catch (\Exception $e) {
+            return [
+                'haserror' => true,
+                'message' => $e->getMessage(),
+            ];
+        }
+
     }
 
     /**
      * @param certifygen_file $file
-     * @return array[]
+     * @return string
      */
     private function create_params_sendFile(certifygen_file $file) : string {
 
@@ -232,9 +247,10 @@ class certifygenvalidation_csv implements ICertificateValidation
 </soapenv:Envelope>';
 
     }
+
     /**
      * @param string $code
-     * @return array[]
+     * @return string
      */
     private function create_params_getFileUrl(string $code) : string {
         return '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fir="http://firma.ws.producto.com/">
@@ -260,13 +276,12 @@ class certifygenvalidation_csv implements ICertificateValidation
     /**
      * @param int $courseid
      * @param int $validationid
-     * @param string $code
      * @return array
+     * @throws coding_exception
      * @throws dml_exception
      * @throws file_exception
-     * @throws stored_file_creation_exception
-     * @throws coding_exception
      * @throws moodle_exception
+     * @throws stored_file_creation_exception
      */
     public function getFile(int $courseid, int $validationid) : array
     {
@@ -322,7 +337,7 @@ class certifygenvalidation_csv implements ICertificateValidation
             $docspeticiondocumentos = $docspeticion->documentos;
             $datos = (string) $docspeticiondocumentos->datos;
             $datos = base64_decode($datos);
-            $file = $this->create_file_from_content($datos, $validationid, $code);
+            $file = $this->create_file_from_content($datos, $validationid, $code, $courseid);
             return [
                 'haserror' => false,
                 'message' => 'ok',
@@ -348,7 +363,6 @@ class certifygenvalidation_csv implements ICertificateValidation
      * @param int $validationid
      * @param string $code
      * @return array
-     * @throws moodle_exception
      */
     public function getFileUrlFromExternalService(int $validationid, string $code) : array
     {
@@ -442,34 +456,19 @@ class certifygenvalidation_csv implements ICertificateValidation
      * @param string $content
      * @param int $validationid
      * @param string $code
-     * @return void
+     * @param $courseid
+     * @return stored_file
      * @throws dml_exception
      * @throws file_exception
      * @throws stored_file_creation_exception
-     * @throws coding_exception
      */
-    public function create_file_from_content(string $content, int $validationid, string $code) {
-        // Create a Pdf file.
-//        $doc = new pdf();
-//        $doc->SetTitle('Certifygen certificate');
-//        $doc->SetAuthor('UNIMOODLE ');
-//        $doc->SetCreator('mod_certifygen');
-//        $doc->SetKeywords('Moodle, PDF, Certifygen, Unimoodle');
-//        $doc->SetSubject('This has been generated by mod_certifygen');
-//        $doc->SetMargins(15, 30);
-//        $doc->AddPage();
-//        $doc->writeHTML($content);
+    public function create_file_from_content(string $content, int $validationid, string $code, $courseid) {
 
         // Get pdf content.
-        $itemid = $validationid;
-        $cv = new certifygen_validations($validationid);
-        if (!empty($cv->get('certifygenid'))) {
-            $cert = new certifygen($cv->get('certifygenid'));
-            $context = \context_course::instance($cert->get('course'));
-        } else {
-            $context = \context_system::instance();
+        $context = context_system::instance();
+        if (!empty($courseid)) {
+            $context = context_course::instance($courseid);
         }
-//        $pdfcontent = $doc->Output($code, 'S');
 
         // Save pdf on moodledata.
         $fs = get_file_storage();
@@ -477,7 +476,7 @@ class certifygenvalidation_csv implements ICertificateValidation
             'contextid' => $context->id,
             'component' => self::FILE_COMPONENT,
             'filearea' => self::FILE_AREA_VALIDATED,
-            'itemid' => $itemid,
+            'itemid' => $validationid,
             'filepath' => self::FILE_PATH,
             'filename' => $code . '.pdf'
         ];
@@ -490,6 +489,7 @@ class certifygenvalidation_csv implements ICertificateValidation
     }
 
     /**
+     * @param int $courseid
      * @return bool
      */
     public function canRevoke(int $courseid): bool
@@ -531,9 +531,8 @@ class certifygenvalidation_csv implements ICertificateValidation
     }
 
     /**
-     * @param certifygenvalidationcsv $csvvalidation
-     * @return array[]
-     * @throws coding_exception
+     * @param string $code
+     * @return string
      */
     private function create_params_status(string $code) : string {
         $params = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fir="http://firma.ws.producto.com/">
@@ -616,27 +615,28 @@ class certifygenvalidation_csv implements ICertificateValidation
             'message' => $message,
         ];
     }
+
     /**
      * @param int $courseid
      * @param int $validationid
      * @param string $code
      * @return string
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function getFileUrl(int $courseid, int $validationid, string $code): string
     {
-        $itemid = $validationid;
         $cv = new certifygen_validations($validationid);
+        $context = context_system::instance();
         if (!empty($cv->get('certifygenid'))) {
             $cert = new certifygen($cv->get('certifygenid'));
-            $context = \context_course::instance($cert->get('course'));
-        } else {
-            $context = \context_system::instance();
+            $context = context_course::instance($cert->get('course'));
         }
         $filerecord = [
             'contextid' => $context->id,
             'component' => self::FILE_COMPONENT,
             'filearea' => self::FILE_AREA_VALIDATED,
-            'itemid' => $itemid,
+            'itemid' => $validationid,
             'filepath' => self::FILE_PATH,
             'filename' => $code
         ];
@@ -676,9 +676,9 @@ class certifygenvalidation_csv implements ICertificateValidation
 
     /**
      * @param int $validationid
+     * @param string $code
      * @return int
      * @throws moodle_exception
-     * @throws coding_exception
      */
     public function getStatus(int $validationid, string $code): int
     {

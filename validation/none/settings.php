@@ -35,7 +35,7 @@ $ADMIN->add('modsettingcertifygencat',
 
 // Certifygenreport_basic settings.
 $settings = new admin_settingpage(
-    'modsettingcertifygenvalidationwebservice',
+    'modsettingcertifygenvalidationnone',
     get_string('pluginnamesettings', 'certifygenvalidation_none'),
     'moodle/site:config');
 if ($ADMIN->fulltree) {

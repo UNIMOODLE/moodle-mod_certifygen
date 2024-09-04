@@ -29,7 +29,7 @@
 // This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2024090200;
+$plugin->version   = 2024090201;
 $plugin->requires  = 2022112802;
 $plugin->component = 'certifygenvalidation_none';
 $plugin->dependencies = [

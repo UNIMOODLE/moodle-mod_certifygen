@@ -35,7 +35,6 @@ use certifygenvalidation_webservice\persistents\certifygenvalidationwebservice;
 use coding_exception;
 use context_course;
 use context_system;
-use core\session\exception;
 use dml_exception;
 use file_exception;
 use mod_certifygen\certifygen_file;
@@ -43,6 +42,7 @@ use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
+use moodle_url;
 use stored_file_creation_exception;
 
 class certifygenvalidation_webservice implements ICertificateValidation
@@ -74,7 +74,6 @@ class certifygenvalidation_webservice implements ICertificateValidation
     /**
      * @param int $courseid
      * @param int $validationid
-     * @param string $code
      * @return array
      */
     public function getFile(int $courseid, int $validationid) : array
@@ -104,6 +103,7 @@ class certifygenvalidation_webservice implements ICertificateValidation
     }
 
     /**
+     * @param int $courseid
      * @return bool
      */
     public function canRevoke(int $courseid): bool
@@ -135,11 +135,10 @@ class certifygenvalidation_webservice implements ICertificateValidation
     {
         $itemid = $validationid;
         $cv = new certifygen_validations($validationid);
+        $context = context_system::instance();
         if (!empty($cv->get('certifygenid'))) {
             $cert = new certifygen($cv->get('certifygenid'));
             $context = context_course::instance($cert->get('course'));
-        } else {
-            $context = context_system::instance();
         }
         $filerecord = [
             'contextid' => $context->id,
@@ -214,9 +213,18 @@ class certifygenvalidation_webservice implements ICertificateValidation
     public function save_file_moodledata(int $validationid) {
         $validation = new certifygen_validations($validationid);
         $code = certifygen_validations::get_certificate_code($validation);
+        $context = context_system::instance();
+        $filearea  = 'certifygenreport';
+        $itemid = $validation;
+        if (!empty($validation->get('certifygenid'))) {
+            $cert = new certifygen($validation->get('certifygenid'));
+            $context = context_course::instance($cert->get('course'));
+            $filearea  = 'issues';
+            $itemid = $validation->get('issueid');
+        }
         // Search for original certificate.
         $filerecord =  [
-            'contextid' => context_system::instance()->id,
+            'contextid' => $context->id,
             'component' => self::FILE_COMPONENT,
             'filearea' => self::FILE_AREA,
             'itemid' => $validationid,
@@ -226,8 +234,8 @@ class certifygenvalidation_webservice implements ICertificateValidation
         $fs = get_file_storage();
         $original = $fs->get_file(context_system::instance()->id,
             self::FILE_COMPONENT,
-            'certifygenreport',
-            $validationid,
+            $filearea,
+            $itemid,
             self::FILE_PATH,
             $code . '.pdf'
         );

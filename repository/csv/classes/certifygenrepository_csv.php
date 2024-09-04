@@ -32,7 +32,6 @@ use certifygenvalidation_csv\csv_configuration;
 use coding_exception;
 use dml_exception;
 use mod_certifygen\interfaces\ICertificateRepository;
-use mod_certifygen\persistents\certifygen_repository;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 use stored_file;
@@ -43,7 +42,7 @@ class certifygenrepository_csv implements ICertificateRepository
     /**
      * @param certifygen_validations $validation
      * @return string
-     * @throws coding_exception|dml_exception
+     * @throws coding_exception|dml_exception|moodle_exception
      */
     public function getFileUrl(certifygen_validations $validation): string
     {
@@ -69,19 +68,7 @@ class certifygenrepository_csv implements ICertificateRepository
         }
         return '';
     }
-    /**
-     * @param certifygen_validations $validation
-     * @return string
-     * @throws coding_exception
-     */
-    private function getFileUrlFromDb(certifygen_validations $validation) : string {
-        $certrepository = certifygen_repository::get_record(
-            ['validationid' => $validation->get('id'), 'userid' => $validation->get('userid')]);
-        if ($certrepository) {
-            return $certrepository->get('url');
-        }
-        return '';
-    }
+
     /**
      * File already saved on external service.
      * This function does not need to be implemented.
