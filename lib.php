@@ -143,14 +143,14 @@ function certifygen_update_instance($data, $mform): bool
  */
 function certifygen_delete_instance(stdClass $data, mod_certifygen_mod_form $mform): bool
 {
-
-    // Delete a model.
-    $model = new certifygen_model($data->modelid);
-    $model->delete();
-
     // Delete a certifygen.
     $certifygen = new certifygen($data->certifygenid);
 
+    // Delete a certifygen_validations.
+    $validations = certifygen_validations::get_records(['certifygenid' => $data->certifygenid]);
+    foreach ($validations as $validation) {
+        $validation->delete();
+    }
     return $certifygen->delete();
 }
 
