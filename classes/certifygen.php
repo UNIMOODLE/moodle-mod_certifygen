@@ -312,7 +312,7 @@ class certifygen {
      * @return array
      * @throws dml_exception
      */
-    public static function get_issues_for_course_by_lang(string $lang, int $templateid, int $courseid, string $component,
+    public static function get_issues_for_course_by_lang(string $lang, int $certifygenid, int $templateid, int $courseid, string $component,
                                                          int $userid, string $tifirst, string $tilast,
                                                          int $limitfrom, int $limitnum, string $sort = ''): array {
         global $DB;
@@ -327,6 +327,7 @@ class certifygen {
             'courseid' => $courseid,
             'component' => $component,
             'lang' => $lang,
+            'certifygenid' => $certifygenid,
             ];
         $where = "";
         if (!empty($tifirst)) {
@@ -356,7 +357,7 @@ class certifygen {
                         WHERE r.shortname = 'student'
                         AND c.id = :courseid $where
                         ) AS us
-                    LEFT JOIN {certifygen_validations} cv ON (cv.userid = us.userid AND cv.lang = :lang)
+                    LEFT JOIN {certifygen_validations} cv ON (cv.userid = us.userid AND cv.lang = :lang  AND cv.certifygenid = :certifygenid)
                     LEFT JOIN {tool_certificate_issues} ci ON (ci.userid = us.userid AND cv.issueid = ci.id AND ci.courseid = us.courseid 
                         AND ci.templateid = :templateid AND ci.component = :component)
                     ";

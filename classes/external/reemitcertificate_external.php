@@ -32,6 +32,7 @@
 namespace mod_certifygen\external;
 
 use coding_exception;
+use context_module;
 use context_system;
 use core\invalid_persistent_exception;
 use external_api;
@@ -45,7 +46,11 @@ use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
+use moodle_exception;
+use tool_certificate\external\issues;
 
+global $CFG;
+require_once($CFG->libdir . '/modinfolib.php');
 class reemitcertificate_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -70,12 +75,12 @@ class reemitcertificate_external extends external_api {
     public static function reemitcertificate(int $id): array {
 
         global $PAGE, $USER;
-        $PAGE->set_context(context_system::instance());
+
         self::validate_parameters(
             self::reemitcertificate_parameters(), ['id' => $id]
         );
         $result = ['result' => true, 'message' => get_string('ok', 'mod_certifygen')];
-
+        $validation = null;
         try {
             // Step 1: Copy data from the old validation id.
             $oldvalidation  = new certifygen_validations($id);
@@ -87,17 +92,29 @@ class reemitcertificate_external extends external_api {
                 'userid' => $oldvalidation->get('userid'),
                 'modelid' => $oldvalidation->get('modelid'),
                 'lang' => $oldvalidation->get('lang'),
-                'status' => certifygen_validations::STATUS_IN_PROGRESS,
+                'status' => certifygen_validations::STATUS_NOT_STARTED,
                 'usermodified' => $USER->id,
             ];
-            // Remove the old one.
-            $oldvalidation->delete();
             // Create a new one.
             $validation = certifygen_validations::manage_validation(0, (object) $data);
+
             // Emit the new one.
-            $certifygen= new certifygen($validation->get('certifygenid'));
+            [$course, $cm] = get_course_and_cm_from_instance($validation->get('certifygenid'), 'certifygen');
+            $context = context_module::instance($cm->id);
+            $PAGE->set_context($context);
+            require_capability('mod/certifygen:reemitcertificates', $context);
+
+            // Delete old issue and file.
+            issues::revoke_issue( $oldvalidation->get('issueid'));
             $result = emitcertificate_external::emitcertificate($validation->get('id'), $validation->get('certifygenid'),
-                $validation->get('modelid'), $validation->get('lang'), $validation->get('userid'), $certifygen->get('course'));
+                $validation->get('modelid'), $validation->get('lang'), $validation->get('userid'), $course->id);
+
+            if (!$result['result']) {
+                $validation->delete();
+            } else {
+                // Remove the old one.
+                $oldvalidation->delete();
+            }
         } catch (moodle_exception $e) {
             error_log(__FUNCTION__ . ' ' . ' error: '.var_export($e->getMessage(), true));
             $result['result'] = false;

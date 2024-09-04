@@ -199,7 +199,7 @@ class activityteacher_table extends table_sql {
         if (empty($row->ctimecreated)) {
             return '';
         }
-        return date('d/m/y', $row->ctimecreated);
+        return date('d/m/y H:i:s', $row->ctimecreated);
     }
 
     /**
@@ -247,11 +247,25 @@ class activityteacher_table extends table_sql {
 
         if ($status == certifygen_validations::STATUS_NOT_STARTED) {
             return '<span data-courseid="' . $row->courseid . '" data-modelid="' . $this->modelid . '" data-id="'. $id .
-                '" data-action="emit-certificate" data-userid="'. $row->id .'" data-lang="'. $this->lang .'" 
+                '" data-action="emit-certificate" data-userid="'. $row->userid .'" data-lang="'. $this->lang .'" 
                 data-langstring="'. $this->langstring .'"  data-cmid="'. $this->cmid .'" data-instanceid="'. $this->instanceid .'" class="btn btn-primary"
                 >'.get_string('emit', 'mod_certifygen').'</span>';
         }
-
+        // Re-emit.
+        if ($row->cstatus == certifygen_validations::STATUS_FINISHED
+            && $this->model->get('mode') == certifygen_model::MODE_PERIODIC
+        && has_capability('mod/certifygen:reemitcertificates', $this->context)) {
+            $today = time();
+            $dif = $today - $row->timecreated;
+            $difindays = abs($dif / (60 * 60 * 24));
+            if ($difindays > (int)$this->model->get('timeondemmand')) {
+                return '<span class="likelink" data-userid="' . $row->userid . '" data-id="' . $id
+                    . '" data-modelid="' . $this->modelid . '" data-lang="' . $this->lang
+                    . '" data-courseid="' . $this->courseid . '" data-cmid="' . $this->cmid
+                    . '" data-action="reemit-certificate">' .
+                    get_string('reemit', 'mod_certifygen') . '</span>';
+            }
+        }
         return '';
     }
 
@@ -285,7 +299,7 @@ class activityteacher_table extends table_sql {
 
         $this->pagesize($pagesize, $total);
 
-        $this->rawdata = certifygen::get_issues_for_course_by_lang($params['lang'], $this->templateid, $this->courseid,
+        $this->rawdata = certifygen::get_issues_for_course_by_lang($params['lang'], $this->instanceid, $this->templateid, $this->courseid,
             'mod_certifygen', $userid, $tifirst, $tilast, $this->get_page_start(),
             $this->get_page_size(), $this->get_sql_sort());
 

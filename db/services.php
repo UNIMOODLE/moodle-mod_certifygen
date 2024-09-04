@@ -50,6 +50,7 @@ use mod_certifygen\external\deleteteacherrequest_external;
 use mod_certifygen\external\getcoursesnames_external;
 use mod_certifygen\external\emitteacherrequest_external;
 use mod_certifygen\external\reemitteacherrequest_external;
+use mod_certifygen\external\reemitcertificate_external;
 use mod_certifygen\external\downloadteachercertificate_external;
 
 defined('MOODLE_INTERNAL') || die();
@@ -79,6 +80,15 @@ $functions = [
         'description' => 'reemitteacherrequest',
         'type' => 'write',
         'capabilities' => 'mod/certifygen:view',
+        'ajax' => true,
+        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
+    'mod_certifygen_reemitcertificate' => [
+        'classname' => reemitcertificate_external::class,
+        'methodname' => 'reemitcertificate',
+        'description' => 'reemitcertificate',
+        'type' => 'write',
+        'capabilities' => 'mod/certifygen:reemitcertificates',
         'ajax' => true,
         'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],

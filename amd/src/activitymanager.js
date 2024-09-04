@@ -21,21 +21,90 @@ let TEMPLATES = {
 };
 let ACTION = {
     EMIT_CERTIFICATE: '[data-action="emit-certificate"]',
+    REEMIT_CERTIFICATE: '[data-action="reemit-certificate"]',
     REVOKE_CERTIFICATE: '[data-action="revoke-certificate"]',
     DOWNLOAD_CERTIFICATE: '[data-action="download-certificate"]',
 };
 let SERVICES = {
     EMIT_CERTIFICATE: 'mod_certifygen_emitcertificate',
+    REEMIT_CERTIFICATE: 'mod_certifygen_reemitcertificate',
     GET_MYCERTIFICATE_TABLE_DATA: 'mod_certifygen_getmycertificatedata',
     REVOKE_CERTIFICATE: 'mod_certifygen_revokecertificate',
     DOWNLOAD_CERTIFICATE: 'mod_certifygen_downloadcertificate',
 };
 const certificateManagement = () => {
     jQuery(ACTION.EMIT_CERTIFICATE).on('click', emitCertificate);
+    jQuery(ACTION.REEMIT_CERTIFICATE).on('click', reemitCertificate);
     jQuery(ACTION.REVOKE_CERTIFICATE).on('click', revokeCertificate);
     jQuery(ACTION.DOWNLOAD_CERTIFICATE).on('click', downloadCertificate);
 };
 
+const reemitCertificate = async (event) => {
+    let id = event.currentTarget.getAttribute('data-id');
+    let modelid = parseInt(event.currentTarget.getAttribute('data-modelid'));
+    let lang = event.currentTarget.getAttribute('data-lang');
+    let courseid = parseInt(event.currentTarget.getAttribute('data-courseid'));
+    let cmid = parseInt(event.currentTarget.getAttribute('data-cmid'));
+    id = parseInt(id);
+    modelid = parseInt(modelid);
+    courseid = parseInt(courseid);
+    cmid = parseInt(cmid);
+    const stringkeys = [
+        {key: 'emitrequesttitle', component: 'mod_certifygen'},
+        {key: 'emitrequestbody', component: 'mod_certifygen', param: id},
+        {key: 'confirm', component: 'mod_certifygen'},
+        {key: 'errortitle', component: 'mod_certifygen'},
+    ];
+    Templates.render(TEMPLATES.LOADING, {visible: true}).done(function(html) {
+        let identifier = jQuery('[data-region="activity-view"]');
+        identifier.append(html);
+        getStrings(stringkeys).then((langStrings) => {
+            return ModalFactory.create({
+                title: langStrings[0],
+                body: langStrings[1],
+                type: ModalFactory.types.SAVE_CANCEL
+            }).then(modal => {
+                modal.getRoot().on(ModalEvents.hidden, () => {
+                    modal.destroy();
+                });
+                modal.getRoot().on(ModalEvents.cancel, () => {
+                    identifier.find('.overlay-icon-container').remove();
+                    studentsReloadTable(modelid, courseid, cmid, lang);
+                });
+                modal.getRoot().on(ModalEvents.save, () => {
+                    let request = {
+                        methodname: SERVICES.REEMIT_CERTIFICATE,
+                        args: {id}
+                    };
+                    Ajax.call([request])[0].done(function(response) {
+                        identifier.html(html);
+                        if (response.result == 1) {
+                            // Recargar tabla.
+                            studentsReloadTable(modelid, courseid, cmid, lang);
+                        } else {
+                            // Mostrar mensaje error.
+                            return ModalFactory.create({
+                                title: langStrings[3],
+                                body: response.message,
+                                type: ModalFactory.types.CANCEL
+                            }).then(modal => {
+                                modal.getRoot().on(ModalEvents.hidden, () => {
+                                    identifier.find('.overlay-icon-container').remove();
+                                    studentsReloadTable(modelid, courseid, cmid, lang);
+                                    modal.destroy();
+                                });
+                                modal.show();
+                            });
+                        }
+                    }).fail(Notification.exception);
+                });
+                return modal;
+            });
+        }).done(function(modal) {
+            modal.show();
+        }).fail(Notification.exception);
+    });
+};
 const downloadCertificate = async(event) => {
     let modelid = parseInt(event.currentTarget.getAttribute('data-modelid'));
     let code = event.currentTarget.getAttribute('data-code');
