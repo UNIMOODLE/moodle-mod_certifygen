@@ -13,40 +13,34 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-// Project implemented by the "Recovery, Transformation and Resilience Plan.
-// Funded by the European Union - Next GenerationEU".
-//
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
-
 /**
- * @package    mod_certifygen
+ * @package   certifygenvalidation_electronic
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use mod_certifygen\output\views\model_view;
+// This line protects the file from being accessed by a URL directly.
+defined('MOODLE_INTERNAL') || die();
 
-require_once('../../config.php');
-require_once('lib.php');
-
-global $CFG, $PAGE, $DB, $COURSE, $USER, $OUTPUT;
-
-require_login();
-
-require_capability('mod/certifygen:manage', context_system::instance());
-
-$PAGE->set_url('/mod/certifygen/modelmanager.php');
-$context = context_system::instance();
-$PAGE->set_context($context);
-$PAGE->set_title(get_string('modelmanager', 'certifygen'));
-$view = new model_view();
-echo $OUTPUT->header();
-echo $OUTPUT->heading(format_string(get_string('modelmanager', 'certifygen')));
-$output = $PAGE->get_renderer('mod_certifygen');
-echo $output->render($view);
-echo $OUTPUT->footer();
+$string['pluginname'] = 'ELECTRONIC Validation';
+$string['enable'] = 'Enable';
+$string['enable_help'] = 'If this plugin is enabled, you can use it to validate Unimoodle Certificates';
+$string['pluginnamesettings'] = 'ELECTRONIC Validation Configuration';
+$string['path'] = 'Certificate Server Path';
+$string['pathdesc'] = 'This field is mandatory to use this validation plugin';
+$string['password'] = 'Certificate Server Password';
+$string['passworddesc'] = 'This field is mandatory to use this validation plugin';
+$string['name'] = 'Certificate Name';
+$string['namedesc'] = 'Field required to sign the certificate';
+$string['location'] = 'Certificate location';
+$string['locationdesc'] = 'Field required to sign the certificate';
+$string['reason'] = 'Certificate reason';
+$string['reasondesc'] = 'Field required to sign the certificate';
+$string['contactinfo'] = 'Certificate contactinfo';
+$string['contactinfodesc'] = 'Field required to sign the certificate';

@@ -156,7 +156,12 @@ class get_pdf_teacher_certificate_external extends external_api {
                 } else if (get_config($validationplugin, 'enabled') === '1') {
                     /** @var ICertificateValidation $subplugin */
                     $subplugin = new $validationpluginclass();
-                    $file = $subplugin->getFile(0, $trequest->get('id'), $code);
+                    $fileresult = $subplugin->getFile(0, $trequest->get('id'), $code);
+                    if (!array_key_exists('file', $fileresult)) {
+                        $result['error'] = $fileresult['error'];
+                        return $result;
+                    }
+                    $file = $fileresult['file'];
                 } else {
                     $result['error']['code'] = 'validation_plugin_not_enabled';
                     $result['error']['message'] = 'Certificate validation plugin is not enabled';

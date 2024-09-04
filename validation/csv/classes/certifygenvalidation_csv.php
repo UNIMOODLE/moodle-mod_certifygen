@@ -71,7 +71,7 @@ class certifygenvalidation_csv implements ICertificateValidation
         $params = $this->create_params_sendFile($file);
         $curl = curl_init();
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'http://pru.sede.uva.es/FirmaCatalogService',
+            CURLOPT_URL => $this->configuration->get_wsdl(),
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -268,9 +268,11 @@ class certifygenvalidation_csv implements ICertificateValidation
      * @throws coding_exception
      * @throws moodle_exception
      */
-    public function getFile(int $courseid, int $validationid, string $code)
+    public function getFile(int $courseid, int $validationid) : array
     {
         try {
+            $validation = new certifygen_validations($validationid);
+            $code = certifygen_validations::get_certificate_code($validation);
             $params = ['validationid' => $validationid];
             $teacherrequest = certifygenvalidationcsv::get_record($params);
             $message = 'Something went wrong';
@@ -281,7 +283,7 @@ class certifygenvalidation_csv implements ICertificateValidation
             $params = $this->create_params_getFileContent($code);
             $curl = curl_init();
             curl_setopt_array($curl, array(
-                CURLOPT_URL => 'http://pru.sede.uva.es/FirmaQueryCatalogService',
+                CURLOPT_URL => $this->configuration->get_querywsdl(),
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
@@ -359,7 +361,7 @@ class certifygenvalidation_csv implements ICertificateValidation
             $params = $this->create_params_getFileUrl($code);
             $curl = curl_init();
             curl_setopt_array($curl, array(
-                CURLOPT_URL => 'http://pru.sede.uva.es/FirmaQueryCatalogService',
+                CURLOPT_URL => $this->configuration->get_querywsdl(),
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
@@ -566,7 +568,7 @@ class certifygenvalidation_csv implements ICertificateValidation
             $params = $this->create_params_revoke($code);
             $curl = curl_init();
             curl_setopt_array($curl, array(
-                CURLOPT_URL => 'http://pru.sede.uva.es/FirmaCatalogService',
+                CURLOPT_URL => $this->configuration->get_wsdl(),
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
@@ -691,7 +693,7 @@ class certifygenvalidation_csv implements ICertificateValidation
             $params = $this->create_params_status($code);
             $curl = curl_init();
             curl_setopt_array($curl, array(
-                CURLOPT_URL => 'http://pru.sede.uva.es/FirmaQueryCatalogService',
+                CURLOPT_URL => $this->configuration->get_querywsdl(),
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,

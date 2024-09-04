@@ -171,16 +171,25 @@ class certifygenvalidation_cmd implements ICertificateValidation
      * @param string $code
      * @return stored_file
      */
-    public function getFile(int $courseid, int $validationid, string $code)
+    public function getFile(int $courseid, int $validationid): array
     {
-        $code = $code . '.pdf';
-        $fs = get_file_storage();
-        $contextid = \context_system::instance()->id;
-        if (!empty($courseid)) {
-            $contextid = context_course::instance($courseid)->id;
+        $result = ['error' => [], 'message' => 'ok'];
+        try {
+            $validation = new certifygen_validations($validationid);
+            $code = certifygen_validations::get_certificate_code($validation);
+            $fs = get_file_storage();
+            $contextid = \context_system::instance()->id;
+            if (!empty($courseid)) {
+                $contextid = context_course::instance($courseid)->id;
+            }
+            $file = $fs->get_file($contextid, self::FILE_COMPONENT,
+                self::FILE_AREA, $validationid, self::FILE_PATH, $code);
+            $result['file'] = $file;
+        } catch(moodle_exception $exception) {
+            $result['error']['code'] = $exception->getCode();
+            $result['error']['message'] = $exception->getMessage();
         }
-        return $fs->get_file($contextid, self::FILE_COMPONENT,
-            self::FILE_AREA, $validationid, self::FILE_PATH, $code);
+        return $result;
     }
 
     /**

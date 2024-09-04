@@ -149,6 +149,23 @@ class emitteacherrequest_external extends external_api {
                     $teacherrequest->set('status', certifygen_validations::STATUS_VALIDATION_OK);
                     $teacherrequest->save();
                 }
+                if ($teacherrequest->get('status') === certifygen_validations::STATUS_VALIDATION_OK) {
+                    // Save on repository plugin.
+                    $repositoryplugin = $certifygenmodel->get('repository');
+                    $repositorypluginclass = $repositoryplugin . '\\' . $repositoryplugin;
+                    /** @var ICertificateRepository $subplugin */
+                    $subplugin = new $repositorypluginclass();
+                    $response = $subplugin->saveFile($response['newfile']);
+                    if (!$response['haserror']) {
+                        $teacherrequest->set('status', certifygen_validations::STATUS_FINISHED);
+                        $teacherrequest->save();
+                    } else {
+                        $teacherrequest->set('status', certifygen_validations::STATUS_STORAGE_ERROR);
+                        $teacherrequest->save();
+                        $result['result'] = false;
+                        $result['message'] = $response['message'];
+                    }
+                }
             }
             unset($result['file']);
         } catch (moodle_exception $e) {
