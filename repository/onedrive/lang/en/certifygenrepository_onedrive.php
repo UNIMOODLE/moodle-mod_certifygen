@@ -34,3 +34,4 @@ $string['enable'] = 'Enable';
 $string['enable_help'] = 'This repository saves the certificates in one of the enabled repositories in the platform';
 $string['settings_folder'] = 'Folder';
 $string['settings_folder_desc'] = 'OneDrive parent folder where all the reports will be saved';
+$string['privacy:metadata'] = 'The Certifygen Onedrive Repository subplugin does not store any personal data.';

@@ -41,3 +41,4 @@ $string['certifygenvalidation_csv_settings'] = 'CSV settings';
 $string['csvnotconfigured'] = 'CSV not configured';
 $string['pluginnamesettings'] = 'CSV Validation Configuration';
 $string['csv_result_not_expected'] = 'Endpoint result not expected';
+$string['privacy:metadata'] = 'The CSV Validation plugin does not store any personal data.';

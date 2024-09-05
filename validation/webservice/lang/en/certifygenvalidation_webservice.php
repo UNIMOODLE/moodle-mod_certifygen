@@ -34,3 +34,4 @@ $string['enable_help'] = 'If this plugin is enabled, you can use it to validate 
 $string['certifygenvalidation_webservice_settings'] = 'WEBSERVICE settings';
 $string['webservicenotconfigured'] = 'Certifygen WEBSERVICE not configured';
 $string['pluginnamesettings'] = 'WEBSERVICE Validation Configuration';
+$string['privacy:metadata'] = 'The WEBSERVICE Validation plugin does not store any personal data.';

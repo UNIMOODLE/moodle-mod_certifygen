@@ -32,3 +32,4 @@ $string['pluginname'] = 'Certifygen Repositorio Local';
 $string['pluginnamesettings'] = 'Configuración del Repositorio Local';
 $string['enable'] = 'Habilitar';
 $string['enable_help'] = 'Este repositorio guarda en el moodledata los certificados.';
+$string['privacy:metadata'] = 'El plugin Certifygen Repositorio Local no almacena datos personales.';

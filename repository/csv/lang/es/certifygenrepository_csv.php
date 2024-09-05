@@ -32,4 +32,4 @@ $string['pluginname'] = 'Repositorio CSV';
 $string['pluginnamesettings'] = 'Configuración del Repositorio CSV';
 $string['enable'] = 'Habilitar';
 $string['enable_help'] = 'Este repositorio solo se puede utilizar si se ha elegido el subplugin de validación csv';
-
+$string['privacy:metadata'] = 'El plugin Repositorio CSV no almacena datos personales.';

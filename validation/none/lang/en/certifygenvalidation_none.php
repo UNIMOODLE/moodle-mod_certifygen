@@ -33,3 +33,4 @@ $string['enable'] = 'Enable';
 $string['enable_help'] = 'If this plugin is enabled, you can use it to validate Unimoodle Certificates via web services';
 $string['certifygenvalidation_none_settings'] = 'Certifygen No Validation settings';
 $string['pluginnamesettings'] = 'Certifygen No Validation Configuration';
+$string['privacy:metadata'] = 'The Certifygen No Validation Validation plugin does not store any personal data.';

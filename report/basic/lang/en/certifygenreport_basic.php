@@ -52,3 +52,4 @@ $string['cdetail_1'] = 'perteneciente a la categoría {$a->name}';
 $string['cdetail_2'] = 'con fecha de inicio en el Campus Virtual {$a->date}';
 $string['cdetail_3'] = 'con fecha de cierre en el Campus Virtual {$a->date}';
 $string['cannotusealgorith_nostudents'] = 'There are no students in course';
+$string['privacy:metadata'] = 'The Basic Report plugin does not store any personal data.';
