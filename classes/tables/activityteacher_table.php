@@ -78,7 +78,7 @@ class activityteacher_table extends table_sql {
         $uniqueid = 'certifygen-activity-teacher-view';
         parent::__construct($uniqueid);
         // Define the list of columns to show.
-        $columns = ['fullname', 'code', 'status', 'dateissued', 'emit', 'download', 'revoke' ];
+        $columns = ['fullname', 'status', 'dateissued', 'emit', 'download', 'revoke' ];
         $this->define_columns($columns);
         $validationplugin = $this->model->get('validation');
         $this->canrevoke = false;
@@ -95,7 +95,6 @@ class activityteacher_table extends table_sql {
         // Define the titles of columns to show in header.
         $headers = [
             get_string('fullname'),
-            get_string('code', 'mod_certifygen'),
             get_string('status', 'mod_certifygen'),
             get_string('date'),
             '',
@@ -178,18 +177,6 @@ class activityteacher_table extends table_sql {
         return get_string('status_'.$row->cstatus, 'mod_certifygen');
     }
 
-    /**
-     * @param $row
-     * @return mixed
-     * @throws moodle_exception
-     */
-    function col_code($row): string
-    {
-        if (empty($row->code)) {
-            return '';
-        }
-        return $row->code;
-    }
     /**
      * @param $row
      * @return string
