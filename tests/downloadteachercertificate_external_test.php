@@ -32,6 +32,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\invalid_persistent_exception;
 use mod_certifygen\external\downloadteachercertificate_external;
 use mod_certifygen\external\emitteacherrequest_external;
 use mod_certifygen\interfaces\ICertificateReport;
@@ -53,8 +54,9 @@ class downloadteachercertificate_external_test extends advanced_testcase {
 
     /**
      * @return void
-     * @throws \core\invalid_persistent_exception
+     * @throws invalid_persistent_exception
      * @throws coding_exception
+     * @throws dml_exception
      * @throws invalid_parameter_exception
      */
     public function test_downloadteachercertificate(): void {
@@ -86,13 +88,16 @@ class downloadteachercertificate_external_test extends advanced_testcase {
                 'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
         $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
 
+        // Login as student.
+        $this->setUser($teacher);
         // Create teacherrequest.
         $teacherrequest = $modgenerator->create_teacher_request($model->get('id'), $course->id, $teacher->id);
 
         // Emit certificate.
-        emitteacherrequest_external::emitteacherrequest($teacherrequest->get('id'));
+        $R = emitteacherrequest_external::emitteacherrequest($teacherrequest->get('id'));
         $teacherrequest = new certifygen_validations($teacherrequest->get('id'));
-        self::assertEquals(certifygen_validations::STATUS_FINISHED, $teacherrequest->get('status'));
+
+        self::assertEquals(certifygen_validations::STATUS_FINISHED, (int)$teacherrequest->get('status'));
         $localrepository = new certifygenrepository_localrepository\certifygenrepository_localrepository();
         $fileurl = $localrepository->getFileUrl($teacherrequest);
 
@@ -107,5 +112,71 @@ class downloadteachercertificate_external_test extends advanced_testcase {
         self::assertTrue($result['result']);
         self::assertEquals(get_string('ok', 'mod_certifygen'), $result['message']);
         self::assertEquals($fileurl, $result['url']);
+    }
+
+    /**
+     * @return void
+     * @throws invalid_persistent_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     */
+    public function test_downloadteachercertificate2(): void {
+
+        // Create course.
+        $course = self::getDataGenerator()->create_course();
+
+        // Create template.
+        $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
+        $certificate1 = $templategenerator->create_template((object)['name' => 'Certificate 1']);
+
+        // Create model.
+        $modgenerator = $this->getDataGenerator()->get_plugin_generator('mod_certifygen');
+        $model = $modgenerator->create_model_by_name(
+            certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
+            $certificate1->get_id(),
+            certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
+        );
+        $modgenerator->assign_model_coursecontext($model->get('id'), $course->id);
+
+        // Create user and enrol as teacher.
+        $teacher = $this->getDataGenerator()->create_user(
+            ['username' => 'test_user_1', 'firstname' => 'test',
+                'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+        $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'editingteacher');
+
+        $student = $this->getDataGenerator()->create_user(
+            ['username' => 'test_user_2', 'firstname' => 'test',
+                'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
+        $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
+
+        $student2 = $this->getDataGenerator()->create_user(
+            ['username' => 'test_user_3', 'firstname' => 'test',
+                'lastname' => 'user 3', 'email' => 'test_user_2@fake.es']);
+        $this->getDataGenerator()->enrol_user($student2->id, $course->id, 'student');
+
+        // Login as student.
+        $this->setUser($student2);
+
+        // Create teacherrequest.
+        $teacherrequest = $modgenerator->create_teacher_request($model->get('id'), $course->id, $teacher->id);
+
+        // Login as student.
+        $this->setUser($student2);
+
+        // Emit certificate.
+        emitteacherrequest_external::emitteacherrequest($teacherrequest->get('id'));
+        $teacherrequest = new certifygen_validations($teacherrequest->get('id'));
+        self::assertEquals(certifygen_validations::STATUS_NOT_STARTED, (int)$teacherrequest->get('status'));
+
+        // Download.
+        $result = downloadteachercertificate_external::downloadteachercertificate($teacherrequest->get('id'));
+
+        // Tests.
+        self::assertIsArray($result);
+        self::assertArrayHasKey('result', $result);
+        self::assertArrayHasKey('message', $result);
+        self::assertFalse($result['result']);
+        self::assertEquals(get_string('nopermissiontodownloadothercerts', 'mod_certifygen'), $result['message']);
     }
 }

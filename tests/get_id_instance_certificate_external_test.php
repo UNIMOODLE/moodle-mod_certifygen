@@ -50,9 +50,12 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
 
     /**
      * @return void
+     * @throws coding_exception
+     * @throws dml_exception
      * @throws invalid_parameter_exception
+     * @throws required_capability_exception
      */
-    public function test_get_id_instance_certificate(): void {
+    public function test_get_id_instance_certificate_nopermission(): void {
 
         // Create user.
         $user1 = $this->getDataGenerator()->create_user(
@@ -68,6 +71,46 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
         // Enrol user in course2 as student
         self::getDataGenerator()->enrol_user($user1->id, $course2->id, 'editingteacher');
         self::setUser($user1);
+
+        // Tests: Course with no mod_certifygen included.
+        $result = get_id_instance_certificate_external::get_id_instance_certificate($user1->id, '', '');
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('error', $result);
+        $this->assertIsArray($result['error']);
+        $this->assertArrayHasKey('code', $result['error']);
+        $this->assertArrayHasKey('message', $result['error']);
+        $this->assertEquals('nopermissiontogetcourses', $result['error']['code']);
+        $this->assertEquals(get_string('nopermissiontogetcourses', 'mod_certifygen'), $result['error']['message']);
+
+    }
+
+    /**
+     * @return void
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws required_capability_exception
+     */
+    public function test_get_id_instance_certificate(): void {
+        global $DB;
+
+        // Create user.
+        $user1 = $this->getDataGenerator()->create_user(
+            ['username' => 'test_user_1', 'firstname' => 'test', 'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+        $manager = $this->getDataGenerator()->create_user();
+        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        $this->getDataGenerator()->role_assign($managerrole->id, $manager->id);
+        $this->setUser($manager);
+
+        // Create courses.
+        $course1 = self::getDataGenerator()->create_course();
+        $course2 = self::getDataGenerator()->create_course();
+
+        // Enrol user in course1 as editingteacher
+        self::getDataGenerator()->enrol_user($user1->id, $course1->id, 'student');
+
+        // Enrol user in course2 as student
+        self::getDataGenerator()->enrol_user($user1->id, $course2->id, 'editingteacher');
 
         // Tests: Course with no mod_certifygen included.
         $result = get_id_instance_certificate_external::get_id_instance_certificate($user1->id, '', '');
@@ -144,10 +187,13 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
 
     /**
      * @return void
+     * @throws coding_exception
+     * @throws dml_exception
      * @throws invalid_parameter_exception
+     * @throws required_capability_exception
      */
     public function test_get_id_instance_certificate_by_userfield(): void {
-
+        global $DB;
         // Create user profile fields.
         $category = self::getDataGenerator()->create_custom_profile_field_category(['name' => 'Category 1']);
         $field = self::getDataGenerator()->create_custom_profile_field(
@@ -165,6 +211,10 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
             ['username' => 'test_user_1', 'firstname' => 'test', 'lastname' => 'user 1',
                 'email' => 'test_user_1@fake.es',
                 'profile_field_DNI' => $dni]);
+        $manager = $this->getDataGenerator()->create_user();
+        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        $this->getDataGenerator()->role_assign($managerrole->id, $manager->id);
+        $this->setUser($manager);
 
         // Create courses.
         $course1 = self::getDataGenerator()->create_course();
@@ -175,7 +225,6 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
 
         // Enrol user in course2 as student
         self::getDataGenerator()->enrol_user($user1->id, $course2->id, 'editingteacher');
-        self::setUser($user1);
 
         // Tests: Course with no mod_certifygen included.
         $result = get_id_instance_certificate_external::get_id_instance_certificate(0, $dni, '');
@@ -259,10 +308,13 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
 
     /**
      * @return void
+     * @throws coding_exception
+     * @throws dml_exception
      * @throws invalid_parameter_exception
+     * @throws required_capability_exception
      */
     public function test_get_id_instance_certificate_by_lang(): void {
-        global $CFG;
+        global $CFG, $DB;
 
         // Add the multilang filter. Make sure it's enabled globally.
         $CFG->filterall = true;
@@ -286,6 +338,10 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
             ['username' => 'test_user_1', 'firstname' => 'test', 'lastname' => 'user 1',
                 'email' => 'test_user_1@fake.es',
                 'profile_field_DNI' => $dni]);
+        $manager = $this->getDataGenerator()->create_user();
+        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        $this->getDataGenerator()->role_assign($managerrole->id, $manager->id);
+        $this->setUser($manager);
 
         // Create courses.
         $spanishname = 'Titulo en castellano';
@@ -302,7 +358,6 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
 
         // Enrol user in course2 as student
         self::getDataGenerator()->enrol_user($user1->id, $course2->id, 'editingteacher');
-        self::setUser($user1);
 
         // Tests: Course with no mod_certifygen included.
         $result = get_id_instance_certificate_external::get_id_instance_certificate(0, $dni, '');

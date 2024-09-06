@@ -99,11 +99,17 @@ class get_courses_as_teacher_external extends external_api {
             self::get_courses_as_teacher_parameters(), ['userid' => $userid, 'userfield' => $userfield, 'lang' => $lang]
         );
         $context = \context_system::instance();
-        require_capability('mod/certifygen:manage', $context);
         $results = ['courses' => [], 'teacher' => [], 'error' => []];
         $haserror = false;
         $courses = [];
         try {
+            if (!has_capability('mod/certifygen:manage', $context)) {
+                unset($results['courses']);
+                unset($results['teacher']);
+                $results['error']['code'] = 'nopermissiontogetcourses';
+                $results['error']['message'] = get_string('nopermissiontogetcourses', 'mod_certifygen');
+                return $results;
+            }
             // Choose user parameter.
             $uparam = mod_certifygen_validate_user_parameters_for_ws($params['userid'], $params['userfield']);
             if (array_key_exists('error', $uparam)) {

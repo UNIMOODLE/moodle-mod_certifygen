@@ -105,6 +105,8 @@ class revokecertificate_external_test extends advanced_testcase {
 
     /**
      * @return void
+     * @throws coding_exception
+     * @throws invalid_parameter_exception
      */
     public function test_revokecertificate(): void {
         $data = [

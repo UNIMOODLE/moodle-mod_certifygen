@@ -36,6 +36,7 @@ global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
 
 use coding_exception;
+use context_module;
 use core\invalid_persistent_exception;
 use external_api;
 use external_function_parameters;
@@ -89,7 +90,16 @@ class emitcertificate_external extends external_api {
         );
 
         $result = ['result' => true, 'message' => get_string('ok', 'mod_certifygen')];
+        [$course, $cm] = get_course_and_cm_from_instance($instanceid, 'certifygen');
 
+        if ($USER->id != $userid) {
+            $context = context_module::instance($cm->id);
+            if (!has_capability('mod/certifygen:canemitotherscertificates', $context)) {
+                $result['result'] = false;
+                $result['message'] = get_string('nopermissiontoemitothercerts', 'mod_certifygen');
+                return $result;
+            }
+        }
         // Step 1: Change status to in progress.
         $data = [
             'userid' => $userid,
@@ -115,7 +125,6 @@ class emitcertificate_external extends external_api {
             $users = user_get_users_by_id([$userid]);
             $user = reset($users);
             $certifygenmodel = new certifygen_model($modelid);
-            $course = get_course($courseid);
             $issueid = certifygen::issue_certificate($instanceid, $user, $certifygenmodel->get('templateid'), $course, $lang);
             $saved = false;
             if ($issueid) {

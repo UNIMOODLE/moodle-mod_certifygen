@@ -35,7 +35,12 @@
 namespace tests;
 
 use advanced_testcase;
+use coding_exception;
+use dml_exception;
+use invalid_parameter_exception;
 use mod_certifygen\external\searchcourse_external;
+use required_capability_exception;
+use restricted_context_exception;
 
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
@@ -55,7 +60,7 @@ class searchcourse_external_test extends advanced_testcase
     /**
      * @return void
      */
-    public function test_searchcourse(): void
+    public function test_searchcourse_nopermission(): void
     {
         // Create user and enrol as teacher.
         $user = $this->getDataGenerator()->create_user(
@@ -64,6 +69,44 @@ class searchcourse_external_test extends advanced_testcase
 
         // Login as user.
         $this->setUser($user);
+
+        $cat = self::getDataGenerator()->create_category();
+        self::getDataGenerator()->create_course(['fullname' => 'Matemáticas 1', 'category' => $cat->id]);
+        self::getDataGenerator()->create_course(['fullname' => 'Matemáticas 2', 'category' => $cat->id]);
+        $name = 'Biologia';
+        self::getDataGenerator()->create_course(['fullname' => $name, 'category' => $cat->id]);
+        $name2 = 'biologia 5';
+        self::getDataGenerator()->create_course(['fullname' => $name2, 'category' => $cat->id]);
+        $haserror = false;
+        try {
+            searchcourse_external::searchcourse('bi');
+        } catch (\moodle_exception $e) {
+            $haserror = true;
+        }
+        $this->assertTrue($haserror);
+    }
+
+    /**
+     * @return void
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws required_capability_exception
+     * @throws restricted_context_exception
+     */
+    public function test_searchcourse(): void
+    {
+        // Create user and enrol as teacher.
+        $user = $this->getDataGenerator()->create_user(
+            ['username' => 'test_user_2', 'firstname' => 'test',
+                'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
+
+        // Login as user.
+        global $DB;
+        $manager = $this->getDataGenerator()->create_user();
+        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        $this->getDataGenerator()->role_assign($managerrole->id, $manager->id);
+        $this->setUser($manager);
 
         $cat = self::getDataGenerator()->create_category();
         self::getDataGenerator()->create_course(['fullname' => 'Matemáticas 1', 'category' => $cat->id]);

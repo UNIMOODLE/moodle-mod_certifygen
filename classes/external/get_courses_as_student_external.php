@@ -33,6 +33,7 @@ namespace mod_certifygen\external;
 
 
 use certifygenfilter;
+use context_system;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
@@ -82,12 +83,19 @@ class get_courses_as_student_external extends external_api {
         $params = self::validate_parameters(
             self::get_courses_as_student_parameters(), ['userid' => $userid, 'userfield' => $userfield, 'lang' => $lang]
         );
-        $context = \context_system::instance();
-        require_capability('mod/certifygen:manage', $context);
+        $context = context_system::instance();
         $results = ['courses' => [], 'student' => [], 'error' => []];
         $haserror = false;
         $courses = [];
         try {
+            if (!has_capability('mod/certifygen:manage', $context)) {
+                unset($results['courses']);
+                unset($results['student']);
+                $results['error']['code'] = 'nopermissiontogetcourses';
+                $results['error']['message'] = get_string('nopermissiontogetcourses', 'mod_certifygen');
+                return $results;
+            }
+
             // Choose user parameter.
             $uparam = mod_certifygen_validate_user_parameters_for_ws($params['userid'], $params['userfield']);
             if (array_key_exists('error', $uparam)) {
@@ -117,7 +125,7 @@ class get_courses_as_student_external extends external_api {
                 return $results;
             }
             // Filter to return course names in $lang language.
-            $filter = new certifygenfilter(\context_system::instance(), [], $lang);
+            $filter = new certifygenfilter(context_system::instance(), [], $lang);
             // Get courses with a certifygen_model asociated where the user is student.
             $enrolments = enrol_get_all_users_courses($userid, true);
             foreach ($enrolments as $enrolment) {

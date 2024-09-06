@@ -36,6 +36,7 @@ global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
 
 use coding_exception;
+use context_module;
 use core\invalid_persistent_exception;
 use external_api;
 use external_function_parameters;
@@ -83,12 +84,20 @@ class downloadcertificate_external extends external_api {
             self::downloadcertificate_parameters(), ['id' => $validationid, 'instanceid' => $instanceid, 'modelid' => $modelid, 'code' => $code,
                 'courseid' => $courseid]
         );
-
+        global $USER;
         $result = ['result' => true, 'message' => 'OK', 'url' => ''];
 
         try {
             // Step 1: verified status finished.
             $validation = new certifygen_validations($validationid);
+            [$course, $cm] = get_course_and_cm_from_instance($instanceid, 'certifygen');
+            $context = context_module::instance($cm->id);
+            if ($USER->id != $validation->get('userid')
+                && !has_capability('mod/certifygen:canemitotherscertificates', $context)) {
+                $result['result'] = false;
+                $result['message'] = get_string('nopermissiontodownloadothercerts', 'mod_certifygen');
+                return $result;
+            }
             if (is_null($validation)) {
                 $result = ['result' => false, 'message' => 'notfound', 'url' => ''];
                 return $result;

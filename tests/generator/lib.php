@@ -75,6 +75,7 @@ class mod_certifygen_generator extends testing_module_generator {
 
         // Configure the platform.
         set_config('enabled',  1, 'certifygenrepository_localrepository');
+        set_config('enabled',  1, 'certifygenvalidation_none');
         $data = [
             'name' => $name,
             'idnumber' => '',
@@ -83,7 +84,7 @@ class mod_certifygen_generator extends testing_module_generator {
             'templateid' => $templateid,
             'timeondemmand' => 0,
             'langs' => 'en,es',
-            'validation' => '',
+            'validation' => 'certifygenvalidation_none',
             'report' => $type == certifygen_model::TYPE_ACTIVITY ? '' : 'certifygenreport_basic',
             'repository' => 'certifygenrepository_localrepository',
 

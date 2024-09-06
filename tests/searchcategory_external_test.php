@@ -54,7 +54,8 @@ class searchcategory_external_test extends advanced_testcase {
     /**
      * @return void
      */
-    public function test_searchcategory(): void {
+    public function test_searchcategory_nopermission(): void {
+
         // Create user and enrol as teacher.
         $user = $this->getDataGenerator()->create_user(
             ['username' => 'test_user_2', 'firstname' => 'test',
@@ -62,6 +63,40 @@ class searchcategory_external_test extends advanced_testcase {
 
         // Login as user.
         $this->setUser($user);
+
+        $name1 = 'Primaria 1';
+        self::getDataGenerator()->create_category(['name' => $name1]);
+        $name2 = 'primaria 2';
+        self::getDataGenerator()->create_category(['name' => $name2]);
+        self::getDataGenerator()->create_category(['name' => 'ESO 1']);
+        $haserror = false;
+        try {
+            searchcategory_external::searchcategory('Prim');
+        } catch (moodle_exception $e) {
+            $haserror = true;
+        }
+        $this->assertTrue($haserror);
+    }
+
+    /**
+     * @return void
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws moodle_exception
+     * @throws restricted_context_exception
+     */
+    public function test_searchcategory(): void {
+        global $DB;
+        $manager = $this->getDataGenerator()->create_user();
+        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        $this->getDataGenerator()->role_assign($managerrole->id, $manager->id);
+        $this->setUser($manager);
+
+        // Create user and enrol as teacher.
+        $user = $this->getDataGenerator()->create_user(
+            ['username' => 'test_user_2', 'firstname' => 'test',
+                'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
 
         $name1 = 'Primaria 1';
         $category1 = self::getDataGenerator()->create_category(['name' => $name1]);

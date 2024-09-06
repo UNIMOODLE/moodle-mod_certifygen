@@ -31,6 +31,7 @@
 
 namespace mod_certifygen\external;
 
+use context_system;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
@@ -62,14 +63,20 @@ class deleteteacherrequest_external extends external_api {
      * @throws invalid_parameter_exception
      */
     public static function deleteteacherrequest(int $id): array {
+        global $USER;
 
         self::validate_parameters(
             self::deleteteacherrequest_parameters(), ['id' => $id]
         );
-        $result = ['result' => true, 'message' => 'OK'];
+        $result = ['result' => true, 'message' => get_string('ok', 'mod_certifygen')];
         try {
+            $context = context_system::instance();
             $candelete = true;
             $request = new certifygen_validations($id);
+            if ($USER->id != $request->get('userid')
+            && !has_capability('mod/certifygen:viewcontextcertificates', $context)) {
+                return ['result' => false, 'message' => get_string('nopermissiondeleteteacherrequest', 'mod_certifygen')];
+            }
             $model = new certifygen_model($request->get('modelid'));
             $validationplugin = $model->get('validation');
             if (!empty($validationplugin) && $request->get('status') != certifygen_validations::STATUS_NOT_STARTED) {

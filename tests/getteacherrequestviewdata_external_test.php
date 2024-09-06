@@ -52,6 +52,8 @@ class getteacherrequestviewdata_external_test extends advanced_testcase {
 
     /**
      * @return void
+     * @throws coding_exception
+     * @throws dml_exception
      * @throws invalid_parameter_exception
      */
     public function test_getteacherrequestviewdata(): void {

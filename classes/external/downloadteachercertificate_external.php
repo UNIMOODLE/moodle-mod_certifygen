@@ -32,6 +32,7 @@
 namespace mod_certifygen\external;
 
 use coding_exception;
+use context_system;
 use core\invalid_persistent_exception;
 use external_api;
 use external_function_parameters;
@@ -64,7 +65,7 @@ class downloadteachercertificate_external extends external_api {
      * @throws invalid_persistent_exception
      */
     public static function downloadteachercertificate(int $id): array {
-
+        global $USER;
         self::validate_parameters(
             self::downloadteachercertificate_parameters(), ['id' => $id]
         );
@@ -74,6 +75,14 @@ class downloadteachercertificate_external extends external_api {
         try {
             // Step 1: verified status finished.
             $trequest = new certifygen_validations($id);
+            $context = context_system::instance();
+            if ($USER->id != $trequest->get('userid')
+            && !has_capability('mod/certifygen:canemitotherscertificates', $context)) {
+                $result['result'] = false;
+                $result['message'] = get_string('nopermissiontodownloadothercerts', 'mod_certifygen');
+                return $result;
+            }
+
             if (is_null($trequest)) {
                 $result = ['result' => false, 'message' => 'notfound', 'url' => ''];
                 return $result;

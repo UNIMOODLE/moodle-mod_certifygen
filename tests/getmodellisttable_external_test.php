@@ -52,9 +52,34 @@ class getmodellisttable_external_test extends advanced_testcase {
 
     /**
      * @return void
+     */
+    public function test_getmodellisttable_nopermision(): void {
+
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+        $haserror = false;
+        try {
+            getmodellisttable_external::getmodellisttable();
+        } catch (moodle_exception $e) {
+            $haserror = true;
+        }
+        $this->assertTrue($haserror);
+    }
+
+    /**
+     * @return void
+     * @throws coding_exception
+     * @throws dml_exception
      * @throws invalid_parameter_exception
+     * @throws required_capability_exception
+     * @throws restricted_context_exception
      */
     public function test_getmodellisttable(): void {
+        global $DB;
+        $manager = $this->getDataGenerator()->create_user();
+        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        $this->getDataGenerator()->role_assign($managerrole->id, $manager->id);
+        $this->setUser($manager);
 
         $result = getmodellisttable_external::getmodellisttable();
         // Tests.

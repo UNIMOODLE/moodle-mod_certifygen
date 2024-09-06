@@ -47,6 +47,13 @@ class emitteacherrequest_external_test extends advanced_testcase {
     public function setUp(): void {
         $this->resetAfterTest();
     }
+
+    /**
+     * @return void
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     */
     public function test_emitteacherrequest(): void {
 
         // Create course.
@@ -75,6 +82,8 @@ class emitteacherrequest_external_test extends advanced_testcase {
                 'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
         $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
 
+        $this->setUser($teacher);
+
         // Create teacherrequest.
         $teacherrequest = $modgenerator->create_teacher_request($model->get('id'), $course->id, $teacher->id);
         self::assertEquals(certifygen_validations::STATUS_NOT_STARTED, $teacherrequest->get('status'));
@@ -84,9 +93,62 @@ class emitteacherrequest_external_test extends advanced_testcase {
         // Tests.
         self::assertIsArray($result);
         self::assertArrayHasKey('result', $result);
-        self::assertArrayNotHasKey('message', $result);
+        self::assertArrayHasKey('message', $result);
         self::assertTrue($result['result']);
-        //TODO: change to STATUS_VALIDATION_OK
+        self::assertEquals(get_string('ok', 'mod_certifygen'), $result['message']);
         self::assertEquals(certifygen_validations::STATUS_FINISHED, $teacherrequest->get('status'));
+    }
+
+    /**
+     * @return void
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     */
+    public function test_emitteacherrequest2(): void {
+
+        // Create course.
+        $course = self::getDataGenerator()->create_course();
+
+        // Create template.
+        $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
+        $certificate1 = $templategenerator->create_template((object)['name' => 'Certificate 1']);
+
+        // Create model.
+        $modgenerator = $this->getDataGenerator()->get_plugin_generator('mod_certifygen');
+        $model = $modgenerator->create_model_by_name(
+            certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
+            $certificate1->get_id(),
+            certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
+        );
+        $modgenerator->assign_model_coursecontext($model->get('id'), $course->id);
+
+        // Create user and enrol as teacher.
+        $teacher = $this->getDataGenerator()->create_user(
+            ['username' => 'test_user_1', 'firstname' => 'test',
+                'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+        $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'editingteacher');
+        $teacher2 = $this->getDataGenerator()->create_user(
+            ['username' => 'test_user_3', 'firstname' => 'test',
+                'lastname' => 'user 3', 'email' => 'test_user_3@fake.es']);
+        $this->getDataGenerator()->enrol_user($teacher2->id, $course->id, 'editingteacher');
+        $student = $this->getDataGenerator()->create_user(
+            ['username' => 'test_user_2', 'firstname' => 'test',
+                'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
+        $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
+
+        $this->setUser($teacher2);
+
+        // Create teacherrequest.
+        $teacherrequest = $modgenerator->create_teacher_request($model->get('id'), $course->id, $teacher->id);
+        self::assertEquals(certifygen_validations::STATUS_NOT_STARTED, $teacherrequest->get('status'));
+        $result = emitteacherrequest_external::emitteacherrequest($teacherrequest->get('id'));
+
+        // Tests.
+        self::assertIsArray($result);
+        self::assertArrayHasKey('result', $result);
+        self::assertArrayHasKey('message', $result);
+        self::assertEquals(get_string('nopermissiontoemitothercerts', 'mod_certifygen'), $result['message']);
+        self::assertFalse($result['result']);
     }
 }

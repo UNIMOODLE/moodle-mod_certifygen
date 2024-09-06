@@ -80,11 +80,17 @@ class get_id_instance_certificate_external extends external_api {
             self::get_id_instance_certificate_parameters(), ['userid' => $userid, 'userfield' => $userfield, 'lang' => $lang]
         );
         $context = \context_system::instance();
-        require_capability('mod/certifygen:manage', $context);
         $results = ['error' => []];
         $haserror = false;
         $instances = [];
         try {
+            if (!has_capability('mod/certifygen:manage', $context)) {
+                unset($results['courses']);
+                unset($results['teacher']);
+                $results['error']['code'] = 'nopermissiontogetcourses';
+                $results['error']['message'] = get_string('nopermissiontogetcourses', 'mod_certifygen');
+                return $results;
+            }
             // Choose user parameter.
             $uparam = mod_certifygen_validate_user_parameters_for_ws($params['userid'], $params['userfield']);
             if (array_key_exists('error', $uparam)) {

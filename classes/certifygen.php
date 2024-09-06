@@ -477,7 +477,7 @@ class certifygen {
             }
         } else {
             $result['result'] = false;
-            $result['message'] = 'plugin_not_enabled';
+            $result['message'] = 'validationplugin_not_enabled';
             $validation->set('status', certifygen_validations::STATUS_ERROR);
             $validation->save();
         }

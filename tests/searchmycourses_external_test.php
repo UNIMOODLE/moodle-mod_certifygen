@@ -35,8 +35,13 @@
 namespace tests;
 
 use advanced_testcase;
+use coding_exception;
+use dml_exception;
+use invalid_parameter_exception;
 use mod_certifygen\external\searchmycourses_external;
 use mod_certifygen\persistents\certifygen_model;
+use moodle_exception;
+use restricted_context_exception;
 
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
@@ -55,6 +60,11 @@ class searchmycourses_external_test extends advanced_testcase
 
     /**
      * @return void
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws moodle_exception
+     * @throws restricted_context_exception
      */
     public function test_searchmycourses_notenrolled(): void
     {
@@ -95,8 +105,14 @@ class searchmycourses_external_test extends advanced_testcase
         self::assertArrayHasKey('overflow', $result);
         self::assertCount(0, $result['list']);
     }
+
     /**
      * @return void
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws moodle_exception
+     * @throws restricted_context_exception
      */
     public function test_searchmycourses_enrolled(): void
     {

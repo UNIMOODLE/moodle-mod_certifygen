@@ -62,13 +62,16 @@ class deletemodel_external extends external_api {
      */
     public static function deletemodel(int $id): array {
 
+        global $USER;
         self::validate_parameters(
             self::deletemodel_parameters(), ['id' => $id]
         );
         $context = context_system::instance();
-        require_capability('mod/certifygen:manage', $context);
         $result = ['result' => true, 'message' => 'OK'];
         try {
+            if (!has_capability('mod/certifygen:manage', $context)) {
+                return ['result' => false, 'message' => get_string('nopermissiondeletemodel', 'mod_certifygen')];
+            }
             $cemited = mod_certifygen_are_there_any_certificate_emited($id);
             if ($cemited) {
                 return ['result' => false, 'message' => get_string('cannotdeletemodelcertemited', 'mod_certifygen')];

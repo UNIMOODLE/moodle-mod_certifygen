@@ -45,7 +45,23 @@ class deletemodel_external_test extends advanced_testcase {
     public function setUp(): void {
         $this->resetAfterTest();
     }
+
+    /**
+     * @throws coding_exception
+     * @throws invalid_parameter_exception
+     * @throws dml_exception
+     */
     public function test_deletemodel(): void {
+        global $DB;
+
+        $user = $this->getDataGenerator()->create_user(
+            ['username' => 'test_manager_1', 'firstname' => 'test',
+                'lastname' => 'manager 1', 'email' => 'test_manager_1@fake.es']);
+
+        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        $this->getDataGenerator()->role_assign($managerrole->id, $user->id);
+
+        $this->setUser($user);
 
         // Create template.
         $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
@@ -65,8 +81,46 @@ class deletemodel_external_test extends advanced_testcase {
         $this->assertEquals(1, $count);
 
         // Delete model.
-        deletemodel_external::deletemodel($model->get('id'));
+        $result = deletemodel_external::deletemodel($model->get('id'));
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('result', $result);
+        $this->assertArrayHasKey('message', $result);
+        $this->assertTrue($result['result']);
+        $this->assertEquals(get_string('ok', 'mod_certifygen'), $result['message']);
         $count = certifygen_model::count_records();
         $this->assertEquals(0, $count);
+    }
+
+    /**
+     * @return void
+     * @throws coding_exception
+     * @throws invalid_parameter_exception
+     */
+    public function test_deletemodel2(): void {
+
+        // Create template.
+        $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
+        $certificate1 = $templategenerator->create_template((object)['name' => 'Certificate 1']);
+
+        // Create model.
+        $modgenerator = $this->getDataGenerator()->get_plugin_generator('mod_certifygen');
+        $model = $modgenerator->create_model_by_name(
+            certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
+            $certificate1->get_id(),
+            certifygen_model::TYPE_TEACHER_ALL_COURSES_USED
+        );
+
+        // Assertion model exists.
+        $this->assertTrue($model->get('id') > 0);
+        $count = certifygen_model::count_records();
+        $this->assertEquals(1, $count);
+
+        // Delete model.
+        $result = deletemodel_external::deletemodel($model->get('id'));
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('result', $result);
+        $this->assertArrayHasKey('message', $result);
+        $this->assertFalse($result['result']);
+        $this->assertEquals(get_string('nopermissiondeletemodel', 'mod_certifygen'), $result['message']);
     }
 }

@@ -51,7 +51,10 @@ class getmycertificatedata_external_test extends advanced_testcase {
 
     /**
      * @return void
+     * @throws coding_exception
+     * @throws dml_exception
      * @throws invalid_parameter_exception
+     * @throws moodle_exception
      */
     public function test_getmycertificatedata(): void {
 

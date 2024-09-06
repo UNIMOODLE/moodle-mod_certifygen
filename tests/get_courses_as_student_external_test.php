@@ -49,13 +49,55 @@ class get_courses_as_student_external_test extends advanced_testcase {
 
     /**
      * @return void
+     * @throws coding_exception
+     * @throws dml_exception
      * @throws invalid_parameter_exception
+     * @throws required_capability_exception
      */
-    public function test_get_courses_as_student_with_no_certifygen(): void {
+    public function test_get_courses_as_student_nopermission(): void {
 
         // Create user.
         $user1 = $this->getDataGenerator()->create_user(
             ['username' => 'test_user_1', 'firstname' => 'test', 'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+
+        // Create courses.
+        $course1 = self::getDataGenerator()->create_course();
+        $course2 = self::getDataGenerator()->create_course();
+
+        // Enrol user in course1 as editingteacher
+        self::getDataGenerator()->enrol_user($user1->id, $course1->id, 'student');
+
+        // Enrol user in course2 as student
+        self::getDataGenerator()->enrol_user($user1->id, $course2->id, 'editingteacher');
+
+        // Tests.
+        $result = get_courses_as_student_external::get_courses_as_student($user1->id, '', '');
+        $this->assertIsArray($result);
+        $this->assertArrayNotHasKey('courses', $result);
+        $this->assertArrayHasKey('error', $result);
+        $this->assertIsArray($result['error']);
+        $this->assertArrayHasKey('code', $result['error']);
+        $this->assertArrayHasKey('message', $result['error']);
+        $this->assertEquals('nopermissiontogetcourses', $result['error']['code']);
+        $this->assertEquals(get_string('nopermissiontogetcourses', 'mod_certifygen'), $result['error']['message']);
+    }
+
+    /**
+     * @return void
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws required_capability_exception
+     */
+    public function test_get_courses_as_student_with_no_certifygen(): void {
+        global $DB;
+        // Create user.
+        $user1 = $this->getDataGenerator()->create_user(
+            ['username' => 'test_user_1', 'firstname' => 'test', 'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+
+        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        $this->getDataGenerator()->role_assign($managerrole->id, $user1->id);
+        $this->setUser($user1);
 
         // Create courses.
         $course1 = self::getDataGenerator()->create_course();
@@ -82,13 +124,20 @@ class get_courses_as_student_external_test extends advanced_testcase {
 
     /**
      * @return void
+     * @throws coding_exception
+     * @throws dml_exception
      * @throws invalid_parameter_exception
+     * @throws required_capability_exception
      */
     public function test_get_courses_as_student(): void {
-
+        global $DB;
         // Create user.
         $user1 = $this->getDataGenerator()->create_user(
             ['username' => 'test_user_1', 'firstname' => 'test', 'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+        $manager = $this->getDataGenerator()->create_user();
+        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        $this->getDataGenerator()->role_assign($managerrole->id, $manager->id);
+        $this->setUser($manager);
 
         // Create courses.
         $course1 = self::getDataGenerator()->create_course();
@@ -147,13 +196,16 @@ class get_courses_as_student_external_test extends advanced_testcase {
         $this->assertEquals($user1->id, $result['student']['id']);
         $this->assertEquals(fullname($user1), $result['student']['fullname']);
     }
+
     /**
      * @return void
+     * @throws coding_exception
+     * @throws dml_exception
      * @throws invalid_parameter_exception
+     * @throws required_capability_exception
      */
     public function test_get_courses_as_student_by_userfield(): void {
-
-
+        global $DB;
         // Create user profile fields.
         $category = self::getDataGenerator()->create_custom_profile_field_category(['name' => 'Category 1']);
         $field = self::getDataGenerator()->create_custom_profile_field(
@@ -171,6 +223,10 @@ class get_courses_as_student_external_test extends advanced_testcase {
             ['username' => 'test_user_1', 'firstname' => 'test',
                 'lastname' => 'user 1', 'email' => 'test_user_1@fake.es',
                 'profile_field_DNI' => $dni]);
+        $manager = $this->getDataGenerator()->create_user();
+        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        $this->getDataGenerator()->role_assign($managerrole->id, $manager->id);
+        $this->setUser($manager);
 
         // Create courses.
         $course1 = self::getDataGenerator()->create_course();
@@ -229,8 +285,16 @@ class get_courses_as_student_external_test extends advanced_testcase {
         $this->assertEquals($user1->id, $result['student']['id']);
         $this->assertEquals(fullname($user1), $result['student']['fullname']);
     }
-    public function test_get_courses_as_student_by_userfield_username(): void {
 
+    /**
+     * @return void
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws required_capability_exception
+     */
+    public function test_get_courses_as_student_by_userfield_username(): void {
+        global $DB;
         // Configure the platform.
         set_config('userfield', 'username', 'mod_certifygen');
 
@@ -239,6 +303,10 @@ class get_courses_as_student_external_test extends advanced_testcase {
         $user1 = $this->getDataGenerator()->create_user(
             ['username' => $field, 'firstname' => 'test',
                 'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+        $manager = $this->getDataGenerator()->create_user();
+        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        $this->getDataGenerator()->role_assign($managerrole->id, $manager->id);
+        $this->setUser($manager);
         $id = (int) $user1->id;
         // Create courses.
         $course1 = self::getDataGenerator()->create_course();
@@ -321,12 +389,16 @@ class get_courses_as_student_external_test extends advanced_testcase {
         $this->assertArrayHasKey('message', $result['error']);
         $this->assertEquals('user_not_found', $result['error']['code']);
     }
+
     /**
      * @return void
+     * @throws coding_exception
+     * @throws dml_exception
      * @throws invalid_parameter_exception
+     * @throws required_capability_exception
      */
     public function test_get_courses_as_student_by_lang(): void {
-        global $CFG;
+        global $CFG, $DB;
 
         // Add the multilang filter. Make sure it's enabled globally.
         $CFG->filterall = true;
@@ -337,6 +409,10 @@ class get_courses_as_student_external_test extends advanced_testcase {
         $user1 = $this->getDataGenerator()->create_user(
             ['username' => 'test_user_1', 'firstname' => 'test',
                 'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+        $manager = $this->getDataGenerator()->create_user();
+        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        $this->getDataGenerator()->role_assign($managerrole->id, $manager->id);
+        $this->setUser($manager);
 
         // Create courses.
         $spanishname = 'Titulo en castellano';

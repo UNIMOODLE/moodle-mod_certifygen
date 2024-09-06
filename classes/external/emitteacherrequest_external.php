@@ -78,6 +78,14 @@ class emitteacherrequest_external extends external_api {
 
         // Step 1: Change status to in progress.
         $teacherrequest = new certifygen_validations($id);
+        if ($USER->id != $teacherrequest->get('userid')) {
+            $context = context_system::instance();
+            if (!has_capability('mod/certifygen:viewcontextcertificates', $context)) {
+                $result['result'] = false;
+                $result['message'] = get_string('nopermissiontoemitothercerts', 'mod_certifygen');
+                return $result;
+            }
+        }
         $teacherrequest->set('status', certifygen_validations::STATUS_IN_PROGRESS);
         $teacherrequest->save();
         try {
