@@ -109,7 +109,6 @@ class associatecontextform extends dynamic_form {
     protected function check_access_for_dynamic_submission(): void
     {
         if (!has_capability('mod/certifygen:manage', $this->get_context_for_dynamic_submission())) {
-            error_log(__FUNCTION__ .' nopermissions: ');
             throw new moodle_exception('nopermissions', 'error', '', 'manage models');
         }
     }
