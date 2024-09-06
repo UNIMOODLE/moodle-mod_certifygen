@@ -106,4 +106,12 @@ class certifygenrepository_csv implements ICertificateRepository
     {
         return false;
     }
+
+    /**
+     * @return string[]
+     */
+    public function get_consistent_validation_plugins(): array
+    {
+        return ['certifygenvalidation_csv'];
+    }
 }

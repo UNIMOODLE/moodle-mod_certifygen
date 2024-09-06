@@ -41,6 +41,7 @@ use core\invalid_persistent_exception;
 use core_form\dynamic_form;
 use dml_exception;
 use html_writer;
+use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
 use moodle_exception;
@@ -260,6 +261,18 @@ class modelform extends dynamic_form {
         if (!array_key_exists('langs', $data)
         || (array_key_exists('langs', $data) && empty($data['langs']))) {
             $errors['langs'] = get_string('required');
+        }
+        // Confirm validation-repository plugins selected
+        $repositoryplugin = $data['repository'];
+        $repositorypluginclass = $repositoryplugin . '\\' . $repositoryplugin;
+        /** @var ICertificateRepository $subplugin */
+        $subplugin = new $repositorypluginclass();
+        $validplugins = $subplugin->get_consistent_validation_plugins();
+        if (!empty($validplugins) && !in_array($data['validation'], $validplugins)) {
+            $a = new \stdClass();
+            $a->validation = get_string('pluginname', $data['validation']);
+            $a->repository = get_string('pluginname', $repositoryplugin);
+            $errors['repository'] = get_string('repositorynotvalidwithvalidationplugin', 'mod_certifygen', $a);
         }
         return $errors;
     }

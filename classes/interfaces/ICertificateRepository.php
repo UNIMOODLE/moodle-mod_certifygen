@@ -41,5 +41,8 @@ interface ICertificateRepository {
     public function saveFile(stored_file $file): array;
     // Saves file url on db.
     public function saveFileUrl(): bool;
+    // Return the list of validation plugin names this repository is valid with.
+    // Empty means all of them are valid.
+    public function get_consistent_validation_plugins(): array;
 }
 

@@ -121,4 +121,12 @@ class certifygenrepository_localrepository implements ICertificateRepository
     {
         return false;
     }
+
+    /**
+     * @return array
+     */
+    public function get_consistent_validation_plugins(): array
+    {
+        return [];
+    }
 }

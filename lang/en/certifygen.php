@@ -181,3 +181,4 @@ $string['nopermissiontodownloadothercerts'] = 'You have no permission to downloa
 $string['nopermissiondeletemodel'] = 'You have no permission to delete a model';
 $string['nopermissiondeleteteacherrequest'] = 'You have no permission to delete this request';
 $string['nopermissiontogetcourses'] = 'You have no permission to get courses';
+$string['repositorynotvalidwithvalidationplugin'] = '{$a->repository} repository plugin is not compatible with {$a->validation} validation plugin.';

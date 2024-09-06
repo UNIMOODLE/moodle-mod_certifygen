@@ -130,4 +130,12 @@ class certifygenrepository_onedrive implements ICertificateRepository
     {
         return true;
     }
+
+    /**
+     * @return array
+     */
+    public function get_consistent_validation_plugins(): array
+    {
+        return [];
+    }
 }
