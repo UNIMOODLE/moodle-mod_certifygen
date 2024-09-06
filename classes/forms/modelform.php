@@ -135,7 +135,7 @@ class modelform extends dynamic_form {
         if (!$cemited) {
             $mform->addElement('select', 'langs', get_string('langs', 'mod_certifygen'), $langs);
             $mform->getElement('langs')->setMultiple(true);
-            $mform->setType('langs', PARAM_RAW);
+            //$mform->setType('langs', PARAM_RAW);
             $mform->addRule('langs', get_string('required'), 'required');
         } else {
             $langstrings = $model->get('langs');
@@ -253,5 +253,14 @@ class modelform extends dynamic_form {
     protected function get_page_url_for_dynamic_submission(): moodle_url
     {
         return new moodle_url('/mod/certifygen/modelmanager.php');
+    }
+    function validation($data, $files) {
+        $errors = [];
+
+        if (!array_key_exists('langs', $data)
+        || (array_key_exists('langs', $data) && empty($data['langs']))) {
+            $errors['langs'] = get_string('required');
+        }
+        return $errors;
     }
 }
