@@ -83,7 +83,7 @@ class modelform extends dynamic_form {
         $mform->addRule('mode', get_string('required'), 'required');
 
         // Timeondemmand.
-        $mform->addElement('text', 'timeondemmand',
+        $mform->addElement('duration', 'timeondemmand',
             get_string('timeondemmand', 'mod_certifygen'));
         $mform->setType('timeondemmand', PARAM_INT);
         $mform->addHelpButton('timeondemmand', 'timeondemmand', 'mod_certifygen');
