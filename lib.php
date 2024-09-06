@@ -308,13 +308,9 @@ function mod_certifygen_myprofile_navigation(core_user\output\myprofile\tree $tr
     if ($USER->id == $user->id
         && certifygen_context::can_i_see_teacherrequestlink($user->id)) {
 
-            $coursedetailscategory = new core_user\output\myprofile\category('mycertifygens',
-                get_string('pluginname', 'mod_certifygen'), 'coursedetails');
-            $tree->add_category($coursedetailscategory);
-
             $link = get_string('mycertificates', 'mod_certifygen');
             $url = new moodle_url('/mod/certifygen/mycertificates.php');
-            $node = new core_user\output\myprofile\node('mycertifygens', 'modcertifygenmy', $link, null, $url);
+            $node = new core_user\output\myprofile\node('miscellaneous', 'modcertifygenmy', $link, null, $url);
             $tree->add_node($node);
         }
 }
