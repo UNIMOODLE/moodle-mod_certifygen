@@ -55,9 +55,7 @@ class mod_certifygen_mod_form extends moodleform_mod {
         $mform->addRule('name', get_string('required'), 'required');
 
         $this->standard_intro_elements(get_string('introduction', 'mod_certifygen'));
-
-        //TODO: capability.
-        $canmanagemodels = true;
+        $canmanagemodels = has_capability('mod/certifygen:manage', context_system::instance());
         $activitymodels =  mod_certifygen_get_activity_models($this->get_course()->id);
         $templateoptions = ['' => get_string('chooseamodel', 'mod_certifygen')] + $activitymodels;
         $manageurl = new moodle_url('/mod/certifygen/modelmanager.php');
