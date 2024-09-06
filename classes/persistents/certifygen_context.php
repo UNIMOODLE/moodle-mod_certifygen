@@ -45,6 +45,7 @@ class certifygen_context extends persistent {
     public const TABLE = 'certifygen_context';
     public const CONTEXT_TYPE_COURSE = 1;
     public const CONTEXT_TYPE_CATEGORY = 2;
+    public const CONTEXT_TYPE_SYSTEM = 3;
 
     /**
      * Define properties
