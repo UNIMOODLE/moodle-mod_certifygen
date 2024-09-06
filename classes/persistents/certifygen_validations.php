@@ -209,7 +209,7 @@ class certifygen_validations extends persistent {
             'certifygenid' => 0,
         ];
         $sql = "SELECT tr.id, tr.name, tr.modelid, tr.status, tr.lang, tr.courses, tr.userid, tr.timecreated, m.validation,
-       m.report, m.mode, m.timeondemmand
+       m.report, m.mode, m.timeondemmand, m.validation
         FROM {certifygen_model} m 
         INNER JOIN {certifygen_validations} tr ON tr.modelid = m.id
         WHERE tr.userid = :userid

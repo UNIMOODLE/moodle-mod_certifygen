@@ -57,6 +57,7 @@ class activityteacher_table extends table_sql {
     private string $lang;
     private string $langstring;
     private bool $canrevoke;
+    private array $statusmessages;
 
     /**
      * Constructor
@@ -85,13 +86,14 @@ class activityteacher_table extends table_sql {
         $context = context_course::instance($courseid);
         $contextmodule = \context_module::instance($cm->id);
         $this->context = $contextmodule;
-        if (has_capability('moodle/course:managegroups', $context) && empty($validationplugin)) {
-            $this->canrevoke = true;
-        } else if (has_capability('moodle/course:managegroups', $context) && !empty($validationplugin)) {
-            $validationpluginclass = $validationplugin . '\\' . $validationplugin;
-            $subplugin = new $validationpluginclass();
+        $validationpluginclass = $validationplugin . '\\' . $validationplugin;
+        /** @var ICertificateValidation $subplugin */
+        $subplugin = new $validationpluginclass();
+        if (has_capability('moodle/course:managegroups', $context) && !empty($validationplugin)) {
             $this->canrevoke = $subplugin->canRevoke($course->id);
         }
+        // Messages.
+        $this->statusmessages = $subplugin->getStatusMessages();
         // Define the titles of columns to show in header.
         $headers = [
             get_string('fullname'),
@@ -174,7 +176,14 @@ class activityteacher_table extends table_sql {
         if (empty($row->cstatus)) {
             return get_string('status_1', 'mod_certifygen');
         }
-        return get_string('status_'.$row->cstatus, 'mod_certifygen');
+        $status = get_string('status_' . $row->cstatus, 'mod_certifygen');
+        if (!empty($this->statusmessages) && array_key_exists($row->cstatus, $this->statusmessages)) {
+            $tooltip = $this->statusmessages[$row->cstatus];
+            $status = '<button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="'.$tooltip.'">
+                        '.get_string('status_'.$row->cstatus, 'mod_certifygen') . '
+                        </button>';
+        }
+        return $status;
     }
 
     /**

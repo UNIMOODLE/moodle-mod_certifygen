@@ -198,4 +198,13 @@ class certifygenvalidation_webservice implements ICertificateValidation
         );
         $fs->create_file_from_storedfile($filerecord, $original);
     }
+    /**
+     * Returns an array of strings associated to certifiacte status to be shown on
+     * activityteacher_table and profile_my_certificates_table
+     */
+    public function getStatusMessages(): array {
+        return [
+            certifygen_validations::STATUS_IN_PROGRESS => get_string('inprogress_msg', 'certifygenvalidation_webservice'),
+        ];
+    }
 }

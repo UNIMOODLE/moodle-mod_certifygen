@@ -158,4 +158,11 @@ class certifygenvalidation_none implements ICertificateValidation
     {
         return false;
     }
+    /**
+     * Returns an array of strings associated to certifiacte status to be shown on
+     * activityteacher_table and profile_my_certificates_table
+     */
+    public function getStatusMessages(): array {
+        return [];
+    }
 }

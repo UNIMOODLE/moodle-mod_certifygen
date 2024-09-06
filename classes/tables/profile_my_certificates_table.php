@@ -36,6 +36,7 @@ require_once($CFG->libdir . '/tablelib.php');
 
 use coding_exception;
 use dml_exception;
+use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
@@ -104,7 +105,23 @@ class profile_my_certificates_table extends table_sql {
      */
     function col_status(stdClass $row): string
     {
-        return get_string('status_' . $row->status, 'mod_certifygen');
+
+        $status = get_string('status_' . $row->status, 'mod_certifygen');
+        if (empty($row->status)) {
+            return $status;
+        }
+        $validationplugin = $row->validation;
+        $validationpluginclass = $validationplugin . '\\' . $validationplugin;
+        /** @var ICertificateValidation $subplugin */
+        $subplugin = new $validationpluginclass();
+        $statusmessages = $subplugin->getStatusMessages();
+        if (!empty($statusmessages) && array_key_exists($row->status, $statusmessages)) {
+            $tooltip = $statusmessages[$row->status];
+            $status = '<button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="'.$tooltip.'">
+                        '.get_string('status_'.$row->status, 'mod_certifygen') . '
+                        </button>';
+        }
+        return $status;
     }
 
     /**
