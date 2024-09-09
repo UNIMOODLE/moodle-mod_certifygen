@@ -88,6 +88,7 @@ class teacherrequestform extends dynamic_form {
         ];
         $mform->addElement('autocomplete', 'courses',
             get_string('courseslist', 'mod_certifygen'), [], $options);
+        $mform->addRule('courses', get_string('required'), 'required');
 
         // Hidden elements.
         $mform->addElement('hidden', 'id', 0);
@@ -161,5 +162,15 @@ class teacherrequestform extends dynamic_form {
     protected function get_page_url_for_dynamic_submission(): moodle_url
     {
         return new moodle_url('/mod/certifygen/mycertificates.php');
+    }
+    function validation($data, $files) {
+        $errors = [];
+
+        if (!array_key_exists('courses', $data)
+            || (array_key_exists('courses', $data) && empty($data['courses']))) {
+            $errors['courses'] = get_string('required');
+        }
+
+        return $errors;
     }
 }
