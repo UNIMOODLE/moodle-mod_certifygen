@@ -46,7 +46,6 @@ $string['type'] = 'Type';
 $string['type_help'] = 'Types help';
 $string['type_1'] = 'Course completion (for students)';
 $string['type_2'] = 'Course used (for teachers)';
-$string['type_3'] = 'All courses used (for teachers)';
 $string['mode'] = 'Mode';
 $string['mode_help'] = 'Mode help';
 $string['mode_1'] = 'Unique';

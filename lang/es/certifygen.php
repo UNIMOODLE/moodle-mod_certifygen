@@ -47,7 +47,6 @@ $string['type'] = 'Tipo';
 $string['type_help'] = 'Tipos help';
 $string['type_1'] = 'Curso completo (para alumnos)';
 $string['type_2'] = 'Uso del curso (for teachers)';
-$string['type_3'] = 'All courses used (for teachers)';
 $string['mode'] = 'Modo';
 $string['mode_help'] = 'Modo help';
 $string['mode_1'] = 'Único';
