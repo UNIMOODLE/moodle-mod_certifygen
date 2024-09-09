@@ -18,7 +18,7 @@
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 /**
- * @package   certifygenrepository_onedrive
+ * @package   certifygenvalidation_none
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
@@ -28,10 +28,9 @@
 // This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Repositorio Onedrive';
-$string['pluginnamesettings'] = 'Configuración del Repositorio Onedrive';
-$string['enable'] = 'Habilitar';
-$string['enable_help'] = 'Este repositorio guarda los certificados en uno de los repositorios habilitados de la plataforma.';
-$string['settings_folder'] = 'Carpeta';
-$string['settings_folder_desc'] = 'Directorio en Onedrive done se van a almacenar los certificados';
-$string['privacy:metadata'] = 'El plugin Certifygen Repositorio Onedrive no almacena datos personales.';
+$string['pluginname'] = 'Certifygen Balioztapenik Gabe';
+$string['enable'] = 'Gaitu';
+$string['enable_help'] = 'Plugin hau gaituta dagoenean, Unimoodle ziurtagiriak web zerbitzuak erabiliz balioztatzeko erabil dezakezu';
+$string['certifygenvalidation_none_settings'] = 'Certifygen Balioztapenik Gabe Konfigurazioa';
+$string['pluginnamesettings'] = 'Certifygen Balioztapenik Gabe Konfigurazioa';
+$string['privacy:metadata'] = 'Certifygen Balioztapenik Gabe pluginak ez du datu pertsonalik gordetzen.';

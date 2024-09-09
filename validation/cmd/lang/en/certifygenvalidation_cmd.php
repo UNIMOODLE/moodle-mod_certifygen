@@ -37,3 +37,7 @@ $string['certifygenvalidation_cmd_settings'] = 'Configuración del CMD';
 $string['cmdnotconfigured'] = 'CMD not configured';
 $string['pluginnamesettings'] = 'CMD Validation Configuration';
 $string['privacy:metadata'] = 'The CMD Validation plugin does not store any personal data.';
+$string['originalfilespath'] = 'Original Files Path';
+$string['originalfilespath_help'] = 'Server path to allocate original certificates';
+$string['validatedfilespath'] = 'Validated Files Path';
+$string['validatedfilespath_help'] = 'Server path to allocate validated certificates';

@@ -18,7 +18,7 @@
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 /**
- * @package   certifygenrepository_onedrive
+ * @package   certifygenrepository_localrepository
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
@@ -28,10 +28,8 @@
 // This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Repositorio Onedrive';
-$string['pluginnamesettings'] = 'Configuración del Repositorio Onedrive';
+$string['pluginname'] = 'Certifygen Repositorio Local';
+$string['pluginnamesettings'] = 'Configuración del Repositorio Local';
 $string['enable'] = 'Habilitar';
-$string['enable_help'] = 'Este repositorio guarda los certificados en uno de los repositorios habilitados de la plataforma.';
-$string['settings_folder'] = 'Carpeta';
-$string['settings_folder_desc'] = 'Directorio en Onedrive done se van a almacenar los certificados';
-$string['privacy:metadata'] = 'El plugin Certifygen Repositorio Onedrive no almacena datos personales.';
+$string['enable_help'] = 'Este repositorio guarda en el moodledata los certificados.';
+$string['privacy:metadata'] = 'El plugin Certifygen Repositorio Local no almacena datos personales.';

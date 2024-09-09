@@ -18,7 +18,7 @@
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 /**
- * @package   certifygenrepository_onedrive
+ * @package   certifygenvalidation_csv
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
@@ -28,10 +28,18 @@
 // This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Repositorio Onedrive';
-$string['pluginnamesettings'] = 'Configuración del Repositorio Onedrive';
-$string['enable'] = 'Habilitar';
-$string['enable_help'] = 'Este repositorio guarda los certificados en uno de los repositorios habilitados de la plataforma.';
-$string['settings_folder'] = 'Carpeta';
-$string['settings_folder_desc'] = 'Directorio en Onedrive done se van a almacenar los certificados';
-$string['privacy:metadata'] = 'El plugin Certifygen Repositorio Onedrive no almacena datos personales.';
+$string['pluginname'] = 'CSV Balioztapena';
+$string['enable'] = 'Gaitu';
+$string['enable_help'] = 'Plugin hau gaituta dagoenean, Unimoodle ziurtagiriak balioztatzeko erabil dezakezu.';
+$string['firmacatalogservicewsdl'] = 'FirmaCatalogService Wsdl';
+$string['firmacatalogservicewsdl_help'] = 'Hau da FirmaCatalogService-aren wsdl-a lortzeko URLa. <span class="bold">Eskaera guztietan beharrezkoa da.</span>';
+$string['firmaquerycatalogservicewsdl'] = 'FirmaQueryCatalogService Wsdl';
+$string['firmaquerycatalogservicewsdl_help'] = 'Hau da FirmaQueryCatalogService-aren wsdl-a lortzeko URLa. <span class="bold">Eskaera guztietan beharrezkoa da.</span>';
+$string['appID'] = 'Aplikazio ID';
+$string['appID_help'] = 'Hau da aplikazioaren identifikatzailea. <span class="bold">Eskaera guztietan beharrezkoa da.</span>';
+$string['certifygenvalidation_csv_settings'] = 'CSV konfigurazioa';
+$string['csvnotconfigured'] = 'CSV ez dago konfiguraturik';
+$string['pluginnamesettings'] = 'CSV Balioztapenaren Konfigurazioa';
+$string['csv_result_not_expected'] = 'Endpointaren emaitza ez da espero zen';
+$string['privacy:metadata'] = 'CSV Balioztapen pluginak ez du datu pertsonalik gordetzen.';
+

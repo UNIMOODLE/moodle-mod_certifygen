@@ -18,7 +18,7 @@
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 /**
- * @package   certifygenrepository_onedrive
+ * @package   certifygenvalidation_webservice
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
@@ -28,10 +28,11 @@
 // This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Repositorio Onedrive';
-$string['pluginnamesettings'] = 'Configuración del Repositorio Onedrive';
+$string['pluginname'] = 'Validación WEBSERVICE';
 $string['enable'] = 'Habilitar';
-$string['enable_help'] = 'Este repositorio guarda los certificados en uno de los repositorios habilitados de la plataforma.';
-$string['settings_folder'] = 'Carpeta';
-$string['settings_folder_desc'] = 'Directorio en Onedrive done se van a almacenar los certificados';
-$string['privacy:metadata'] = 'El plugin Certifygen Repositorio Onedrive no almacena datos personales.';
+$string['enable_help'] = 'Si este plugin está habilitado, puedes usarlo para validar Certificados Unimoodle a través de servicios web';
+$string['certifygenvalidation_webservice_settings'] = 'Configuración de WEBSERVICE';
+$string['webservicenotconfigured'] = 'Certifygen WEBSERVICE no configurado';
+$string['pluginnamesettings'] = 'Configuración de Validación WEBSERVICE';
+$string['privacy:metadata'] = 'El plugin de Validación WEBSERVICE no almacena ningún dato personal.';
+$string['inprogress_msg'] = 'Accede a la secretaría de tu universidad para continuar con el proceso de validación del certificado.';

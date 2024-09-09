@@ -18,7 +18,7 @@
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 /**
- * @package   certifygenrepository_onedrive
+ * @package   certifygenvalidation_electronic
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
@@ -28,10 +28,21 @@
 // This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Repositorio Onedrive';
-$string['pluginnamesettings'] = 'Configuración del Repositorio Onedrive';
+$string['pluginname'] = 'Validació ELECTRÒNICA';
 $string['enable'] = 'Habilitar';
-$string['enable_help'] = 'Este repositorio guarda los certificados en uno de los repositorios habilitados de la plataforma.';
-$string['settings_folder'] = 'Carpeta';
-$string['settings_folder_desc'] = 'Directorio en Onedrive done se van a almacenar los certificados';
-$string['privacy:metadata'] = 'El plugin Certifygen Repositorio Onedrive no almacena datos personales.';
+$string['enable_help'] = 'Si aquest complement està habilitat, pots utilitzar-lo per validar Certificats Unimoodle';
+$string['pluginnamesettings'] = 'Configuració de la Validació ELECTRÒNICA';
+$string['path'] = 'Ruta del Servei de Certificats';
+$string['pathdesc'] = 'Aquest camp és obligatori per utilitzar aquest complement de validació';
+$string['password'] = 'Contrasenya del Servei de Certificats';
+$string['passworddesc'] = 'Aquest camp és obligatori per utilitzar aquest complement de validació';
+$string['name'] = 'Nom del Certificat';
+$string['namedesc'] = 'Camp requerit per signar el certificat';
+$string['location'] = 'Ubicació del Certificat';
+$string['locationdesc'] = 'Camp requerit per signar el certificat';
+$string['reason'] = 'Raó del Certificat';
+$string['reasondesc'] = 'Camp requerit per signar el certificat';
+$string['contactinfo'] = 'Informació de contacte del Certificat';
+$string['contactinfodesc'] = 'Camp requerit per signar el certificat';
+$string['privacy:metadata'] = 'El complement de Validació ELECTRÒNICA no emmagatzema cap dada personal.';
+

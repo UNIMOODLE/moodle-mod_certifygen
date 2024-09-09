@@ -42,6 +42,6 @@ $string['location'] = 'Certificate location';
 $string['locationdesc'] = 'Field required to sign the certificate';
 $string['reason'] = 'Certificate reason';
 $string['reasondesc'] = 'Field required to sign the certificate';
-$string['contactinfo'] = 'Certificate contactinfo';
+$string['contactinfo'] = 'Certificate contact infornation';
 $string['contactinfodesc'] = 'Field required to sign the certificate';
 $string['privacy:metadata'] = 'The ELECTRONIC Validation plugin does not store any personal data.';

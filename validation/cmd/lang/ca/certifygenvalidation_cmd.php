@@ -18,7 +18,7 @@
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 /**
- * @package   certifygenrepository_onedrive
+ * @package   certifygenvalidation_cmd
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
@@ -28,10 +28,18 @@
 // This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Repositorio Onedrive';
-$string['pluginnamesettings'] = 'Configuración del Repositorio Onedrive';
+$string['pluginname'] = 'Validació CMD';
 $string['enable'] = 'Habilitar';
-$string['enable_help'] = 'Este repositorio guarda los certificados en uno de los repositorios habilitados de la plataforma.';
-$string['settings_folder'] = 'Carpeta';
-$string['settings_folder_desc'] = 'Directorio en Onedrive done se van a almacenar los certificados';
-$string['privacy:metadata'] = 'El plugin Certifygen Repositorio Onedrive no almacena datos personales.';
+$string['enable_help'] = 'Si aquest complement està habilitat, pots utilitzar-lo per validar Certificats Unimoodle';
+$string['path'] = 'Ruta';
+$string['path_help'] = 'Ruta del comandament del servei extern AJUDA';
+$string['certifygenvalidation_cmd_settings'] = 'Configuració del CMD';
+$string['cmdnotconfigured'] = 'CMD no configurat';
+$string['pluginnamesettings'] = 'Configuració de la Validació CMD';
+$string['privacy:metadata'] = 'El plugin de Validació CMD no emmagatzema cap dada personal.';
+$string['originalfilespath'] = 'Ruta d\'Arxius Originals';
+$string['originalfilespath_help'] = 'Ruta al servidor per allotjar els certificats originals';
+$string['validatedfilespath'] = 'Ruta d\'Arxius Validats';
+$string['validatedfilespath_help'] = 'Ruta al servidor per allotjar els certificats validats';
+
+

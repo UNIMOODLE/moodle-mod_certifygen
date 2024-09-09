@@ -18,7 +18,7 @@
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 /**
- * @package   certifygenrepository_onedrive
+ * @package   certifygenvalidation_electronic
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
@@ -28,10 +28,21 @@
 // This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Repositorio Onedrive';
-$string['pluginnamesettings'] = 'Configuración del Repositorio Onedrive';
+$string['pluginname'] = 'Validación ELECTRÓNICA';
 $string['enable'] = 'Habilitar';
-$string['enable_help'] = 'Este repositorio guarda los certificados en uno de los repositorios habilitados de la plataforma.';
-$string['settings_folder'] = 'Carpeta';
-$string['settings_folder_desc'] = 'Directorio en Onedrive done se van a almacenar los certificados';
-$string['privacy:metadata'] = 'El plugin Certifygen Repositorio Onedrive no almacena datos personales.';
+$string['enable_help'] = 'Se este plugin está habilitado, podes usalo para validar Certificados Unimoodle';
+$string['pluginnamesettings'] = 'Configuración da Validación ELECTRÓNICA';
+$string['path'] = 'Ruta do Servidor de Certificados';
+$string['pathdesc'] = 'Este campo é obrigatorio para usar este plugin de validación';
+$string['password'] = 'Contrasinal do Servidor de Certificados';
+$string['passworddesc'] = 'Este campo é obrigatorio para usar este plugin de validación';
+$string['name'] = 'Nome do Certificado';
+$string['namedesc'] = 'Campo requirido para firmar o certificado';
+$string['location'] = 'Ubicación do Certificado';
+$string['locationdesc'] = 'Campo requirido para firmar o certificado';
+$string['reason'] = 'Razón do Certificado';
+$string['reasondesc'] = 'Campo requirido para firmar o certificado';
+$string['contactinfo'] = 'Información de contacto do Certificado';
+$string['contactinfodesc'] = 'Campo requirido para firmar o certificado';
+$string['privacy:metadata'] = 'O plugin de Validación ELECTRÓNICA non almacena ningún dato persoal.';
+

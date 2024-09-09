@@ -28,10 +28,10 @@
 // This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Repositorio Onedrive';
-$string['pluginnamesettings'] = 'Configuración del Repositorio Onedrive';
+$string['pluginname'] = 'Repositori Onedrive';
+$string['pluginnamesettings'] = 'Configuració del Repositori Onedrive';
 $string['enable'] = 'Habilitar';
-$string['enable_help'] = 'Este repositorio guarda los certificados en uno de los repositorios habilitados de la plataforma.';
+$string['enable_help'] = 'Aquest repositori emmagatzema els certificats en un dels repositoris habilitats de la plataforma.';
 $string['settings_folder'] = 'Carpeta';
-$string['settings_folder_desc'] = 'Directorio en Onedrive done se van a almacenar los certificados';
-$string['privacy:metadata'] = 'El plugin Certifygen Repositorio Onedrive no almacena datos personales.';
+$string['settings_folder_desc'] = 'Directori a Onedrive on es desaran els certificats';
+$string['privacy:metadata'] = 'El plugin Repositori Onedrive Certifygen no emmagatzema dades personals.';

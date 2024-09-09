@@ -35,4 +35,4 @@ $string['certifygenvalidation_webservice_settings'] = 'WEBSERVICE settings';
 $string['webservicenotconfigured'] = 'Certifygen WEBSERVICE not configured';
 $string['pluginnamesettings'] = 'WEBSERVICE Validation Configuration';
 $string['privacy:metadata'] = 'The WEBSERVICE Validation plugin does not store any personal data.';
-$string['inprogress_msg'] = 'Accede a la secretaría para continuar con el proceso de validación del certificado';
+$string['inprogress_msg'] = 'Access your university\'s administration office to continue with the certificate validation process.';

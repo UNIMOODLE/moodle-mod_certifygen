@@ -18,7 +18,7 @@
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 /**
- * @package   certifygenrepository_onedrive
+ * @package   certifygenvalidation_csv
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
@@ -28,10 +28,18 @@
 // This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Repositorio Onedrive';
-$string['pluginnamesettings'] = 'Configuración del Repositorio Onedrive';
+$string['pluginname'] = 'Validación CSV';
 $string['enable'] = 'Habilitar';
-$string['enable_help'] = 'Este repositorio guarda los certificados en uno de los repositorios habilitados de la plataforma.';
-$string['settings_folder'] = 'Carpeta';
-$string['settings_folder_desc'] = 'Directorio en Onedrive done se van a almacenar los certificados';
-$string['privacy:metadata'] = 'El plugin Certifygen Repositorio Onedrive no almacena datos personales.';
+$string['enable_help'] = 'Si este plugin está habilitado, puedes usarlo para validar Certificados Unimoodle';
+$string['firmacatalogservicewsdl'] = 'FirmaCatalogService Wsdl';
+$string['firmacatalogservicewsdl_help'] = 'Esta es la URL de FirmaCatalogService para obtener el wsdl. <span class="bold">Es requerida en todas las solicitudes.</span>';
+$string['firmaquerycatalogservicewsdl'] = 'FirmaQueryCatalogService Wsdl';
+$string['firmaquerycatalogservicewsdl_help'] = 'Esta es la URL de FirmaQueryCatalogService para obtener el wsdl. <span class="bold">Es requerida en todas las solicitudes.</span>';
+$string['appID'] = 'ID de Aplicación';
+$string['appID_help'] = 'Este es el identificador de la aplicación. <span class="bold">Es requerido en todas las solicitudes.</span>';
+$string['certifygenvalidation_csv_settings'] = 'Configuración de CSV';
+$string['csvnotconfigured'] = 'CSV no configurado';
+$string['pluginnamesettings'] = 'Configuración de la Validación CSV';
+$string['csv_result_not_expected'] = 'Resultado del endpoint no esperado';
+$string['privacy:metadata'] = 'El plugin de Validación CSV no almacena ningún dato personal.';
+

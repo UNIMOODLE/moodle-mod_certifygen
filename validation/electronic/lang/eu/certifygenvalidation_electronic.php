@@ -18,7 +18,7 @@
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 /**
- * @package   certifygenrepository_onedrive
+ * @package   certifygenvalidation_electronic
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
@@ -28,10 +28,21 @@
 // This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Repositorio Onedrive';
-$string['pluginnamesettings'] = 'Configuración del Repositorio Onedrive';
-$string['enable'] = 'Habilitar';
-$string['enable_help'] = 'Este repositorio guarda los certificados en uno de los repositorios habilitados de la plataforma.';
-$string['settings_folder'] = 'Carpeta';
-$string['settings_folder_desc'] = 'Directorio en Onedrive done se van a almacenar los certificados';
-$string['privacy:metadata'] = 'El plugin Certifygen Repositorio Onedrive no almacena datos personales.';
+$string['pluginname'] = 'BALIOZTAZIO ELEKTRONIKOA';
+$string['enable'] = 'Gaitu';
+$string['enable_help'] = 'Plugin hau gaituta dagoenean, Unimoodle ziurtagiriak balioztatzeko erabil dezakezu.';
+$string['pluginnamesettings'] = 'BALIOZTAZIO ELEKTRONIKOAREN KONFIGURAZIOA';
+$string['path'] = 'Ziurtagiri Zerbitzariaren Bidea';
+$string['pathdesc'] = 'Eremu hau derrigorrezkoa da balioztapen plugin hau erabiltzeko';
+$string['password'] = 'Ziurtagiri Zerbitzariaren Pasahitza';
+$string['passworddesc'] = 'Eremu hau derrigorrezkoa da balioztapen plugin hau erabiltzeko';
+$string['name'] = 'Ziurtagiriaren Izena';
+$string['namedesc'] = 'Ziurtagiria sinatzeko beharrezko eremua';
+$string['location'] = 'Ziurtagiriaren Kokapena';
+$string['locationdesc'] = 'Ziurtagiria sinatzeko beharrezko eremua';
+$string['reason'] = 'Ziurtagiriaren Arrazoia';
+$string['reasondesc'] = 'Ziurtagiria sinatzeko beharrezko eremua';
+$string['contactinfo'] = 'Ziurtagiriaren Kontaktuen Informazioa';
+$string['contactinfodesc'] = 'Ziurtagiria sinatzeko beharrezko eremua';
+$string['privacy:metadata'] = 'BALIOZTAZIO ELEKTRONIKOA pluginak ez du datu pertsonalik gordetzen.';
+

@@ -29,9 +29,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Repositorio Onedrive';
-$string['pluginnamesettings'] = 'Configuración del Repositorio Onedrive';
+$string['pluginnamesettings'] = 'Configuración do Repositorio Onedrive';
 $string['enable'] = 'Habilitar';
-$string['enable_help'] = 'Este repositorio guarda los certificados en uno de los repositorios habilitados de la plataforma.';
+$string['enable_help'] = 'Este repositorio almacena os certificados nun dos repositorios habilitados da plataforma.';
 $string['settings_folder'] = 'Carpeta';
-$string['settings_folder_desc'] = 'Directorio en Onedrive done se van a almacenar los certificados';
-$string['privacy:metadata'] = 'El plugin Certifygen Repositorio Onedrive no almacena datos personales.';
+$string['settings_folder_desc'] = 'Directorio en Onedrive onde se almacenarán os certificados';
+$string['privacy:metadata'] = 'O plugin Repositorio Onedrive Certifygen non almacena datos persoais.';

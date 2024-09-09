@@ -1,3 +1,4 @@
+
 <?php
 // This file is part of Moodle - http://moodle.org/
 //
@@ -22,7 +23,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
- * Spaish strings
+ * Spanish strings
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -38,13 +39,12 @@ $string['pluginadministration'] = 'Módulo de administración del Certificado de
 $string['pluginnamesettings'] = 'Configuración del Certificado Unimoodle Certifygen';
 $string['certifygen:addinstance'] = 'Añade una nueva instacia del Certificado de Unimoodle Certifygen';
 $string['certifygen:view'] = 'Ver un Certificado de Unimoodle Certifygen';
-$string['certifygen:manage'] = 'Manage an unimoodle certifygen certificate';
-$string['certifygen:canmanagecertificates'] = 'Can Manage Certificates an unimoodle certifygen certificate';
-$string['certifygen:viewmycontextcertificates'] = 'View My Context Certificates an unimoodle certifygen certificate';
-$string['certifygen:viewcontextcertificates'] = 'View Context Certificates an unimoodle certifygen certificate';
-$string['certifygen:canemitstudentscertificates'] = 'canemitstudentscertificates';
+$string['certifygen:manage'] = 'Gestionar certificados Unimoodle Certifygen';
+$string['certifygen:canmanagecertificates'] = 'Puede gestionar certificados Unimoodle Certifygen';
+$string['certifygen:viewmycontextcertificates'] = 'Ver mis certificados Unimoodle Certifygen';
+$string['certifygen:viewcontextcertificates'] = 'Ver certificados Unimoodle Certifygen de otros profesores';
 $string['type'] = 'Tipo';
-$string['type_help'] = 'Tipos help';
+$string['type_help'] = 'Elige el tipo de certificado que deseas emitir. Alumno o profesor.';
 $string['type_1'] = 'Curso completo (para alumnos)';
 $string['type_2'] = 'Uso del curso (for teachers)';
 $string['mode'] = 'Modo';
@@ -61,7 +61,7 @@ $string['modelname'] = 'Nombre del modelo';
 $string['modelidnumber'] = 'Idnumber';
 $string['contextcertificatelink'] = 'Certificado Unimoodle Certifygen - curso';
 $string['chooseamodel'] = 'Elige un modelo';
-$string['model'] = 'Model';
+$string['model'] = 'Modelo';
 $string['modelsmanager'] = 'Gestión de modelos';
 $string['associatemodels'] = 'Asociar modelos a contextos';
 $string['download'] = 'Descargar';
@@ -98,7 +98,7 @@ $string['subplugintype_certifygenvalidation_plural'] = 'Métodos de validación 
 $string['managecertifygenvalidationplugins'] = 'Gestionar los plugins de validación del certificado Unimoodle Certifygen';
 $string['validationplugins'] = 'Validation plugins';
 $string['certifygenvalidationpluginname'] = $string['validationplugins'];
-$string['hideshow'] = 'Hide/Show';
+$string['hideshow'] = 'Ocultar/Mostrar';
 $string['settings'] = 'Configuración';
 $string['assigncontextto'] = 'Asignar contextos al model "{$a}"';
 $string['toomanycategoriestoshow'] = 'Demasiadas categorias para mostrar';
@@ -153,7 +153,7 @@ $string['chooseuserfield'] = 'Elige un campo de usuario';
 $string['userfield'] = 'Campo de Usuario';
 $string['userfield_desc'] = 'Este parametro se utiliza en los servicios web para identificar al usuario. Si no se elige nada se usará el id de la tabla user.';
 $string['report'] = 'Plantilla para profesor';
-$string['ok'] = 'OK';
+$string['ok'] = 'Acepto';
 $string['checkstatustask'] = 'Comprobar estado de los certificados';
 $string['checkfiletask'] = 'Comprobar archivos';
 $string['teachercertificates'] = 'Certificados  de profesores';
@@ -163,6 +163,19 @@ $string['repository'] = 'Repositorio';
 $string['repository_help'] = 'Repositorio help';
 $string['mycertificatesnotaccess'] = 'No tienes permiso para acceder a esta pagina';
 $string['teacherrequestreportnomodels'] = 'Todavía no se ha creado ningun modelo asociado a cursos para los certificados de profesor';
+$string['privacy:metadata:certifygen_validations'] = 'Information about the certificate issuance';
+$string['privacy:metadata:name'] = 'Nombre de certificado (solo para certificados de profesor)';
+$string['privacy:metadata:courses'] = 'Los ids de curso asociados al certificado (solo para certificados de profesor)';
+$string['privacy:metadata:code'] = 'Código de certificadoo (solo para certificados de profesor)';
+$string['privacy:metadata:certifygenid'] = 'El id de la instancia de actividad (solo para certificados de alumno)';
+$string['privacy:metadata:issueid'] = 'El id de emisión (solo para certificados de alumno)';
+$string['privacy:metadata:userid'] = 'Id del usuario al que pertenece el certificado.';
+$string['privacy:metadata:modelid'] = 'Id de modelo';
+$string['privacy:metadata:lang'] = 'El idioma del certificado';
+$string['privacy:metadata:status'] = 'Estado del certificado';
+$string['privacy:metadata:usermodified'] = 'Id de usuario';
+$string['privacy:metadata:timecreated'] = 'Tiempo en el que se emitió el certificado';
+$string['privacy:metadata:timemodified'] = 'Tiempo en el que se modificó el certificado';
 $string['nopermissiontoemitothercerts'] = 'No tienes permiso para emitir este certificado';
 $string['nopermissiontodownloadothercerts'] = 'No tienes permiso para descargar este certificado';
 $string['nopermissiondeletemodel'] = 'No tienes permiso para borrar un modelo';
