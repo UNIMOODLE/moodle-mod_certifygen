@@ -41,9 +41,9 @@ class csv_configuration
     {
         // Necesario: enable, appId != vacio y soap services enabled.
         $this->pluginenabled = get_config('certifygenvalidation_csv', 'enabled') == '1';
-        $wsdl = get_config('certifygenvalidation_csv', 'firmacatalogservicewsdl');
+        $wsdl = get_config('certifygenvalidation_csv', 'firmacatalogserviceurl');
         $this->wsdlenabled = !empty($wsdl);
-        $querywsdl = get_config('certifygenvalidation_csv', 'firmaquerycatalogservicewsdl');
+        $querywsdl = get_config('certifygenvalidation_csv', 'firmaquerycatalogserviceurl');
         $this->querywsdlenabled = !empty($querywsdl);
         $appid = get_config('certifygenvalidation_csv', 'appID');
         $this->appidenabled = !empty($appid);
