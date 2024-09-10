@@ -235,6 +235,8 @@ class certifygen_context extends persistent {
                 $hascontext = self::has_course_course_context($courseid, $context);
             } else if ($context->type == self::CONTEXT_TYPE_CATEGORY) {
                 $hascontext = self::has_course_category_context($courseid, $context);
+            } else if ($context->type == self::CONTEXT_TYPE_SYSTEM) {
+                $hascontext = true;
             }
             if ($hascontext) {
                 $modelids[] = $context->modelid;

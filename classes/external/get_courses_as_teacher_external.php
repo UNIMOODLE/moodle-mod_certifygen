@@ -134,6 +134,8 @@ class get_courses_as_teacher_external extends external_api {
             // Lang exists.
             $langstrings = get_string_manager()->get_list_of_translations();
             if (!empty($lang) && !in_array($lang, array_keys($langstrings))) {
+                unset($results['courses']);
+                unset($results['teacher']);
                 $results['error']['code'] = 'lang_not_found';
                 $results['error']['message'] = 'Lang not found on platform';
                 return $results;
@@ -172,6 +174,8 @@ class get_courses_as_teacher_external extends external_api {
             }
             $results['courses'] = $courses;
         } catch (\moodle_exception $e) {
+            unset($results['courses']);
+            unset($results['teacher']);
             $haserror = true;
             $results['error']['code'] = $e->getCode();
             $results['error']['message'] = $e->getMessage();
