@@ -30,7 +30,7 @@ namespace certifygenreport_basic;
 
 use stdClass;
 
-class useofthecoursealgorith {
+class useofthecoursealgorithm {
 
     private const  L1 = 0;
     private const  L2 = 2;

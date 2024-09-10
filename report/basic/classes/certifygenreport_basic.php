@@ -27,14 +27,13 @@
  */
 namespace certifygenreport_basic;
 global $CFG;
-require_once($CFG->dirroot . '/lib/pdflib.php');
+//require_once($CFG->dirroot . '/lib/pdflib.php');
 
 use certifygenreport_basic\output\report_view;
 use context_system;
 use mod_certifygen\interfaces\ICertificateReport;
 use mod_certifygen\persistents\certifygen_validations;
-use moodle_url;
-use pdf;
+//use pdf;
 
 class certifygenreport_basic implements ICertificateReport
 {
@@ -69,14 +68,17 @@ class certifygenreport_basic implements ICertificateReport
         }
         try {
             // Step 2: Create pdf.
-            $doc = new pdf();
+            //$doc = new pdf();
+            $doc = new certifygenpdf();
             $image_file = $this->get_logo_url();
             if (!empty($image_file)) {
                 $doc->setHeaderData($image_file, 8, 'Unimoodle Certifygen', '');
             } else {
                 $doc->setPrintHeader(false);
             }
-            $doc->setPrintFooter(true);
+            $footertext = get_config('certifygenreport_basic', 'footer');
+            $doc->set_footer_text(strip_tags($footertext));
+            $doc->setPrintFooter();
 
             $doc->AddPage();
             $renderer = $PAGE->get_renderer('certifygenreport_basic');

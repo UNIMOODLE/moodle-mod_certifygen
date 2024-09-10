@@ -32,15 +32,18 @@ namespace certifygenreport_basic\output;
 global $CFG;
 require_once($CFG->dirroot.'/user/lib.php');
 
-use certifygenreport_basic\useofthecoursealgorith;
+use certifygenreport_basic\useofthecoursealgorithm;
+use coding_exception;
 use context_course;
 use context_system;
 use dml_exception;
-use mod_data\output\empty_database_action_bar;
+use moodle_exception;
 use moodle_url;
+use renderable;
 use stdClass;
+use templatable;
 
-class report_view implements \renderable, \templatable
+class report_view implements renderable, templatable
 {
     private int $userid;
     private bool $showtext;
@@ -51,6 +54,9 @@ class report_view implements \renderable, \templatable
 
     /**
      * @param int $userid
+     * @param array $courses
+     * @param bool $showtext
+     * @param bool $showendtext
      */
     public function __construct(int $userid, array $courses, bool $showtext = true, bool $showendtext = true)
     {
@@ -62,7 +68,7 @@ class report_view implements \renderable, \templatable
     /**
      * @param \renderer_base $output
      * @return stdClass
-     * @throws \coding_exception
+     * @throws coding_exception
      * @throws dml_exception
      */
     public function export_for_template(\renderer_base $output)
@@ -74,7 +80,6 @@ class report_view implements \renderable, \templatable
         $url = $this->get_logo_url();
 //        $data->logo = $url->out();
         $data->logosrc = $url;
-        $data->footer = $this->get_footer();
         if ($this->showtext) {
             $data->hastext = true;
             $data->text = get_string('reporttext', 'certifygenreport_basic', (object)['teacher' => $name] );
@@ -121,8 +126,8 @@ class report_view implements \renderable, \templatable
     /**
      * @param stdClass $course
      * @return string
-     * @throws \coding_exception
-     * @throws \moodle_exception
+     * @throws coding_exception
+     * @throws moodle_exception
      */
     private function get_course_details_string(stdClass $course) : string {
         $detail = '';
@@ -144,14 +149,15 @@ class report_view implements \renderable, \templatable
      * @return array
      */
     private function get_course_teachers(int $courseid) : array {
-        $teachersstring = '';
         $context = context_course::instance($courseid);
         $teachers = get_enrolled_users($context, 'moodle/course:managegroups');
         return $teachers;
     }
+
     /**
      * @param int $courseid
-     * @return array
+     * @return int
+     * @throws coding_exception
      */
     private function get_course_students_number(int $courseid) : int {
         $students = 0;
@@ -168,7 +174,7 @@ class report_view implements \renderable, \templatable
     /**
      * @param array $teachers
      * @return string
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     private function get_course_teachersstring(array $teachers) : string {
         $teachersstring = '';
@@ -185,9 +191,12 @@ class report_view implements \renderable, \templatable
         }
         return $teachersstring;
     }
+
     /**
      * @param int $courseid
      * @return string
+     * @throws coding_exception
+     * @throws moodle_exception
      */
     private function get_course_type_by_algorithm(int $courseid) : string {
         /**
@@ -196,7 +205,7 @@ class report_view implements \renderable, \templatable
          * */
         $numstudents = $this->get_course_students_number($courseid);
 
-        $algorith = new useofthecoursealgorith($courseid, $numstudents);
+        $algorith = new useofthecoursealgorithm($courseid, $numstudents);
         return $algorith->get_course_type();
     }
     /**
@@ -215,13 +224,5 @@ class report_view implements \renderable, \templatable
         }
         $img_base64_encoded =  'data:image/png;base64, ' . base64_encode($logo->get_content());
         return  '@' . preg_replace('#^data:image/[^;]+;base64,#', '', $img_base64_encoded) . '">';
-    }
-
-    /**
-     * @return string
-     * @throws dml_exception
-     */
-    public function get_footer() : string {
-        return get_config('certifygenreport_basic', 'footer');
     }
 }
