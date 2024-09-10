@@ -33,7 +33,7 @@ namespace mod_certifygen\external;
 
 use coding_exception;
 use context_system;
-use core\invalid_persistent_exception;
+use dml_exception;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
@@ -42,11 +42,10 @@ use invalid_parameter_exception;
 use mod_certifygen\certifygen;
 use mod_certifygen\certifygen_file;
 use mod_certifygen\interfaces\ICertificateReport;
-use mod_certifygen\interfaces\ICertificateRepository;
-use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-
+global $CFG;
+require_once($CFG->dirroot .'/lib/datalib.php');
 class emitteacherrequest_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -65,7 +64,7 @@ class emitteacherrequest_external extends external_api {
      * @param int $id
      * @return array
      * @throws coding_exception
-     * @throws invalid_parameter_exception|\dml_exception
+     * @throws invalid_parameter_exception|dml_exception
      */
     public static function emitteacherrequest(int $id): array {
 
@@ -112,12 +111,16 @@ class emitteacherrequest_external extends external_api {
             $lang = $teacherrequest->get('lang');
             $modelid = $teacherrequest->get('modelid');
             $certifygenfile = new certifygen_file($file, $userid, $lang, $modelid, $id);
-
+            $coursesids = $teacherrequest->get('courses');
+            $coursesids = explode(',', $coursesids);
+            $courses = self::get_courses_information($coursesids);
             $data = [
                 'lang' => $lang,
                 'user_id' => $userid,
                 'user_fullname' => fullname($certifygenfile->get_user()),
-                'filename' => str_replace('.pdf', '', $file->get_filename()),
+                'code' => str_replace('.pdf', '', $file->get_filename()),
+                'filename' => $file->get_filename(),
+                'courses' => $courses
             ];
             $certifygenfile->set_metadata($data);
             // Step 3: Call to validation plugin.
@@ -131,6 +134,23 @@ class emitteacherrequest_external extends external_api {
             $teacherrequest->save();
         }
         return $result;
+    }
+
+    /**
+     * @param array $ids
+     * @return array
+     * @throws dml_exception
+     */
+    private static function get_courses_information(array $ids) : array {
+        $courses = [];
+        foreach ($ids as $id) {
+            $course = get_course($id);
+            $courses[] = [
+                'id' => $id,
+                'name' => $course->fullname,
+            ];
+        }
+        return $courses;
     }
     /**
      * Describes the data returned from the external function.

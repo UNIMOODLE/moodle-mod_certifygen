@@ -45,5 +45,13 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext('certifygenvalidation_cmd/path',
         new lang_string('path', 'certifygenvalidation_cmd'),
         new lang_string('path_help', 'certifygenvalidation_cmd'), ""));
+
+    $settings->add(new admin_setting_configtext('certifygenvalidation_cmd/originalfilespath',
+        new lang_string('originalfilespath', 'certifygenvalidation_cmd'),
+        new lang_string('originalfilespath_help', 'certifygenvalidation_cmd'), ""));
+
+    $settings->add(new admin_setting_configtext('certifygenvalidation_cmd/validatedfilespath',
+        new lang_string('validatedfilespath', 'certifygenvalidation_cmd'),
+        new lang_string('validatedfilespath_help', 'certifygenvalidation_cmd'), ""));
 }
 //$ADMIN->add('modsettingcertifygencat', $settings);
