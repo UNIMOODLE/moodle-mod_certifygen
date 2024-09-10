@@ -78,7 +78,6 @@ class report_view implements renderable, templatable
         $name = fullname($user);
         $data = new stdClass();
         $url = $this->get_logo_url();
-//        $data->logo = $url->out();
         $data->logosrc = $url;
         if ($this->showtext) {
             $data->hastext = true;

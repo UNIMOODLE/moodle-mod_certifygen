@@ -54,7 +54,7 @@ if ($ADMIN->fulltree) {
     $desc = new lang_string('logo_desc', 'certifygenreport_basic');
     $setting = new admin_setting_configstoredfile('certifygenreport_basic/logo',
         $name,
-        $desc, 'logo', 0, ['accepted_types' => ['image']]);
+        $desc, 'logo', 0, ['accepted_types' => ['.png']]);
     $settings->add($setting);
 
     // Footer.

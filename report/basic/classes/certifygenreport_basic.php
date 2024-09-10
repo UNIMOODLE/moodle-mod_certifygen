@@ -70,12 +70,13 @@ class certifygenreport_basic implements ICertificateReport
             // Step 2: Create pdf.
             //$doc = new pdf();
             $doc = new certifygenpdf();
-            $image_file = $this->get_logo_url();
-            if (!empty($image_file)) {
-                $doc->setHeaderData($image_file, 8, 'Unimoodle Certifygen', '');
-            } else {
-                $doc->setPrintHeader(false);
-            }
+//            $image_file = $this->get_logo_url();
+//            if (!empty($image_file)) {
+//                $doc->setHeaderData($image_file, 8, 'Unimoodle Certifygen', '');
+//            } else {
+//                $doc->setPrintHeader(false);
+//            }
+            $doc->setPrintHeader(false);
             $footertext = get_config('certifygenreport_basic', 'footer');
             $doc->set_footer_text(strip_tags($footertext));
             $doc->setPrintFooter();
@@ -131,35 +132,48 @@ class certifygenreport_basic implements ICertificateReport
 
         return $result;
     }
-
-    /**
-     * @return string
-     * @throws dml_exception
-     */
-    public function get_logo_url() : string {
-        global $CFG;
-        try {
-            $fs = get_file_storage();
-            $context = context_system::instance();
-            $filename = get_config('certifygenreport_basic', 'logo');
-            if (empty($filename)) {
-                return '';
-            }
-            $logo = $fs->get_file($context->id, report_view::REPORT_COMPONENT, 'logo', 0,
-                '/', $filename);
-            if (!$logo) {
-                return '';
-            }
-            // Lo guardamos en el repo.
-            $url = '/mod/certifygen/report/basic/pix' . $filename;
-            if (file_exists($CFG->dirroot . $url)) {
-                unlink($url);
-            }
-            $logo->copy_content_to($CFG->dirroot . $url);
-
-        } catch ( \moodle_exception $exception) {
-            $url = '';
-        }
-        return $url;
-    }
+//    public function get_logo_url() : string {
+//        global $CFG;
+//        try {
+//            $fs = get_file_storage();
+//            $context = context_system::instance();
+//            $filename = get_config('certifygenreport_basic', 'logo');
+//            if (empty($filename)) {
+//                return '';
+//            }
+//            $logo = $fs->get_file($context->id, report_view::REPORT_COMPONENT, 'logo', 0,
+//                '/', $filename);
+//            if (!$logo) {
+//                return '';
+//            }
+//            // Lo guardamos en el repo.
+//            $tempdir = make_temp_directory('certifygen');
+//            //$url = tempnam($tempdir, 'certifygen') . '.png';
+//            $url = tempnam($tempdir, 'certifygen');
+//            file_put_contents($url, $logo->get_content());
+//
+//            // no funciona como pantalla pero en pdf si,
+//            // //por lo menos desde el report_view que lo lleva a template y luego se pasa a pdf.
+////            $img_base64_encoded =  'data:image/png;base64, ' . base64_encode($logo->get_content());
+////            $url = '@' . preg_replace('#^data:image/[^;]+;base64,#', '', $img_base64_encoded) . '">';
+//
+//            // base64 no funciona en loca
+////            $img_base64_encoded =  'data:image/png;base64, ' . base64_encode($logo->get_content());
+////            //$url = '@' . preg_replace('#^data:image/[^;]+;base64,#', '', $img_base64_encoded) . '">';
+////            $url = preg_replace('#^data:image/[^;]+;base64,#', '', $img_base64_encoded);
+//
+//            // FUnciona en local pero en pre no.
+////            $url = '/mod/certifygen/report/basic/pix' . $filename;
+////            if (file_exists($CFG->dirroot . $url)) {
+////                unlink($url);
+////            }
+////            $logo->copy_content_to($CFG->dirroot . $url);
+//
+//        } catch ( \moodle_exception $exception) {
+//            $url = '';
+//        }
+//
+//        error_log(__FUNCTION__ . ' url : '.var_export($url, true));
+//        return $url;
+//    }
 }
