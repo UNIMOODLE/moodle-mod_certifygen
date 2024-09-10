@@ -97,20 +97,33 @@ class certifygen_context extends persistent {
 
     /**
      * @return bool
+     * @throws coding_exception
      * @throws dml_exception
      */
     public static function exists_system_context_model() : bool {
         global $DB;
-        $contexts = [
+        $mcontexts = [
             certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
         ];
-        list($insql, $inparams) = $DB->get_in_or_equal($contexts, SQL_PARAMS_NAMED);
+        list($minsql, $minparams) = $DB->get_in_or_equal($mcontexts, SQL_PARAMS_NAMED);
+        $ccontexts = [
+            certifygen_context::CONTEXT_TYPE_CATEGORY,
+            certifygen_context::CONTEXT_TYPE_COURSE,
+        ];
+        list($cinsql, $cinparams) = $DB->get_in_or_equal($ccontexts, SQL_PARAMS_NAMED);
+        $scontexts = [
+            certifygen_context::CONTEXT_TYPE_SYSTEM,
+        ];
+        list($sinsql, $sinparams) = $DB->get_in_or_equal($scontexts, SQL_PARAMS_NAMED);
+
         $sql = "SELECT count(*) as total
         FROM {certifygen_model} m
         INNER JOIN {certifygen_context} c ON c.modelid = m.id
-        WHERE m.type $insql AND c.contextids <> ''";
+        WHERE m.type $minsql 
+        AND ((c.contextids <> '' AND c.type $cinsql) OR (c.contextids = '' AND c.type $sinsql) )";
 
-        $result = $DB->get_records_sql($sql, $inparams);
+        $params = array_merge($minparams, $cinparams, $sinparams);
+        $result = $DB->get_records_sql($sql, $params);
         $result = reset($result);
         return $result->total > 0;
     }
@@ -246,6 +259,8 @@ class certifygen_context extends persistent {
                 $hascontext = self::has_course_course_context($courseid, $context);
             } else if ($context->type == self::CONTEXT_TYPE_CATEGORY) {
                 $hascontext = self::has_course_category_context($courseid, $context);
+            } else if ($context->type == self::CONTEXT_TYPE_SYSTEM) {
+                $hascontext = true;
             }
             if ($hascontext) {
                 $modelids[] = $context->modelid;

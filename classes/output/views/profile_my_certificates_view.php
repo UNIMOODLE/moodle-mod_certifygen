@@ -3,6 +3,8 @@
 namespace mod_certifygen\output\views;
 global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
+
+use mod_certifygen\persistents\certifygen_context;
 use mod_certifygen\tables\profile_my_certificates_table;
 use renderable;
 use stdClass;
@@ -43,6 +45,10 @@ class profile_my_certificates_view implements renderable, templatable
         ob_end_clean();
         $data->table = $out1;
         $data->userid = $this->userid;
+        [$modelids, $langs] = certifygen_context::get_system_context_modelids_and_langs();
+        if (count($modelids) > 0) {
+            $data->cancreaterequest = true;
+        }
         if ($this->userid == $USER->id) {
             $data->mycertificates = true;
         } else {
