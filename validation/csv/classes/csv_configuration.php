@@ -39,7 +39,6 @@ class csv_configuration
     private string $querywsdl;
     public function __construct()
     {
-        // Necesario: enable, appId != vacio y soap services enabled.
         $this->pluginenabled = get_config('certifygenvalidation_csv', 'enabled') == '1';
         $wsdl = get_config('certifygenvalidation_csv', 'firmacatalogserviceurl');
         $this->wsdlenabled = !empty($wsdl);
@@ -47,9 +46,6 @@ class csv_configuration
         $this->querywsdlenabled = !empty($querywsdl);
         $appid = get_config('certifygenvalidation_csv', 'appID');
         $this->appidenabled = !empty($appid);
-        $protocols = get_config('core', 'webserviceprotocols');
-        $protocols = explode(',', $protocols);
-        $this->soapenabled = in_array('soap', $protocols);
         if ($this->is_enabled()) {
             $this->appId = $appid;
             $this->wsdl = $wsdl;
@@ -61,7 +57,7 @@ class csv_configuration
      * @return bool
      */
     public function is_enabled() : bool {
-        return $this->soapenabled && $this->querywsdlenabled && $this->wsdlenabled && $this->appidenabled;
+        return $this->querywsdlenabled && $this->wsdlenabled && $this->appidenabled;
     }
 
     /**
