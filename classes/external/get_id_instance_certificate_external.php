@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of the mod_certifygen plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ class get_id_instance_certificate_external extends external_api {
      * @throws \required_capability_exception
      * @throws \dml_exception
      */
-    public static function get_id_instance_certificate(int $userid, string $userfield, string $lang): array {
+    public static function get_id_instance_certificate(int $userid, string $userfield, string $lang, string $validation, string $repository): array {
         global $CFG;
         /**
          * Devuelve una lista de aquellas instancias de mod_certificate visibles,
@@ -166,6 +166,7 @@ class get_id_instance_certificate_external extends external_api {
                             'modeltemplateid' => $model->get('templateid'),
                             'modellangs' => $model->get('langs'),
                             'modelvalidation' => $model->get('validation'),
+                            'modelrepository' => $model->get('repository'),
                         ];
                         $instances[] = $instance;
                     }

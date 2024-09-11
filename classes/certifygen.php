@@ -54,46 +54,10 @@ require_once($CFG->dirroot . '/grade/querylib.php');
 require_once($CFG->dirroot . '/user/lib.php');
 require_once($CFG->libdir . '/gradelib.php');
 
+/**
+ * Class certifygen
+ */
 class certifygen {
-//    /**
-//     * Gets users who meet access restrictionss and had not been issued.
-//     *
-//     * @param stdClass $coursecertificate
-//     * @param \cm_info $cm
-//     * @return array
-//     */
-//    public static function get_users_to_issue(stdClass $coursecertificate, \cm_info $cm): array {
-//        global $DB;
-//        return [];
-//        $context = \context_course::instance($coursecertificate->course);
-//        // Get users already issued subquery.
-//        [$usersissuedsql, $usersissuedparams] = self::get_users_issued_select($coursecertificate->course,
-//            $coursecertificate->template);
-//        // Get users enrolled with receive capabilities subquery.
-//        [$enrolledsql, $enrolledparams] = get_enrolled_sql($context, 'mod/coursecertificate:receive', 0, true);
-//        $sql  = "SELECT eu.id FROM ($enrolledsql) eu WHERE eu.id NOT IN ($usersissuedsql)";
-//        $params = array_merge($enrolledparams, $usersissuedparams);
-//        $potentialusers = $DB->get_records_sql($sql, $params);
-//
-//        // Filter only users with access to the activity {@see info_module::filter_user_list}.
-//        $info = new info_module($cm);
-//        $filteredusers = $info->filter_user_list($potentialusers);
-//
-//        // Filter only users without 'viewall' capabilities and with access to the activity.
-//        $users = [];
-//        foreach ($filteredusers as $filtereduser) {
-//            $modinfouser = get_fast_modinfo($cm->get_course(), $filtereduser->id);
-//            $cmuser = $modinfouser->get_cms()[$cm->id] ?? null;
-//            // Property 'cm_info::uservisible' checks if user has access to the activity - it is visible, in the
-//            // correct group, user has capability to view it, is available. However, for teachers it
-//            // can return true even if they do not satisfy availability criteria,
-//            // therefore we need to additionally check property 'cm_info::available'.
-//            if ($cmuser && $cmuser->uservisible && $cmuser->available) {
-//                $users[] = $filtereduser;
-//            }
-//        }
-//        return $users;
-//    }
 
     /**
      * Returns the record for the certificate user has in a given course
@@ -108,7 +72,8 @@ class certifygen {
      * @return stdClass|null
      * @throws dml_exception
      */
-    public static function get_user_certificate(int $instaceid, int $userid, int $courseid, int $templateid, string $lang): ?stdClass {
+    public static function get_user_certificate(int $instaceid, int $userid, int $courseid, int $templateid,
+                                                string $lang) :?stdClass {
 
         global $DB;
 

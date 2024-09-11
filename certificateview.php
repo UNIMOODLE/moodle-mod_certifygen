@@ -1,6 +1,6 @@
 <?php
-// This file is part of the tool_certificate plugin for Moodle - http://moodle.org/
-//
+// This file is part of the mod_certifygen plugin for Moodle - http://moodle.org/
+// 
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -43,7 +43,7 @@ require_login();
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url(new moodle_url('/mod/certifygen/certificateview.php', ['code' => $issuecode]));
 $lang = certifygen_validations::get_lang_by_code_for_activities($issuecode);
-//$lang = explode('_', $issuecode);
+
 if ($preview) {
     $templateid = required_param('templateid', PARAM_INT);
     $template = \mod_certifygen\template::instance($templateid, (object) ['lang' => $lang]);

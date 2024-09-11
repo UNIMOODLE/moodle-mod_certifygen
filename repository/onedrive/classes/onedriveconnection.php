@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of the mod_certifygen plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -32,9 +32,11 @@ use core\oauth2\api;
 use core\oauth2\client;
 use core\oauth2\issuer;
 use core\oauth2\rest_exception;
+use curl;
 use dml_exception;
 use dml_missing_record_exception;
 use moodle_exception;
+use moodle_url;
 use repository_onedrive\rest;
 
 class onedriveconnection
@@ -72,10 +74,6 @@ class onedriveconnection
      */
     public function is_enabled() : bool {
         return $this->enabled;
-    }
-    public function get_file_url() : string {
-        // TODO.
-        return '';
     }
     /**
      * Get a cached user authenticated oauth client.
@@ -262,7 +260,7 @@ class onedriveconnection
      */
     protected function get_mimetype_from_filename($filename) {
         $mimetype = 'application/unknown';
-        $types = core_filetypes::get_types();
+        $types = \core_filetypes::get_types();
         $fileextension = '.bin';
         if (strpos($filename, '.') !== false) {
             $fileextension = substr($filename, strrpos($filename, '.') + 1);

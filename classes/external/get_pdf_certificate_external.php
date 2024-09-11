@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of the mod_certifygen plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -133,7 +133,8 @@ class get_pdf_certificate_external extends external_api {
                     return $result;
                 }
             }
-
+            // TODO: devolver el del plugin de almacenamiento si es q existe.
+            // esta mal, VER LA PETICION DEL PROFE.
             // Process status
             $file = \mod_certifygen\certifygen::get_user_certificate_file($idinstance, $model->get('templateid'), $userid,
                 $certifygen->get('course'), $lang);

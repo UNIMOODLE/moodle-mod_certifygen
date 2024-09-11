@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of the mod_certifygen plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -211,6 +211,7 @@ class get_courses_as_teacher_external extends external_api {
                                                     'templateid' => new external_value(PARAM_INT, 'Model template id', VALUE_OPTIONAL),
                                                     'langs' => new external_value(PARAM_RAW, 'Model langs', VALUE_OPTIONAL),
                                                     'validation' => new external_value(PARAM_RAW, 'Model validation', VALUE_OPTIONAL),
+                                                    'repository' => new external_value(PARAM_RAW, 'Model validation', VALUE_OPTIONAL),
                                                 ],
                                                 'courses list', VALUE_OPTIONAL)
                             , '', VALUE_OPTIONAL),
