@@ -22,9 +22,9 @@
     Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos
 }}
 {{!
-    @template mod_certifygen/activity
+    @template mod_certifygen/showerrors
 
-    Activity
+    Showerrors
 
     Classes required for JS:
     * None
@@ -39,42 +39,13 @@
     {
     }
 }}
-<div data-region="activity-view" {{#isstudent}} class="student"{{/isstudent}}>
-    <h3 class="mt-5 mb-5">
-        {{#isstudent}}
-            {{#str}} mycertificate, mod_certifygen {{/str}}</h3>
-        {{/isstudent}}
-        {{^isstudent}}
-            {{#str}} certificatelist, mod_certifygen {{/str}}</h3>
-        {{/isstudent}}
+<div data-region="showerrors-view">
+    <div>
+        {{{ form }}}
+    </div>
 
-    {{#form}}
-        <div>
-            {{{ form }}}
-        </div>
-    {{/form}}
     <div>
         {{{ table }}}
     </div>
 
 </div>
-
-{{#js}}
-    require(['mod_certifygen/activitymanager'], (module) => module.init());
-{{/js}}
-
-<style>
-
-    [data-region="activity-view"].student .c0 {
-        display: none;
-    }
-    [data-region="activity-view"] .likelink {
-        cursor: pointer;
-        color: #0f6cbf;
-        text-decoration: none;
-    }
-    [data-region="activity-view"] .likelink:hover {
-        color: #094478;
-        text-decoration: underline;
-    }
-</style>

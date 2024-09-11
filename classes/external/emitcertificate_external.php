@@ -45,8 +45,10 @@ use external_value;
 use invalid_parameter_exception;
 use mod_certifygen\certifygen;
 use mod_certifygen\certifygen_file;
+use mod_certifygen\event\certificate_issued;
 use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\persistents\certifygen_error;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
@@ -146,6 +148,16 @@ class emitcertificate_external extends external_api {
             if (is_null($file)) {
                 $result['result'] = false;
                 $result['message'] = 'File not found';
+                $validation->set('status', certifygen_validations::STATUS_STUDENT_ERROR);
+                $validation->save();
+                $data = [
+                    'validationid' => $validation->get('id'),
+                    'status' => $validation->get('status'),
+                    'code' => 'file_not_found',
+                    'message' => $result['message'],
+                    'usermodified' => $USER->id,
+                ];
+                certifygen_error::manage_certifygen_error(0, (object)$data);
             } else {
                 $certifygenfile = new certifygen_file($file, $userid, $lang, $modelid, $validation->get('id'));
                 $data = [
@@ -157,10 +169,18 @@ class emitcertificate_external extends external_api {
                     'course_shortname' => $course->shortname,
                     'filename' => str_replace('.pdf', '', $file->get_filename()),
                 ];
+                $certdata = get_json_certificate_external::get_json_certificate($userid, '', $instanceid, '', $validation->get('lang'));
+                if (array_key_exists('json', $certdata) && !empty($certdata['json'])) {
+                    $certdata = (array)json_decode($certdata['json']);
+                    $data = array_merge($data, $certdata);
+                }
                 $certifygenfile->set_metadata($data);
 
                 // Step 4: Start certifygen certificate proccess
                 $result = certifygen::start_emit_certificate_proccess($validation, $certifygenfile, $certifygenmodel);
+
+                // Step 5: event trigger
+                certificate_issued::create_from_validation($validation)->trigger();
             }
         } catch (moodle_exception $e) {
             error_log(__FUNCTION__ . ' ' . ' error: '.var_export($e->getMessage(), true));
@@ -168,6 +188,14 @@ class emitcertificate_external extends external_api {
             $result['message'] = $e->getMessage();
             $validation->set('status', certifygen_validations::STATUS_ERROR);
             $validation->save();
+            $data = [
+                'validationid' => $validation->get('id'),
+                'status' => $validation->get('status'),
+                'code' => $e->getCode(),
+                'message' => $result['message'],
+                'usermodified' => $USER->id,
+            ];
+            certifygen_error::manage_certifygen_error(0, (object)$data);
         }
         return $result;
     }

@@ -38,6 +38,7 @@ use core\task\scheduled_task;
 use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen;
+use mod_certifygen\persistents\certifygen_error;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_repository;
 use mod_certifygen\persistents\certifygen_validations;
@@ -58,6 +59,7 @@ class checkfile extends scheduled_task
      */
     public function execute()
     {
+        global $USER;
         $validations = certifygen_validations::get_records(['status' => certifygen_validations::STATUS_VALIDATION_OK]);
         foreach ($validations as $validation) {
             try {
@@ -104,6 +106,14 @@ class checkfile extends scheduled_task
                                 $repository->save();
                             } else {
                                 $status = certifygen_validations::STATUS_STORAGE_ERROR;
+                                $data = [
+                                    'validationid' => $validation->get('id'),
+                                    'status' => certifygen_validations::STATUS_STORAGE_ERROR,
+                                    'code' => 'empty_repository_url',
+                                    'message' => 'getFileUrl returns empty url',
+                                    'usermodified' => $USER->id,
+                                ];
+                                certifygen_error::manage_certifygen_error(0, (object)$data);
                             }
                         }
                         // Save status.
@@ -112,15 +122,39 @@ class checkfile extends scheduled_task
                     } else {
                         $validation->set('status', certifygen_validations::STATUS_STORAGE_ERROR);
                         $validation->save();
+                        $data = [
+                            'validationid' => $validation->get('id'),
+                            'status' => certifygen_validations::STATUS_STORAGE_ERROR,
+                            'code' => 'saveFile_returns_error',
+                            'message' => 'saveFile returns error',
+                            'usermodified' => $USER->id,
+                        ];
+                        certifygen_error::manage_certifygen_error(0, (object)$data);
                     }
                 } else {
                     $validation->set('status', certifygen_validations::STATUS_STORAGE_ERROR);
                     $validation->save();
+                    $data = [
+                        'validationid' => $validation->get('id'),
+                        'status' => certifygen_validations::STATUS_STORAGE_ERROR,
+                        'code' => 'getFile_not_file_parameter',
+                        'message' => 'getFile does not return file parameter',
+                        'usermodified' => $USER->id,
+                    ];
+                    certifygen_error::manage_certifygen_error(0, (object)$data);
                 }
             } catch (\moodle_exception $e) {
                 error_log(__FUNCTION__ . ' e: '.var_export($e->getMessage(), true));
                 $validation->set('status', certifygen_validations::STATUS_STORAGE_ERROR);
                 $validation->save();
+                $data = [
+                    'validationid' => $validation->get('id'),
+                    'status' => certifygen_validations::STATUS_STORAGE_ERROR,
+                    'code' => $e->getCode(),
+                    'message' => $e->getMessage(),
+                    'usermodified' => $USER->id,
+                ];
+                certifygen_error::manage_certifygen_error(0, (object)$data);
                 continue;
             }
         }

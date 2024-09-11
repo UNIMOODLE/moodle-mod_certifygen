@@ -37,6 +37,7 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
+use mod_certifygen\event\certificate_revoked;
 use mod_certifygen\interfaces\ICertificateReport;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
@@ -99,6 +100,17 @@ class deleteteacherrequest_external extends external_api {
                 }
             }
             if ($candelete) {
+                $eventdata = [
+                    'objectid' => $request->get('id'),
+                    'userid' => $USER->id,
+                    'context' => $context,
+                    'other' => [
+                        'validation' => $model->get('validation'),
+                        'repository' => $model->get('repository'),
+                        'report' => $model->get('report'),
+                    ]
+                ];
+                certificate_revoked::create($eventdata)->trigger();
                 $request->delete();
             }
         } catch (moodle_exception $e) {

@@ -41,7 +41,9 @@ use external_value;
 use invalid_parameter_exception;
 use mod_certifygen\certifygen;
 use mod_certifygen\certifygen_file;
+use mod_certifygen\event\certificate_issued;
 use mod_certifygen\interfaces\ICertificateReport;
+use mod_certifygen\persistents\certifygen_error;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 global $CFG;
@@ -101,8 +103,16 @@ class emitteacherrequest_external extends external_api {
             $subplugin = new $reportpluginclass();
             $result = $subplugin->createFile($teacherrequest);
             if (!$result['result']) {
-                $teacherrequest->set('status', certifygen_validations::STATUS_ERROR);
+                $teacherrequest->set('status', certifygen_validations::STATUS_TEACHER_ERROR);
                 $teacherrequest->save();
+                $data = [
+                    'validationid' => $teacherrequest->get('id'),
+                    'status' => $teacherrequest->get('status'),
+                    'code' => 'teacher_certificate_error',
+                    'message' => $result['message'],
+                    'usermodified' => $USER->id,
+                ];
+                certifygen_error::manage_certifygen_error(0, (object)$data);
                 return $result;
             }
             /** @var \stored_file $file */
@@ -126,12 +136,23 @@ class emitteacherrequest_external extends external_api {
             // Step 3: Call to validation plugin.
             $result = certifygen::start_emit_certificate_proccess($teacherrequest, $certifygenfile, $certifygenmodel);
             unset($result['file']);
+
+            // Step 4: event trigger
+            certificate_issued::create_from_validation($teacherrequest)->trigger();
         } catch (moodle_exception $e) {
             error_log(__FUNCTION__ . ' ' . ' error: '.var_export($e->getMessage(), true));
             $result['result'] = false;
             $result['message'] = $e->getMessage();
             $teacherrequest->set('status', certifygen_validations::STATUS_ERROR);
             $teacherrequest->save();
+            $data = [
+                'validationid' => $teacherrequest->get('id'),
+                'status' => $teacherrequest->get('status'),
+                'code' => $e->getCode(),
+                'message' => $result['message'],
+                'usermodified' => $USER->id,
+            ];
+            certifygen_error::manage_certifygen_error(0, (object)$data);
         }
         return $result;
     }

@@ -13,7 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 // Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU".
 //
@@ -30,21 +29,36 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use mod_certifygen\output\views\associatemodelcontexts_view;
+namespace mod_certifygen\event;
 
-require_once('../../config.php');
-require_once('lib.php');
-global $PAGE;
+use coding_exception;
+use context_module;
+use context_system;
+use core\event\base;
+use mod_book\event\chapter_created;
+use mod_certifygen\persistents\certifygen_validations;
+use moodle_exception;
 
-require_login();
+global $CFG;
+require_once($CFG->dirroot . '/lib/modinfolib.php');
+class certificate_revoked extends base
+{
 
-$PAGE->set_context(context_system::instance());
-$PAGE->set_url(new moodle_url('/mod/certifygen/associatemodels.php'));
-$name = get_string('associatemodels', 'mod_certifygen');
-$view = new associatemodelcontexts_view();
-$output = $PAGE->get_renderer('mod_certifygen');
-echo $output->header();
-echo $output->heading(format_string($name));
-echo $output->render($view);
-echo $output->footer();
-
+    /**
+     * @inheritDoc
+     */
+    protected function init()
+    {
+        $this->data['crud'] = 'c';
+        $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
+        $this->data['objecttable'] = 'certifygen_validations';
+    }
+    /**
+     * Returns description of what happened.
+     *
+     * @return string
+     */
+    public function get_description() {
+        return "The user with id '$this->userid' has revoked a certificate";
+    }
+}

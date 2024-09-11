@@ -13,23 +13,46 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU".
+//
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
- * @package   certifygenrepository_localrepository
+ * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// This line protects the file from being accessed by a URL directly.
-defined('MOODLE_INTERNAL') || die();
+namespace mod_certifygen\tables;
 
-$string['pluginname'] = 'Certifygen Repositorio Local';
-$string['pluginnamesettings'] = 'Configuración del Repositorio Local';
-$string['enable'] = 'Habilitar';
-$string['enable_help'] = 'Este repositorio guarda en el moodledata los certificados.';
-$string['privacy:metadata'] = 'El plugin Certifygen Repositorio Local no almacena datos personales.';
+use core_table\local\filter\filterset;
+use core_table\local\filter\integer_filter;
+use core_table\local\filter\string_filter;
+
+class errors_filterset extends filterset
+{
+    /**
+     * @return class-string[]
+     */
+    public function get_required_filters(): array
+    {
+        return [];
+    }
+
+    /**
+     * @return array
+     */
+    public function get_optional_filters(): array
+    {
+        return [
+            'modelname' => string_filter::class,
+            'userfullname' => string_filter::class,
+        ];
+    }
+}

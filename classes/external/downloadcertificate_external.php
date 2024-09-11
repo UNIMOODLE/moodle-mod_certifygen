@@ -45,6 +45,7 @@ use external_value;
 use invalid_parameter_exception;
 use mod_certifygen\certifygen;
 use mod_certifygen\certifygen_file;
+use mod_certifygen\event\certificate_downloaded;
 use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
@@ -117,6 +118,9 @@ class downloadcertificate_external extends external_api {
                 if (empty($result['url'])) {
                     $result['result'] = false;
                     $result['message'] = 'empty_url';
+                } else {
+                    // triger event.
+                    certificate_downloaded::create_from_validation($validation)->trigger();
                 }
             } else {
                 $result['result'] = false;

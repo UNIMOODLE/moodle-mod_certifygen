@@ -36,6 +36,7 @@ use mod_certifygen\output\views\activity_view;
 use mod_certifygen\output\views\model_view;
 use mod_certifygen\output\views\mycertificates_view;
 use mod_certifygen\output\views\profile_my_certificates_view;
+use mod_certifygen\output\views\showerrors_view;
 use mod_certifygen\output\views\student_view;
 use mod_certifygen\output\views\teacher_view;
 use mod_certifygen\output\views\associatemodelcontexts_view;
@@ -44,6 +45,18 @@ use plugin_renderer_base;
 
 class renderer extends plugin_renderer_base {
 
+    /**
+     * Activity view renderer
+     * @param activity_view $view
+     * @return string
+     * @throws \coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     */
+    public function render_showerrors_view(showerrors_view $view): string {
+        $data = $view->export_for_template($this);
+        return $this->render_from_template('mod_certifygen/showerrors', $data);
+    }
     /**
      * Activity view renderer
      * @param activity_view $view

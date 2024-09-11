@@ -93,5 +93,20 @@
                 <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for certifygen_template"/>
             </KEYS>
         </TABLE>
+        <TABLE NAME="certifygen_error" COMMENT="Stores certificate errors">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="validationid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false" COMMENT="certificate status"/>
+                <FIELD NAME="code" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="certificate error message"/>
+                <FIELD NAME="message" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="certificate error message"/>
+                <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for certifygen_template"/>
+            </KEYS>
+        </TABLE>
     </TABLES>
 </XMLDB>

@@ -79,6 +79,11 @@ $teacherrequestreportsettings = new admin_externalpage('certifygenteacherrequest
     '/mod/certifygen/teacherrequestreport.php',  'mod/certifygen:viewcontextcertificates', $module->is_enabled() === false);
 $ADMIN->add('certifygencat', $teacherrequestreportsettings);
 
+$errorspage = new admin_externalpage('certifygenerrors',
+    get_string('certifygenerrors', 'mod_certifygen'),
+    '/mod/certifygen/showerrors.php',  'mod/certifygen:manage');
+$ADMIN->add('modsettingcertifygencat', $errorspage);
+
 // Subplugins settings.
 foreach (core_plugin_manager::instance()->get_plugins_of_type('certifygenvalidation') as $plugin) {
     /** @var \mod_certifygen\plugininfo\certifygenvalidation $plugin */

@@ -39,6 +39,7 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
+use mod_certifygen\event\certificate_downloaded;
 use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
@@ -102,6 +103,9 @@ class downloadteachercertificate_external extends external_api {
                 if (empty($result['url'])) {
                     $result['result'] = false;
                     $result['message'] = 'empty_url';
+                } else {
+                    // triger event.
+                    certificate_downloaded::create_from_validation($trequest)->trigger();
                 }
             } else {
                 $result['result'] = false;

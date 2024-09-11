@@ -21,6 +21,8 @@ class certifygen_validations extends persistent {
     public const STATUS_STORAGE_ERROR = 6;
     public const STATUS_ERROR = 7;
     public const STATUS_FINISHED = 8;
+    public const STATUS_TEACHER_ERROR = 9;
+    public const STATUS_STUDENT_ERROR = 10;
     public const TEACHER_REQUEST_CODE_STARTSWITH = 'TR';
 
     /**
@@ -268,5 +270,18 @@ class certifygen_validations extends persistent {
                     'id' => $validation->get('issueid')]);
         }
         return $code;
+    }
+
+    /**
+     * @return array
+     */
+    public static function get_status_error() : array {
+        return [
+            self::STATUS_ERROR,
+            self::STATUS_STUDENT_ERROR,
+            self::STATUS_STORAGE_ERROR,
+            self::STATUS_TEACHER_ERROR,
+            self::STATUS_VALIDATION_ERROR,
+        ];
     }
 }

@@ -44,6 +44,7 @@ use external_value;
 use invalid_parameter_exception;
 use mod_certifygen\certifygen;
 use mod_certifygen\certifygen_file;
+use mod_certifygen\event\certificate_revoked;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
@@ -74,7 +75,7 @@ class revokecertificate_external extends external_api {
      * @throws invalid_parameter_exception
      */
     public static function revokecertificate(int $issueid, int $userid, int $modelid): array {
-        global $DB;
+        global $DB, $USER;
 
         self::validate_parameters(
             self::revokecertificate_parameters(), ['issueid' => $issueid, 'userid' => $userid, 'modelid' => $modelid]
@@ -103,12 +104,20 @@ class revokecertificate_external extends external_api {
             $template->revoke_issue($issueid);
 
             // Step 5: Remove validation id.
-            try {
-                $validation = certifygen_validations::get_record($data, MUST_EXIST);
-                $validation->delete();
-            } catch (moodle_exception $exception) {
-                error_log(__FUNCTION__ . ' ' . __LINE__ . ' validation - getMessage: '.var_export($exception->getMessage(), true));
-            }
+            $validation = certifygen_validations::get_record($data, MUST_EXIST);
+            $model = new certifygen_model($validation->get('modelid'));
+            $eventdata = [
+                'objectid' => $validation->get('id'),
+                'userid' => $USER->id,
+                'context' => $context,
+                'other' => [
+                    'validation' => $model->get('validation'),
+                    'repository' => $model->get('repository'),
+                    'report' => $model->get('report'),
+                ]
+            ];
+            certificate_revoked::create($eventdata)->trigger();
+            $validation->delete();
         } catch (moodle_exception $e) {
             error_log(__FUNCTION__ . ' ' . __LINE__ . ' 2 validation - getMessage: '.var_export($e->getMessage(), true));
             $result['result'] = false;

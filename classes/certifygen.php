@@ -40,6 +40,7 @@ use core_course\customfield\course_handler;
 use dml_exception;
 use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\persistents\certifygen_error;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
@@ -456,6 +457,7 @@ class certifygen {
      * @throws dml_exception
      */
     public static function start_emit_certificate_proccess(certifygen_validations $validation, certifygen_file $certifygenfile, certifygen_model $certifygenmodel) : array {
+        global $USER;
         $result = ['result' => true, 'message' => get_string('ok', 'mod_certifygen')];
 
         // Step 4: Call to validation plugin.
@@ -471,6 +473,14 @@ class certifygen {
                 }
                 $validation->set('status', certifygen_validations::STATUS_VALIDATION_ERROR);
                 $validation->save();
+                $data = [
+                    'validationid' => $validation->get('id'),
+                    'status' => $validation->get('status'),
+                    'code' => 'validation_plugin_send_file_error',
+                    'message' => 'validation_plugin_send_file_error',
+                    'usermodified' => $USER->id,
+                ];
+                certifygen_error::manage_certifygen_error(0, (object)$data);
             } else if (!$subplugin->checkStatus()) {
                 $validation->set('status', certifygen_validations::STATUS_VALIDATION_OK);
                 $validation->save();
@@ -478,8 +488,16 @@ class certifygen {
         } else {
             $result['result'] = false;
             $result['message'] = 'validationplugin_not_enabled';
-            $validation->set('status', certifygen_validations::STATUS_ERROR);
+            $validation->set('status', certifygen_validations::STATUS_VALIDATION_ERROR);
             $validation->save();
+            $data = [
+                'validationid' => $validation->get('id'),
+                'status' => $validation->get('status'),
+                'code' => 'validationplugin_not_enabled',
+                'message' => 'validationplugin_not_enabled',
+                'usermodified' => $USER->id,
+            ];
+            certifygen_error::manage_certifygen_error(0, (object)$data);
         }
         // Step 5: Call to repository plugin.
         if ($validation->get('status') === certifygen_validations::STATUS_VALIDATION_OK) {
@@ -497,8 +515,99 @@ class certifygen {
                 $validation->save();
                 $result['result'] = false;
                 $result['message'] = $response['message'];
+                $data = [
+                    'validationid' => $validation->get('id'),
+                    'status' => $validation->get('status'),
+                    'code' => $response['message'],
+                    'message' => $response['message'],
+                    'usermodified' => $USER->id,
+                ];
+                certifygen_error::manage_certifygen_error(0, (object)$data);
             }
         }
         return $result;
+    }
+
+    /**
+     * @param string $userfullname
+     * @param string $modelname
+     * @return int
+     * @throws dml_exception
+     */
+    public static function count_errors(string $userfullname = '', string $modelname = '') {
+        global $DB;
+        $params = [];
+        $where = "";
+        if (!empty($modelname)) {
+            $params['modelname'] = '%' . $modelname . '%';
+            $where .= $DB->sql_like('cm.name', ':modelname');
+        }
+        if (!empty($userfullname)) {
+            $fullname = $DB->sql_fullname('u.firstname', 'u.lastname');
+            $params['search'] = '%' . $userfullname . '%';
+            if (!empty($where)) {
+                $where .= ' AND ';
+            }
+            $params['search'] = '%' . $DB->sql_like_escape($userfullname) . '%';
+            $where .= $DB->sql_like($fullname, ':search', false);
+        }
+        $wheresql = '';
+        if (!empty($where)) {
+            $wheresql = ' WHERE ' . $where;
+        }
+        $sql = "SELECT COUNT(*)
+                FROM  mdl_certifygen_error ce
+                INNER JOIN mdl_certifygen_validations cv ON cv.id = ce.validationid
+                INNER JOIN mdl_certifygen_model cm ON cm.id = cv.modelid
+                INNER JOIN {user} u ON u.id = cv.userid
+                LEFT JOIN mdl_certifygen c ON c.id = cv.certifygenid
+                $wheresql
+                ";
+
+        return $DB->count_records_sql($sql, $params);
+    }
+
+    /**
+     * @param string $userfullname
+     * @param string $modelname
+     * @return array
+     * @throws dml_exception
+     */
+    public static function get_errors(string $userfullname = '', string $modelname = '') {
+        global $DB;
+
+        $params = [];
+        $where = "";
+        if (!empty($modelname)) {
+            $params['modelname'] = '%' . $modelname . '%';
+            $where .= $DB->sql_like('cm.name', ':modelname');
+        }
+        if (!empty($userfullname)) {
+            $fullname = $DB->sql_fullname();
+            $params['search'] = '%' . $userfullname . '%';
+            if (!empty($where)) {
+                $where .= ' AND ';
+            }
+            $params['search'] = '%' . $DB->sql_like_escape($userfullname) . '%';
+            $where .= $DB->sql_like($fullname, ':search', false);
+        }
+        $wheresql = '';
+        if (!empty($where)) {
+            $wheresql = ' WHERE ' . $where;
+        }
+        $sql = "SELECT ce.id, ce.`status`, ce.code AS errorcode, ce.message AS errormessage, ce.timecreated, ce.validationid, 
+       cv.name AS teacherreportname,
+       c.name AS activityname,
+       cm.validation AS modelvalidation, cm.report AS modelreport, cm.repository AS modelrepository, cm.type AS modeltype, cm.name as modelname,
+       u.id as userid, u.picture, u.firstname, u.lastname, u.firstnamephonetic, u.lastnamephonetic, u.middlename, u.alternatename, u.imagealt, u.email
+                FROM  {certifygen_error} ce
+                INNER JOIN {certifygen_validations} cv ON cv.id = ce.validationid
+                INNER JOIN {certifygen_model} cm ON cm.id = cv.modelid
+                INNER JOIN {user} u ON u.id = cv.userid
+                LEFT JOIN {certifygen} c ON c.id = cv.certifygenid
+                $wheresql
+                ORDER BY ce.timecreated DESC";
+
+        return $DB->get_records_sql($sql, $params);
     }
 }
