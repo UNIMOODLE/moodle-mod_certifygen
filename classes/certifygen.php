@@ -576,7 +576,8 @@ class certifygen {
      * @return array
      * @throws dml_exception
      */
-    public static function get_errors(string $userfullname = '', string $modelname = ''): array {
+    public static function get_errors(string $userfullname = '', string $modelname = '',
+                                      int $limitfrom, int $limitnum): array {
         global $DB;
 
         $params = [];
@@ -603,7 +604,7 @@ class certifygen {
         $sql .= " ce.validationid, cv.name AS teacherreportname, c.name AS activityname,cm.validation AS modelvalidation,";
         $sql .= " cm.report AS modelreport, cm.repository AS modelrepository,cm.type AS modeltype, cm.name as modelname,";
         $sql .= " u.id as userid, u.picture, u.firstname, u.lastname, u.firstnamephonetic, u.lastnamephonetic,";
-        $sql .= " u.middlename, u.alternatename, u.imagealt, u.email";
+        $sql .= " u.middlename, u.alternatename, u.imagealt, u.email, cv.certifygenid";
         $sql .= " FROM  {certifygen_error} ce";
         $sql .= " INNER JOIN {certifygen_validations} cv ON cv.id = ce.validationid";
         $sql .= " INNER JOIN {certifygen_model} cm ON cm.id = cv.modelid";
@@ -612,6 +613,6 @@ class certifygen {
         $sql .= $wheresql;
         $sql .= "ORDER BY ce.timecreated DESC";
 
-        return $DB->get_records_sql($sql, $params);
+        return $DB->get_records_sql($sql, $params, $limitfrom, $limitnum);
     }
 }

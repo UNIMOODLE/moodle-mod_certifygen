@@ -77,7 +77,7 @@ class showerrors_view  implements renderable, templatable {
         $tablelist->baseurl = new \moodle_url('/mod/certifygen/showerrors.php');
         $tablelist->set_filterset($filters);
         ob_start();
-        $tablelist->out(10, true);
+        $tablelist->out(10, false);
         $out1 = ob_get_contents();
         ob_end_clean();
         $data = new \stdClass();

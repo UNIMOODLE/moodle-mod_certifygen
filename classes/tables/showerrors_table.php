@@ -36,6 +36,9 @@ require_once("$CFG->libdir/moodlelib.php");
 use coding_exception;
 use dml_exception;
 use mod_certifygen\certifygen;
+use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\persistents\certifygen_model;
+use moodle_url;
 use table_sql;
 /**
  * showerrors_table
@@ -57,7 +60,7 @@ class showerrors_table extends table_sql {
         parent::__construct($uniqueid);
         // Define the list of columns to show.
         $columns = ['user', 'status', 'message', 'model', 'type', 'validation', 'repository', 'report', 'name',
-            'validationid', 'timecreated'];
+            'validationid', 'timecreated', 'download'];
         $this->define_columns($columns);
 
         // Define the titles of columns to show in header.
@@ -73,6 +76,7 @@ class showerrors_table extends table_sql {
             get_string('name', 'mod_certifygen'),
             get_string('idrequest', 'mod_certifygen'),
             get_string('date'),
+            get_string('download'),
             ];
         $this->define_headers($headers);
     }
@@ -96,7 +100,8 @@ class showerrors_table extends table_sql {
 
         $total = certifygen::count_errors($userfullname, $modelname);
         $this->pagesize($pagesize, $total);
-        $this->rawdata = certifygen::get_errors($userfullname, $modelname);
+        $this->rawdata = certifygen::get_errors($userfullname, $modelname, $this->get_page_start(),
+            $this->get_page_size());
     }
 
     /**
@@ -120,6 +125,36 @@ class showerrors_table extends table_sql {
         ];
 
         return $OUTPUT->user_picture((object) $data, ['size' => 35, 'includefullname' => true]);
+    }
+    /**
+     * Download certificate
+     * @param $row
+     * @return string
+     * @throws coding_exception
+     * @throws dml_exception
+     */
+    final public function col_download($row): string {
+
+        // Validation plugin.
+        $validationplugin = $row->modelvalidation;
+        $validationpluginclass = $validationplugin . '\\' . $validationplugin;
+        if (get_config($validationplugin, 'enabled') === '1') {
+            /** @var ICertificateValidation $subplugin */
+            $subplugin = new $validationpluginclass();
+            $courseid = 0;
+            if ($row->modeltype == certifygen_model::TYPE_ACTIVITY) {
+                $certifygen = new \mod_certifygen\persistents\certifygen($row->certifygenid);
+                $courseid = $certifygen->get('course');
+            }
+            $response = $subplugin->get_file($courseid, $row->validationid);
+            if (array_key_exists('file', $response)) {
+                $file = $response['file'];
+                $url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(),
+                    $file->get_itemid(), $file->get_filepath(), $file->get_filename())->out();
+                return \html_writer::link($url, get_string('download'));
+            }
+        }
+        return '';
     }
     /**
      * Type
