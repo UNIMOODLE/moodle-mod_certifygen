@@ -51,7 +51,6 @@ function certifygen_supports(string $feature): ?bool {
         case FEATURE_MOD_INTRO:
         case FEATURE_SHOW_DESCRIPTION:
         case FEATURE_COMPLETION_TRACKS_VIEWS:
-        case FEATURE_BACKUP_MOODLE2:
             return true;
         default:
             return null;
@@ -120,12 +119,12 @@ function certifygen_update_instance($data, $mform): bool {
  * @return bool Success/Fail
  * @throws coding_exception
  */
-function certifygen_delete_instance(stdClass $data, mod_certifygen_mod_form $mform): bool {
+function certifygen_delete_instance($id): bool {
     // Delete a certifygen.
-    $certifygen = new certifygen($data->certifygenid);
+    $certifygen = new certifygen($id);
 
     // Delete a certifygen_validations.
-    $validations = certifygen_validations::get_records(['certifygenid' => $data->certifygenid]);
+    $validations = certifygen_validations::get_records(['certifygenid' => $id]);
     foreach ($validations as $validation) {
         $validation->delete();
     }
