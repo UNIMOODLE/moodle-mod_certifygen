@@ -22,18 +22,19 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
 namespace mod_certifygen\forms;
+
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once("$CFG->dirroot/mod/certifygen/lib.php");
-
 use coding_exception;
 use context;
 use context_system;
@@ -42,22 +43,26 @@ use core_form\dynamic_form;
 use dml_exception;
 use html_writer;
 use mod_certifygen\interfaces\ICertificateRepository;
-use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
 use moodle_exception;
 use moodle_url;
-use tool_certificate\certificate;
-use MoodleQuickForm;
 use tool_certificate\permission;
 use function get_string_manager;
-
+/**
+ * Model form
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class modelform extends dynamic_form {
 
     /**
+     * Definition
      * @throws coding_exception|dml_exception
      */
-    protected function definition()
-    {
+    protected function definition() {
         global $OUTPUT;
         $mform =& $this->_form;
         $modelid = is_null($this->_ajaxformdata) ? 0 : (int)$this->_ajaxformdata['id'];
@@ -104,16 +109,16 @@ class modelform extends dynamic_form {
             $html = html_writer::div($html, 'w-100');
             $mform->addElement('html', $html);
         }
-
         // End Model Form Part.
 
-        // Templateid
+        // Templateid.
         $templates = mod_certifygen_get_templates();
         if (!$cemited) {
             $canmanagetemplates = permission::can_manage_anywhere();
             $templateoptions = ['' => get_string('chooseatemplate', 'mod_certifygen')] + $templates;
             $manageurl = new moodle_url('/admin/tool/certificate/manage_templates.php');
-            $elements = [$mform->createElement('select', 'templateid', get_string('template', 'mod_certifygen'), $templateoptions)];
+            $elements = [$mform->createElement('select', 'templateid',
+                get_string('template', 'mod_certifygen'), $templateoptions)];
             $mform->setType('templateid', PARAM_INT);
 
             // Adding "Manage templates" link if user has capabilities to manage templates.
@@ -123,20 +128,21 @@ class modelform extends dynamic_form {
             }
             $mform->addGroup($elements, 'template_group', get_string('template', 'mod_certifygen'),
                 html_writer::div('', 'w-100'), false);
-            $mform->hideIf('template_group', 'type', 'noteq', certifygen_model::TYPE_ACTIVITY);
+            $mform->hideIf('template_group', 'type', 'noteq',
+                certifygen_model::TYPE_ACTIVITY);
 
         } else if ($model->get('templateid')) {
-            $html = get_string('template', 'mod_certifygen') . ' : ' . $templates[(int)$model->get('templateid')];
+            $html = get_string('template', 'mod_certifygen') . ' : '
+                . $templates[(int)$model->get('templateid')];
             $html = html_writer::div($html, 'w-100');
             $mform->addElement('html', $html);
         }
 
-        // Langs
+        // Langs.
         $langs = get_string_manager()->get_list_of_translations();
         if (!$cemited) {
             $mform->addElement('select', 'langs', get_string('langs', 'mod_certifygen'), $langs);
             $mform->getElement('langs')->setMultiple(true);
-            //$mform->setType('langs', PARAM_RAW);
             $mform->addRule('langs', get_string('required'), 'required');
         } else {
             $langstrings = $model->get('langs');
@@ -153,7 +159,8 @@ class modelform extends dynamic_form {
         // Validation.
         $types = mod_certifygen_get_validation();
         if (!$cemited) {
-            $mform->addElement('select', 'validation', get_string('validation', 'mod_certifygen'), $types);
+            $mform->addElement('select', 'validation',
+                get_string('validation', 'mod_certifygen'), $types);
             $mform->setType('validation', PARAM_RAW);
             $mform->addRule('validation', get_string('required'), 'required');
         } else {
@@ -165,7 +172,8 @@ class modelform extends dynamic_form {
         // Report (only for teacher model type).
         $types = mod_certifygen_get_report();
         if (!$cemited) {
-            $mform->addElement('select', 'report', get_string('report', 'mod_certifygen'), $types);
+            $mform->addElement('select', 'report', get_string('report', 'mod_certifygen'),
+                $types);
             $mform->setType('report', PARAM_RAW);
             $mform->hideIf('report', 'type', 'eq', certifygen_model::TYPE_ACTIVITY);
         } else {
@@ -175,11 +183,12 @@ class modelform extends dynamic_form {
             $mform->addElement('html', $html);
         }
 
-        // Repository
+        // Repository.
         $types = mod_certifygen_get_repositories();
 
         if (!$cemited) {
-            $mform->addElement('select', 'repository', get_string('repository', 'mod_certifygen'), $types);
+            $mform->addElement('select', 'repository',
+                get_string('repository', 'mod_certifygen'), $types);
             $mform->setType('repository', PARAM_RAW);
             $mform->addRule('repository', get_string('required'), 'required');
         } else {
@@ -195,40 +204,40 @@ class modelform extends dynamic_form {
     }
 
     /**
+     * get_context_for_dynamic_submission
      * @throws dml_exception
      */
-    protected function get_context_for_dynamic_submission(): context
-    {
+    protected function get_context_for_dynamic_submission(): context {
         return context_system::instance();
     }
 
     /**
+     * check_access_for_dynamic_submission
      * @throws coding_exception
      * @throws moodle_exception
      * @throws dml_exception
      */
-    protected function check_access_for_dynamic_submission(): void
-    {
+    protected function check_access_for_dynamic_submission(): void {
         if (!has_capability('mod/certifygen:manage', $this->get_context_for_dynamic_submission())) {
             throw new moodle_exception('nopermissions', 'error', '', 'manage models');
         }
     }
 
     /**
+     * process_dynamic_submission
      * @throws coding_exception
      * @throws invalid_persistent_exception
      */
-    public function process_dynamic_submission()
-    {
+    public function process_dynamic_submission() {
         $formdata = $this->get_data();
         certifygen_model::save_model_object($formdata);
     }
 
     /**
+     * set_data_for_dynamic_submission
      * @throws coding_exception
      */
-    public function set_data_for_dynamic_submission(): void
-    {
+    public function set_data_for_dynamic_submission(): void {
         if (!empty($this->_ajaxformdata['id'])) {
             $model = new certifygen_model($this->_ajaxformdata['id']);
             $this->set_data([
@@ -249,13 +258,21 @@ class modelform extends dynamic_form {
     }
 
     /**
+     * get_page_url_for_dynamic_submission
      * @return moodle_url
      */
-    protected function get_page_url_for_dynamic_submission(): moodle_url
-    {
+    protected function get_page_url_for_dynamic_submission(): moodle_url {
         return new moodle_url('/mod/certifygen/modelmanager.php');
     }
-    function validation($data, $files) {
+
+    /**
+     * Validation
+     * @param $data
+     * @param $files
+     * @return array
+     * @throws coding_exception
+     */
+    public function validation($data, $files) {
         $errors = [];
 
         if (!array_key_exists('langs', $data)
@@ -272,7 +289,8 @@ class modelform extends dynamic_form {
             $a = new \stdClass();
             $a->validation = get_string('pluginname', $data['validation']);
             $a->repository = get_string('pluginname', $repositoryplugin);
-            $errors['repository'] = get_string('repositorynotvalidwithvalidationplugin', 'mod_certifygen', $a);
+            $errors['repository'] = get_string('repositorynotvalidwithvalidationplugin',
+                'mod_certifygen', $a);
         }
         return $errors;
     }

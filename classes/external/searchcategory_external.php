@@ -18,6 +18,15 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
+/**
+ * Search category
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 namespace mod_certifygen\external;
 
 use coding_exception;
@@ -35,11 +44,12 @@ use moodle_exception;
 use restricted_context_exception;
 
 /**
+ * Search category
  * @package    mod_certifygen
- * * @copyright  2024 Proyecto UNIMOODLE
- * * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
- * * @author     3IPUNT <contacte@tresipunt.com>
- * * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class searchcategory_external extends external_api {
 
@@ -55,6 +65,7 @@ class searchcategory_external extends external_api {
     }
 
     /**
+     * Search category
      * @param string $query
      * @return array
      * @throws coding_exception
@@ -75,10 +86,9 @@ class searchcategory_external extends external_api {
         require_capability('mod/certifygen:manage', $context);
 
         $likename = $DB->sql_like('name', ':name', false, true);
-        $sql = "SELECT id, name
-              FROM {course_categories} c
-             WHERE $likename";
-
+        $sql = "SELECT id, name";
+        $sql .= " FROM {course_categories} c";
+        $sql .= " WHERE $likename";
         $rs = $DB->get_recordset_sql($sql, ['name' => '%' . $query . '%']);
         $count = 0;
         $list = [];
@@ -89,9 +99,9 @@ class searchcategory_external extends external_api {
             $name = '';
             foreach ($parentids as $parentid) {
                 $parent = core_course_category::get($parentid);
-                $name .= ' / ' . $parent ->get_formatted_name();
+                $name .= ' / ' . $parent->get_formatted_name();
             }
-            $name .= ' / ' . $category1 ->get_formatted_name();
+            $name .= ' / ' . $category1->get_formatted_name();
             $category = (object)[
                 'id' => $record->id,
                 'name' => strip_tags(format_text($name)),

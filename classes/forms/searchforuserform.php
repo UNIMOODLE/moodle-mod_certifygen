@@ -32,15 +32,28 @@
 
 namespace mod_certifygen\forms;
 
+use coding_exception;
 use context_system;
+use dml_exception;
 use moodleform;
-
 use core_user;
-class searchforuserform extends moodleform
-{
+/**
+ * Search for user form
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class searchforuserform extends moodleform {
 
-    protected function definition()
-    {
+    /**
+     * Definition
+     * @return void
+     * @throws coding_exception
+     * @throws dml_exception
+     */
+    protected function definition() {
         $mform =& $this->_form;
         $context = context_system::instance();
         $options = [
@@ -49,7 +62,7 @@ class searchforuserform extends moodleform
             'valuehtmlcallback' => function($userid) use ($context): string {
                 $user = core_user::get_user($userid);
                 return fullname($user, has_capability('moodle/site:viewfullnames', $context));
-            }
+            },
         ];
         $mform->addElement('autocomplete', 'user', get_string('user'), [], $options);
         $this->add_action_buttons(false, get_string('filter', 'mod_certifygen'));

@@ -17,6 +17,7 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
  * @package   certifygenvalidation_electronic
  * @copyright  2024 Proyecto UNIMOODLE
@@ -45,4 +46,3 @@ $string['reasondesc'] = 'Ziurtagiria sinatzeko beharrezko eremua';
 $string['contactinfo'] = 'Ziurtagiriaren Kontaktuen Informazioa';
 $string['contactinfodesc'] = 'Ziurtagiria sinatzeko beharrezko eremua';
 $string['privacy:metadata'] = 'BALIOZTAZIO ELEKTRONIKOA pluginak ez du datu pertsonalik gordetzen.';
-

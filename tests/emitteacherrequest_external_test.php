@@ -25,6 +25,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -35,10 +36,19 @@ use mod_certifygen\external\emitteacherrequest_external;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
 require_once($CFG->dirroot.'/lib/externallib.php');
-
+/**
+ * Issue certificate test
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class emitteacherrequest_external_test extends advanced_testcase {
 
     /**
@@ -49,6 +59,7 @@ class emitteacherrequest_external_test extends advanced_testcase {
     }
 
     /**
+     * test
      * @return void
      * @throws coding_exception
      * @throws dml_exception
@@ -100,6 +111,7 @@ class emitteacherrequest_external_test extends advanced_testcase {
     }
 
     /**
+     * test
      * @return void
      * @throws coding_exception
      * @throws dml_exception

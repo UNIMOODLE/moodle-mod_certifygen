@@ -22,15 +22,14 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 namespace mod_certifygen\external;
-
 use coding_exception;
 use context_system;
 use core\invalid_persistent_exception;
@@ -43,7 +42,14 @@ use mod_certifygen\event\certificate_downloaded;
 use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-
+/**
+ * Download teacher certificate
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class downloadteachercertificate_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -59,6 +65,7 @@ class downloadteachercertificate_external extends external_api {
     }
 
     /**
+     * Download teacher certificate
      * @param int $id
      * @return array
      * @throws coding_exception
@@ -99,12 +106,12 @@ class downloadteachercertificate_external extends external_api {
             if (get_config($repositoryplugin, 'enabled') === '1') {
                 /** @var ICertificateRepository $subplugin */
                 $subplugin = new $repositorypluginclass();
-                $result['url'] = $subplugin->getFileUrl($trequest);
+                $result['url'] = $subplugin->get_file_url($trequest);
                 if (empty($result['url'])) {
                     $result['result'] = false;
                     $result['message'] = 'empty_url';
                 } else {
-                    // triger event.
+                    // Triger event.
                     certificate_downloaded::create_from_validation($trequest)->trigger();
                 }
             } else {
@@ -131,5 +138,4 @@ class downloadteachercertificate_external extends external_api {
             ]
         );
     }
-
 }

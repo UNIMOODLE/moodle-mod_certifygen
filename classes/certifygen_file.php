@@ -25,6 +25,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -32,6 +33,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_certifygen;
+
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
 use coding_exception;
@@ -42,22 +46,34 @@ use mod_certifygen\task\checkstatus;
 use moodle_url;
 use stdClass;
 use stored_file;
-
+/**
+ * certifygen_file
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class certifygen_file {
+    /** @var stored_file $file */
     private stored_file $file;
-    private stdClass $course;
+    /** @var int $userid */
     private int $userid;
+    /** @var int $modelid */
     private int $modelid;
+    /** @var int $validationid */
     private int $validationid;
+    /** @var string  $lang */
     private string $lang;
+    /** @var array  $metadata */
     private array $metadata;
 
     /**
+     * certifygen_file
      * @throws coding_exception
      */
     public function __construct(stored_file $file, int $userid, string $lang, int $modelid, int $validationid) {
         $this->file = $file;
-//        $this->course = $course;
         $this->userid = $userid;
         $this->lang = $lang;
         $this->modelid = $modelid;
@@ -65,56 +81,51 @@ class certifygen_file {
     }
 
     /**
-     * @return stdClass
-     * @throws dml_exception
-     */
-//    public function get_course() : stdClass {
-//        return $this->course;
-//    }
-    /**
+     * get_validationid
      * @return int
      */
-    public function get_validationid() : int {
+    public function get_validationid(): int {
         return $this->validationid;
     }
     /**
+     * get_file
      * @return stored_file
      */
-    public function get_file() : stored_file {
+    public function get_file(): stored_file {
         return $this->file;
     }
 
     /**
+     * get_user
      * @return stdClass
      */
-    public function get_user() : stdClass {
+    public function get_user(): stdClass {
         $users = user_get_users_by_id([$this->userid]);
         return reset($users);
     }
 
     /**
+     * set_metadata
      * @param array $data
      * @return void
      */
-    public function set_metadata(array $data) : void {
+    public function set_metadata(array $data): void {
         $this->metadata = $data;
     }
     /**
+     * get_metadata
      * @return array
      * @throws dml_exception
      */
-    public function get_metadata() : array {
+    public function get_metadata(): array {
         return $this->metadata;
-//        return [
-//            'userid' => $this->userid,
-//            'courseid' => $this->course->id,
-//            'coursefullname' => $this->get_course()->fullname,
-//            'lang' => $this->lang,
-//            'contentfile' => $this->file->get_content(),
-//            'modelid' => $this->modelid
-//        ];
     }
-    public function get_file_url() : string {
+
+    /**
+     * get_file_url
+     * @return string
+     */
+    public function get_file_url(): string {
         $file = $this->get_file();
         $name = $file->get_filename();
         return moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(),
@@ -122,10 +133,11 @@ class certifygen_file {
     }
 
     /**
+     * get_model_type
      * @return int
      * @throws coding_exception
      */
-    public function get_model_type() : int {
+    public function get_model_type(): int {
         $model = new certifygen_model($this->modelid);
         return $model->get('type');
     }

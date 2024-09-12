@@ -25,6 +25,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -43,22 +44,30 @@ use mod_certifygen\persistents\certifygen_model;
 use moodle_exception;
 use restricted_context_exception;
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
 require_once($CFG->dirroot . '/lib/externallib.php');
-
-class searchmycourses_external_test extends advanced_testcase
-{
+/**
+ * Search my courses
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class searchmycourses_external_test extends advanced_testcase {
 
     /**
      * Test set up.
      */
-    public function setUp(): void
-    {
+    public function setUp(): void {
         $this->resetAfterTest();
     }
 
     /**
+     * Test
      * @return void
      * @throws coding_exception
      * @throws dml_exception
@@ -66,8 +75,7 @@ class searchmycourses_external_test extends advanced_testcase
      * @throws moodle_exception
      * @throws restricted_context_exception
      */
-    public function test_searchmycourses_notenrolled(): void
-    {
+    public function test_searchmycourses_notenrolled(): void {
         // Create user.
         $user = $this->getDataGenerator()->create_user(
             ['username' => 'test_user_2', 'firstname' => 'test',
@@ -107,6 +115,7 @@ class searchmycourses_external_test extends advanced_testcase
     }
 
     /**
+     * Test
      * @return void
      * @throws coding_exception
      * @throws dml_exception
@@ -114,8 +123,7 @@ class searchmycourses_external_test extends advanced_testcase
      * @throws moodle_exception
      * @throws restricted_context_exception
      */
-    public function test_searchmycourses_enrolled(): void
-    {
+    public function test_searchmycourses_enrolled(): void {
         // Create user and enrol as teacher.
         $user = $this->getDataGenerator()->create_user(
             ['username' => 'test_user_2', 'firstname' => 'test',

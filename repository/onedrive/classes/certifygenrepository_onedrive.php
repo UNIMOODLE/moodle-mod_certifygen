@@ -1,5 +1,5 @@
 <?php
-// This file is part of the mod_certifygen plugin for Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
  * @package   certifygenrepository_onedrive
  * @copyright  2024 Proyecto UNIMOODLE
@@ -32,17 +33,24 @@ use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\persistents\certifygen_repository;
 use mod_certifygen\persistents\certifygen_validations;
 use stored_file;
-
-class certifygenrepository_onedrive implements ICertificateRepository
-{
+/**
+ * certifygenrepository_onedrive
+ * @package   certifygenrepository_onedrive
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class certifygenrepository_onedrive implements ICertificateRepository {
+    /** @var string $url */
     private $url = '';
     /**
+     * getFileUrl
      * @param certifygen_validations $validation
      * @return string
      * @throws coding_exception
      */
-    public function getFileUrl(certifygen_validations $validation): string
-    {
+    public function get_file_url(certifygen_validations $validation): string {
         if (empty($this->url)) {
             $certrepository = certifygen_repository::get_record(
                 ['validationid' => $validation->get('id'), 'userid' => $validation->get('userid')]);
@@ -52,35 +60,15 @@ class certifygenrepository_onedrive implements ICertificateRepository
             return '';
         }
         return $this->url;
-        // TODO igual es mejor no tener que guardar la url en db ...:
-//        $code = certifygen_validations::get_certificate_code($validation);
-//        if (empty($this->url)) {
-//            global $CFG, $USER;
-//            $result = [
-//                'result' => true,
-//                'haserror' => false,
-//                'message' => 'ok',
-//            ];
-//
-//            try {
-//                $connection = new onedriveconnection();
-//                $this->url = $connection->get_file_url();
-//            } catch (\moodle_exception $e) {
-//                $result['result'] = false;
-//                $result['haserror'] = true;
-//                $result['message'] = $e->getMessage();
-//            }
-//            return $result;
-//        }
-//        return $this->url;
     }
 
     /**
+     * saveFile
      * @param stored_file $file
      * @return array
+     * @throws \core\oauth2\rest_exception
      */
-    public function saveFile(stored_file $file): array
-    {
+    public function save_file(stored_file $file): array {
         global $CFG, $USER;
         $result = [
             'result' => true,
@@ -110,11 +98,11 @@ class certifygenrepository_onedrive implements ICertificateRepository
     }
 
     /**
+     * is_enabled
      * @return bool
      * @throws \dml_exception
      */
-    public function is_enabled(): bool
-    {
+    public function is_enabled(): bool {
 //        $enabled = (int) get_config('certifygenrepository_onedrive', 'enabled');
 //        $connection = new onedriveconnection();
 //        if ($enabled && $connection->is_enabled()) {
@@ -124,18 +112,18 @@ class certifygenrepository_onedrive implements ICertificateRepository
     }
 
     /**
+     * save_file_url
      * @return bool
      */
-    public function saveFileUrl(): bool
-    {
+    public function save_file_url(): bool {
         return true;
     }
 
     /**
+     * get_consistent_validation_plugins
      * @return array
      */
-    public function get_consistent_validation_plugins(): array
-    {
+    public function get_consistent_validation_plugins(): array {
         return [];
     }
 }

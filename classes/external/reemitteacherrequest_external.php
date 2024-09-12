@@ -22,6 +22,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -44,7 +45,14 @@ use mod_certifygen\interfaces\ICertificateReport;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-
+/**
+ * Re emit teacher certificate
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class reemitteacherrequest_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -60,6 +68,7 @@ class reemitteacherrequest_external extends external_api {
     }
 
     /**
+     * Reemit certificate
      * @param int $id
      * @return array
      * @throws \dml_exception
@@ -93,7 +102,7 @@ class reemitteacherrequest_external extends external_api {
             $teacherrequest = certifygen_validations::manage_validation(0, (object) $data);
             $result = emitteacherrequest_external::emitteacherrequest($teacherrequest->get('id'));
         } catch (moodle_exception $e) {
-            error_log(__FUNCTION__ . ' ' . ' error: '.var_export($e->getMessage(), true));
+            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $result['result'] = false;
             $result['message'] = $e->getMessage();
             $teacherrequest->set('status', certifygen_validations::STATUS_ERROR);

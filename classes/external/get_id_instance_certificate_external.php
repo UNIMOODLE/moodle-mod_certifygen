@@ -20,6 +20,7 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos..
+
 /**
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
@@ -28,24 +29,32 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 namespace mod_certifygen\external;
-
-
+use dml_exception;
 use external_api;
 use external_function_parameters;
 use external_multiple_structure;
 use external_single_structure;
 use external_value;
+use invalid_parameter_exception;
 use mod_certifygen\persistents\certifygen;
-use mod_certifygen\persistents\certifygen_context;
 use mod_certifygen\persistents\certifygen_model;
 use certifygenfilter;
+
+defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot.'/user/lib.php');
 require_once($CFG->dirroot.'/mod/certifygen/lib.php');
 require_once($CFG->dirroot.'/mod/certifygen/classes/filters/certifygenfilter.php');
+/**
+ * Get instances where there is a mod_certifygen
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class get_id_instance_certificate_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -63,21 +72,16 @@ class get_id_instance_certificate_external extends external_api {
     }
 
     /**
-     * @throws \invalid_parameter_exception
-     * @throws \required_capability_exception
-     * @throws \dml_exception
+     * get_id_instance_certificate
+     * @throws invalid_parameter_exception
+     * @throws dml_exception
      */
-    public static function get_id_instance_certificate(int $userid, string $userfield, string $lang, string $validation, string $repository): array {
-        global $CFG;
-        /**
-         * Devuelve una lista de aquellas instancias de mod_certificate visibles,
-         * con restricciones verificadas a las que el usuario puede acceder y generar el certificado de acuerdo
-         * con la configuración de la instancia.
-         */
-        //TODO: revisar el acceso a la actividad por cm_info->visible.
-        // TODO: // si no envian lang, se pone el idioma de la plataforma.
+    public static function get_id_instance_certificate(int $userid, string $userfield, string $lang): array {
+
+        // TODO: revisar el acceso a la actividad por cm_info->visible.
         $params = self::validate_parameters(
-            self::get_id_instance_certificate_parameters(), ['userid' => $userid, 'userfield' => $userfield, 'lang' => $lang]
+            self::get_id_instance_certificate_parameters(), ['userid' => $userid, 'userfield' => $userfield,
+                'lang' => $lang]
         );
         $context = \context_system::instance();
         $results = ['error' => []];
@@ -116,7 +120,7 @@ class get_id_instance_certificate_external extends external_api {
             // Filter to return course names in $lang language.
             $filter = new certifygenfilter(\context_system::instance(), [], $lang);
 
-            // Get all mod_certifygen activities;
+            // Get all mod_certifygen activities.
             $allactivities = certifygen::get_records();
             $courseids = array_map(function($activity) {
                 return $activity->get('course');
@@ -136,10 +140,8 @@ class get_id_instance_certificate_external extends external_api {
                         continue;
                     }
                     $coursefullname = $filter->filter($enrolment->fullname);
-//                    $coursefullname = format_text($enrolment->fullname);
                     $coursefullname = strip_tags($coursefullname);
                     $courseshortname = $filter->filter($enrolment->shortname);
-//                    $courseshortname = format_text($enrolment->shortname);
                     $courseshortname = strip_tags($courseshortname);
                     $course = [
                         'id' => $enrolment->ctxinstance,
@@ -153,7 +155,6 @@ class get_id_instance_certificate_external extends external_api {
                             continue;
                         }
                         $model = certifygen_model::get_record(['id' => $activity->get('modelid')]);
-//                        $actvname = format_text($activity->get('name'));
                         $actvname = $filter->filter($activity->get('name'));
                         $actvname = strip_tags($actvname);
                         $instance['instance'] = [
@@ -190,25 +191,37 @@ class get_id_instance_certificate_external extends external_api {
      * @return external_single_structure
      */
     public static function get_id_instance_certificate_returns(): external_single_structure {
-        return new external_single_structure(array(
+        return new external_single_structure([
                 'instances' => new external_multiple_structure( new external_single_structure(
                         [
                             'course'   => new external_single_structure([
                                 'id' => new external_value(PARAM_INT, 'Course id', VALUE_OPTIONAL),
-                                'shortname' => new external_value(PARAM_RAW, 'Course shortname', VALUE_OPTIONAL),
-                                'fullname' => new external_value(PARAM_RAW, 'Course fullname', VALUE_OPTIONAL),
-                                'categoryid' => new external_value(PARAM_INT, 'Category id', VALUE_OPTIONAL),
+                                'shortname' => new external_value(PARAM_RAW, 'Course shortname',
+                                    VALUE_OPTIONAL),
+                                'fullname' => new external_value(PARAM_RAW, 'Course fullname',
+                                    VALUE_OPTIONAL),
+                                'categoryid' => new external_value(PARAM_INT, 'Category id',
+                                    VALUE_OPTIONAL),
                             ], 'Course information', VALUE_OPTIONAL),
                             'instance'   => new external_single_structure([
-                                'id' => new external_value(PARAM_INT, 'Instance id', VALUE_OPTIONAL),
-                                'name' => new external_value(PARAM_RAW, 'Instance name', VALUE_OPTIONAL),
-                                'modelname' => new external_value(PARAM_RAW, 'Model name', VALUE_OPTIONAL),
-                                'modelmode' => new external_value(PARAM_INT, 'Model mode', VALUE_OPTIONAL),
-                                'modeltimeondemmand' => new external_value(PARAM_INT, 'Model timeondemmand', VALUE_OPTIONAL),
-                                'modeltype' => new external_value(PARAM_INT, 'Model type', VALUE_OPTIONAL),
-                                'modeltemplateid' => new external_value(PARAM_INT, 'Model template id', VALUE_OPTIONAL),
-                                'modellangs' => new external_value(PARAM_RAW, 'Model langs', VALUE_OPTIONAL),
-                                'modelvalidation' => new external_value(PARAM_RAW, 'Model validation', VALUE_OPTIONAL),
+                                'id' => new external_value(PARAM_INT, 'Instance id',
+                                    VALUE_OPTIONAL),
+                                'name' => new external_value(PARAM_RAW, 'Instance name',
+                                    VALUE_OPTIONAL),
+                                'modelname' => new external_value(PARAM_RAW, 'Model name',
+                                    VALUE_OPTIONAL),
+                                'modelmode' => new external_value(PARAM_INT, 'Model mode',
+                                    VALUE_OPTIONAL),
+                                'modeltimeondemmand' => new external_value(PARAM_INT, 'Model timeondemmand',
+                                    VALUE_OPTIONAL),
+                                'modeltype' => new external_value(PARAM_INT, 'Model type',
+                                    VALUE_OPTIONAL),
+                                'modeltemplateid' => new external_value(PARAM_INT, 'Model template id',
+                                    VALUE_OPTIONAL),
+                                'modellangs' => new external_value(PARAM_RAW, 'Model langs',
+                                    VALUE_OPTIONAL),
+                                'modelvalidation' => new external_value(PARAM_RAW, 'Model validation',
+                                    VALUE_OPTIONAL),
                             ], 'Module Instance information', VALUE_OPTIONAL),
                         ], 'Module Instances list', VALUE_OPTIONAL)
                     , '', VALUE_OPTIONAL),
@@ -216,7 +229,7 @@ class get_id_instance_certificate_external extends external_api {
                     'message' => new external_value(PARAM_RAW, 'Error message'),
                     'code' => new external_value(PARAM_RAW, 'Error code'),
                 ], 'Errors information', VALUE_OPTIONAL),
-            )
+            ]
         );
     }
 }

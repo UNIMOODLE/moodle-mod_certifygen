@@ -39,16 +39,25 @@ use mod_book\event\chapter_created;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->dirroot . '/lib/modinfolib.php');
-class certificate_revoked extends base
-{
+/**
+ * certificate_revoked
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class certificate_revoked extends base {
 
     /**
-     * @inheritDoc
+     * init
+     * @return void
      */
-    protected function init()
-    {
+    protected function init() {
         $this->data['crud'] = 'c';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
         $this->data['objecttable'] = 'certifygen_validations';

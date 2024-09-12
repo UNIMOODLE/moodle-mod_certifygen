@@ -188,3 +188,4 @@ $string['certifygenerrors'] = 'Ver errores del proceso';
 $string['idrequest'] = 'Id Petición';
 $string['validationplugin_not_enabled'] = 'El plugin de validación no está habilitado';
 $string['removefilters'] = 'Eliminar filtros';
+$string['nopermissiontorevokecerts'] = 'No tienes permisos para revocar un certificado';

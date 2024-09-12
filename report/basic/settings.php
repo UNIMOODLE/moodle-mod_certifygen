@@ -22,6 +22,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    certifygenreport_basic
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -65,7 +66,4 @@ if ($ADMIN->fulltree) {
         $desc, '');
     $settings->add($setting);
     $settings->add($setting);
-
-
 }
-//$ADMIN->add('modsettingcertifygencat', $settings);

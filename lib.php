@@ -27,9 +27,8 @@
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-*/
+ */
 
-// This line protects the file from being accessed by a URL directly.
 use core\invalid_persistent_exception;
 use core_user\output\myprofile\tree;
 use mod_certifygen\forms\certificatestablefiltersform;
@@ -42,24 +41,12 @@ use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use tool_certificate\permission;
 
-defined('MOODLE_INTERNAL') || die();
-
-
 /**
  * The features this activity supports.
- *
- * @param string $feature FEATURE_xx constant for requested feature
- * @return true|null True if module supports feature, null if doesn't know
- *@uses FEATURE_GROUPMEMBERSONLY
- * @uses FEATURE_MOD_INTRO
- * @uses FEATURE_COMPLETION_TRACKS_VIEWS
- * @uses FEATURE_GRADE_HAS_GRADE
- * @uses FEATURE_GRADE_OUTCOMES
- * @uses FEATURE_GROUPS
- * @uses FEATURE_GROUPINGS
+ * @param string $feature
+ * @return bool|null
  */
-function certifygen_supports(string $feature): ?bool
-{
+function certifygen_supports(string $feature): ?bool {
     switch ($feature) {
         case FEATURE_MOD_INTRO:
         case FEATURE_SHOW_DESCRIPTION:
@@ -79,13 +66,10 @@ function certifygen_supports(string $feature): ?bool
  * @throws coding_exception
  * @throws invalid_persistent_exception
  */
-function certifygen_add_instance(stdClass $data, $mform = null): int
-{
+function certifygen_add_instance(stdClass $data, $mform = null): int {
     global $USER;
 
     $data->modelname = $data->name;
-    // Create a model.
-//    $model = certifygen_model::save_model_object($data);
 
     // Create a certifygen.
     $certifygendata = [
@@ -114,13 +98,8 @@ function certifygen_add_instance(stdClass $data, $mform = null): int
  * @throws invalid_persistent_exception
  * @throws coding_exception
  */
-function certifygen_update_instance($data, $mform): bool
-{
+function certifygen_update_instance($data, $mform): bool {
     global $USER;
-
-    // Update a model.
-//    $data->modelname = $data->name;
-//    certifygen_model::save_model_object($data);
 
     // Update a certifygen.
     $certifygen = new certifygen($data->instance);
@@ -141,8 +120,7 @@ function certifygen_update_instance($data, $mform): bool
  * @return bool Success/Fail
  * @throws coding_exception
  */
-function certifygen_delete_instance(stdClass $data, mod_certifygen_mod_form $mform): bool
-{
+function certifygen_delete_instance(stdClass $data, mod_certifygen_mod_form $mform): bool {
     // Delete a certifygen.
     $certifygen = new certifygen($data->certifygenid);
 
@@ -159,7 +137,7 @@ function certifygen_delete_instance(stdClass $data, mod_certifygen_mod_form $mfo
  * @return array
  * @throws coding_exception
  */
-function mod_certifygen_get_modes() : array {
+function mod_certifygen_get_modes(): array {
     return [
         certifygen_model::MODE_UNIQUE => get_string('mode_1', 'mod_certifygen'),
         certifygen_model::MODE_PERIODIC => get_string('mode_2', 'mod_certifygen'),
@@ -170,10 +148,12 @@ function mod_certifygen_get_modes() : array {
  * @return array
  * @throws coding_exception
  */
-function mod_certifygen_get_types() : array {
+function mod_certifygen_get_types(): array {
     return [
-        certifygen_model::TYPE_ACTIVITY => get_string('type_'. certifygen_model::TYPE_ACTIVITY, 'mod_certifygen'),
-        certifygen_model::TYPE_TEACHER_ALL_COURSES_USED => get_string('type_'. certifygen_model::TYPE_TEACHER_ALL_COURSES_USED, 'mod_certifygen'),
+        certifygen_model::TYPE_ACTIVITY => get_string('type_'. certifygen_model::TYPE_ACTIVITY,
+            'mod_certifygen'),
+        certifygen_model::TYPE_TEACHER_ALL_COURSES_USED =>
+            get_string('type_'. certifygen_model::TYPE_TEACHER_ALL_COURSES_USED, 'mod_certifygen'),
     ];
 }
 /**
@@ -181,21 +161,22 @@ function mod_certifygen_get_types() : array {
  * @return array
  * @throws coding_exception
  */
-function mod_certifygen_get_context_types() : array {
+function mod_certifygen_get_context_types(): array {
     return [
         certifygen_context::CONTEXT_TYPE_COURSE => get_string('course'),
         certifygen_context::CONTEXT_TYPE_CATEGORY => get_string('category'),
-        certifygen_context::CONTEXT_TYPE_SYSTEM=> get_string('system', 'mod_certifygen'),
+        certifygen_context::CONTEXT_TYPE_SYSTEM => get_string('system', 'mod_certifygen'),
     ];
 }
 /**
+ * mod_certifygen_get_activity_models
  * @param int $courseid
  * @return array
  * @throws coding_exception
  * @throws dml_exception
  * @throws moodle_exception
  */
-function mod_certifygen_get_activity_models(int $courseid) : array {
+function mod_certifygen_get_activity_models(int $courseid): array {
     $models = certifygen_model::get_records(['type' => certifygen_model::TYPE_ACTIVITY]);
     $validmodels = certifygen_context::get_course_valid_modelids($courseid);
     $list = [];
@@ -213,7 +194,7 @@ function mod_certifygen_get_activity_models(int $courseid) : array {
  * @throws coding_exception
  * @throws dml_exception
  */
-function mod_certifygen_get_validation() : array {
+function mod_certifygen_get_validation(): array {
 
     $all = [];
     $enabled = [];
@@ -239,7 +220,7 @@ function mod_certifygen_get_validation() : array {
  * @return array
  * @throws coding_exception
  */
-function mod_certifygen_get_report() : array {
+function mod_certifygen_get_report(): array {
 
     $enabled = [];
     foreach (core_plugin_manager::instance()->get_plugins_of_type('certifygenreport') as $plugin) {
@@ -258,7 +239,7 @@ function mod_certifygen_get_report() : array {
  * @return array
  * @throws coding_exception
  */
-function mod_certifygen_get_repositories() : array {
+function mod_certifygen_get_repositories(): array {
 
     $enabled = [];
     foreach (core_plugin_manager::instance()->get_plugins_of_type('certifygenrepository') as $plugin) {
@@ -280,7 +261,7 @@ function mod_certifygen_get_repositories() : array {
  * @return array
  * @throws dml_exception
  */
-function mod_certifygen_get_templates(int $courseid = 0) : array {
+function mod_certifygen_get_templates(int $courseid = 0): array {
     $context = context_system::instance();
     if ($courseid > 0) {
         $context = context_course::instance($courseid);
@@ -296,6 +277,7 @@ function mod_certifygen_get_templates(int $courseid = 0) : array {
 }
 
 /**
+ * mod_certifygen_myprofile_navigation
  * @param tree $tree
  * @param $user
  * @param $iscurrentuser
@@ -311,12 +293,14 @@ function mod_certifygen_myprofile_navigation(core_user\output\myprofile\tree $tr
 
             $link = get_string('mycertificates', 'mod_certifygen');
             $url = new moodle_url('/mod/certifygen/mycertificates.php');
-            $node = new core_user\output\myprofile\node('miscellaneous', 'modcertifygenmy', $link, null, $url);
+            $node = new core_user\output\myprofile\node('miscellaneous', 'modcertifygenmy', $link,
+                null, $url);
             $tree->add_node($node);
-        }
+    }
 }
 
 /**
+ * mod_certifygen_pluginfile
  * @param $course
  * @param $cm
  * @param $context
@@ -352,20 +336,16 @@ function mod_certifygen_pluginfile(
         return false;
     }
 
-    // Make sure the user is logged in and has access to the module (plugins that are not course modules should leave out the 'cm' part).
+    // Make sure the user is logged in and has access to the module
+    // (plugins that are not course modules should leave out the 'cm' part).
     require_login($course);
-
-    // Check the relevant capabilities - these may vary depending on the filearea being accessed.
-//    if (!has_capability('mod/certifygen:view', $context)) {
-//        return false;
-//    }
 
     // The args is an array containing [itemid, path].
     // Fetch the itemid from the path.
     $itemid = array_shift($args);
 
     // The itemid can be used to check access to a record, and ensure that the
-    // record belongs to the specifeid context. For example:
+    // record belongs to the specifeid context. For example.
     if ($filearea === ICertificateValidation::FILE_AREA) {
         $validation = new certifygen_validations($itemid);
         if (!$validation) {
@@ -376,16 +356,15 @@ function mod_certifygen_pluginfile(
     // Extract the filename / filepath from the $args array.
     $filename = array_pop($args); // The last item in the $args array.
     if (empty($args)) {
-        // $args is empty => the path is '/'.
         $filepath = '/';
     } else {
-        // $args contains the remaining elements of the filepath.
         $filepath = '/' . implode('/', $args) . '/';
     }
 
     // Retrieve the file from the Files API.
     $fs = get_file_storage();
-    $file = $fs->get_file($context->id, ICertificateValidation::FILE_COMPONENT, $filearea, $itemid, $filepath, $filename);
+    $file = $fs->get_file($context->id, ICertificateValidation::FILE_COMPONENT, $filearea, $itemid,
+        $filepath, $filename);
     if (!$file) {
         // The file does not exist.
         return false;
@@ -395,11 +374,12 @@ function mod_certifygen_pluginfile(
 }
 
 /**
+ * mod_certifygen_get_lang_selected
  * @param certifygen_model $model
  * @return string
  * @throws coding_exception
  */
-function mod_certifygen_get_lang_selected(certifygen_model $model) : string {
+function mod_certifygen_get_lang_selected(certifygen_model $model): string {
     global $USER;
     $langs = $model->get_model_languages();
     $lang = $USER->lang;
@@ -409,13 +389,16 @@ function mod_certifygen_get_lang_selected(certifygen_model $model) : string {
     return optional_param('lang', $lang, PARAM_RAW);
 }
 /**
+ * mod_certifygen_get_certificates_table_form
  * @param certifygen_model $model
  * @param moodle_url $url
+ * @param string $defaultlang
+ * @param string $role
  * @return string
  * @throws coding_exception
- * @throws moodle_exception
  */
-function mod_certifygen_get_certificates_table_form(certifygen_model $model, moodle_url $url, string $defaultlang = '', string $role = 'student') : string {
+function mod_certifygen_get_certificates_table_form(certifygen_model $model, moodle_url $url, string $defaultlang = '',
+                                                    string $role = 'student'): string {
 
     if (empty($defaultlang)) {
         $defaultlang = mod_certifygen_get_lang_selected($model);
@@ -430,12 +413,13 @@ function mod_certifygen_get_certificates_table_form(certifygen_model $model, moo
 }
 
 /**
+ * mod_certifygen_validate_user_parameters_for_ws
  * @param int $userid
  * @param string $userfield
  * @return array
  * @throws dml_exception
  */
-function mod_certifygen_validate_user_parameters_for_ws(int $userid, string $userfield) : array {
+function mod_certifygen_validate_user_parameters_for_ws(int $userid, string $userfield): array {
     global $DB;
 
     if (empty($userid) && empty($userfield)) {
@@ -470,8 +454,6 @@ function mod_certifygen_validate_user_parameters_for_ws(int $userid, string $use
             $results['error']['message'] = 'There is not valid user field selected on the platform.';
             return $results;
         }
-//        $id = $DB->get_field('user_info_data', 'userid', ['fieldid' => $fieldid, 'data' => $userfield]);
-
         if (!$id) {
             $results['error']['code'] = 'user_not_found';
             $results['error']['message'] = 'User not found by userfield parameter';
@@ -490,19 +472,21 @@ function mod_certifygen_validate_user_parameters_for_ws(int $userid, string $use
 }
 
 /**
+ * mod_certifygen_are_there_any_certificate_emited
  * @param int $modelid
  * @return bool
  * @throws coding_exception
  * @throws dml_exception
  */
-function mod_certifygen_are_there_any_certificate_emited(int $modelid) : bool {
+function mod_certifygen_are_there_any_certificate_emited(int $modelid): bool {
     global $DB;
 
     if (!$modelid) {
         return false;
     }
 
-    [$insql, $inparams] = $DB->get_in_or_equal(certifygen_validations::STATUS_NOT_STARTED, SQL_PARAMS_NAMED, 'param', false);
+    [$insql, $inparams] = $DB->get_in_or_equal(certifygen_validations::STATUS_NOT_STARTED, SQL_PARAMS_NAMED,
+        'param', false);
     [$modelsql, $modelparams] = $DB->get_in_or_equal($modelid, SQL_PARAMS_NAMED, 'modelid');
     $params = array_merge($inparams, $modelparams);
     $inparams['modelid'] = $modelid;

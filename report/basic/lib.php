@@ -17,7 +17,9 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
+ *
  * @package   certifygenreport_basic
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -28,6 +30,7 @@
 use certifygenreport_basic\output\report_view;
 
 /**
+ * certifygenreport_basic_pluginfile
  * @param $course
  * @param $cm
  * @param $context
@@ -58,7 +61,8 @@ function certifygenreport_basic_pluginfile(
         return false;
     }
 
-    // Make sure the user is logged in and has access to the module (plugins that are not course modules should leave out the 'cm' part).
+    // Make sure the user is logged in and has access to the module
+    // (plugins that are not course modules should leave out the 'cm' part).
     require_login($course);
 
     // The args is an array containing [itemid, path].
@@ -68,10 +72,8 @@ function certifygenreport_basic_pluginfile(
     // Extract the filename / filepath from the $args array.
     $filename = array_pop($args); // The last item in the $args array.
     if (empty($args)) {
-        // $args is empty => the path is '/'.
         $filepath = '/';
     } else {
-        // $args contains the remaining elements of the filepath.
         $filepath = '/' . implode('/', $args) . '/';
     }
 

@@ -17,15 +17,15 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
+ *
  * @package   certifygenvalidation_webservice
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-namespace tests;
 
 use advanced_testcase;
 use certifygenvalidation_webservice\external\change_status_external;
@@ -35,10 +35,20 @@ use mod_certifygen\external\emitteacherrequest_external;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
 require_once($CFG->dirroot.'/mod/certifygen/tests/generator/lib.php');
 require_once($CFG->dirroot.'/lib/externallib.php');
+/**
+ * get_user_requests_external_test
+ * @package   certifygenvalidation_webservice
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class get_user_requests_external_test extends advanced_testcase {
 
     /**
@@ -47,6 +57,14 @@ class get_user_requests_external_test extends advanced_testcase {
     public function setUp(): void {
         $this->resetAfterTest();
     }
+
+    /**
+     * Test 1
+     * @return void
+     * @throws \coding_exception
+     * @throws \core\invalid_persistent_exception
+     * @throws \invalid_parameter_exception
+     */
     public function test_1(): void {
 
         // Create course.
@@ -84,11 +102,11 @@ class get_user_requests_external_test extends advanced_testcase {
                 'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
         $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
 
-        // Create request
+        // Create request.
         $teacherrequest = $modgenerator->create_teacher_request($model->get('id'), $course->id, $teacher->id);
         self::assertEquals(certifygen_validations::STATUS_NOT_STARTED, $teacherrequest->get('status'));
 
-        // Validate
+        // Validate.
         $result = get_user_requests_external::get_user_requests($teacher->id, '' , 'en');
 
         // Tests.
@@ -100,6 +118,13 @@ class get_user_requests_external_test extends advanced_testcase {
         self::assertEquals('pluginnotenabled', $result['error']['code']);
     }
 
+    /**
+     * Test 2
+     * @return void
+     * @throws \coding_exception
+     * @throws \core\invalid_persistent_exception
+     * @throws \invalid_parameter_exception
+     */
     public function test_2(): void {
         // Create course.
         $course = self::getDataGenerator()->create_course();
@@ -139,11 +164,11 @@ class get_user_requests_external_test extends advanced_testcase {
                 'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
         $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
 
-        // Create request
+        // Create request.
         $teacherrequest = $modgenerator->create_teacher_request($model->get('id'), $course->id, $teacher->id);
         self::assertEquals(certifygen_validations::STATUS_NOT_STARTED, $teacherrequest->get('status'));
 
-        // Validate
+        // Validate.
         $result = get_user_requests_external::get_user_requests($teacher->id, '' , 'en');
 
         // Tests.
@@ -153,6 +178,14 @@ class get_user_requests_external_test extends advanced_testcase {
         self::assertEmpty($result['requests']);
     }
 
+    /**
+     * Test 3
+     * @return void
+     * @throws \coding_exception
+     * @throws \core\invalid_persistent_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     */
     public function test_3(): void {
         // Create course.
         $course = self::getDataGenerator()->create_course();
@@ -192,16 +225,16 @@ class get_user_requests_external_test extends advanced_testcase {
                 'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
         $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
 
-        // Create request
+        // Create request.
         $teacherrequest = $modgenerator->create_teacher_request($model->get('id'), $course->id, $teacher->id);
         self::assertEquals(certifygen_validations::STATUS_NOT_STARTED, $teacherrequest->get('status'));
 
-        // Emit certificate
+        // Emit certificate.
         emitteacherrequest_external::emitteacherrequest($teacherrequest->get('id'));
         $teacherrequest = new certifygen_validations($teacherrequest->get('id'));
         self::assertEquals(certifygen_validations::STATUS_IN_PROGRESS, $teacherrequest->get('status'));
 
-        // Validate
+        // Validate.
         $result = get_user_requests_external::get_user_requests($teacher->id, '' , 'en');
         self::assertIsArray($result);
         self::assertArrayHasKey('requests', $result);
@@ -234,6 +267,14 @@ class get_user_requests_external_test extends advanced_testcase {
         self::assertArrayHasKey('repository', $result['requests'][0]['model']);
     }
 
+    /**
+     * Test 4
+     * @return void
+     * @throws \coding_exception
+     * @throws \core\invalid_persistent_exception
+     * @throws \invalid_parameter_exception
+     * @throws \moodle_exception
+     */
     public function test_4(): void {
 
         // Configure the platform.
@@ -296,7 +337,7 @@ class get_user_requests_external_test extends advanced_testcase {
         self::assertFalse($validation);
         emitcertificate_external::emitcertificate(0, $cm->instance, $model->get('id'), $lang, $student->id, $course->id);
 
-        // Validate
+        // Validate.
         $result = get_user_requests_external::get_user_requests($student->id, '' , 'en');
         self::assertIsArray($result);
         self::assertArrayHasKey('requests', $result);
@@ -323,5 +364,4 @@ class get_user_requests_external_test extends advanced_testcase {
         self::assertArrayHasKey('report', $result['requests'][0]['model']);
         self::assertArrayHasKey('repository', $result['requests'][0]['model']);
     }
-
 }

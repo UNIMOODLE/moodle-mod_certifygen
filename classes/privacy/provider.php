@@ -30,6 +30,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_certifygen\privacy;
+use coding_exception;
 use context_course;
 use context_module;
 use context_system;
@@ -40,26 +41,36 @@ use core_privacy\local\request\context;
 use core_privacy\local\request\contextlist;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
+use dml_exception;
 use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-global $CFG;
-require_once($CFG->dirroot . '/lib/modinfolib.php');
+use moodle_exception;
+
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+require_once($CFG->dirroot . '/lib/modinfolib.php');
+/**
+ * Implementation of the privacy subsystem plugin provider for the certifygen activity module.
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class provider implements
     \core_privacy\local\metadata\provider,
     \core_privacy\local\request\plugin\provider,
-    \core_privacy\local\request\core_userlist_provider
-{
+    \core_privacy\local\request\core_userlist_provider {
 
     /**
+     * get_metadata
      * @param collection $collection
      * @return collection
      */
-    public static function get_metadata(collection $collection): collection
-    {
+    public static function get_metadata(collection $collection): collection {
         $validations = [
             'name' => 'privacy:metadata:name',
             'courses' => 'privacy:metadata:courses',
@@ -74,26 +85,28 @@ class provider implements
             'timecreated' => 'privacy:metadata:timecreated',
             'timemodified' => 'privacy:metadata:timemodified',
         ];
-        $collection->add_database_table('certifygen_validations', $validations, 'privacy:metadata:certifygen_validations');
+        $collection->add_database_table('certifygen_validations', $validations,
+            'privacy:metadata:certifygen_validations');
         return $collection;
     }
 
     /**
+     * get_contexts_for_userid
      * @param int $userid
      * @return contextlist
      */
-    public static function get_contexts_for_userid(int $userid): contextlist
-    {
+    public static function get_contexts_for_userid(int $userid): contextlist {
         // This plugin involves two main contexts, system for teachers and module for students.
         $contextlist = new contextlist();
 
-        $sql = "SELECT ctx.id
-                  FROM {course_modules} cm
-                  JOIN {modules} m ON cm.module = m.id AND m.name = :modulename
-                  JOIN {certifygen} a ON cm.instance = a.id
-                  JOIN {certifygen_validations} cv ON cv.certifygenid = a.id
-                  JOIN {context} ctx ON cm.id = ctx.instanceid AND ctx.contextlevel = :contextlevel
-                 WHERE cv.userid = :userid";
+        $sql = "SELECT ctx.id";
+        $sql .= " FROM {course_modules} cm";
+        $sql .= " JOIN {modules} m ON cm.module = m.id AND m.name = :modulename";
+        $sql .= " JOIN {certifygen} a ON cm.instance = a.id";
+        $sql .= " JOIN {certifygen_validations} cv ON cv.certifygenid = a.id";
+        $sql .= " JOIN {context} ctx ON cm.id = ctx.instanceid AND ctx.contextlevel = :contextlevel";
+        $sql .= " WHERE cv.userid = :userid";
+
         $params = [
             'modulename' => 'certifygen',
             'contextlevel' => CONTEXT_MODULE,
@@ -101,29 +114,30 @@ class provider implements
         ];
         $contextlist->add_from_sql($sql, $params);
 
-        $sql = "SELECT c.id
-                  FROM {context} c 
-                 WHERE c.contextlevel = :contextsystem";
+        $sql = "SELECT c.id";
+        $sql .= " FROM {context} c ";
+        $sql .= " WHERE c.contextlevel = :contextsystem";
         $contextlist->add_from_sql($sql, ['contextsystem' => CONTEXT_SYSTEM]);
         return $contextlist;
     }
 
     /**
+     * export_user_data
      * @param approved_contextlist $contextlist
      * @return mixed
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \moodle_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
-    public static function export_user_data(approved_contextlist $contextlist)
-    {
+    public static function export_user_data(approved_contextlist $contextlist) {
         $user = $contextlist->get_user();
         $validations = certifygen_validations::get_records(['userid' => $user->id]);
         foreach ($validations as $validation) {
             $context = context_system::instance();
             $code = certifygen_validations::get_certificate_code($validation);
             if (!empty($validation->get('certifygenid'))) {
-                [$course, $cm] = get_course_and_cm_from_instance((int)$validation->get('certifygenid'), 'certifygen');
+                [$course, $cm] = get_course_and_cm_from_instance((int)$validation->get('certifygenid'),
+                    'certifygen');
                 $context = context_module::instance($cm->id);
             }
             $certifygenmodel = new certifygen_model($validation->get('modelid'));
@@ -132,7 +146,7 @@ class provider implements
             $url = '';
             if ($validation->get('status') == certifygen_validations::STATUS_FINISHED) {
                 $subplugin = new $repositorypluginclass();
-                $url = $subplugin->getFileUrl($validation);
+                $url = $subplugin->get_file_url($validation);
             }
             $data = [
                 'code' => $code,
@@ -150,14 +164,14 @@ class provider implements
     }
 
     /**
+     * delete_data_for_all_users_in_context
      * @param \context $context
      * @return mixed
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \moodle_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
-    public static function delete_data_for_all_users_in_context(\context $context)
-    {
+    public static function delete_data_for_all_users_in_context(\context $context) {
         global $DB;
 
         $fs = get_file_storage();
@@ -177,14 +191,14 @@ class provider implements
     }
 
     /**
+     * delete_data_for_user
      * @param approved_contextlist $contextlist
      * @return mixed
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \moodle_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
-    public static function delete_data_for_user(approved_contextlist $contextlist)
-    {
+    public static function delete_data_for_user(approved_contextlist $contextlist) {
         if (empty($contextlist->count())) {
             return;
         }
@@ -197,10 +211,10 @@ class provider implements
     }
 
     /**
+     * get_users_in_context
      * @param userlist $userlist
      */
-    public static function get_users_in_context(userlist $userlist)
-    {
+    public static function get_users_in_context(userlist $userlist) {
         $context = $userlist->get_context();
         if ($context instanceof context_module) {
             // Students.
@@ -208,35 +222,36 @@ class provider implements
                 'instanceid'    => $context->instanceid,
                 'modulename'    => 'certifygen',
             ];
-            // Certificates issues
-            $sql = "SELECT cv.userid
-              FROM {course_modules} cm
-              JOIN {modules} m ON m.id = cm.module AND m.name = :modulename
-              JOIN {certifygen} a ON a.id = cm.instance
-              JOIN {certifygen_validations} cv ON cv.certifygenid = a.id
-             WHERE cm.id = :instanceid";
+
+            // Certificates issues.
+            $sql = "SELECT cv.userid";
+            $sql .= " FROM {course_modules} cm";
+            $sql .= " JOIN {modules} m ON m.id = cm.module AND m.name = :modulename";
+            $sql .= " JOIN {certifygen} a ON a.id = cm.instance";
+            $sql .= " JOIN {certifygen_validations} cv ON cv.certifygenid = a.id";
+            $sql .= " WHERE cm.id = :instanceid";
             $userlist->add_from_sql('userid', $sql, $params);
         } else if ($context instanceof context_system) {
             // Teachers.
             $params = [
                 'certifygenid'    => 0,
             ];
-            $sql = "SELECT cv.userid
-              FROM {certifygen_validations} cv 
-             WHERE cv.certifygenid = :certifygenid";
+
+            $sql = "SELECT cv.userid";
+            $sql .= " FROM {certifygen_validations} cv";
+            $sql .= " WHERE cv.certifygenid = :certifygenid";
             $userlist->add_from_sql('userid', $sql, $params);
         }
-
     }
 
     /**
+     * delete_data_for_users
      * @param approved_userlist $userlist
      * @return mixed
-     * @throws \coding_exception
-     * @throws \dml_exception
+     * @throws coding_exception
+     * @throws dml_exception
      */
-    public static function delete_data_for_users(approved_userlist $userlist)
-    {
+    public static function delete_data_for_users(approved_userlist $userlist) {
         global $DB;
 
         $context = $userlist->get_context();
@@ -246,20 +261,22 @@ class provider implements
         }
         list($userinsql, $userinparams) = $DB->get_in_or_equal($userlist->get_userids(), SQL_PARAMS_NAMED);
 
-        $validations = $DB->get_records_select('certifygen_validations', ' userid ' . $userinsql, $userinparams);
+        $validations = $DB->get_records_select('certifygen_validations', ' userid ' . $userinsql,
+            $userinparams);
         foreach ($validations as $validation) {
             self::remove_validation_data($validation);
         }
     }
 
     /**
+     * remove_validation_data
      * @param certifygen_validations $validation
      * @return void
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \moodle_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
-    private static function remove_validation_data(certifygen_validations $validation) : void {
+    private static function remove_validation_data(certifygen_validations $validation): void {
         $fs = get_file_storage();
         // Delete issue files.
         $context = context_system::instance();
@@ -286,13 +303,16 @@ class provider implements
                 $fs->delete_area_files($context->id, 'mod_certifygen', $filearea, $validation->get('id'));
             }
             if (empty($validation->get('certifygenid'))) {
-                $fs->delete_area_files($context->id, 'mod_certifygen', 'certifygenreport', $validation->get('id'));
+                $fs->delete_area_files($context->id, 'mod_certifygen', 'certifygenreport',
+                    $validation->get('id'));
             } else {
-                $fs->delete_area_files(context_system::instance()->id, 'mod_certifygen', 'issues', $validation->get('id'));
+                $fs->delete_area_files(context_system::instance()->id, 'mod_certifygen', 'issues',
+                    $validation->get('id'));
 
             }
-        } catch (\moodle_exception $e) {
+        } catch (moodle_exception $e) {
             // por si no existe el fichero...
+            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
         }
 
         // Delete issue records.

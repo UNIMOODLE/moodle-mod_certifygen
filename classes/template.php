@@ -33,7 +33,6 @@
 
 namespace mod_certifygen;
 
-
 use coding_exception;
 use context_course;
 use context_system;
@@ -61,22 +60,23 @@ use tool_certificate\event\certificate_issued;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class template extends \tool_certificate\template {
+    /** @var string $lang */
     private string $lang;
 
     /**
+     * instance
      * @param int $id
      * @param stdClass|null $obj
      * @return template
      * @throws coding_exception
      */
-
-    public static function instance(int $id = 0, ?stdClass $obj = null): template
-    {
+    public static function instance(int $id = 0, ?stdClass $obj = null): template {
         $data = new stdClass();
         if ($obj !== null) {
             $lang = $obj->lang;
             // Ignore fields that are not properties.
-            $data = (object)array_intersect_key((array)$obj, \tool_certificate\persistent\template::properties_definition());
+            $data = (object)array_intersect_key((array)$obj,
+                \tool_certificate\persistent\template::properties_definition());
         }
         $t = new self();
         $t->persistent = new \tool_certificate\persistent\template($id, $data);
@@ -115,7 +115,8 @@ class template extends \tool_certificate\template {
                 'DisplayDocTitle' => true,
             ]);
             $pdf->SetAutoPageBreak(true);
-            // Remove full-stop at the end, if it exists, to avoid "..pdf" being created and being filtered by clean_filename.
+            // Remove full-stop at the end, if it exists, to avoid "..pdf"
+            // being created and being filtered by clean_filename.
             $filename = rtrim($this->get_formatted_name(), '.');
             $filename = clean_filename($filename . '.pdf');
             // Loop through the pages and display their content.
@@ -248,10 +249,8 @@ class template extends \tool_certificate\template {
      *
      */
     public function issue_certificate($userid, $expires = null, array $data = [], $component = 'mod_certifygen',
-                                      $courseid = null, ?lock $lock = null) : int {
+                                      $courseid = null, ?lock $lock = null): int {
         global $DB;
-
-//        component_class_callback(tool_tenant\config::class, 'push_for_user', [$userid]);
 
         $issue = new stdClass();
         $issue->userid = $userid;
@@ -270,21 +269,12 @@ class template extends \tool_certificate\template {
 
         // Insert the record into the database.
         $issue->id = $DB->insert_record('tool_certificate_issues', $issue);
-//        if ($lock) {
-//            error_log(__FUNCTION__ . ' lock released ' . __LINE__);
-//            $lock->release();
-//        }
         issue_handler::create()->save_additional_data($issue, $data);
         // Trigger event.
         certificate_issued::create_from_issue($issue)->trigger();
 
         // Reload issue from DB in case the event handlers modified it.
         $issue = $this->get_issue_from_code($issue->code);
-        // Create the issue file and send notification.
-//        $issuefile = $this->create_issue_file($issue);
-//        self::send_issue_notification($issue, $issuefile);
-
-//        component_class_callback(tool_tenant\config::class, 'pop', []);
 
         return $issue->id;
     }

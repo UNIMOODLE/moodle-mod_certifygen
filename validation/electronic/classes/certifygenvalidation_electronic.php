@@ -17,18 +17,17 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
+ *
  * @package   certifygenvalidation_electronic
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
 namespace certifygenvalidation_electronic;
 
-use coding_exception;
 use context_course;
 use context_system;
 use dml_exception;
@@ -37,18 +36,27 @@ use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
-use moodle_url;
 use setasign\Fpdi\Tcpdf\Fpdi;
+
+defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot.'/lib/tcpdf/tcpdf.php');
 require_once($CFG->dirroot.'/mod/assign/feedback/editpdf/fpdi/autoload.php');
-
+/**
+ * ELECTRONIC
+ * @package   certifygenvalidation_electronic
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class certifygenvalidation_electronic implements ICertificateValidation
 {
     private const CERTIFYGENVALIDATION_ELECTRONIC_TEMP_DIRECTORY = '/mod/certifygen/validation/electronic/temp/';
 
     /**
+     * add_certificate_signature
      * @param certifygen_file $file
      * @return string
      * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
@@ -69,9 +77,6 @@ class certifygenvalidation_electronic implements ICertificateValidation
         $pdf->SetTitle('Unimoodle Certifygen title');
         $pdf->SetSubject('Unimoodle Certifygen subject');
         $pdf->SetKeywords('Unimoodle Certifygen, certifygen');
-
-        // Set default header data
-        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, 'Unimoodle Certifygen', PDF_HEADER_STRING);
 
         // Set header and footer fonts
         $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
@@ -162,6 +167,7 @@ class certifygenvalidation_electronic implements ICertificateValidation
     }
 
     /**
+     * sendFile
      * @param certifygen_file $file
      * @return array
      * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
@@ -170,7 +176,7 @@ class certifygenvalidation_electronic implements ICertificateValidation
      * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
      * @throws \setasign\Fpdi\PdfReader\PdfReaderException
      */
-    public function sendFile(certifygen_file $file): array
+    public function send_file(certifygen_file $file): array
     {
         $haserror = false;
         $message = 'ok';
@@ -207,6 +213,7 @@ class certifygenvalidation_electronic implements ICertificateValidation
     }
 
     /**
+     * delete_temp_file
      * @param $name
      * @return void
      */
@@ -216,11 +223,12 @@ class certifygenvalidation_electronic implements ICertificateValidation
         unlink($completefilepath);
     }
     /**
+     * getFile
      * @param int $courseid
      * @param int $validationid
      * @return array
      */
-    public function getFile(int $courseid, int $validationid): array
+    public function get_file(int $courseid, int $validationid): array
     {
         $result = ['error' => [], 'message' => 'ok'];
         try {
@@ -248,6 +256,7 @@ class certifygenvalidation_electronic implements ICertificateValidation
     }
 
     /**
+     * revoke
      * @param string $code
      * @return array
      */
@@ -259,6 +268,7 @@ class certifygenvalidation_electronic implements ICertificateValidation
     }
 
     /**
+     * is_enabled
      * @return bool
      * @throws dml_exception
      */
@@ -268,24 +278,27 @@ class certifygenvalidation_electronic implements ICertificateValidation
     }
 
     /**
+     * checkStatus
      * @return bool
      */
-    public function checkStatus(): bool
+    public function check_status(): bool
     {
         return false;
     }
 
     /**
+     * getStatus
      * @param int $validationid
      * @param string $code
      * @return int
      */
-    public function getStatus(int $validationid, string $code): int
+    public function get_status(int $validationid, string $code): int
     {
         return certifygen_validations::STATUS_VALIDATION_OK;
     }
 
     /**
+     * checkfile
      * @return bool
      */
     public function checkfile(): bool
@@ -294,17 +307,20 @@ class certifygenvalidation_electronic implements ICertificateValidation
     }
 
     /**
+     * canRevoke
+     * @param int $courseid
      * @return bool
      */
-    public function canRevoke(int $courseid): bool
+    public function can_revoke(int $courseid): bool
     {
         return false;
     }
     /**
      * Returns an array of strings associated to certifiacte status to be shown on
      * activityteacher_table and profile_my_certificates_table
+     * @return array
      */
-    public function getStatusMessages(): array {
+    public function get_status_messages(): array {
         return [];
     }
 }

@@ -25,6 +25,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -34,10 +35,19 @@
 use mod_certifygen\external\get_courses_as_student_external;
 use mod_certifygen\persistents\certifygen_model;
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
 require_once($CFG->dirroot.'/lib/externallib.php');
-
+/**
+ * Get courses as student test
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class get_courses_as_student_external_test extends advanced_testcase {
 
     /**
@@ -48,6 +58,7 @@ class get_courses_as_student_external_test extends advanced_testcase {
     }
 
     /**
+     * Test 1
      * @return void
      * @throws coding_exception
      * @throws dml_exception
@@ -55,6 +66,7 @@ class get_courses_as_student_external_test extends advanced_testcase {
      * @throws required_capability_exception
      */
     public function test_get_courses_as_student_nopermission(): void {
+        global $DB;
 
         // Create user.
         $user1 = $this->getDataGenerator()->create_user(
@@ -64,14 +76,15 @@ class get_courses_as_student_external_test extends advanced_testcase {
         $course1 = self::getDataGenerator()->create_course();
         $course2 = self::getDataGenerator()->create_course();
 
-        // Enrol user in course1 as editingteacher
+        // Enrol user in course1 as editingteacher.
         self::getDataGenerator()->enrol_user($user1->id, $course1->id, 'student');
 
-        // Enrol user in course2 as student
+        // Enrol user in course2 as student.
         self::getDataGenerator()->enrol_user($user1->id, $course2->id, 'editingteacher');
 
         // Tests.
         $result = get_courses_as_student_external::get_courses_as_student($user1->id, '', '');
+        error_log(__FUNCTION__ . ' courses: '.var_export($result, true));
         $this->assertIsArray($result);
         $this->assertArrayNotHasKey('courses', $result);
         $this->assertArrayHasKey('error', $result);
@@ -83,6 +96,7 @@ class get_courses_as_student_external_test extends advanced_testcase {
     }
 
     /**
+     * Test 2
      * @return void
      * @throws coding_exception
      * @throws dml_exception
@@ -103,10 +117,10 @@ class get_courses_as_student_external_test extends advanced_testcase {
         $course1 = self::getDataGenerator()->create_course();
         $course2 = self::getDataGenerator()->create_course();
 
-        // Enrol user in course1 as editingteacher
+        // Enrol user in course1 as editingteacher.
         self::getDataGenerator()->enrol_user($user1->id, $course1->id, 'student');
 
-        // Enrol user in course2 as student
+        // Enrol user in course2 as student.
         self::getDataGenerator()->enrol_user($user1->id, $course2->id, 'editingteacher');
 
         // Tests.
@@ -123,6 +137,7 @@ class get_courses_as_student_external_test extends advanced_testcase {
     }
 
     /**
+     * Test 3
      * @return void
      * @throws coding_exception
      * @throws dml_exception
@@ -143,10 +158,10 @@ class get_courses_as_student_external_test extends advanced_testcase {
         $course1 = self::getDataGenerator()->create_course();
         $course2 = self::getDataGenerator()->create_course();
 
-        // Enrol user in course1 as editingteacher
+        // Enrol user in course1 as editingteacher.
         self::getDataGenerator()->enrol_user($user1->id, $course1->id, 'student');
 
-        // Enrol user in course2 as student
+        // Enrol user in course2 as student.
         self::getDataGenerator()->enrol_user($user1->id, $course2->id, 'editingteacher');
 
         // Create template.
@@ -198,6 +213,7 @@ class get_courses_as_student_external_test extends advanced_testcase {
     }
 
     /**
+     * Test 4
      * @return void
      * @throws coding_exception
      * @throws dml_exception
@@ -232,10 +248,10 @@ class get_courses_as_student_external_test extends advanced_testcase {
         $course1 = self::getDataGenerator()->create_course();
         $course2 = self::getDataGenerator()->create_course();
 
-        // Enrol user in course1 as student
+        // Enrol user in course1 as student.
         self::getDataGenerator()->enrol_user($user1->id, $course1->id, 'student');
 
-        // Enrol user in course2 as editingteacher
+        // Enrol user in course2 as editingteacher.
         self::getDataGenerator()->enrol_user($user1->id, $course2->id, 'editingteacher');
 
         // Create template.
@@ -287,6 +303,7 @@ class get_courses_as_student_external_test extends advanced_testcase {
     }
 
     /**
+     * Test 5
      * @return void
      * @throws coding_exception
      * @throws dml_exception
@@ -312,10 +329,10 @@ class get_courses_as_student_external_test extends advanced_testcase {
         $course1 = self::getDataGenerator()->create_course();
         $course2 = self::getDataGenerator()->create_course();
 
-        // Enrol user in course1 as student
+        // Enrol user in course1 as student.
         self::getDataGenerator()->enrol_user($user1->id, $course1->id, 'student');
 
-        // Enrol user in course2 as editingteacher
+        // Enrol user in course2 as editingteacher.
         self::getDataGenerator()->enrol_user($user1->id, $course2->id, 'editingteacher');
 
         // Create template.
@@ -391,6 +408,7 @@ class get_courses_as_student_external_test extends advanced_testcase {
     }
 
     /**
+     * Test 5
      * @return void
      * @throws coding_exception
      * @throws dml_exception
@@ -419,15 +437,15 @@ class get_courses_as_student_external_test extends advanced_testcase {
         $englishname = 'Titulo en ingles';
         $data = [
             'fullname' => '<span lang="es" class="multilang">' . $spanishname
-                . '</span><span lang="en" class="multilang">' . $englishname . '</span>'
+                . '</span><span lang="en" class="multilang">' . $englishname . '</span>',
         ];
         $course1 = self::getDataGenerator()->create_course($data);
         $course2 = self::getDataGenerator()->create_course();
 
-        // Enrol user in course1 as student
+        // Enrol user in course1 as student.
         self::getDataGenerator()->enrol_user($user1->id, $course1->id, 'student');
 
-        // Enrol user in course2 as editingteacher
+        // Enrol user in course2 as editingteacher.
         self::getDataGenerator()->enrol_user($user1->id, $course2->id, 'editingteacher');
 
         // Create template.

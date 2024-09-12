@@ -25,6 +25,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -35,14 +36,22 @@
 use core\invalid_persistent_exception;
 use mod_certifygen\external\downloadteachercertificate_external;
 use mod_certifygen\external\emitteacherrequest_external;
-use mod_certifygen\interfaces\ICertificateReport;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
+
+defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
 require_once($CFG->dirroot.'/lib/externallib.php');
-
+/**
+ * Download teacher certificate test
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class downloadteachercertificate_external_test extends advanced_testcase {
 
     /**
@@ -53,6 +62,7 @@ class downloadteachercertificate_external_test extends advanced_testcase {
     }
 
     /**
+     * test
      * @return void
      * @throws invalid_persistent_exception
      * @throws coding_exception
@@ -94,12 +104,12 @@ class downloadteachercertificate_external_test extends advanced_testcase {
         $teacherrequest = $modgenerator->create_teacher_request($model->get('id'), $course->id, $teacher->id);
 
         // Emit certificate.
-        $R = emitteacherrequest_external::emitteacherrequest($teacherrequest->get('id'));
+        emitteacherrequest_external::emitteacherrequest($teacherrequest->get('id'));
         $teacherrequest = new certifygen_validations($teacherrequest->get('id'));
 
         self::assertEquals(certifygen_validations::STATUS_FINISHED, (int)$teacherrequest->get('status'));
         $localrepository = new certifygenrepository_localrepository\certifygenrepository_localrepository();
-        $fileurl = $localrepository->getFileUrl($teacherrequest);
+        $fileurl = $localrepository->get_file_url($teacherrequest);
 
         // Download.
         $result = downloadteachercertificate_external::downloadteachercertificate($teacherrequest->get('id'));
@@ -115,6 +125,7 @@ class downloadteachercertificate_external_test extends advanced_testcase {
     }
 
     /**
+     * test
      * @return void
      * @throws invalid_persistent_exception
      * @throws coding_exception

@@ -17,6 +17,7 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
  * @package   certifygenvalidation_electronic
  * @copyright  2024 Proyecto UNIMOODLE
@@ -45,4 +46,3 @@ $string['reasondesc'] = 'Campo requerido para firmar el certificado';
 $string['contactinfo'] = 'Información de contacto del Certificado';
 $string['contactinfodesc'] = 'Campo requerido para firmar el certificado';
 $string['privacy:metadata'] = 'El plugin de Validación ELECTRÓNICA no almacena ningún dato personal.';
-

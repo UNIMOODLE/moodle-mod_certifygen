@@ -17,7 +17,9 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
+ *
  * @package   certifygenvalidation_webservice
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -25,18 +27,27 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace tests;
-
 use advanced_testcase;
 use certifygenvalidation_webservice\external\change_status_external;
 use mod_certifygen\external\emitteacherrequest_external;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
 require_once($CFG->dirroot.'/mod/certifygen/tests/generator/lib.php');
 require_once($CFG->dirroot.'/lib/externallib.php');
+
+/**
+ * change_status_external_test
+ * @package   certifygenvalidation_webservice
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class change_status_external_test extends advanced_testcase {
 
     /**
@@ -45,6 +56,15 @@ class change_status_external_test extends advanced_testcase {
     public function setUp(): void {
         $this->resetAfterTest();
     }
+
+    /**
+     * Test
+     * @return void
+     * @throws \coding_exception
+     * @throws \core\invalid_persistent_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     */
     public function test_1(): void {
 
         // Create course.
@@ -82,18 +102,18 @@ class change_status_external_test extends advanced_testcase {
                 'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
         $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
 
-        // Create request
+        // Create request.
         $teacherrequest = $modgenerator->create_teacher_request($model->get('id'), $course->id, $teacher->id);
         self::assertEquals(certifygen_validations::STATUS_NOT_STARTED, $teacherrequest->get('status'));
 
-        // Emit certificate
+        // Emit certificate.
         emitteacherrequest_external::emitteacherrequest($teacherrequest->get('id'));
 
         $teacherrequest = new certifygen_validations($teacherrequest->get('id'));
 
         self::assertEquals(certifygen_validations::STATUS_IN_PROGRESS, $teacherrequest->get('status'));
 
-        // Validate
+        // Validate.
         $result = change_status_external::change_status($teacher->id, '' , $teacherrequest->get('id'));
 
         // Tests.
@@ -105,6 +125,15 @@ class change_status_external_test extends advanced_testcase {
         self::assertEquals(certifygen_validations::STATUS_VALIDATION_OK, $result['newstatus']);
         self::assertEquals(get_string('status_'. certifygen_validations::STATUS_VALIDATION_OK, 'mod_certifygen'), $result['newstatusdesc']);
     }
+
+    /**
+     * Test
+     * @return void
+     * @throws \coding_exception
+     * @throws \core\invalid_persistent_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     */
     public function test_2(): void {
 
         // Create course.
@@ -142,17 +171,17 @@ class change_status_external_test extends advanced_testcase {
                 'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
         $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
 
-        // Create request
+        // Create request.
         $teacherrequest = $modgenerator->create_teacher_request($model->get('id'), $course->id, $teacher->id);
         self::assertEquals(certifygen_validations::STATUS_NOT_STARTED, $teacherrequest->get('status'));
 
-        // Emit certificate
+        // Emit certificate.
         emitteacherrequest_external::emitteacherrequest($teacherrequest->get('id'));
 
         $teacherrequest = new certifygen_validations($teacherrequest->get('id'));
         self::assertEquals(certifygen_validations::STATUS_IN_PROGRESS, $teacherrequest->get('status'));
 
-        // Validate
+        // Validate.
         $result = change_status_external::change_status($student->id, '' , $teacherrequest->get('id'));
 
         // Tests.
@@ -163,6 +192,13 @@ class change_status_external_test extends advanced_testcase {
         self::assertArrayHasKey('message', $result['error']);
         self::assertEquals('request_user_not_matched', $result['error']['code']);
     }
+
+    /**
+     * Test
+     * @return void
+     * @throws \coding_exception
+     * @throws \invalid_parameter_exception
+     */
     public function test_3(): void {
 
         // Create course.
@@ -178,7 +214,7 @@ class change_status_external_test extends advanced_testcase {
                 'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
         $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
 
-        // Validate
+        // Validate.
         $result = change_status_external::change_status($student->id, '' , 9999);
 
         // Tests.

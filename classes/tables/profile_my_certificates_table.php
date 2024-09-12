@@ -22,15 +22,17 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
 namespace mod_certifygen\tables;
+
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->libdir . '/tablelib.php');
 
@@ -42,9 +44,18 @@ use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 use stdClass;
 use table_sql;
-
+/**
+ * profile_my_certificates_table
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class profile_my_certificates_table extends table_sql {
+    /** @var int $userid */
     private int $userid;
+    /** @var array $langstrings */
     private array $langstrings;
     /**
      * Constructor
@@ -53,7 +64,7 @@ class profile_my_certificates_table extends table_sql {
      * @param int $instance
      * @throws coding_exception|moodle_exception
      */
-    function __construct(int $userid) {
+    public function __construct(int $userid) {
         $this->userid = $userid;
         $this->langstrings = get_string_manager()->get_list_of_translations();
         $uniqueid = 'profile-my-certificates-view';
@@ -76,22 +87,21 @@ class profile_my_certificates_table extends table_sql {
         $this->define_headers($headers);
     }
 
-
     /**
+     * Name
      * @param $row
      * @return string
      */
-    function col_name(stdClass $row): string
-    {
+    final function col_name(stdClass $row): string {
         return $row->name;
     }
 
     /**
+     * Date
      * @param $row
      * @return string
      */
-    function col_date(stdClass $row): string
-    {
+    final function col_date(stdClass $row): string {
         if (empty($row->timecreated)) {
             return '';
         }
@@ -99,12 +109,12 @@ class profile_my_certificates_table extends table_sql {
     }
 
     /**
-     * @param $row
+     * Status
+     * @param stdClass $row
      * @return string
      * @throws coding_exception
      */
-    function col_status(stdClass $row): string
-    {
+    final function col_status(stdClass $row): string {
 
         $status = get_string('status_' . $row->status, 'mod_certifygen');
         if (empty($row->status)) {
@@ -114,43 +124,43 @@ class profile_my_certificates_table extends table_sql {
         $validationpluginclass = $validationplugin . '\\' . $validationplugin;
         /** @var ICertificateValidation $subplugin */
         $subplugin = new $validationpluginclass();
-        $statusmessages = $subplugin->getStatusMessages();
+        $statusmessages = $subplugin->get_status_messages();
         if (!empty($statusmessages) && array_key_exists($row->status, $statusmessages)) {
             $tooltip = $statusmessages[$row->status];
-            $status = '<button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="'.$tooltip.'">
-                        '.get_string('status_'.$row->status, 'mod_certifygen') . '
-                        </button>';
+            $status = '<button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" 
+            title="'.$tooltip.'"> ' . get_string('status_' . $row->status, 'mod_certifygen')
+                . '</button>';
         }
         return $status;
     }
 
     /**
+     * Language
      * @param stdClass $row
      * @return string
      * @throws coding_exception
      */
-    function col_lang(stdClass $row): string
-    {
+    final function col_lang(stdClass $row): string {
         return $this->langstrings[$row->lang];
     }
     /**
+     * See courses
      * @param $row
      * @return mixed
      * @throws moodle_exception
      */
-    function col_seecourses(stdClass $row): string
-    {
+    final function col_seecourses(stdClass $row): string {
         return '<span class="likelink" data-name="' . $row->name . '" data-action="see-courses" data-courses="' . $row->courses . '">'
             . get_string('seecourses', 'mod_certifygen') . '</span>';
     }
 
     /**
+     * Issue certificate
      * @param stdClass $row
      * @return string
      * @throws coding_exception
      */
-    function col_emit(stdClass $row): string
-    {
+    final function col_emit(stdClass $row): string {
         // Emit.
         if ($row->status == certifygen_validations::STATUS_NOT_STARTED) {
             return '<span class="likelink" data-userid="' . $row->userid . '" data-id="' . $row->id . '" data-action="emit">' .
@@ -171,14 +181,12 @@ class profile_my_certificates_table extends table_sql {
     }
 
     /**
-     * @param $row
+     * Download
+     * @param stdClass $row
      * @return string
-     * @throws dml_exception
-     * @throws moodle_exception
      * @throws coding_exception
      */
-    function col_download(stdClass $row): string
-    {
+    final function col_download(stdClass $row): string {
         $status = $row->status;
         if (is_null($status)) {
             $status = certifygen_validations::STATUS_NOT_STARTED;
@@ -190,7 +198,13 @@ class profile_my_certificates_table extends table_sql {
         return '';
     }
 
-    function col_delete(stdClass $row): string {
+    /**
+     * Delete
+     * @param stdClass $row
+     * @return string
+     * @throws coding_exception
+     */
+    final function col_delete(stdClass $row): string {
         return '<span class="likelink" data-action="delete-request" data-id="' . $row->id . '">'.
             get_string('delete', 'mod_certifygen').'</span>';
     }
@@ -201,8 +215,7 @@ class profile_my_certificates_table extends table_sql {
      * @param bool $useinitialsbar do you want to use the initials bar?
      * @throws dml_exception
      */
-    public function query_db($pagesize, $useinitialsbar = true): void
-    {
+    public function query_db($pagesize, $useinitialsbar = true): void {
         $total = certifygen_validations::count_my_requests_as_teachers($this->userid);
         $this->pagesize($pagesize, $total);
         $this->rawdata = certifygen_validations::get_my_requests_as_teacher($this->userid, $this->get_page_start(),
@@ -215,11 +228,11 @@ class profile_my_certificates_table extends table_sql {
     }
 
     /**
+     * print_nothing_to_display
      * @return void
      * @throws coding_exception
      */
-    public function print_nothing_to_display(): void
-    {
+    public function print_nothing_to_display(): void {
         global $OUTPUT;
         echo $this->render_reset_button();
         $this->print_initials_bar();

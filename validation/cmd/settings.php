@@ -17,7 +17,9 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
+ *
  * @package   certifygenvalidation_cmd
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -54,4 +56,3 @@ if ($ADMIN->fulltree) {
         new lang_string('validatedfilespath', 'certifygenvalidation_cmd'),
         new lang_string('validatedfilespath_help', 'certifygenvalidation_cmd'), ""));
 }
-//$ADMIN->add('modsettingcertifygencat', $settings);

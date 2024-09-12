@@ -22,6 +22,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -29,30 +30,31 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 namespace mod_certifygen\external;
+
+defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
-
-use coding_exception;
 use context_module;
-use core\invalid_persistent_exception;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
-use mod_certifygen\certifygen;
-use mod_certifygen\certifygen_file;
 use mod_certifygen\event\certificate_downloaded;
 use mod_certifygen\interfaces\ICertificateRepository;
-use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-use mod_certifygen\template;
 use moodle_exception;
-
+/**
+ * Download student certificate
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class downloadcertificate_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -72,6 +74,7 @@ class downloadcertificate_external extends external_api {
     }
 
     /**
+     * Download studetn certificate
      * @param int $validationid
      * @param int $instanceid
      * @param int $modelid
@@ -80,10 +83,11 @@ class downloadcertificate_external extends external_api {
      * @return array
      * @throws invalid_parameter_exception
      */
-    public static function downloadcertificate(int $validationid, int $instanceid, int $modelid, string $code, int $courseid): array {
+    public static function downloadcertificate(int $validationid, int $instanceid, int $modelid, string $code,
+                                               int $courseid): array {
         self::validate_parameters(
-            self::downloadcertificate_parameters(), ['id' => $validationid, 'instanceid' => $instanceid, 'modelid' => $modelid, 'code' => $code,
-                'courseid' => $courseid]
+            self::downloadcertificate_parameters(), ['id' => $validationid, 'instanceid' => $instanceid,
+                'modelid' => $modelid, 'code' => $code, 'courseid' => $courseid]
         );
         global $USER;
         $result = ['result' => true, 'message' => 'OK', 'url' => ''];
@@ -114,12 +118,12 @@ class downloadcertificate_external extends external_api {
             if (get_config($repositoryplugin, 'enabled') === '1') {
                 /** @var ICertificateRepository $subplugin */
                 $subplugin = new $repositorypluginclass();
-                $result['url'] = $subplugin->getFileUrl($validation);
+                $result['url'] = $subplugin->get_file_url($validation);
                 if (empty($result['url'])) {
                     $result['result'] = false;
                     $result['message'] = 'empty_url';
                 } else {
-                    // triger event.
+                    // Triger event.
                     certificate_downloaded::create_from_validation($validation)->trigger();
                 }
             } else {
@@ -148,5 +152,4 @@ class downloadcertificate_external extends external_api {
             ]
         );
     }
-
 }

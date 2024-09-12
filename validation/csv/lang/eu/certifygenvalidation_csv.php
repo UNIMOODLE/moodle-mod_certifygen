@@ -17,7 +17,9 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
+ *
  * @package   certifygenvalidation_csv
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -42,4 +44,3 @@ $string['csvnotconfigured'] = 'CSV ez dago konfiguraturik';
 $string['pluginnamesettings'] = 'CSV Balioztapenaren Konfigurazioa';
 $string['csv_result_not_expected'] = 'Endpointaren emaitza ez da espero zen';
 $string['privacy:metadata'] = 'CSV Balioztapen pluginak ez du datu pertsonalik gordetzen.';
-

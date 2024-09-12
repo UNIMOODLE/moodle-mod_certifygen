@@ -25,19 +25,30 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-use mod_certifygen\external\deletemodel_external;
+
 use mod_certifygen\external\get_courses_as_teacher_external;
 use mod_certifygen\persistents\certifygen_model;
+
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
 require_once($CFG->dirroot.'/lib/externallib.php');
-
+/**
+ * Get courses as teacher  test
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class get_courses_as_teacher_external_test extends advanced_testcase {
 
     /**
@@ -48,6 +59,7 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
     }
 
     /**
+     * Test
      * @return void
      * @throws coding_exception
      * @throws dml_exception
@@ -68,10 +80,10 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
         $course1 = self::getDataGenerator()->create_course();
         $course2 = self::getDataGenerator()->create_course();
 
-        // Enrol user in course1 as teacher
+        // Enrol user in course1 as teacher...
         self::getDataGenerator()->enrol_user($user1->id, $course1->id, 'editingteacher');
 
-        // Enrol user in course2 as student
+        // Enrol user in course2 as student.
         self::getDataGenerator()->enrol_user($user1->id, $course2->id, 'student');
 
         // Create template.
@@ -100,6 +112,7 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
     }
 
     /**
+     * Test
      * @return void
      * @throws coding_exception
      * @throws dml_exception
@@ -117,7 +130,7 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
         $user1 = $this->getDataGenerator()->create_user(
             ['username' => 'test_user_1', 'firstname' => 'test', 'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
         $manager = $this->getDataGenerator()->create_user();
-        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        $managerrole = $DB->get_record('role', ['shortname' => 'manager']);
         $this->getDataGenerator()->role_assign($managerrole->id, $manager->id);
         $this->setUser($manager);
 
@@ -125,10 +138,10 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
         $course1 = self::getDataGenerator()->create_course();
         $course2 = self::getDataGenerator()->create_course();
 
-        // Enrol user in course1 as teacher
+        // Enrol user in course1 as teacher...
         self::getDataGenerator()->enrol_user($user1->id, $course1->id, 'editingteacher');
 
-        // Enrol user in course2 as student
+        // Enrol user in course2 as student.
         self::getDataGenerator()->enrol_user($user1->id, $course2->id, 'student');
 
         // Create template.
@@ -177,6 +190,7 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
     }
 
     /**
+     * Test
      * @return void
      * @throws coding_exception
      * @throws dml_exception
@@ -212,10 +226,10 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
         $course1 = self::getDataGenerator()->create_course();
         $course2 = self::getDataGenerator()->create_course();
 
-        // Enrol user in course1 as teacher
+        // Enrol user in course1 as teacher.
         self::getDataGenerator()->enrol_user($user1->id, $course1->id, 'editingteacher');
 
-        // Enrol user in course2 as student
+        // Enrol user in course2 as student.
         self::getDataGenerator()->enrol_user($user1->id, $course2->id, 'student');
 
         // Tests.
@@ -241,6 +255,7 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
     }
 
     /**
+     * Test
      * @return void
      * @throws coding_exception
      * @throws dml_exception
@@ -267,10 +282,10 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
         $course1 = self::getDataGenerator()->create_course();
         $course2 = self::getDataGenerator()->create_course();
 
-        // Enrol user in course1 as teacher
+        // Enrol user in course1 as teacher.
         self::getDataGenerator()->enrol_user($user1->id, $course1->id, 'editingteacher');
 
-        // Enrol user in course2 as student
+        // Enrol user in course2 as student.
         self::getDataGenerator()->enrol_user($user1->id, $course2->id, 'student');
 
         // Tests.
@@ -320,6 +335,7 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
     }
 
     /**
+     * Test
      * @return void
      * @throws coding_exception
      * @throws dml_exception
@@ -348,15 +364,15 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
         $englishname = 'Titulo en ingles';
         $data = [
             'fullname' => '<span lang="es" class="multilang">' . $spanishname
-                . '</span><span lang="en" class="multilang">' . $englishname . '</span>'
+                . '</span><span lang="en" class="multilang">' . $englishname . '</span>',
         ];
         $course1 = self::getDataGenerator()->create_course($data);
         $course2 = self::getDataGenerator()->create_course();
 
-        // Enrol user in course1 as teacher
+        // Enrol user in course1 as teacher.
         self::getDataGenerator()->enrol_user($user1->id, $course1->id, 'editingteacher');
 
-        // Enrol user in course2 as student
+        // Enrol user in course2 as student.
         self::getDataGenerator()->enrol_user($user1->id, $course2->id, 'student');
 
         // Tests.

@@ -18,31 +18,67 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 namespace mod_certifygen\interfaces;
 
 use mod_certifygen\persistents\certifygen_validations;
 use stored_file;
-
+/**
+ * ICertificateRepository
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 interface ICertificateRepository {
+    /** @var string  FILE_COMPONENT*/
     const FILE_COMPONENT = 'mod_certifygen';
+    /** @var string FILE_AREA */
     const FILE_AREA = 'certifygenrepository';
+    /** @var string FILE_PATH */
     const FILE_PATH = '/';
+
+    /**
+     * is_enabled
+     * @return bool
+     */
     public function is_enabled(): bool;
-    // Returl url so that user can download the certificate.
-    public function getFileUrl(certifygen_validations $trequest): string;
-    public function saveFile(stored_file $file): array;
-    // Saves file url on db.
-    public function saveFileUrl(): bool;
-    // Return the list of validation plugin names this repository is valid with.
-    // Empty means all of them are valid.
+
+    /**
+     * Returl url so that user can download the certificate.
+     * @param certifygen_validations $trequest
+     * @return string
+     */
+    public function get_file_url(certifygen_validations $trequest): string;
+
+    /**
+     * saveFile
+     * @param stored_file $file
+     * @return array
+     */
+    public function save_file(stored_file $file): array;
+
+    /**
+     * Saves file url on db.
+     * @return bool
+     */
+    public function save_file_url(): bool;
+
+    /**
+     * Return the list of validation plugin names this repository is valid with.
+     * Empty means all of them are valid.
+     * @return array
+     */
     public function get_consistent_validation_plugins(): array;
 }
+
 

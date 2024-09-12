@@ -17,30 +17,33 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
+use core\invalid_persistent_exception;
 use mod_certifygen\persistents\certifygen_context;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 
 /**
+ * mod_certifygen_generator
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 class mod_certifygen_generator extends testing_module_generator {
 
 
     /**
+     * create_model
      * @param int $type
      * @param int $mode
      * @param int $templateid
      * @param string $validation
      * @param string $report
      * @return certifygen_model
-     * @throws \core\invalid_persistent_exception
-     * @throws coding_exception
+     * @throws invalid_persistent_exception
+     * @throws coding_exception|moodle_exception
      */
     public function create_model(int $type, int $mode, int $templateid, string $validation, string $report) {
 
@@ -56,18 +59,20 @@ class mod_certifygen_generator extends testing_module_generator {
             'validation' => $validation,
             'report' => $report,
             'repository' => 'certifygenrepository_localrepository',
-
         ];
         $model = new certifygen_model(0,  (object)$data);
         return $model->create();
     }
 
     /**
+     * create_model_by_name
      * @param string $name
      * @param int $templateid
+     * @param int $type
      * @return certifygen_model
-     * @throws \core\invalid_persistent_exception
+     * @throws invalid_persistent_exception
      * @throws coding_exception
+     * @throws moodle_exception
      */
     public function create_model_by_name(string $name, int $templateid, int $type) {
 
@@ -87,18 +92,18 @@ class mod_certifygen_generator extends testing_module_generator {
             'validation' => 'certifygenvalidation_none',
             'report' => $type == certifygen_model::TYPE_ACTIVITY ? '' : 'certifygenreport_basic',
             'repository' => 'certifygenrepository_localrepository',
-
         ];
         $model = new certifygen_model(0, (object)$data);
         return $model->create();
     }
 
     /**
+     * create_teacher_request
      * @param int $modelid
      * @param string $courses
      * @param int $userid
      * @return certifygen_validations
-     * @throws \core\invalid_persistent_exception
+     * @throws invalid_persistent_exception
      * @throws coding_exception
      */
     public function create_teacher_request(int $modelid, string $courses, int $userid) {
@@ -119,6 +124,7 @@ class mod_certifygen_generator extends testing_module_generator {
     }
 
     /**
+     * install_language_package
      * @param string $langcode
      * @return void
      * @throws moodle_exception
@@ -129,24 +135,11 @@ class mod_certifygen_generator extends testing_module_generator {
     }
 
     /**
+     * assign_model_coursecontext
      * @param int $modelid
+     * @param string $contextids
      * @return certifygen_context
-     * @throws \core\invalid_persistent_exception
-     * @throws coding_exception
-     */
-//    public function assign_model_systemcontext(int $modelid) {
-//        $data = [
-//            'modelid' => $modelid,
-//            'contextids' => '',
-//            'type' => certifygen_context::CONTEXT_TYPE_SYSTEM,
-//        ];
-//        $context = new certifygen_context(0, (object)$data);
-//        return $context->create();
-//    }
-    /**
-     * @param int $modelid
-     * @return certifygen_context
-     * @throws \core\invalid_persistent_exception
+     * @throws invalid_persistent_exception
      * @throws coding_exception
      */
     public function assign_model_coursecontext(int $modelid, string $contextids) {

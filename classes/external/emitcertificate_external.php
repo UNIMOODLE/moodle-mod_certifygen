@@ -22,19 +22,19 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
 namespace mod_certifygen\external;
+
+defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
-
 use coding_exception;
 use context_module;
 use core\invalid_persistent_exception;
@@ -52,7 +52,14 @@ use mod_certifygen\persistents\certifygen_error;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
-
+/**
+ * Issue student certificate
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class emitcertificate_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -73,6 +80,7 @@ class emitcertificate_external extends external_api {
     }
 
     /**
+     * Issue certificate
      * @param int $id
      * @param int $instanceid
      * @param int $modelid
@@ -82,13 +90,15 @@ class emitcertificate_external extends external_api {
      * @return array
      * @throws coding_exception
      * @throws invalid_parameter_exception
-     * @throws invalid_persistent_exception
+     * @throws invalid_persistent_exception|moodle_exception
      */
-    public static function emitcertificate(int $id, int $instanceid, int $modelid, string $lang, int $userid, int $courseid): array {
+    public static function emitcertificate(int $id, int $instanceid, int $modelid, string $lang, int $userid,
+                                           int $courseid): array {
         global $USER;
 
         self::validate_parameters(
-            self::emitcertificate_parameters(), ['id' => $id, 'instanceid' => $instanceid, 'modelid' => $modelid, 'lang' => $lang, 'userid' => $userid, 'courseid' => $courseid]
+            self::emitcertificate_parameters(), ['id' => $id, 'instanceid' => $instanceid, 'modelid' => $modelid,
+                'lang' => $lang, 'userid' => $userid, 'courseid' => $courseid]
         );
 
         $result = ['result' => true, 'message' => get_string('ok', 'mod_certifygen')];
@@ -122,19 +132,22 @@ class emitcertificate_external extends external_api {
             }
         }
         $validation = certifygen_validations::manage_validation($id, (object) $data);
+        error_log(__FUNCTION__ . ' validation: '.var_export($validation, true));
         try {
             // Step 2: Generate issue.
             $users = user_get_users_by_id([$userid]);
             $user = reset($users);
             $certifygenmodel = new certifygen_model($modelid);
-            $issueid = certifygen::issue_certificate($instanceid, $user, $certifygenmodel->get('templateid'), $course, $lang);
+            $issueid = certifygen::issue_certificate($instanceid, $user, $certifygenmodel->get('templateid'), $course,
+                $lang);
             $saved = false;
             if ($issueid) {
                 $saved = true;
                 $validation->set('issueid', $issueid);
                 $validation->save();
             }
-            if ($existingcertificate = certifygen::get_user_certificate($instanceid, $userid, $courseid, $certifygenmodel->get('templateid'), $lang)) {
+            if ($existingcertificate = certifygen::get_user_certificate($instanceid, $userid, $courseid,
+                $certifygenmodel->get('templateid'), $lang)) {
                 if (!$saved) {
                     $saved = true;
                     $validation->set('issueid', $existingcertificate->id);
@@ -143,8 +156,8 @@ class emitcertificate_external extends external_api {
             }
 
             // Step 3: Generate the tool_certificate certificate.
-            $file = certifygen::get_user_certificate_file($instanceid, $certifygenmodel->get('templateid'), $userid, $courseid, $lang);
-
+            $file = certifygen::get_user_certificate_file($instanceid, $certifygenmodel->get('templateid'), $userid,
+                $courseid, $lang);
             if (is_null($file)) {
                 $result['result'] = false;
                 $result['message'] = 'File not found';
@@ -169,21 +182,22 @@ class emitcertificate_external extends external_api {
                     'course_shortname' => $course->shortname,
                     'filename' => str_replace('.pdf', '', $file->get_filename()),
                 ];
-                $certdata = get_json_certificate_external::get_json_certificate($userid, '', $instanceid, '', $validation->get('lang'));
+                $certdata = get_json_certificate_external::get_json_certificate($userid, '', $instanceid,
+                    '', $validation->get('lang'));
                 if (array_key_exists('json', $certdata) && !empty($certdata['json'])) {
                     $certdata = (array)json_decode($certdata['json']);
                     $data = array_merge($data, $certdata);
                 }
                 $certifygenfile->set_metadata($data);
 
-                // Step 4: Start certifygen certificate proccess
+                // Step 4: Start certifygen certificate proccess.
                 $result = certifygen::start_emit_certificate_proccess($validation, $certifygenfile, $certifygenmodel);
 
-                // Step 5: event trigger
+                // Step 5: event trigger.
                 certificate_issued::create_from_validation($validation)->trigger();
             }
         } catch (moodle_exception $e) {
-            error_log(__FUNCTION__ . ' ' . ' error: '.var_export($e->getMessage(), true));
+            debugging(__FUNCTION__ . ' ' . ' error: ' . $e->getMessage());
             $result['result'] = false;
             $result['message'] = $e->getMessage();
             $validation->set('status', certifygen_validations::STATUS_ERROR);
@@ -212,5 +226,4 @@ class emitcertificate_external extends external_api {
             ]
         );
     }
-
 }

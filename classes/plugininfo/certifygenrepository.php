@@ -20,7 +20,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
- * Subplugin info class.
+ * Certifygenrepository class.
  *
  * @package   mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
@@ -39,8 +39,15 @@ use moodle_exception;
 use moodle_url;
 use part_of_admin_tree;
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * Certifygenrepository class.
+ *
+ * @package   mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class certifygenrepository extends base {
 
     /**
@@ -49,30 +56,13 @@ class certifygenrepository extends base {
      * @throws coding_exception
      * @throws dml_exception
      */
-    public static function get_enabled_plugins() : array {
-        global $DB;
+    public static function get_enabled_plugins(): array {
 
         $plugins = core_plugin_manager::instance()->get_installed_plugins('certifygenrepository');
         if (!$plugins) {
-            return array();
+            return [];
         }
-//        $installed = array();
-//        foreach ($plugins as $plugin => $version) {
-//            $installed[] = 'certifygenrepository_'.$plugin;
-//        }
-//
-//        list($installed, $params) = $DB->get_in_or_equal($installed, SQL_PARAMS_NAMED);
-//        $disabled = $DB->get_records_select('config_plugins', "plugin $installed AND name = 'enabled'", $params, 'plugin ASC');
-//
-//        foreach ($disabled as $conf) {
-//            if (!empty($conf->value)) {
-//                continue;
-//            }
-//            list($type, $name) = explode('_', $conf->plugin, 2);
-//            unset($plugins[$name]);
-//        }
-//
-        $enabled = array();
+        $enabled = [];
         foreach ($plugins as $plugin => $version) {
             $enabled[$plugin] = $plugin;
         }
@@ -81,35 +71,25 @@ class certifygenrepository extends base {
     }
 
     /**
-     * Return URL used for management of plugins of this type.
-     * @return moodle_url
-     * @throws moodle_exception
-     */
-//    public static function get_manage_url(): moodle_url
-//    {
-//        return new moodle_url('/mod/certifygen/adminmanageplugins.php', array('subtype'=>'certifygenrepository'));
-//    }
-
-    /**
+     * load_settings
      * @param part_of_admin_tree $adminroot
      * @param $parentnodename
      * @param $hassiteconfig
      * @return void
      */
-    public function load_settings(part_of_admin_tree $adminroot, $parentnodename, $hassiteconfig): void
-    {
-        global $CFG, $USER, $DB, $OUTPUT, $PAGE; // In case settings.php wants to refer to them.
-        $ADMIN = $adminroot; // May be used in settings.php.
+    public function load_settings(part_of_admin_tree $adminroot, $parentnodename, $hassiteconfig): void {
+        $ADMIN = $adminroot;
         $plugininfo = $this; // Also can be used inside settings.php.
 
         if (!$this->is_installed_and_upgraded()) {
             return;
         }
 
-        if (!$hassiteconfig or !file_exists($this->full_path('settings.php'))) {
+        if (!$hassiteconfig || !file_exists($this->full_path('settings.php'))) {
             return;
         }
-        $settings = new admin_settingpage($this->component, $this->displayname, 'moodle/site:config', $this->is_enabled() === false);
+        $settings = new admin_settingpage($this->component, $this->displayname, 'moodle/site:config',
+            $this->is_enabled() === false);
         include($this->full_path('settings.php')); // This may also set $settings to null.
 
         if ($settings) {
@@ -118,10 +98,10 @@ class certifygenrepository extends base {
     }
 
     /**
+     * get_settings_section_name
      * @return string
      */
-    public function get_settings_section_name(): string
-    {
+    public function get_settings_section_name(): string {
         return 'certifygenrepository';
     }
 }

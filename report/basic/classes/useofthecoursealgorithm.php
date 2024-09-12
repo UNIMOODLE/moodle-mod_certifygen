@@ -18,7 +18,9 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
+ *
  * @package    certifygenreport_basic
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -28,60 +30,102 @@
 
 namespace certifygenreport_basic;
 
+use dml_exception;
 use stdClass;
-
+/**
+ * useofthecoursealgorithm
+ * @package    certifygenreport_basic
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class useofthecoursealgorithm {
 
+    /** @var int L1 */
     private const  L1 = 0;
+    /** @var int L2 */
     private const  L2 = 2;
+    /** @var int M1 */
     private const  M1 = 4;
+    /** @var int M2 */
     private const  M2 = 6;
+    /** @var int H1 */
     private const  H1 = 8;
+    /** @var int H2 */
     private const  H2 = 10;
+    /** @var int LOW */
     private const LOW = 'L';
+    /** @var int MEDIUM */
     private const  MEDIUM = 'M';
+    /** @var int HIGH */
     private const  HIGH = 'H';
+    /** @var int $numstudents */
     private int $numstudents;
+    /** @var int $courseid */
     private int $courseid;
+    /** @var int $course */
     private stdClass $course;
+    /** @var int $resources */
     private int $resources;
+    /** @var int $resourceslevel */
     private string $resourceslevel;
+    /** @var int $resourceviews */
     private array $resourceviews;
+    /** @var int $resourceviewslevel */
     private string $resourceviewslevel;
+    /** @var int $forumnews */
     private int $forumnews;
+    /** @var int $forumnewslevel */
     private string $forumnewslevel;
+    /** @var int $forums */
     private int $forums;
+    /** @var int $forumslevel */
     private string $forumslevel;
+    /** @var int $foruminteractions */
     private int $foruminteractions;
+    /** @var int $foruminteractionslevel */
     private string $foruminteractionslevel;
+    /** @var int $assigns */
     private int $assigns;
+    /** @var int $assignslevel */
     private string $assignslevel;
+    /** @var int $assignsubmissions */
     private array $assignsubmissions;
+    /** @var int $assignsubmissionslevel */
     private string $assignsubmissionslevel;
+    /** @var int $gradeitems */
     private int $gradeitems;
+    /** @var int $gradeitemslevel */
     private string $gradeitemslevel;
+    /** @var int $gradefeedback */
     private int $gradefeedback;
+    /** @var int $gradefeedbacklevel */
     private string $gradefeedbacklevel;
 
     /**
+     * Construct
      * @param int $courseid
+     * @param int $numstudents
+     * @throws dml_exception
+     * @throws \moodle_exception
      */
-    public function __construct(int $courseid, int $numstudents)
-    {
+    public function __construct(int $courseid, int $numstudents) {
         $this->courseid = $courseid;
         $this->numstudents = $numstudents;
         $this->course = get_course($courseid);
         if ($this->numstudents == 0) {
-            error_log(__CLASS__ . ' courseid: '.var_export($courseid, true));
-            error_log(__CLASS__ . ' numstudents: '.var_export($numstudents, true));
+            debugging(__CLASS__ . '  courseid '  . $courseid);
+            debugging(__CLASS__ . '  numstudents '  . $numstudents);
             throw new \moodle_exception('cannotusealgorith_nostudents', 'certifygenreport_basic');
         }
     }
     /**
+     * get_course_info
      * @return void
-     * @throws \dml_exception
+     * @throws dml_exception
      */
-    private function get_course_info() : void {
+    private function get_course_info(): void {
         $this->get_resources();
         $this->get_resource_views();
         $this->get_forums();
@@ -91,35 +135,26 @@ class useofthecoursealgorithm {
         $this->get_assigns_submissions();
         $this->get_grade_items();
         $this->get_grade_feedback();
-//        print_object('resources');
-//        print_object($this->resources);
-//        print_object('resourceviews');
-//        print_object($this->resourceviews);
-//        print_object('forums');
-//        print_object($this->forums);
-//        print_object('forumnews');
-//        print_object($this->forumnews);
-//        print_object('foruminteractions');
-//        print_object($this->foruminteractions);
-//        print_object('assigns');
-//        print_object($this->assigns);
-//        print_object('assignsubmissions');
-//        print_object($this->assignsubmissions);
-//        print_object('gradeitems');
-//        print_object($this->gradeitems);
     }
     /**
+     * get_course_type
      * @return string
+     * @throws dml_exception
      */
-    public function get_course_type() : string {
+    public function get_course_type(): string {
         $this->get_course_info();
 
         if (
-            ($this->assignsubmissionslevel == self::LOW && ($this->resourceslevel == self::MEDIUM || $this->resourceslevel == self::HIGH) && $this->resourceviewslevel == self::LOW && $this->foruminteractionslevel == self::LOW)
+            ($this->assignsubmissionslevel == self::LOW && ($this->resourceslevel == self::MEDIUM
+                    || $this->resourceslevel == self::HIGH) && $this->resourceviewslevel == self::LOW
+                && $this->foruminteractionslevel == self::LOW)
             ||
-            ($this->assignsubmissionslevel == self::LOW && $this->resourceslevel == self::LOW && ($this->foruminteractionslevel == self::MEDIUM || $this->foruminteractionslevel == self::HIGH) && $this->forumnewslevel == self::LOW)
+            ($this->assignsubmissionslevel == self::LOW && $this->resourceslevel == self::LOW
+                && ($this->foruminteractionslevel == self::MEDIUM || $this->foruminteractionslevel == self::HIGH)
+                && $this->forumnewslevel == self::LOW)
             ||
-            ($this->assignsubmissionslevel == self::LOW && $this->resourceslevel == self::LOW && $this->foruminteractionslevel == self::LOW)
+            ($this->assignsubmissionslevel == self::LOW && $this->resourceslevel == self::LOW
+                && $this->foruminteractionslevel == self::LOW)
         ) {
             return 'Inactivo';
         } else if (
@@ -167,10 +202,11 @@ class useofthecoursealgorithm {
     }
 
     /**
+     * get_item_level
      * @param int $item
-     * @return int
+     * @return string
      */
-    private function get_item_level(int $item) : string {
+    private function get_item_level(int $item): string {
         if ($item <= self::L2) {
             $level = self::LOW;
         } else if ($item <= self::M2) {
@@ -181,44 +217,43 @@ class useofthecoursealgorithm {
         return $level;
     }
     /**
+     * get_resources
      * @return void
-     * @throws \dml_exception
      */
-    private function get_resources() : void {
+    private function get_resources(): void {
         global $DB;
         try {
-            $sql = "SELECT COUNT(*)  
-                    FROM {course_modules} cm
-                    LEFT JOIN {modules} m ON m.id = cm.module
-                    WHERE cm.course = :courseid
-                    AND m.name IN ('resource','url','label','page', 'book', 'folder','glossary','scorm', 'data')
-                    AND cm.visible=1";
-
+            $sql = "SELECT COUNT(*)";
+            $sql .= " FROM {course_modules} cm";
+            $sql .= " LEFT JOIN {modules} m ON m.id = cm.module";
+            $sql .= " WHERE cm.course = :courseid";
+            $sql .= " AND m.name IN ('resource','url','label','page', 'book', 'folder','glossary','scorm', 'data')";
+            $sql .= " AND cm.visible=1";
             $this->resources = $DB->count_records_sql($sql, ['courseid' => $this->courseid]);
             $this->resourceslevel = $this->get_item_level($this->resources);
         } catch (\moodle_exception $e) {
-            error_log(__FUNCTION__ . ' error: '. $e->getMessage(), true);
+            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $this->resources = 0;
             $this->resourceslevel = self::LOW;
         }
     }
 
     /**
+     * get_resource_views
      * @return void
-     * @throws \dml_exception
      */
-    private function get_resource_views() : void {
+    private function get_resource_views(): void {
         global $DB;
         try {
-            $sql = "SELECT logs.userid, count(logs.id) views
-            FROM {logstore_standard_log} logs 
-            WHERE logs.action='viewed'
-            AND logs.component IN ('mod_resource','mod_url','mod_label','mod_page', 'mod_book', 'mod_folder','mod_glossary','mod_scorm','mod_data')
-            AND logs.timecreated > :startdate
-            AND logs.timecreated < :enddate
-            AND logs.courseid = :courseid
-            GROUP BY logs.userid,logs.courseid";
-
+            $sql = "SELECT logs.userid, count(logs.id) views";
+            $sql .= " FROM {logstore_standard_log} logs ";
+            $sql .= " WHERE logs.action='viewed'";
+            $sql .= " AND logs.component IN ('mod_resource','mod_url','mod_label','mod_page', 'mod_book', 'mod_folder',";
+            $sql .= " 'mod_glossary','mod_scorm','mod_data')";
+            $sql .= " AND logs.timecreated > :startdate";
+            $sql .= " AND logs.timecreated < :enddate";
+            $sql .= " AND logs.courseid = :courseid";
+            $sql .= " GROUP BY logs.userid,logs.courseid";
             $params = [
                 'courseid' => $this->courseid,
                 'startdate' => $this->course->startdate,
@@ -232,7 +267,7 @@ class useofthecoursealgorithm {
             $sum = $sum / $this->numstudents;
             $this->resourceviewslevel = $this->get_item_level($sum);
         } catch (\moodle_exception $e) {
-            error_log(__FUNCTION__ . ' error: '. $e->getMessage(), true);
+            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $this->resourceviews = [];
             $this->resourceviewslevel = self::LOW;
         }
@@ -240,63 +275,64 @@ class useofthecoursealgorithm {
 
 
     /**
+     * get_forums
      * @return void
-     * @throws \dml_exception
      */
-    private function get_forums() : void {
+    private function get_forums(): void {
         global $DB;
         try {
-            $sql = "SELECT COUNT(*)
-                        FROM {course_modules} cm
-                        LEFT JOIN {modules} m ON m.id = cm.module
-                        WHERE cm.course = :courseid
-                        AND m.name IN ('forum') AND cm.visible=1";
+            $sql = "SELECT COUNT(*)";
+            $sql .= " FROM {course_modules} cm";
+            $sql .= " LEFT JOIN {modules} m ON m.id = cm.module";
+            $sql .= " WHERE cm.course = :courseid";
+            $sql .= " AND m.name IN ('forum') AND cm.visible=1";
             $this->forums = $DB->count_records_sql($sql, ['courseid' => $this->courseid]);
             $this->forumslevel = $this->get_item_level($this->forums);
         } catch (\moodle_exception $e) {
-            error_log(__FUNCTION__ . ' error: '. $e->getMessage(), true);
+            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $this->forums = 0;
             $this->forumslevel = self::LOW;
         }
     }
     /**
+     * get_forum_views
      * @return void
-     * @throws \dml_exception
      */
-    private function get_forum_views() : void {
+    private function get_forum_views(): void {
         global $DB;
         try {
-            $sql = "SELECT COUNT(*)
-                        FROM {course_modules} cm
-                        LEFT JOIN {modules} m ON m.id = cm.module
-                        WHERE cm.course = :courseid
-                        AND m.name IN ('forum') AND cm.visible=1
-                        AND cm.instance IN (SELECT f.id 
-                                FROM {forum} f WHERE f.type = 'news' AND f.course = :courseid2)";
-            $this->forumnews = $DB->count_records_sql($sql, ['courseid' => $this->courseid, 'courseid2' => $this->courseid]);
+            $sql = "SELECT COUNT(*)";
+            $sql .= " FROM {course_modules} cm";
+            $sql .= " LEFT JOIN {modules} m ON m.id = cm.module";
+            $sql .= " WHERE cm.course = :courseid";
+            $sql .= " AND m.name IN ('forum') AND cm.visible=1";
+            $sql .= " AND cm.instance IN (SELECT f.id";
+            $sql .= " FROM {forum} f WHERE f.type = 'news' AND f.course = :courseid2)";
+            $this->forumnews = $DB->count_records_sql($sql, ['courseid' => $this->courseid,
+                'courseid2' => $this->courseid]);
             $this->forumnewslevel = $this->get_item_level($this->forumnews);
         } catch (\moodle_exception $e) {
-            error_log(__FUNCTION__ . ' error: '. $e->getMessage(), true);
+            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $this->forumnews = 0;
             $this->forumnewslevel = self::LOW;
         }
     }
     /**
+     * get_forum_interactions
      * @return void
-     * @throws \dml_exception
      */
-    private function get_forum_interactions() : void {
+    private function get_forum_interactions(): void {
         global $DB;
         try {
-            $sql = "SELECT count(slogs.id) total
-                FROM  {logstore_standard_log} as slogs
-                WHERE slogs.component ='mod_forum' 
-                AND slogs.action='viewed' 
-                AND slogs.target='discussion'
-                AND slogs.timecreated > :startdate
-                AND slogs.timecreated < :enddate
-                AND slogs.courseid = :courseid
-                GROUP BY slogs.courseid";
+            $sql = "SELECT count(slogs.id) total";
+            $sql .= " FROM  {logstore_standard_log} as slogs";
+            $sql .= " WHERE slogs.component ='mod_forum' ";
+            $sql .= " AND slogs.action='viewed' ";
+            $sql .= " AND slogs.target='discussion'";
+            $sql .= " AND slogs.timecreated > :startdate";
+            $sql .= " AND slogs.timecreated < :enddate";
+            $sql .= " AND slogs.courseid = :courseid";
+            $sql .= " GROUP BY slogs.courseid";
             $params = [
                 'courseid' => $this->courseid,
                 'startdate' => $this->course->startdate,
@@ -309,25 +345,25 @@ class useofthecoursealgorithm {
             }
             $this->foruminteractionslevel = $this->get_item_level($this->foruminteractions);
         } catch (\moodle_exception $e) {
-            error_log(__FUNCTION__ . ' error: '. $e->getMessage(), true);
+            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $this->foruminteractions = [];
             $this->foruminteractionslevel = self::LOW;
         }
     }
     /**
+     * get_assigns
      * @return void
-     * @throws \dml_exception
      */
-    private function get_assigns() : void {
+    private function get_assigns(): void {
         global $DB;
         try {
-            $sql = "SELECT count(*) media 
-                        FROM {course_modules} cm 
-                        INNER JOIN {modules} m ON m.id = cm.module
-                        WHERE m.name = 'assign'
-                        AND cm.visible=1 
-                        AND cm.course = :courseid
-                        GROUP BY cm.course";
+            $sql = "SELECT count(*) media ";
+            $sql .= " FROM {course_modules} cm ";
+            $sql .= " INNER JOIN {modules} m ON m.id = cm.module";
+            $sql .= " WHERE m.name = 'assign'";
+            $sql .= " AND cm.visible=1 ";
+            $sql .= " AND cm.course = :courseid";
+            $sql .= " GROUP BY cm.course";
             $params = [
                 'courseid' => $this->courseid,
             ];
@@ -338,24 +374,24 @@ class useofthecoursealgorithm {
             }
             $this->assignslevel = $this->get_item_level($this->assigns);
         } catch (\moodle_exception $e) {
-            error_log(__FUNCTION__ . ' error: '. $e->getMessage(), true);
+            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $this->assigns = [];
             $this->assignslevel = self::LOW;
         }
     }
     /**
+     * get_assigns_submissions
      * @return void
-     * @throws \dml_exception
      */
-    private function get_assigns_submissions() : void {
+    private function get_assigns_submissions(): void {
         global $DB;
         try {
-            $sql = "SELECT assign_subm.userid userid, COUNT(assign_subm.id) total
-                        FROM {assign_submission} assign_subm
-                        LEFT JOIN {assign} assign  ON (assign.id = assign_subm.assignment)
-                        WHERE assign_subm.timecreated > :startdate
-                        AND assign.course = :courseid
-                        GROUP BY assign.course, assign_subm.userid";
+            $sql = "SELECT assign_subm.userid userid, COUNT(assign_subm.id) total";
+            $sql .= " FROM {assign_submission} assign_subm";
+            $sql .= " LEFT JOIN {assign} assign  ON (assign.id = assign_subm.assignment)";
+            $sql .= " WHERE assign_subm.timecreated > :startdate";
+            $sql .= " AND assign.course = :courseid";
+            $sql .= " GROUP BY assign.course, assign_subm.userid";
             $params = [
                 'courseid' => $this->courseid,
                 'startdate' => $this->course->startdate,
@@ -368,24 +404,24 @@ class useofthecoursealgorithm {
             $sum = $sum / $this->numstudents;
             $this->assignsubmissionslevel = $this->get_item_level($sum);
         } catch (\moodle_exception $e) {
-            error_log(__FUNCTION__ . ' error: '. $e->getMessage(), true);
+            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $this->assignsubmissions = [];
             $this->assignsubmissionslevel = self::LOW;
         }
     }
     /**
+     * get_grade_items
      * @return void
-     * @throws \dml_exception
      */
-    private function get_grade_items() : void {
+    private function get_grade_items(): void {
         global $DB;
         try {
-            $sql = "SELECT count(gradeitems.id) total
-                        FROM {grade_items} gradeitems
-                        WHERE gradeitems.hidden=0 
-                        AND gradeitems.itemtype in ('manual', 'mod')
-                        AND gradeitems.courseid = :courseid
-                        GROUP BY gradeitems.courseid";
+            $sql = "SELECT count(gradeitems.id) total";
+            $sql .= " FROM {grade_items} gradeitems";
+            $sql .= " WHERE gradeitems.hidden=0 ";
+            $sql .= " AND gradeitems.itemtype in ('manual', 'mod')";
+            $sql .= " AND gradeitems.courseid = :courseid";
+            $sql .= " GROUP BY gradeitems.courseid";
             $params = [
                 'courseid' => $this->courseid,
             ];
@@ -396,26 +432,26 @@ class useofthecoursealgorithm {
             }
             $this->gradeitemslevel = $this->get_item_level($this->gradeitems);
         } catch (\moodle_exception $e) {
-            error_log(__FUNCTION__ . ' error: '. $e->getMessage(), true);
+            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $this->gradeitems = [];
             $this->gradeitemslevel = self::LOW;
         }
     }
     /**
+     * get_grade_feedback
      * @return void
-     * @throws \dml_exception
      */
-    private function get_grade_feedback() : void {
+    private function get_grade_feedback(): void {
         global $DB;
         try {
-            $sql = "SELECT count(distinct(items.id))
-                        FROM {grade_grades} grades
-                        RIGHT JOIN {grade_items} items on (items.id = grades.itemid)
-                        WHERE grades.hidden=0 
-                        AND itemtype in ('manual', 'mod')
-                        AND feedback is not NULL
-                        AND items.courseid = :courseid
-                        GROUP BY courseid";
+            $sql = "SELECT count(distinct(items.id))";
+            $sql .= " FROM {grade_grades} grades";
+            $sql .= " RIGHT JOIN {grade_items} items on (items.id = grades.itemid)";
+            $sql .= " WHERE grades.hidden=0";
+            $sql .= " AND itemtype in ('manual', 'mod')";
+            $sql .= " AND feedback is not NULL";
+            $sql .= " AND items.courseid = :courseid";
+            $sql .= " GROUP BY courseid";
             $params = [
                 'courseid' => $this->courseid,
             ];
@@ -426,7 +462,7 @@ class useofthecoursealgorithm {
             }
             $this->gradefeedbacklevel = $this->get_item_level($this->gradefeedback);
         } catch (\moodle_exception $e) {
-            error_log(__FUNCTION__ . ' error: '. $e->getMessage(), true);
+            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $this->gradefeedback = 0;
             $this->gradefeedbacklevel = self::LOW;
         }

@@ -17,14 +17,16 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
- * @package   certifygenvalidation_webservice
+ * Implementation of the privacy subsystem plugin provider for the certifygenvalidation_webservice plugin.
+ * @package    certifygenvalidation_webservice
  * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 
 use certifygenvalidation_webservice\external\change_status_external;
 use certifygenvalidation_webservice\external\get_user_requests_external;
@@ -52,6 +54,6 @@ $services = [
         'functions' => [
             'certifygenvalidation_webservice_change_status',
             'certifygenvalidation_webservice_get_user_requests',
-        ]
-    ]
+        ],
+    ],
 ];

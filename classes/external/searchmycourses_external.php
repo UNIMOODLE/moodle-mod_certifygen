@@ -18,6 +18,15 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
+/**
+ * Search my courses ws class
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 namespace mod_certifygen\external;
 
 use coding_exception;
@@ -31,15 +40,15 @@ use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
 use mod_certifygen\persistents\certifygen_context;
-use mod_certifygen\persistents\certifygen_model;
 use restricted_context_exception;
 
 /**
+ * Search my courses ws class
  * @package    mod_certifygen
- * * @copyright  2024 Proyecto UNIMOODLE
- * * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
- * * @author     3IPUNT <contacte@tresipunt.com>
- * * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class searchmycourses_external extends external_api {
 
@@ -57,6 +66,7 @@ class searchmycourses_external extends external_api {
     }
 
     /**
+     * Search my courses
      * @param string $query
      * @param int $userid
      * @param int $modelid
@@ -81,7 +91,7 @@ class searchmycourses_external extends external_api {
         self::validate_context($context);
         $params = [
             'fullname' => '%' . $query . '%',
-            'userid' => $userid
+            'userid' => $userid,
         ];
         $modelcontext = certifygen_context::get_record(['modelid' => $modelid]);
         $wherecategory = $wherecourse = '';
@@ -113,13 +123,13 @@ class searchmycourses_external extends external_api {
             }
         }
         $likename = $DB->sql_like('c.fullname', ':fullname', false, true);
-        $sql = "SELECT c.id, c.fullname
-                    FROM  {user_enrolments} ue 
-                    INNER JOIN {enrol} e ON e.id = ue.enrolid
-                    INNER JOIN {course} c ON c.id = e.courseid
-                    WHERE ue.userid = :userid 
-                    AND $likename
-                    $wherecourse $wherecategory";
+        $sql = "SELECT c.id, c.fullname";
+        $sql .= " FROM  {user_enrolments} ue ";
+        $sql .= " INNER JOIN {enrol} e ON e.id = ue.enrolid";
+        $sql .= " INNER JOIN {course} c ON c.id = e.courseid";
+        $sql .= " WHERE ue.userid = :userid ";
+        $sql .= " AND $likename";
+        $sql .= " $wherecourse $wherecategory";
 
         $rs = $DB->get_recordset_sql($sql, $params);
         $count = 0;

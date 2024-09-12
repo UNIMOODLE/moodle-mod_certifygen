@@ -17,14 +17,15 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
+ *
  * @package   certifygenrepository_localrepository
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 namespace certifygenrepository_localrepository;
 
 use coding_exception;
@@ -37,17 +38,23 @@ use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_url;
 use stored_file;
-
-class certifygenrepository_localrepository implements ICertificateRepository
-{
+/**
+ *
+ * @package   certifygenrepository_localrepository
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class certifygenrepository_localrepository implements ICertificateRepository {
     /**
+     * getFileUrl
      * @param certifygen_validations $validation
      * @return string
      * @throws coding_exception
      * @throws dml_exception
      */
-    public function getFileUrl(certifygen_validations $validation): string
-    {
+    public function get_file_url(certifygen_validations $validation): string {
         $code = certifygen_validations::get_certificate_code($validation);
         $code .= '.pdf';
         $contextid = context_system::instance()->id;
@@ -70,11 +77,11 @@ class certifygenrepository_localrepository implements ICertificateRepository
     }
 
     /**
+     * saveFile
      * @param stored_file $file
      * @return array
      */
-    public function saveFile(stored_file $file): array
-    {
+    public function save_file(stored_file $file): array {
         $result = [
             'result' => true,
             'message' => 'ok',
@@ -89,7 +96,7 @@ class certifygenrepository_localrepository implements ICertificateRepository
                 'filearea' => self::FILE_AREA,
                 'itemid' => $file->get_itemid(),
                 'filepath' => self::FILE_PATH,
-                'filename' => $file->get_filename()
+                'filename' => $file->get_filename(),
             ];
             $fs->create_file_from_storedfile($filerecord, $file);
             $file->delete();
@@ -102,11 +109,11 @@ class certifygenrepository_localrepository implements ICertificateRepository
     }
 
     /**
+     * is_enabled
      * @return bool
      * @throws dml_exception
      */
-    public function is_enabled(): bool
-    {
+    public function is_enabled(): bool {
         $enabled = (int) get_config('certifygenrepository_localrepository', 'enabled');
         if ($enabled) {
             return true;
@@ -115,18 +122,18 @@ class certifygenrepository_localrepository implements ICertificateRepository
     }
 
     /**
+     * saveFileUrl
      * @return bool
      */
-    public function saveFileUrl(): bool
-    {
+    public function save_file_url(): bool {
         return false;
     }
 
     /**
+     * get_consistent_validation_plugins
      * @return array
      */
-    public function get_consistent_validation_plugins(): array
-    {
+    public function get_consistent_validation_plugins(): array {
         return [];
     }
 }

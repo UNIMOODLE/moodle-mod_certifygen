@@ -20,17 +20,17 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
  * @package    mod_certifygen
- * * @copyright  2024 Proyecto UNIMOODLE
- * * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
- * * @author     3IPUNT <contacte@tresipunt.com>
- * * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace mod_certifygen\external;
 
-use coding_exception;
 use context_system;
 use dml_exception;
 use external_api;
@@ -39,8 +39,14 @@ use mod_certifygen\output\views\profile_my_certificates_view;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
-use moodle_exception;
-
+/**
+ * Get teacher request view data
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class getteacherrequestviewdata_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -54,6 +60,7 @@ class getteacherrequestviewdata_external extends external_api {
     }
 
     /**
+     * Get teacher request view data
      * @param int $userid
      * @return array
      * @throws dml_exception

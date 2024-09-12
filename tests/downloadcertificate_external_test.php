@@ -25,6 +25,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -39,10 +40,19 @@ use mod_certifygen\external\emitcertificate_external;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
 require_once($CFG->dirroot.'/lib/externallib.php');
-
+/**
+ * Download certifiacte test
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class downloadcertificate_external_test extends advanced_testcase {
 
     /**
@@ -53,6 +63,7 @@ class downloadcertificate_external_test extends advanced_testcase {
     }
 
     /**
+     * test
      * @return void
      * @throws invalid_persistent_exception
      * @throws coding_exception
@@ -111,7 +122,7 @@ class downloadcertificate_external_test extends advanced_testcase {
         $validation = certifygen_validations::get_record($data);
         $code = certifygen_validations::get_certificate_code($validation);
         $localrepository = new certifygenrepository_localrepository\certifygenrepository_localrepository();
-        $fileurl = $localrepository->getFileUrl($validation);
+        $fileurl = $localrepository->get_file_url($validation);
         $result = downloadcertificate_external::downloadcertificate($validation->get('id'), $cm->instance,
             $model->get('id'), $code, $course->id);
 
@@ -127,6 +138,7 @@ class downloadcertificate_external_test extends advanced_testcase {
     }
 
     /**
+     * test
      * @return void
      * @throws invalid_persistent_exception
      * @throws coding_exception

@@ -20,16 +20,18 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
  * @package    mod_certifygen
- * * @copyright  2024 Proyecto UNIMOODLE
- * * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
- * * @author     3IPUNT <contacte@tresipunt.com>
- * * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 namespace mod_certifygen\external;
+
+defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/lib/formslib.php');
@@ -49,7 +51,14 @@ use external_single_structure;
 use external_value;
 use moodle_exception;
 use moodle_url;
-
+/**
+ * Get my certificate data
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class getmycertificatedata_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -66,6 +75,7 @@ class getmycertificatedata_external extends external_api {
     }
 
     /**
+     * Get my certificate data
      * @param int $modelid
      * @param int $courseid
      * @param int $cmid
@@ -83,18 +93,17 @@ class getmycertificatedata_external extends external_api {
                 'lang' => $lang]
         );
         $PAGE->set_context(context_system::instance());
-        $model = new certifygen_model($modelid);
         if ($cmid > 0) {
-            $cm = get_coursemodule_from_id('certifygen', $cmid, 0, false, MUST_EXIST);
+            $cm = get_coursemodule_from_id('certifygen', $cmid, 0, false,
+                MUST_EXIST);
             $certifygen = $DB->get_record('certifygen', ['id' => $cm->instance], '*', MUST_EXIST);
-            $certifygenmodel = $DB->get_record('certifygen_model', ['id' => $certifygen->modelid], '*', MUST_EXIST);
+            $certifygenmodel = $DB->get_record('certifygen_model', ['id' => $certifygen->modelid], '*',
+                MUST_EXIST);
             $view = new activity_view($courseid, $certifygenmodel->templateid, $cm, $lang);
         } else {
-//            $view = new profile_my_certificates_view();
             // Creo q este caso no se usa en este serivicio. mando error para controlarlo.
             throw new moodle_exception('cmid must be greater than 0.');
         }
-        
         $output = $PAGE->get_renderer('mod_certifygen');
         $data = $view->export_for_template($output);
 

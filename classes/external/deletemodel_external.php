@@ -22,6 +22,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -30,8 +31,10 @@
  */
 
 namespace mod_certifygen\external;
-global $CFG;
 
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
 use context_system;
 use external_api;
 use external_function_parameters;
@@ -41,6 +44,14 @@ use invalid_parameter_exception;
 use mod_certifygen\persistents\certifygen_model;
 use moodle_exception;
 require_once($CFG->dirroot . '/mod/certifygen/lib.php');
+/**
+ * Delete model
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class deletemodel_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -56,13 +67,13 @@ class deletemodel_external extends external_api {
     }
 
     /**
+     * Delete model
      * @param int $id
      * @return array
      * @throws invalid_parameter_exception
      */
     public static function deletemodel(int $id): array {
 
-        global $USER;
         self::validate_parameters(
             self::deletemodel_parameters(), ['id' => $id]
         );
@@ -98,5 +109,4 @@ class deletemodel_external extends external_api {
             ]
         );
     }
-
 }

@@ -22,6 +22,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -214,20 +215,6 @@ $functions = [
         'type' => 'read',
         'capabilities' => 'mod/certifygen:manage',
     ],
-//    'mod_certifygen_getPdfStudentCourseCompleted' => [
-//        'classname' => getPdfStudentCourseCompleted_external::class,
-//        'methodname' => 'getPdfStudentCourseCompleted',
-//        'description' => 'get Pdf Student Course Completed',
-//        'type' => 'read',
-//        'capabilities' => 'mod/certifygen:manage',
-//    ],
-//    'mod_certifygen_getJsonStudentCourseCompleted' => [
-//        'classname' => getJsonStudentCourseCompleted_external::class,
-//        'methodname' => 'getJsonStudentCourseCompleted',
-//        'description' => 'get Json Student Course Completed',
-//        'type' => 'read',
-//        'capabilities' => 'mod/certifygen:manage',
-//    ],
     'mod_certifygen_get_courses_as_student' => [
         'classname' => get_courses_as_student_external::class,
         'methodname' => 'get_courses_as_student',
@@ -276,10 +263,6 @@ $services = [
             'mod_certifygen_get_courses_as_student',
             'mod_certifygen_get_json_teacher_certificate',
             'mod_certifygen_get_pdf_teacher_certificate',
-//            'mod_certifygen_getPdfTeaching',
-//            'mod_certifygen_getJsonTeaching',
-//            'mod_certifygen_getPdfStudentCourseCompleted',
-//            'mod_certifygen_getJsonStudentCourseCompleted',
-        ]
-    ]
+        ],
+    ],
 ];

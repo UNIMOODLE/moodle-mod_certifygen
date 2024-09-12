@@ -20,16 +20,19 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos..
+
 /**
+ *
  * @package    certifygenvalidation_webservice
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
 namespace certifygenvalidation_webservice\external;
+
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->dirroot.'/user/lib.php');
 require_once($CFG->dirroot.'/mod/certifygen/classes/filters/certifygenfilter.php');
@@ -42,7 +45,16 @@ use external_single_structure;
 use external_value;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
+use moodle_exception;
 
+/**
+ * Change status
+ * @package    certifygenvalidation_webservice
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class change_status_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -60,10 +72,13 @@ class change_status_external extends external_api {
     }
 
     /**
+     * Change status
      * @param int $userid
-     * @param int $idinstance
-     * @param string $datos
-     * @return string[]
+     * @param string $userfield
+     * @param int $requestid
+     * @return array|array[]
+     * @throws \coding_exception
+     * @throws \invalid_parameter_exception
      */
     public static function change_status(int $userid, string $userfield, int $requestid): array {
         $params = self::validate_parameters(
@@ -116,17 +131,17 @@ class change_status_external extends external_api {
             $ws->save_file_moodledata($requestid);
             $request->set('status', certifygen_validations::STATUS_VALIDATION_OK);
             $request->save();
-        } catch(\moodle_exception $e) {
+        } catch (moodle_exception $e) {
             return ['error' => [
                 'code' => $e->getCode(),
                 'message' => $e->getMessage(),
-                ]
+                ],
             ];
         }
         return [
             'requestid' => $params['requestid'],
             'newstatus' => certifygen_validations::STATUS_VALIDATION_OK,
-            'newstatusdesc' => get_string('status_'. $request->get('status'), 'mod_certifygen')
+            'newstatusdesc' => get_string('status_'. $request->get('status'), 'mod_certifygen'),
         ];
     }
     /**

@@ -22,6 +22,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -29,34 +30,52 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 namespace mod_certifygen\tables;
+
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->libdir . '/tablelib.php');
 
 use cm_info;
 use coding_exception;
 use context_course;
+use context_module;
 use dml_exception;
 use mod_certifygen\certifygen;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-use mod_certifygen\template;
 use moodle_exception;
-use moodle_url;
 use table_sql;
-
+/**
+ * activityteacher_table
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class activityteacher_table extends table_sql {
+    /** @var int $courseid */
     private int $courseid;
-    private \context_module $context;
+    /** @var context_module|bool|\context $context */
+    private context_module $context;
+    /** @var int $templateid */
     private int $templateid;
+    /** @var int $cmid */
     private int $cmid;
+    /** @var int $instanceid */
     private int $instanceid;
+    /** @var int|bool|mixed|null $modelid */
     private int $modelid;
+    /** @var string $lang */
     private string $lang;
+    /** @var string $langstring */
     private string $langstring;
+    /** @var bool $canrevoke */
     private bool $canrevoke;
+    /** @var array $statusmessages */
     private array $statusmessages;
 
     /**
@@ -84,16 +103,16 @@ class activityteacher_table extends table_sql {
         $validationplugin = $this->model->get('validation');
         $this->canrevoke = false;
         $context = context_course::instance($courseid);
-        $contextmodule = \context_module::instance($cm->id);
+        $contextmodule = context_module::instance($cm->id);
         $this->context = $contextmodule;
         $validationpluginclass = $validationplugin . '\\' . $validationplugin;
         /** @var ICertificateValidation $subplugin */
         $subplugin = new $validationpluginclass();
         if (has_capability('moodle/course:managegroups', $context) && !empty($validationplugin)) {
-            $this->canrevoke = $subplugin->canRevoke($course->id);
+            $this->canrevoke = $subplugin->can_revoke($course->id);
         }
         // Messages.
-        $this->statusmessages = $subplugin->getStatusMessages();
+        $this->statusmessages = $subplugin->get_status_messages();
         // Define the titles of columns to show in header.
         $headers = [
             get_string('fullname'),
@@ -105,9 +124,7 @@ class activityteacher_table extends table_sql {
         ];
 
         $this->define_headers($headers);
-
     }
-
 
     /**
      * This function is called for each data row to allow processing of the
@@ -117,9 +134,7 @@ class activityteacher_table extends table_sql {
      * @return string $string Return username with link to profile or username only
      *     when downloading.
      */
-    function col_fullname($row): string
-    {
-
+    public function col_fullname($row): string {
         global $OUTPUT;
         $data = [
             'id' => $row->id,
@@ -134,16 +149,17 @@ class activityteacher_table extends table_sql {
             'email' => $row->email,
         ];
 
-        return $OUTPUT->user_picture((object) $data, array('size' => 35, 'courseid' => $this->courseid, 'includefullname' => true));
+        return $OUTPUT->user_picture((object) $data, ['size' => 35, 'courseid' => $this->courseid,
+            'includefullname' => true]);
     }
 
     /**
+     * Revoke
      * @param $row
      * @return string
      * @throws coding_exception
      */
-    function col_revoke($row): string
-    {
+    public function col_revoke($row): string {
         global $USER;
         if ($USER->id != $row->id
             && !has_capability('mod/certifygen:canmanagecertificates', $this->context, $USER->id)) {
@@ -159,7 +175,7 @@ class activityteacher_table extends table_sql {
         if ($status == certifygen_validations::STATUS_FINISHED) {
             return '<span class="likelink" data-action="revoke-certificate" data-username="'. $row->firstname. ' '
                 . $row->lastname .'" data-issueid="'. $row->issueid.'" data-modelid="'. $this->modelid
-                .'" data-courseid="'. $this->courseid.'" data-userid="'. $row->id.'" data-cmid="'.  $this->cmid .'"
+                .'" data-courseid="'. $this->courseid.'" data-userid="'. $row->id.'" data-cmid="'. $this->cmid .'"
                 data-lang="'. $this->lang .'" data-langstring="'. $this->langstring .'"  >' .
                 get_string('revoke', 'tool_certificate') . '</span>';
         }
@@ -167,31 +183,31 @@ class activityteacher_table extends table_sql {
     }
 
     /**
+     * Status
      * @param $row
      * @return string
      * @throws coding_exception
      */
-    function col_status($row): string
-    {
+    public function col_status($row): string {
         if (empty($row->cstatus)) {
             return get_string('status_1', 'mod_certifygen');
         }
         $status = get_string('status_' . $row->cstatus, 'mod_certifygen');
         if (!empty($this->statusmessages) && array_key_exists($row->cstatus, $this->statusmessages)) {
             $tooltip = $this->statusmessages[$row->cstatus];
-            $status = '<button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="'.$tooltip.'">
-                        '.get_string('status_'.$row->cstatus, 'mod_certifygen') . '
-                        </button>';
+            $status = '<button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="'
+                . $tooltip . '">'
+                . get_string('status_'.$row->cstatus, 'mod_certifygen') . '</button>';
         }
         return $status;
     }
 
     /**
+     * Date issued
      * @param $row
      * @return string
      */
-    function col_dateissued($row): string
-    {
+    public function col_dateissued($row): string {
         if (empty($row->ctimecreated)) {
             return '';
         }
@@ -199,34 +215,36 @@ class activityteacher_table extends table_sql {
     }
 
     /**
+     * Download
      * @param $row
      * @return string
      * @throws coding_exception
      * @throws dml_exception
      */
-    function col_download($row): string
-    {
+    public function col_download($row): string {
         $status = $row->cstatus;
         if (is_null($row->cstatus)) {
             $status = certifygen_validations::STATUS_NOT_STARTED;
         }
         if ($status == certifygen_validations::STATUS_FINISHED) {
-            return '<span data-courseid="' . $row->courseid . '" data-instanceid="' . $this->instanceid . '" data-modelid="' . $this->modelid . '"
-            data-id="'. $row->validationid . '" data-action="download-certificate" data-userid="'. $row->id .'"
-            data-code="'. $row->code .'" data-lang="'. $this->lang .'" data-langstring="'. $this->langstring .'"  data-cmid="'. $this->cmid .'"
-            class="btn btn-primary">' . get_string('download') . '</span>';
+            return '<span data-courseid="' . $row->courseid . '" data-instanceid="' . $this->instanceid
+                . '" data-modelid="' . $this->modelid . '" data-id="'. $row->validationid
+                . '" data-action="download-certificate" data-userid="'. $row->id .'" data-code="'
+                . $row->code .'" data-lang="'. $this->lang .'" data-langstring="'. $this->langstring
+                .'"  data-cmid="'. $this->cmid .'" class="btn btn-primary">'
+                . get_string('download') . '</span>';
         }
         return '';
     }
     /**
+     * Issue
      * @param $row
      * @return string
      * @throws dml_exception
      * @throws moodle_exception
      * @throws coding_exception
      */
-    function col_emit($row): string
-    {
+    public function col_emit($row): string {
         global $USER;
 
         if ($USER->id != $row->id
@@ -244,8 +262,9 @@ class activityteacher_table extends table_sql {
         if ($status == certifygen_validations::STATUS_NOT_STARTED) {
             return '<span data-courseid="' . $row->courseid . '" data-modelid="' . $this->modelid . '" data-id="'. $id .
                 '" data-action="emit-certificate" data-userid="'. $row->userid .'" data-lang="'. $this->lang .'" 
-                data-langstring="'. $this->langstring .'"  data-cmid="'. $this->cmid .'" data-instanceid="'. $this->instanceid .'" class="btn btn-primary"
-                >'.get_string('emit', 'mod_certifygen').'</span>';
+                data-langstring="'. $this->langstring .'"  data-cmid="'. $this->cmid .'" data-instanceid="'
+                . $this->instanceid .'" class="btn btn-primary">'
+                . get_string('emit', 'mod_certifygen') . '</span>';
         }
         // Re-emit.
         if ($row->cstatus == certifygen_validations::STATUS_FINISHED
@@ -272,8 +291,7 @@ class activityteacher_table extends table_sql {
      * @param bool $useinitialsbar do you want to use the initials bar?
      * @throws dml_exception
      */
-    public function query_db($pagesize, $useinitialsbar = true): void
-    {
+    public function query_db($pagesize, $useinitialsbar = true): void {
 
         $userid = 0;
         $tifirst = '';
@@ -295,7 +313,8 @@ class activityteacher_table extends table_sql {
 
         $this->pagesize($pagesize, $total);
 
-        $this->rawdata = certifygen::get_issues_for_course_by_lang($params['lang'], $this->instanceid, $this->templateid, $this->courseid,
+        $this->rawdata = certifygen::get_issues_for_course_by_lang($params['lang'], $this->instanceid,
+            $this->templateid, $this->courseid,
             'mod_certifygen', $userid, $tifirst, $tilast, $this->get_page_start(),
             $this->get_page_size(), $this->get_sql_sort());
 
@@ -304,11 +323,11 @@ class activityteacher_table extends table_sql {
     }
 
     /**
+     * print_nothing_to_display
      * @return void
      * @throws coding_exception
      */
-    public function print_nothing_to_display(): void
-    {
+    public function print_nothing_to_display(): void {
         global $OUTPUT;
         echo $this->render_reset_button();
         $this->print_initials_bar();

@@ -22,6 +22,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -29,12 +30,13 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 namespace mod_certifygen\output\views;
+
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->dirroot . '/mod/certifygen/lib.php');
 use coding_exception;
-use context_module;
 use core_table\local\filter\filter;
 use core_table\local\filter\integer_filter;
 use core_table\local\filter\string_filter;
@@ -51,26 +53,43 @@ use renderable;
 use stdClass;
 use templatable;
 use renderer_base;
+/**
+ * Activity view
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class activity_view implements renderable, templatable {
+    /** @var int $courseid */
     private int $courseid;
+    /** @var bool $isteacher */
     private bool $isteacher;
+    /** @var int $templateid */
     private int $templateid;
+    /** @var int $pagesize */
     private int $pagesize;
+    /** @var string $lang */
     private string $lang;
+    /** @var stdClass $cm */
     private stdClass $cm;
+    /** @var certifygen_model $certificatemodel */
     private certifygen_model $certificatemodel;
+    /** @var bool $hasvalidator */
     private bool $hasvalidator;
 
     /**
+     * __construct
      * @param int $courseid
      * @param int $templateid
      * @param stdClass $cm
+     * @param string $lang
      * @param int $pagesize
      * @throws coding_exception
      */
     public function __construct(int $courseid, int $templateid, stdClass $cm, string $lang = "", int $pagesize = 10) {
 
-        $cmcontext = context_module::instance($cm->id);
         $ccontext = \context_course::instance($courseid);
         $this->isteacher = has_capability('moodle/course:managegroups', $ccontext);
         $this->courseid = $courseid;
@@ -84,11 +103,12 @@ class activity_view implements renderable, templatable {
     }
 
     /**
+     * export_for_template
      * @throws coding_exception
      * @throws moodle_exception
      * @throws dml_exception
      */
-    public function export_for_template(renderer_base $output) : stdClass {
+    public function export_for_template(renderer_base $output): stdClass {
         $url = new moodle_url('/mod/certifygen/view.php', ['id' => $this->cm->id]);
         $data = new stdClass();
         $data->table = $this->get_certificates_table();
@@ -103,26 +123,27 @@ class activity_view implements renderable, templatable {
     }
 
     /**
+     * get_certificates_table
      * @return string
      * @throws coding_exception
      * @throws moodle_exception
      */
-    private function get_certificates_table() : string {
+    private function get_certificates_table(): string {
         global $USER;
         $filters = new certificates_filterset();
         $lang = $this->lang;
         if (empty($this->lang)) {
             $lang = mod_certifygen_get_lang_selected($this->certificatemodel);
         }
-        $filters->add_filter(new string_filter('lang',filter::JOINTYPE_DEFAULT, [$lang]));
+        $filters->add_filter(new string_filter('lang', filter::JOINTYPE_DEFAULT, [$lang]));
         if (!$this->isteacher) {
-            $filters->add_filter(new integer_filter('userid',filter::JOINTYPE_DEFAULT, [(int)$USER->id]));
+            $filters->add_filter(new integer_filter('userid', filter::JOINTYPE_DEFAULT, [(int)$USER->id]));
         }
         if ($tifirst = optional_param('tifirst', '', PARAM_RAW)) {
-            $filters->add_filter(new string_filter('tifirst',filter::JOINTYPE_DEFAULT, [$tifirst]));
+            $filters->add_filter(new string_filter('tifirst', filter::JOINTYPE_DEFAULT, [$tifirst]));
         }
         if ($tilast = optional_param('tilast', '', PARAM_RAW)) {
-            $filters->add_filter(new string_filter('tilast',filter::JOINTYPE_DEFAULT, [$tilast]));
+            $filters->add_filter(new string_filter('tilast', filter::JOINTYPE_DEFAULT, [$tilast]));
         }
         $activityteachertable = new activityteacher_table($this->courseid, $this->templateid, $this->cm->instance);
         $activityteachertable->set_filterset($filters);

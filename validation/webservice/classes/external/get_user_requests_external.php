@@ -20,7 +20,9 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos..
+
 /**
+ *
  * @package    certifygenvalidation_webservice
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -28,9 +30,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 namespace certifygenvalidation_webservice\external;
-
 
 use certifygenfilter;
 use certifygenvalidation_webservice\certifygenvalidation_none;
@@ -40,15 +40,26 @@ use external_function_parameters;
 use external_multiple_structure;
 use external_single_structure;
 use external_value;
+use invalid_parameter_exception;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-use mod_certifygen\plugininfo\certifygenvalidation;
 use moodle_exception;
+
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->dirroot.'/user/lib.php');
 require_once($CFG->dirroot.'/mod/certifygen/lib.php');
 require_once($CFG->dirroot.'/mod/certifygen/classes/filters/certifygenfilter.php');
+/**
+ * get_user_requests_external
+ * @package    certifygenvalidation_webservice
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class get_user_requests_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -68,9 +79,10 @@ class get_user_requests_external extends external_api {
     /**
      * Returns only in progress user request.
      * @param int $userid
-     * @param int $idinstance
-     * @param string $datos
-     * @return string[]
+     * @param string $userfield
+     * @param string $lang
+     * @return array[]
+     * @throws invalid_parameter_exception
      */
     public static function get_user_requests(int $userid, string $userfield, string $lang): array {
         $params = self::validate_parameters(
@@ -85,7 +97,7 @@ class get_user_requests_external extends external_api {
                 return ['error' => [
                     'message' => 'ws validation plugin not enabled',
                     'code' => 'pluginnotenabled',
-                    ]
+                    ],
                 ];
             }
             // Choose user parameter.
@@ -131,7 +143,7 @@ class get_user_requests_external extends external_api {
                 if (!empty($request->get('certifygenid'))) {
                     $urequest['role'] = 'student';
                     $instance = [
-                        'id' => (int)$request->get('certifygenid')
+                        'id' => (int)$request->get('certifygenid'),
                     ];
                     $certifygen = new certifygen($request->get('certifygenid'));
                     $actvname = $filter->filter($certifygen->get('name'));
@@ -139,7 +151,8 @@ class get_user_requests_external extends external_api {
                     $instance['name'] = $actvname;
                     $urequest['instance'] = $instance;
                 }
-                $modeldata = array_merge((array)$model->to_record(), ['typedesc' => get_string('type_'. $model->get('type'), 'mod_certifygen')]);
+                $modeldata = array_merge((array)$model->to_record(),
+                    ['typedesc' => get_string('type_'. $model->get('type'), 'mod_certifygen')]);
                 $urequest['model'] = $modeldata;
                 $urequest['lang'] = $request->get('lang');
                 $urequest['status'] = (int)$request->get('status');

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of the mod_certifygen plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -16,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -27,49 +27,67 @@ defined('MOODLE_INTERNAL') || die();
 
 // Given XML multilinguage text, return relevant text according to
 // current language:
-//   - look for multilang blocks in the text.
-//   - if there exists texts in the currently active language, print them.
-//   - else, if there exists texts in the current parent language, print them.
-//   - else, print the first language in the text.
+// - look for multilang blocks in the text.
+// - if there exists texts in the currently active language, print them.
+// - else, if there exists texts in the current parent language, print them.
+// - else, print the first language in the text.
 // Please note that English texts are not used as default anymore!
 //
 // This version is based on original multilang filter by Gaetan Frenoy,
 // rewritten by Eloy and skodak.
 //
 // Following new syntax is not compatible with old one:
-//   <span lang="XX" class="multilang">one lang</span><span lang="YY" class="multilang">another language</span>
+// <span lang="XX" class="multilang">one lang</span><span lang="YY" class="multilang">another language</span>.
 global $CFG;
 require_once($CFG->dirroot. '/filter/multilang/filter.php');
+/**
+ * Certifygen filter
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class certifygenfilter extends filter_multilang {
+    /** @var string $lang */
     private string $lang;
+
+    /**
+     * Construct
+     * @param $context
+     * @param array $localconfig
+     * @param string $lang
+     */
     public function __construct($context, array $localconfig, string $lang) {
         $this->lang = $lang;
         $this->context = $context;
         $this->localconfig = $localconfig;
     }
-    function filter($text, array $options = array()) {
+
+    /**
+     * filter
+     * @param $text
+     * @param array $options
+     * @return array|float|int|string|string[]
+     */
+    public function filter($text, array $options = []) {
         global $CFG;
 
-        // [pj] I don't know about you but I find this new implementation funny :P
-        // [skodak] I was laughing while rewriting it ;-)
-        // [nicolasconnault] Should support inverted attributes: <span class="multilang" lang="en"> (Doesn't work curently)
-        // [skodak] it supports it now, though it is slower - any better idea?
-
-        if (empty($text) or is_numeric($text)) {
+        if (empty($text) || is_numeric($text)) {
             return $text;
         }
 
-        if (empty($CFG->filter_multilang_force_old) and !empty($CFG->filter_multilang_converted)) {
-            // new syntax
+        if (empty($CFG->filter_multilang_force_old) && !empty($CFG->filter_multilang_converted)) {
+            // New syntax.
             $search = '/(<span(\s+lang="[a-zA-Z0-9_-]+"|\s+class="multilang"){2}\s*>.*?<\/span>)(\s*<span(\s+lang="[a-zA-Z0-9_-]+"|\s+class="multilang"){2}\s*>.*?<\/span>)+/is';
         } else {
-            // old syntax
+            // Old syntax.
             $search = '/(<(?:lang|span) lang="[a-zA-Z0-9_-]*".*?>.*?<\/(?:lang|span)>)(\s*<(?:lang|span) lang="[a-zA-Z0-9_-]*".*?>.*?<\/(?:lang|span)>)+/is';
         }
         $result = preg_replace_callback($search, [$this, 'process_match'], $text);
 
         if (is_null($result)) {
-            return $text; //error during regex processing (too many nested spans?)
+            return $text; // Error during regex processing (too many nested spans?).
         } else {
             return $result;
         }
@@ -88,7 +106,7 @@ class certifygenfilter extends filter_multilang {
             return $langblock[0];
         }
 
-        $langlist = array();
+        $langlist = [];
         foreach ($rawlanglist[1] as $index => $lang) {
             $lang = str_replace('-', '_', strtolower($lang)); // Normalize languages.
             $langlist[$lang] = $rawlanglist[2][$index];

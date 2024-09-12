@@ -17,7 +17,9 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
+ *
  * @package   certifygenrepository_csv
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -33,3 +35,4 @@ $string['pluginnamesettings'] = 'Configuración del Repositorio CSV';
 $string['enable'] = 'Habilitar';
 $string['enable_help'] = 'Este repositorio solo se puede utilizar si se ha elegido el subplugin de validación csv';
 $string['privacy:metadata'] = 'El plugin Repositorio CSV no almacena datos personales.';
+

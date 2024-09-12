@@ -22,6 +22,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -51,7 +52,7 @@ if ($ADMIN->fulltree) {
     ];
     foreach ($customfields as $customfield) {
         if ($customfield->datatype == 'text') {
-            $options[ 'profile_' . $customfield->id] = $customfield->name;
+            $options['profile_' . $customfield->id] = $customfield->name;
         }
     }
     $settings->add(new admin_setting_configselect('mod_certifygen/userfield',

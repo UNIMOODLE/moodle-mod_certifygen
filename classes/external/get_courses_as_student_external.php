@@ -20,6 +20,7 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos..
+
 /**
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
@@ -27,13 +28,10 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
 namespace mod_certifygen\external;
-
-
 use certifygenfilter;
 use context_system;
+use core_completion_external;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
@@ -42,11 +40,22 @@ use external_value;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_context;
 use mod_certifygen\persistents\certifygen_model;
+use moodle_exception;
+
+defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot.'/user/lib.php');
 require_once($CFG->dirroot.'/mod/certifygen/classes/filters/certifygenfilter.php');
 require_once($CFG->dirroot.'/mod/certifygen/lib.php');
+/**
+ * Get courses as student
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class get_courses_as_student_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -64,6 +73,7 @@ class get_courses_as_student_external extends external_api {
     }
 
     /**
+     * Get courses as student
      * @param int $userid
      * @param string $userfield
      * @param string $lang
@@ -73,13 +83,7 @@ class get_courses_as_student_external extends external_api {
      * @throws \required_capability_exception
      */
     public static function get_courses_as_student(int $userid, string $userfield, string $lang): array {
-        global $CFG, $DB;
-        /**
-         * Devuelve un json con la información necesaria para el anterior servicio para
-         * confeccionar el certificado. El objetivo de este servicio es independizar el proceso de
-         * obtención de los datos del proceso de generación del documento con la presentación
-         * final.
-         */
+
         $params = self::validate_parameters(
             self::get_courses_as_student_parameters(), ['userid' => $userid, 'userfield' => $userfield, 'lang' => $lang]
         );
@@ -136,18 +140,16 @@ class get_courses_as_student_external extends external_api {
                 if (!certifygen::get_record(['course' => $enrolment->ctxinstance])) {
                     continue;
                 }
-//                $coursefullname = format_text($enrolment->fullname);
                 $coursefullname = $filter->filter($enrolment->fullname);
                 $coursefullname = strip_tags($coursefullname);
-//                $courseshortname = format_text($enrolment->shortname);
                 $courseshortname = $filter->filter($enrolment->shortname);
                 $courseshortname = strip_tags($courseshortname);
                 $completed = false;
                 try {
-                    $completion = \core_completion_external::get_course_completion_status($enrolment->ctxinstance, $userid);
+                    $completion = core_completion_external::get_course_completion_status($enrolment->ctxinstance, $userid);
                     $completed = $completion['completionstatus']['completed'];
-                } catch (\moodle_exception $e) {
-                    error_log(__FUNCTION__ . ' completion error: '.var_export($e->getMessage(), true));
+                } catch (moodle_exception $e) {
+                    //debugging(__FUNCTION__ . ' completion error: '.$e->getMessage());
                 }
 
                 $modellist = certifygen_context::get_course_valid_modelids($enrolment->ctxinstance);
@@ -162,7 +164,7 @@ class get_courses_as_student_external extends external_api {
                 ];
             }
             $results['courses'] = $courses;
-        } catch (\moodle_exception $e) {
+        } catch (moodle_exception $e) {
             $haserror = true;$results['error']['code'] = $e->getCode();
             $results['error']['message'] = $e->getMessage();
         }
@@ -177,7 +179,7 @@ class get_courses_as_student_external extends external_api {
      * @return external_single_structure
      */
     public static function get_courses_as_student_returns(): external_single_structure {
-        return new external_single_structure(array(
+        return new external_single_structure([
                 'courses' => new external_multiple_structure( new external_single_structure(
                         [
                             'id'   => new external_value(PARAM_RAW, 'Course id'),
@@ -198,7 +200,7 @@ class get_courses_as_student_external extends external_api {
                     'message' => new external_value(PARAM_RAW, 'Error message', VALUE_OPTIONAL),
                     'code' => new external_value(PARAM_RAW, 'Error code', VALUE_OPTIONAL),
                 ], 'Errors information', VALUE_OPTIONAL),
-            )
+            ]
         );
     }
 }

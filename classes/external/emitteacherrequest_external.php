@@ -22,6 +22,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -30,7 +31,6 @@
  */
 
 namespace mod_certifygen\external;
-
 use coding_exception;
 use context_system;
 use dml_exception;
@@ -46,8 +46,20 @@ use mod_certifygen\interfaces\ICertificateReport;
 use mod_certifygen\persistents\certifygen_error;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
+use stored_file;
+
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->dirroot .'/lib/datalib.php');
+/**
+ * Issue teacher certificate
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class emitteacherrequest_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -63,6 +75,7 @@ class emitteacherrequest_external extends external_api {
     }
 
     /**
+     * Issue teacher certificate
      * @param int $id
      * @return array
      * @throws coding_exception
@@ -101,7 +114,7 @@ class emitteacherrequest_external extends external_api {
             $reportpluginclass = $reportplugin . '\\' . $reportplugin;
             /** @var ICertificateReport $subplugin */
             $subplugin = new $reportpluginclass();
-            $result = $subplugin->createFile($teacherrequest);
+            $result = $subplugin->create_file($teacherrequest);
             if (!$result['result']) {
                 $teacherrequest->set('status', certifygen_validations::STATUS_TEACHER_ERROR);
                 $teacherrequest->save();
@@ -115,7 +128,7 @@ class emitteacherrequest_external extends external_api {
                 certifygen_error::manage_certifygen_error(0, (object)$data);
                 return $result;
             }
-            /** @var \stored_file $file */
+            /** @var stored_file $file */
             $file = $result['file'];
             $userid = $teacherrequest->get('userid');
             $lang = $teacherrequest->get('lang');
@@ -130,17 +143,17 @@ class emitteacherrequest_external extends external_api {
                 'user_fullname' => fullname($certifygenfile->get_user()),
                 'code' => str_replace('.pdf', '', $file->get_filename()),
                 'filename' => $file->get_filename(),
-                'courses' => $courses
+                'courses' => $courses,
             ];
             $certifygenfile->set_metadata($data);
             // Step 3: Call to validation plugin.
             $result = certifygen::start_emit_certificate_proccess($teacherrequest, $certifygenfile, $certifygenmodel);
             unset($result['file']);
 
-            // Step 4: event trigger
+            // Step 4: event trigger.
             certificate_issued::create_from_validation($teacherrequest)->trigger();
         } catch (moodle_exception $e) {
-            error_log(__FUNCTION__ . ' ' . ' error: '.var_export($e->getMessage(), true));
+            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $result['result'] = false;
             $result['message'] = $e->getMessage();
             $teacherrequest->set('status', certifygen_validations::STATUS_ERROR);
@@ -162,7 +175,7 @@ class emitteacherrequest_external extends external_api {
      * @return array
      * @throws dml_exception
      */
-    private static function get_courses_information(array $ids) : array {
+    private static function get_courses_information(array $ids): array {
         $courses = [];
         foreach ($ids as $id) {
             $course = get_course($id);

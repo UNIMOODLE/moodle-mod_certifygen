@@ -20,17 +20,16 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos..
+
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
 namespace mod_certifygen\external;
-
 
 use external_api;
 use external_function_parameters;
@@ -41,11 +40,20 @@ use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->dirroot.'/user/lib.php');
 require_once($CFG->dirroot.'/mod/certifygen/lib.php');
 require_once($CFG->dirroot.'/mod/certifygen/classes/filters/certifygenfilter.php');
-
+/**
+ * Get teacher certificate (issue it if it is not already created)
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class get_pdf_teacher_certificate_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -66,6 +74,7 @@ class get_pdf_teacher_certificate_external extends external_api {
     }
 
     /**
+     * Get teacher certificate (issue certificate if it is necessary)
      * @param int $userid
      * @param string $userfield
      * @param string $name
@@ -78,12 +87,6 @@ class get_pdf_teacher_certificate_external extends external_api {
      */
     public static function get_pdf_teacher_certificate(int $userid, string $userfield, string $name, string $courses,
                                                        int $modelid, string $lang): array {
-        /**
-         * Devuelve el PDF del certificado de que el profesor ha impartido docencia en el curso
-         * indicado con el detalle del uso que ha realizado de la herramienta que aparecerá en el
-         * certificado. Este servicio web llamará a getJsonTeaching para obtener la información a
-         * maquetar
-         */
         $params = self::validate_parameters(
             self::get_pdf_teacher_certificate_parameters(),
             ['userid' => $userid, 'userfield' => $userfield, 'name' => $name, 'courses' => $courses,
@@ -162,7 +165,7 @@ class get_pdf_teacher_certificate_external extends external_api {
                 if (get_config($validationplugin, 'enabled') === '1') {
                     /** @var ICertificateValidation $subplugin */
                     $subplugin = new $validationpluginclass();
-                    $fileresult = $subplugin->getFile(0, $trequest->get('id'), $code);
+                    $fileresult = $subplugin->get_file(0, $trequest->get('id'), $code);
                     if (!array_key_exists('file', $fileresult)) {
                         $result['error'] = $fileresult['error'];
                         return $result;

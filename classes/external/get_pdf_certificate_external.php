@@ -20,6 +20,7 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos..
+
 /**
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
@@ -27,11 +28,7 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
 namespace mod_certifygen\external;
-
-
 use external_api;
 use external_function_parameters;
 use external_single_structure;
@@ -40,9 +37,19 @@ use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->dirroot.'/user/lib.php');
 require_once($CFG->dirroot.'/mod/certifygen/lib.php');
+/**
+ * Get studetns certificate (issue it if it is not already created)
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class get_pdf_certificate_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -62,6 +69,7 @@ class get_pdf_certificate_external extends external_api {
     }
 
     /**
+     * Get student certificate (issue certificate if it is necessary)
      * @param int $userid
      * @param string $userfield
      * @param int $idinstance
@@ -72,19 +80,14 @@ class get_pdf_certificate_external extends external_api {
      * @throws \invalid_parameter_exception
      * @throws \required_capability_exception
      */
-    public static function get_pdf_certificate(int $userid, string $userfield, int $idinstance, string $lang, string $customfields): array {
-        /**
-         * Devuelve el PDF del certificado identificado con los parámetros de entrada validando su acceso en base a
-         * las restricciones de la configuración de la instancia.
-         * El parámetro opcional customfields, permitirá al sistema externo sobreescribir cualquier “customfield”
-         * del contexto de generación del pdf. No se realizará ninguna comprobación como podría ser si el customfield
-         * es “readonly” o no.
-        */
-        // PENDIENTE:
+    public static function get_pdf_certificate(int $userid, string $userfield, int $idinstance, string $lang,
+                                               string $customfields): array {
+
         // TODO:customfields... que modifica el fichero.
         $params = self::validate_parameters(
             self::get_pdf_certificate_parameters(),
-            ['userid' => $userid, 'userfield' => $userfield, 'idinstance' => $idinstance, 'lang' => $lang, 'customfields' => $customfields]
+            ['userid' => $userid, 'userfield' => $userfield, 'idinstance' => $idinstance, 'lang' => $lang,
+                'customfields' => $customfields]
         );
         $context = \context_system::instance();
         require_capability('mod/certifygen:manage', $context);
@@ -106,7 +109,7 @@ class get_pdf_certificate_external extends external_api {
                 $result['error']['message'] = 'User not found';
                 return $result;
             }
-            // Activity exists?
+            // Activity exists?.
             $certifygen = new certifygen($params['idinstance']);
 
             // Is user enrolled on this course as student?
@@ -135,7 +138,7 @@ class get_pdf_certificate_external extends external_api {
             }
             // TODO: devolver el del plugin de almacenamiento si es q existe.
             // esta mal, VER LA PETICION DEL PROFE.
-            // Process status
+            // Process status.
             $file = \mod_certifygen\certifygen::get_user_certificate_file($idinstance, $model->get('templateid'), $userid,
                 $certifygen->get('course'), $lang);
             if (is_null($file)) {
@@ -143,10 +146,10 @@ class get_pdf_certificate_external extends external_api {
                 $result['error']['code'] = 'file_not_found';
                 $result['error']['message'] = 'File not found';
             } else {
-                $result['file'] = $file->get_contenthash(); // PARAM_FILE
+                $result['file'] = $file->get_contenthash();
             }
         } catch (\moodle_exception $e) {
-            error_log("error: ".var_export($e, true));
+            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             unset($result['file']);
             $haserror = true;
             $result['error']['code'] = $e->errorcode;

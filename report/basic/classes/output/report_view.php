@@ -22,6 +22,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    certifygenreport_basic
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -29,6 +30,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace certifygenreport_basic\output;
+
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->dirroot.'/user/lib.php');
 
@@ -42,37 +46,49 @@ use moodle_url;
 use renderable;
 use stdClass;
 use templatable;
-
-class report_view implements renderable, templatable
-{
+/**
+ * Report view class
+ * @package    certifygenreport_basic
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class report_view implements renderable, templatable {
+    /** @var int $userid */
     private int $userid;
+    /** @var bool $showtext */
     private bool $showtext;
+    /** @var bool $showendtext */
     private bool $showendtext;
+    /** @var string REPORT_COMPONENT */
     const REPORT_COMPONENT = 'certifygenreport_basic';
+    /** @var string REPORT_FILEAREA */
     const REPORT_FILEAREA = 'logo';
+    /** @var int MAX_NUMBER_COURSES */
     const MAX_NUMBER_COURSES = 7;
 
     /**
+     * Construct
      * @param int $userid
      * @param array $courses
      * @param bool $showtext
      * @param bool $showendtext
      */
-    public function __construct(int $userid, array $courses, bool $showtext = true, bool $showendtext = true)
-    {
+    public function __construct(int $userid, array $courses, bool $showtext = true, bool $showendtext = true) {
         $this->userid = $userid;
         $this->courses = $courses;
         $this->showtext = $showtext;
         $this->showendtext = $showendtext;
     }
     /**
+     * export_for_template
      * @param \renderer_base $output
      * @return stdClass
      * @throws coding_exception
      * @throws dml_exception
      */
-    public function export_for_template(\renderer_base $output)
-    {
+    public function export_for_template(\renderer_base $output) {
         $user = user_get_users_by_id([$this->userid]);
         $user = reset($user);
         $name = fullname($user);
@@ -92,9 +108,13 @@ class report_view implements renderable, templatable
     }
 
     /**
+     * Get courses list
      * @return array
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
-    private function get_courses_list() : array {
+    private function get_courses_list(): array {
         $courses = [];
         foreach ($this->courses as $course) {
             $courses[] = $this->get_user_evaluation_in_course((int)$course['courseid']);
@@ -103,10 +123,14 @@ class report_view implements renderable, templatable
     }
 
     /**
-     * @param stdClass $course
+     * get_user_evaluation_in_course
+     * @param int $courseid
      * @return string[]
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
-    private function get_user_evaluation_in_course(int $courseid) : array {
+    private function get_user_evaluation_in_course(int $courseid): array {
         $course = get_course($courseid);
         $teachers = $this->get_course_teachers($courseid);
         $info = new stdClass();
@@ -123,12 +147,13 @@ class report_view implements renderable, templatable
     }
 
     /**
+     * get_course_details_string
      * @param stdClass $course
      * @return string
      * @throws coding_exception
      * @throws moodle_exception
      */
-    private function get_course_details_string(stdClass $course) : string {
+    private function get_course_details_string(stdClass $course): string {
         $detail = '';
         $category = \core_course_category::get($course->category);
         $data = ['name' => strip_tags(format_text($category->name))];
@@ -144,21 +169,23 @@ class report_view implements renderable, templatable
         return $detail;
     }
     /**
+     * get_course_teachers
      * @param int $courseid
      * @return array
      */
-    private function get_course_teachers(int $courseid) : array {
+    private function get_course_teachers(int $courseid): array {
         $context = context_course::instance($courseid);
         $teachers = get_enrolled_users($context, 'moodle/course:managegroups');
         return $teachers;
     }
 
     /**
+     * get_course_students_number
      * @param int $courseid
      * @return int
      * @throws coding_exception
      */
-    private function get_course_students_number(int $courseid) : int {
+    private function get_course_students_number(int $courseid): int {
         $students = 0;
         $context = context_course::instance($courseid);
         $participants = get_enrolled_users($context);
@@ -171,17 +198,18 @@ class report_view implements renderable, templatable
         return $students;
     }
     /**
+     * get_course_teachersstring
      * @param array $teachers
      * @return string
      * @throws coding_exception
      */
-    private function get_course_teachersstring(array $teachers) : string {
+    private function get_course_teachersstring(array $teachers): string {
         $teachersstring = '';
         $total = count($teachers);
         $cont = 0;
         foreach ($teachers as $teacher) {
             $cont++;
-            if (!empty($teachersstring) && $cont != $total){
+            if (!empty($teachersstring) && $cont != $total) {
                 $teachersstring .= ', ';
             } else if (!empty($teachersstring) && $cont == $total) {
                 $teachersstring .= ' ' . get_string('and', 'certifygenreport_basic') . ' ';
@@ -192,26 +220,25 @@ class report_view implements renderable, templatable
     }
 
     /**
+     * get_course_type_by_algorithm
+     * Los tipos de curso caracterizados son los siguientes: Inactivo, Con
+     * entregas, Repositorio, Comunicativo, Evaluativo y Equilibrado.)
      * @param int $courseid
      * @return string
      * @throws coding_exception
      * @throws moodle_exception
      */
-    private function get_course_type_by_algorithm(int $courseid) : string {
-        /**
-         * Los tipos de curso caracterizados son los siguientes: Inactivo, Con
-         * entregas, Repositorio, Comunicativo, Evaluativo y Equilibrado.)
-         * */
+    private function get_course_type_by_algorithm(int $courseid): string {
         $numstudents = $this->get_course_students_number($courseid);
-
         $algorith = new useofthecoursealgorithm($courseid, $numstudents);
         return $algorith->get_course_type();
     }
     /**
+     * get_logo_url
      * @return moodle_url
      * @throws dml_exception
      */
-    public function get_logo_url() : string {
+    public function get_logo_url(): string {
         global $OUTPUT, $CFG;
         $fs = get_file_storage();
         $context = context_system::instance();
@@ -221,7 +248,7 @@ class report_view implements renderable, templatable
         if (!$logo) {
             return '';
         }
-        $img_base64_encoded =  'data:image/png;base64, ' . base64_encode($logo->get_content());
-        return  '@' . preg_replace('#^data:image/[^;]+;base64,#', '', $img_base64_encoded) . '">';
+        $imgbase64encoded = 'data:image/png;base64, ' . base64_encode($logo->get_content());
+        return '@' . preg_replace('#^data:image/[^;]+;base64,#', '', $imgbase64encoded) . '">';
     }
 }

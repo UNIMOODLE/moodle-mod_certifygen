@@ -17,7 +17,9 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
+ *
  * @package   certifygenrepository_csv
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -35,35 +37,43 @@ use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 use stored_file;
-
-class certifygenrepository_csv implements ICertificateRepository
-{
+/**
+ * certifygenrepository_csv
+ * @package   certifygenrepository_csv
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class certifygenrepository_csv implements ICertificateRepository {
+    /** @var string $url */
     private $url = '';
     /**
+     * getFileUrl
      * @param certifygen_validations $validation
      * @return string
      * @throws coding_exception|dml_exception|moodle_exception
      */
-    public function getFileUrl(certifygen_validations $validation): string
-    {
+    public function get_file_url(certifygen_validations $validation): string {
         if (empty($this->url)) {
             $code = certifygen_validations::get_certificate_code($validation);
-            $this->url = $this->getFileUrlFromExternalService($validation, $code);
+            $this->url = $this->call_file_url_from_external_service($validation, $code);
         }
         return $this->url;
     }
 
     /**
+     * get_file_url_from_external_service
      * @param certifygen_validations $validation
      * @param string $code
      * @return string
      * @throws moodle_exception
      * @throws coding_exception
      */
-    private function getFileUrlFromExternalService(certifygen_validations $validation, string $code) : string {
+    private function call_file_url_from_external_service(certifygen_validations $validation, string $code): string {
         $validationcsv = new certifygenvalidation_csv();
-        $data = $validationcsv->getFileUrlFromExternalService($validation->get('id'), $code);
-        if (array_key_exists('url', $data)){
+        $data = $validationcsv->get_file_url_from_external_service($validation->get('id'), $code);
+        if (array_key_exists('url', $data)) {
             return $data['url'];
         }
         return '';
@@ -75,8 +85,7 @@ class certifygenrepository_csv implements ICertificateRepository
      * @param stored_file $file
      * @return array
      */
-    public function saveFile(stored_file $file): array
-    {
+    public function save_file(stored_file $file): array {
         $result = [
             'result' => true,
             'haserror' => false,
@@ -86,11 +95,11 @@ class certifygenrepository_csv implements ICertificateRepository
     }
 
     /**
+     * is_enabled
      * @return bool
      * @throws dml_exception
      */
-    public function is_enabled(): bool
-    {
+    public function is_enabled(): bool {
         $csvconfiguration = new csv_configuration();
         $cenabled = $csvconfiguration->is_enabled();
         if ($cenabled && get_config('certifygenrepository_csv', 'enabled')) {
@@ -100,18 +109,18 @@ class certifygenrepository_csv implements ICertificateRepository
     }
 
     /**
+     * saveFileUrl
      * @return bool
      */
-    public function saveFileUrl(): bool
-    {
+    public function save_file_url(): bool {
         return false;
     }
 
     /**
+     * get_consistent_validation_plugins
      * @return string[]
      */
-    public function get_consistent_validation_plugins(): array
-    {
+    public function get_consistent_validation_plugins(): array {
         return ['certifygenvalidation_csv'];
     }
 }

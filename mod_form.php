@@ -35,6 +35,7 @@ use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
 
 defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
 
@@ -44,10 +45,13 @@ require_once($CFG->dirroot.'/course/moodleform_mod.php');
 class mod_certifygen_mod_form extends moodleform_mod {
 
     /**
-     * @inheritDoc
+     * definition
+     * @return void
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
-    protected function definition()
-    {
+    protected function definition() {
         global $OUTPUT;
         $mform =& $this->_form;
         $mform->addElement('text', 'name', get_string('name', 'mod_certifygen'), ['size' => '64']);
@@ -56,7 +60,7 @@ class mod_certifygen_mod_form extends moodleform_mod {
 
         $this->standard_intro_elements(get_string('introduction', 'mod_certifygen'));
         $canmanagemodels = has_capability('mod/certifygen:manage', context_system::instance());
-        $activitymodels =  mod_certifygen_get_activity_models($this->get_course()->id);
+        $activitymodels = mod_certifygen_get_activity_models($this->get_course()->id);
         $templateoptions = ['' => get_string('chooseamodel', 'mod_certifygen')] + $activitymodels;
         $manageurl = new moodle_url('/mod/certifygen/modelmanager.php');
         $elements = [$mform->createElement('select', 'modelid', get_string('model', 'mod_certifygen'), $templateoptions)];
@@ -73,36 +77,18 @@ class mod_certifygen_mod_form extends moodleform_mod {
         $rules = [];
         $rules['modelid'][] = [null, 'required', null, 'client'];
         $mform->addGroupRule('models_group', $rules);
-//
+
         if (!is_null($this->get_instance())) {
             $certifygen = new certifygen($this->get_instance());
             $modelid = $certifygen->get('modelid');
             $mform->setDefault('modelid', $modelid);
         }
-//        $hasissues = $this->has_issues();
-//        if ($hasissues) {
-//            // If coursecertificate has issues, just add the current template to the selector.
-//            $templates = $this->get_current_template($modelid);
-//        } else {
-//            // Get all available templates for the user.
-//            $templates = mod_certifygen_get_templates();
-//        }
-
-//        $modelform = new modelform();
-//        $mform = $modelform->get_common_elements($mform, $hasissues, $templates);
 
         // Course module elements.
         $this->standard_coursemodule_elements();
 
-//        if ($modelid) {
-//            $mform = $modelform->set_default_values($modelid, $mform);
-//        }
-//        $mform->addElement('hidden', 'modelid', $modelid);
-//        $mform->setType('modelid', PARAM_INT);
         $mform->addElement('hidden', 'type', certifygen_model::TYPE_ACTIVITY);
         $mform->setType('type', PARAM_INT);
         $this->add_action_buttons();
     }
-
-
 }

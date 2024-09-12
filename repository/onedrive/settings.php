@@ -22,6 +22,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    certifygenrepository_onedrive
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -47,7 +48,7 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configcheckbox('certifygenrepository_onedrive/enabled',
         new lang_string('enable', 'certifygenrepository_onedrive'),
         new lang_string('enable_help', 'certifygenrepository_onedrive'), 0));
-    //  Onedrive folder.
+    // Onedrive folder.
     $settings->add(new admin_setting_configtext(
         'certifygenrepository_onedrive/folder',
         get_string('settings_folder', 'certifygenrepository_onedrive'),

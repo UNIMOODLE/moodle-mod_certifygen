@@ -25,6 +25,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -38,23 +39,29 @@ use core\task\scheduled_task;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-
-class checkstatus extends scheduled_task
-{
-
+/**
+ * checkstatus
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class checkstatus extends scheduled_task {
     /**
-     * @inheritDoc
+     * Name
+     * @return \lang_string|string
+     * @throws \coding_exception
      */
-    public function get_name()
-    {
+    public function get_name() {
         return get_string('checkstatustask', 'mod_certifygen');
     }
 
     /**
-     * @inheritDoc
+     * Execute
+     * @return void
      */
-    public function execute()
-    {
+    public function execute() {
         $validations = certifygen_validations::get_records(['status' => certifygen_validations::STATUS_IN_PROGRESS]);
         foreach ($validations as $validation) {
             try {
@@ -69,17 +76,17 @@ class checkstatus extends scheduled_task
                 }
                 /** @var ICertificateValidation $subplugin */
                 $subplugin = new $validationpluginclass();
-                if (!$subplugin->checkStatus()) {
+                if (!$subplugin->check_status()) {
                     continue;
                 }
                 $code = certifygen_validations::get_certificate_code($validation);
-                $newstatus = $subplugin->getStatus($validation->get('id'), $code);
+                $newstatus = $subplugin->get_status($validation->get('id'), $code);
                 if ($newstatus != $validation->get('status')) {
                     $validation->set('status', $newstatus);
                     $validation->save();
                 }
             } catch (\moodle_exception $e) {
-                error_log(__FUNCTION__ . 'e: '.var_export($e->getMessage(), true));
+                debugging(__FUNCTION__ . 'e: ' . $e->getMessage());
             }
         }
     }

@@ -25,22 +25,30 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-use mod_certifygen\external\deletemodel_external;
-use mod_certifygen\external\get_courses_as_teacher_external;
-use mod_certifygen\external\getcoursesnames_external;
+
 use mod_certifygen\external\getmodellisttable_external;
-use mod_certifygen\external\getmycertificatedata_external;
 use mod_certifygen\persistents\certifygen_model;
+
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
 require_once($CFG->dirroot.'/lib/externallib.php');
-
+/**
+ * Get model list table test
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class getmodellisttable_external_test extends advanced_testcase {
 
     /**
@@ -51,6 +59,7 @@ class getmodellisttable_external_test extends advanced_testcase {
     }
 
     /**
+     * Test
      * @return void
      */
     public function test_getmodellisttable_nopermision(): void {
@@ -67,6 +76,7 @@ class getmodellisttable_external_test extends advanced_testcase {
     }
 
     /**
+     * Test
      * @return void
      * @throws coding_exception
      * @throws dml_exception

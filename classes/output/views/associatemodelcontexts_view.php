@@ -17,7 +17,9 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
+ *
  * @package   mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -30,11 +32,22 @@ use renderable;
 use stdClass;
 use templatable;
 use renderer_base;
+/**
+ * associatemodelcontexts_view
+ * @package   mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class associatemodelcontexts_view implements renderable, templatable {
+    /** @var int $pagesize */
     private int $pagesize;
+    /** @var bool $useinitialsbar */
     private bool $useinitialsbar;
 
     /**
+     * __construct
      * @param int $pagesize
      * @param bool $useinitialsbar
      */
@@ -44,6 +57,7 @@ class associatemodelcontexts_view implements renderable, templatable {
     }
 
     /**
+     * export_for_template
      * @param renderer_base $output
      * @return stdClass
      */
@@ -55,4 +69,3 @@ class associatemodelcontexts_view implements renderable, templatable {
         return $data;
     }
 }
-

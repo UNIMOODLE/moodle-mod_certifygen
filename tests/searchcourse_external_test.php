@@ -25,6 +25,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -42,26 +43,33 @@ use mod_certifygen\external\searchcourse_external;
 use required_capability_exception;
 use restricted_context_exception;
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
 require_once($CFG->dirroot . '/lib/externallib.php');
-
-class searchcourse_external_test extends advanced_testcase
-{
+/**
+ * Search course test
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class searchcourse_external_test extends advanced_testcase {
 
     /**
      * Test set up.
      */
-    public function setUp(): void
-    {
+    public function setUp(): void {
         $this->resetAfterTest();
     }
 
     /**
+     * Test
      * @return void
      */
-    public function test_searchcourse_nopermission(): void
-    {
+    public function test_searchcourse_nopermission(): void {
         // Create user and enrol as teacher.
         $user = $this->getDataGenerator()->create_user(
             ['username' => 'test_user_2', 'firstname' => 'test',
@@ -87,6 +95,7 @@ class searchcourse_external_test extends advanced_testcase
     }
 
     /**
+     * Test
      * @return void
      * @throws coding_exception
      * @throws dml_exception
@@ -94,8 +103,7 @@ class searchcourse_external_test extends advanced_testcase
      * @throws required_capability_exception
      * @throws restricted_context_exception
      */
-    public function test_searchcourse(): void
-    {
+    public function test_searchcourse(): void {
         // Create user and enrol as teacher.
         $user = $this->getDataGenerator()->create_user(
             ['username' => 'test_user_2', 'firstname' => 'test',
@@ -104,7 +112,7 @@ class searchcourse_external_test extends advanced_testcase
         // Login as user.
         global $DB;
         $manager = $this->getDataGenerator()->create_user();
-        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        $managerrole = $DB->get_record('role', ['shortname' => 'manager']);
         $this->getDataGenerator()->role_assign($managerrole->id, $manager->id);
         $this->setUser($manager);
 

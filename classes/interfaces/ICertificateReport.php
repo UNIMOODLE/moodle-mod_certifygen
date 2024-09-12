@@ -18,25 +18,44 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 namespace mod_certifygen\interfaces;
 
 use mod_certifygen\persistents\certifygen_validations;
-
+/**
+ * ICertificateReport
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 interface ICertificateReport {
+    /** @var string FILE_COMPONENT*/
     const FILE_COMPONENT = 'mod_certifygen';
+    /** @var string FILE_AREA*/
     const FILE_AREA = 'certifygenreport';
+    /** @var string FILE_PATH */
     const FILE_PATH = '/';
-//    const FILE_NAME_STARTSWITH = 'VVBNcertifygenreport_';
 
+    /**
+     * is_enabled
+     * @return bool
+     */
     public function is_enabled(): bool;
-    public function createFile(certifygen_validations $trequest): array;
-}
 
+    /**
+     * createFile
+     * @param certifygen_validations $trequest
+     * @return array
+     */
+    public function create_file(certifygen_validations $trequest): array;
+}

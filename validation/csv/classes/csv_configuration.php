@@ -17,7 +17,9 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
+ *
  * @package   certifygenvalidation_csv
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -25,18 +27,29 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace certifygenvalidation_csv;
-
+/**
+ * csv_configuration
+ * @package   certifygenvalidation_csv
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class csv_configuration
 {
 
-    private bool $pluginenabled;
-    private bool $soapenabled;
+    private bool $pluginenable;
     private bool $wsdlenabled;
     private bool $querywsdlenabled;
     private bool $appidenabled;
     private string $appId;
     private string $wsdl;
     private string $querywsdl;
+
+    /**
+     * Construct
+     * @throws \dml_exception
+     */
     public function __construct()
     {
         $this->pluginenabled = get_config('certifygenvalidation_csv', 'enabled') == '1';
@@ -54,6 +67,7 @@ class csv_configuration
     }
 
     /**
+     * is enabled
      * @return bool
      */
     public function is_enabled() : bool {
@@ -61,6 +75,7 @@ class csv_configuration
     }
 
     /**
+     * ge appid
      * @return string
      */
     public function get_appid() : string {
@@ -68,6 +83,7 @@ class csv_configuration
     }
 
     /**
+     * Get wuerywsdl
      * @return string
      */
     public function get_querywsdl() : string {
@@ -75,6 +91,7 @@ class csv_configuration
     }
 
     /**
+     * Get wsdl
      * @return string
      */
     public function get_wsdl() : string {

@@ -17,7 +17,9 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
+ *
  * @package   certifygenvalidation_csv
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -28,26 +30,42 @@
 namespace certifygenvalidation_csv;
 
 use SoapClient;
-
-class soapconnection
-{
+/**
+ * soapconnection
+ * @package   certifygenvalidation_csv
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class soapconnection {
+    /** @var array $options */
     private $options = [];
-    public function __construct()
-    {
+
+    /**
+     * Constrcut
+     */
+    public function __construct() {
         $this->options = [
-//                "uri"=> $this->configuration->get_wsdl(),
-            "style"=> SOAP_RPC,
-            "use"=> SOAP_ENCODED,
-            "soap_version"=> SOAP_1_1,
-//                "cache_wsdl"=> WSDL_CACHE_BOTH,
+            "style" => SOAP_RPC,
+            "use" => SOAP_ENCODED,
+            "soap_version" => SOAP_1_1,
             "connection_timeout" => 15,
-            "trace" => true, // false
+            "trace" => true,
             "encoding" => "UTF-8",
-            "exceptions" => true, // false
+            "exceptions" => true,
         ];
     }
 
-    function call(string $wsdl, string $function, array $params) {
+    /**
+     * call
+     * @param string $wsdl
+     * @param string $function
+     * @param array $params
+     * @return mixed
+     * @throws \SoapFault
+     */
+    public function call(string $wsdl, string $function, array $params) {
         $client = new SoapClient($wsdl, $this->options);
         return $client->__soapCall('iniciarProcesoFirma', $params);
     }

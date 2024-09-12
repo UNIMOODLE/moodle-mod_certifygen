@@ -17,6 +17,7 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
  * @package   certifygenvalidation_cmd
  * @copyright  2024 Proyecto UNIMOODLE
@@ -24,7 +25,6 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 namespace certifygenvalidation_cmd;
 
 use coding_exception;
@@ -42,19 +42,28 @@ use moodle_url;
 use stored_file;
 use stored_file_creation_exception;
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->dirroot. '/user/lib.php');
-class certifygenvalidation_cmd implements ICertificateValidation
-{
+/**
+ * certifygenvalidation_cmd
+ * @package   certifygenvalidation_cmd
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class certifygenvalidation_cmd implements ICertificateValidation {
 
     /**
+     * Send File
      * @param certifygen_file $file
      * @return array
-     * @throws coding_exception
-     * @throws dml_exception|exception
+     * @throws dml_exception
+     * @throws exception
      */
-    public function sendFile(certifygen_file $file): array
-    {
+    public function send_file(certifygen_file $file): array {
         $newfile  = null;
         $path = get_config('certifygenvalidation_cmd', 'path');
         $originalfilespath = get_config('certifygenvalidation_cmd', 'originalfilespath');
@@ -63,7 +72,7 @@ class certifygenvalidation_cmd implements ICertificateValidation
             throw new exception('cmdnotconfigured', 'certifygenvalidation_cmd');
         }
 
-        // Step 1: upload file to $originalfilespath
+        // Step 1: upload file to $originalfilespath.
         $originalfilename = $originalfilespath . $file->get_file()->get_filename();
         $validatedfilename = $validatedfilespath . $file->get_file()->get_filename();
         $tempdir = make_temp_directory('certifygen');
@@ -83,30 +92,30 @@ class certifygenvalidation_cmd implements ICertificateValidation
             ];
         }
 
-        // Step 2: call external endpoint
+        // Step 2: call external endpoint.
         $data = $file->get_metadata();
         $datajson = json_encode($data);
-        // Construye el comando
+        // Construye el comando.
         $command = "$path $originalfilename '$datajson'";
 
-        // Ejecuta el comando y captura la salida
+        // Ejecuta el comando y captura la salida.
         $output = [];
-        $return_var = 0;
-        exec($command, $output, $return_var);
+        $returnvar = 0;
+        exec($command, $output, $returnvar);
 
         $haserror = false;
         $message = 'ok';
-        // Muestra la salida del comando
-        if ($return_var !== 0) {
+        // Muestra la salida del comando.
+        if ($returnvar !== 0) {
             $haserror = true;
-            $message = " Error ejecutando el comando. Código de salida: " . $return_var;
+            $message = " Error ejecutando el comando. Código de salida: " . $returnvar;
         } else {
             if (!empty($output)) {
                 try {
                     $newfile = $this->save_file_on_moodledata($validatedfilename, $file);
                     unlink($tempfile);
                 } catch (moodle_exception $e) {
-                    error_log(__FUNCTION__ . '-CMD e: '.var_export($e->getMessage(), true));
+                    debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
                     $haserror = true;
                     $message = $e->getMessage();
                 }
@@ -120,6 +129,7 @@ class certifygenvalidation_cmd implements ICertificateValidation
     }
 
     /**
+     * Save file
      * @param certifygen_file $file
      * @param $content
      * @return void
@@ -127,8 +137,8 @@ class certifygenvalidation_cmd implements ICertificateValidation
      * @throws file_exception
      * @throws stored_file_creation_exception
      */
-    private function save_file_on_moodledata(string $validatedfile, certifygen_file $file) :stored_file {
-        // Get validated file
+    private function save_file_on_moodledata(string $validatedfile, certifygen_file $file): stored_file {
+        // Get validated file.
         $validatedfile = file_get_contents($validatedfile);
 
         // Save pdf on moodledata.
@@ -148,30 +158,31 @@ class certifygenvalidation_cmd implements ICertificateValidation
     }
 
     /**
+     * Get file record
      * @param int $courseid
      * @param int $validationid
      * @param string $filename
      * @return array
      */
-    private function get_filerecord_array(int $contextid, int $validationid, string $filename) : array {
+    private function get_filerecord_array(int $contextid, int $validationid, string $filename): array {
         return [
             'contextid' => $contextid,
             'component' => self::FILE_COMPONENT,
             'filearea' => self::FILE_AREA,
             'itemid' => $validationid,
             'filepath' => self::FILE_PATH,
-            'filename' => $filename
+            'filename' => $filename,
         ];
     }
 
     /**
+     * Get File
      * @param int $courseid
      * @param int $validationid
      * @param string $code
      * @return stored_file
      */
-    public function getFile(int $courseid, int $validationid): array
-    {
+    public function get_file(int $courseid, int $validationid): array {
         $result = ['error' => [], 'message' => 'ok'];
         try {
             $validation = new certifygen_validations($validationid);
@@ -184,7 +195,7 @@ class certifygenvalidation_cmd implements ICertificateValidation
             $file = $fs->get_file($contextid, self::FILE_COMPONENT,
                 self::FILE_AREA, $validationid, self::FILE_PATH, $code);
             $result['file'] = $file;
-        } catch(moodle_exception $exception) {
+        } catch (moodle_exception $exception) {
             $result['error']['code'] = $exception->getCode();
             $result['error']['message'] = $exception->getMessage();
         }
@@ -192,23 +203,23 @@ class certifygenvalidation_cmd implements ICertificateValidation
     }
 
     /**
+     * Can revoke
      * @param int $courseid
      * @return bool
      */
-    public function canRevoke(int $courseid): bool
-    {
+    public function can_revoke(int $courseid): bool {
         return false;
     }
 
     /**
+     * Get file url
      * @param int $courseid
      * @param int $validationid
      * @param string $code
      * @return string
      */
-    public function getFileUrl(int $courseid, int $validationid, string $code): string
-    {
-        $newfile = $this->getFile($courseid, $validationid, $code);
+    public function get_file_url(int $courseid, int $validationid, string $code): string {
+        $newfile = $this->get_file($courseid, $validationid, $code);
         if (!$newfile) {
             return '';
         }
@@ -225,11 +236,11 @@ class certifygenvalidation_cmd implements ICertificateValidation
     }
 
     /**
+     * enable
      * @return bool
      * @throws dml_exception
      */
-    public function is_enabled(): bool
-    {
+    public function is_enabled(): bool {
         $enabled = (int) get_config('certifygenvalidation_cmd', 'enabled');
         $pathenabled = get_config('certifygenvalidation_cmd', 'path');
         if ($enabled && !empty($pathenabled)) {
@@ -239,35 +250,35 @@ class certifygenvalidation_cmd implements ICertificateValidation
     }
 
     /**
+     * Check status
      * @return bool
      */
-    public function checkStatus(): bool
-    {
+    public function check_status(): bool {
         return false;
     }
 
     /**
+     * Get status
      * @param int $validationid
      * @param string $code
      * @return int
      */
-    public function getStatus(int $validationid, string $code): int
-    {
+    public function get_status(int $validationid, string $code): int {
         return certifygen_validations::STATUS_IN_PROGRESS;
     }
 
     /**
+     * Check file
      * @return bool
      */
-    public function checkfile(): bool
-    {
+    public function checkfile(): bool {
         return false;
     }
     /**
      * Returns an array of strings associated to certifiacte status to be shown on
      * activityteacher_table and profile_my_certificates_table
      */
-    public function getStatusMessages(): array {
+    public function get_status_messages(): array {
         return [];
     }
 }

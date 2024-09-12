@@ -22,6 +22,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -29,27 +30,30 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 namespace mod_certifygen\external;
+
+defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
-
 use coding_exception;
-use core\invalid_persistent_exception;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
-use mod_certifygen\certifygen;
-use mod_certifygen\certifygen_file;
 use mod_certifygen\event\certificate_revoked;
-use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
-
+/**
+ * Revoke certificate
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class revokecertificate_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -67,6 +71,7 @@ class revokecertificate_external extends external_api {
     }
 
     /**
+     * Revoke certificate
      * @param int $issueid
      * @param int $userid
      * @param int $modelid
@@ -90,14 +95,20 @@ class revokecertificate_external extends external_api {
         ];
         $validation = null;
         try {
-            // Step 2: Remove tool_certificate_issues record
+            if ($USER->id == $userid) {
+                $result['result'] = false;
+                $result['message'] = get_string('nopermissiontorevokecerts', 'mod_certifygen');
+                return $result;
+            }
+            // Step 2: Remove tool_certificate_issues record.
             $issue = $DB->get_record('tool_certificate_issues', ['id' => $issueid], '*', MUST_EXIST);
             $template = \tool_certificate\template::instance($issue->templateid);
             // Make sure the user has the required capabilities.
             $context = \context_course::instance($issue->courseid, IGNORE_MISSING) ?: $template->get_context();
             self::validate_context($context);
             if (!$template->can_revoke($issue->userid, $context)) {
-                throw new \required_capability_exception($template->get_context(), 'tool/certificate:issue', 'nopermissions', 'error');
+                throw new \required_capability_exception($template->get_context(), 'tool/certificate:issue',
+                    'nopermissions', 'error');
             }
 
             // Step 4: Delete the issue.
@@ -114,12 +125,12 @@ class revokecertificate_external extends external_api {
                     'validation' => $model->get('validation'),
                     'repository' => $model->get('repository'),
                     'report' => $model->get('report'),
-                ]
+                ],
             ];
             certificate_revoked::create($eventdata)->trigger();
             $validation->delete();
         } catch (moodle_exception $e) {
-            error_log(__FUNCTION__ . ' ' . __LINE__ . ' 2 validation - getMessage: '.var_export($e->getMessage(), true));
+            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $result['result'] = false;
             $result['message'] = $e->getMessage();
             if (!is_null($validation)) {
@@ -143,5 +154,4 @@ class revokecertificate_external extends external_api {
             ]
         );
     }
-
 }

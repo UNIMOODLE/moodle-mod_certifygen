@@ -17,15 +17,15 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
+ *
  * @package   certifygenvalidation_none
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
 namespace certifygenvalidation_none;
 global $CFG;
 require_once $CFG->libdir . '/soaplib.php';
@@ -41,16 +41,22 @@ use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
-use moodle_url;
-
+/**
+ * @package   certifygenvalidation_none
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class certifygenvalidation_none implements ICertificateValidation
 {
 
     /**
+     * Send file
      * @param certifygen_file $file
      * @return array
      */
-    public function sendFile(certifygen_file $file): array
+    public function send_file(certifygen_file $file): array
     {
         try {
             // Change context.
@@ -88,21 +94,23 @@ class certifygenvalidation_none implements ICertificateValidation
     }
 
     /**
+     * Get file
      * @param int $courseid
      * @param int $validationid
      * @return array
      */
-    public function getFile(int $courseid, int $validationid) : array
+    public function get_file(int $courseid, int $validationid) : array
     {
         return ['error' => [], 'message' => 'ok'];
     }
 
     /**
+     * Can revoke
      * @param int $courseid
      * @return bool
      * @throws coding_exception
      */
-    public function canRevoke(int $courseid): bool
+    public function can_revoke(int $courseid): bool
     {
         if ($courseid) {
             return has_capability('tool/certificate:issue', context_course::instance($courseid));
@@ -124,6 +132,7 @@ class certifygenvalidation_none implements ICertificateValidation
     }
 
     /**
+     * Is enabled
      * @return bool
      * @throws dml_exception
      */
@@ -133,25 +142,27 @@ class certifygenvalidation_none implements ICertificateValidation
     }
 
     /**
+     * Check status
      * @return bool
      */
-    public function checkStatus(): bool
+    public function check_status(): bool
     {
         return false;
     }
 
     /**
-     *
+     * Get status
      * @param int $validationid
      * @param string $code
      * @return int
      */
-    public function getStatus(int $validationid, string $code): int
+    public function get_status(int $validationid, string $code): int
     {
         return certifygen_validations::STATUS_VALIDATION_OK;
     }
 
     /**
+     * Check file
      * @return bool
      */
     public function checkfile(): bool
@@ -162,7 +173,7 @@ class certifygenvalidation_none implements ICertificateValidation
      * Returns an array of strings associated to certifiacte status to be shown on
      * activityteacher_table and profile_my_certificates_table
      */
-    public function getStatusMessages(): array {
+    public function get_status_messages(): array {
         return [];
     }
 }

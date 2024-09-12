@@ -20,6 +20,7 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos..
+
 /**
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
@@ -27,11 +28,7 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
 namespace mod_certifygen\external;
-
-
 use certifygenfilter;
 use external_api;
 use external_function_parameters;
@@ -40,12 +37,21 @@ use external_multiple_structure;
 use external_value;
 use mod_certifygen\persistents\certifygen_context;
 use mod_certifygen\persistents\certifygen_model;
-use tool_admin_presets\form\continue_form;
+
+defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot.'/user/lib.php');
 require_once($CFG->dirroot.'/mod/certifygen/classes/filters/certifygenfilter.php');
 require_once($CFG->dirroot.'/mod/certifygen/lib.php');
+/**
+ * Get courses as teacher
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class get_courses_as_teacher_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -63,6 +69,7 @@ class get_courses_as_teacher_external extends external_api {
     }
 
     /**
+     * Get courses as teacher
      * @param int $userid
      * @param string $userfield
      * @param string $lang
@@ -72,29 +79,7 @@ class get_courses_as_teacher_external extends external_api {
      * @throws \required_capability_exception
      */
     public static function get_courses_as_teacher(int $userid, string $userfield, string $lang): array {
-        global $CFG, $DB;
-        // si no envian lang, se pone el idioma de la plataforma.
-        /**
-         * OLD
-         * Devuelve un json con la información necesaria para el anterior servicio para
-         * confeccionar el certificado. El objetivo de este servicio es independizar el proceso de
-         * obtención de los datos del proceso de generación del documento con la presentación
-         * final.
-         */
-        /**
-         * NEW:
-         * Devuelve un json con la lista de cursos en los cuales figura como profesor la persona indicada
-         * por su identificador (userid).
-         * Este servicio permitirá a un sistema externo mostrar los cursos certificables.
-         * El servicio devolverá como mínimo los siguientes atributos de cada curso y se valorará que se ofrezca un
-         * servicio para configurar otros atributos de los disponibles para el profesor y los cursos en moodle:
-         * a. course.shortname
-         * b. course.fullname
-         * c. course.categoryid.
-         * d. reportype asociado al curso: [model type]
-         *
-         * Enviar la info en el idioma pedido por $lang. si no se envia nada, el idioma e la plataforma.
- */
+
         $params = self::validate_parameters(
             self::get_courses_as_teacher_parameters(), ['userid' => $userid, 'userfield' => $userfield, 'lang' => $lang]
         );
@@ -149,10 +134,8 @@ class get_courses_as_teacher_external extends external_api {
                 if (!has_capability('moodle/course:managegroups', $coursecontext, $userid)) {
                     continue;
                 }
-//                $coursefullname = format_text($enrolment->fullname);
                 $coursefullname = $filter->filter($enrolment->fullname);
                 $coursefullname = strip_tags($coursefullname);
-//                $courseshortname = format_text($enrolment->shortname);
                 $courseshortname = $filter->filter($enrolment->shortname);
                 $courseshortname = strip_tags($courseshortname);
                 $models = certifygen_context::get_course_context_modelids($enrolment->ctxinstance);
@@ -191,27 +174,40 @@ class get_courses_as_teacher_external extends external_api {
      * @return external_single_structure
      */
     public static function get_courses_as_teacher_returns(): external_single_structure {
-        return new external_single_structure(array(
+        return new external_single_structure([
                 'courses' => new external_multiple_structure(
                     new external_single_structure(
                         [
                             'id'   => new external_value(PARAM_RAW, 'Course id', VALUE_OPTIONAL),
-                            'shortname'   => new external_value(PARAM_RAW, 'Course shortname', VALUE_OPTIONAL),
-                            'fullname' => new external_value(PARAM_RAW, 'Course fullname', VALUE_OPTIONAL),
-                            'categoryid' => new external_value(PARAM_INT, 'Course category id', VALUE_OPTIONAL),
+                            'shortname'   => new external_value(PARAM_RAW, 'Course shortname',
+                                VALUE_OPTIONAL),
+                            'fullname' => new external_value(PARAM_RAW, 'Course fullname',
+                                VALUE_OPTIONAL),
+                            'categoryid' => new external_value(PARAM_INT, 'Course category id',
+                                VALUE_OPTIONAL),
                             'models' => new external_multiple_structure(
                                             new external_single_structure(
                                                 [
-                                                    'id' => new external_value(PARAM_INT, 'Instance id', VALUE_OPTIONAL),
-                                                    'idnumber' => new external_value(PARAM_RAW, 'Model name', VALUE_OPTIONAL),
-                                                    'name' => new external_value(PARAM_RAW, 'Model name', VALUE_OPTIONAL),
-                                                    'mode' => new external_value(PARAM_INT, 'Model mode', VALUE_OPTIONAL),
-                                                    'timeondemmand' => new external_value(PARAM_INT, 'Model timeondemmand', VALUE_OPTIONAL),
-                                                    'type' => new external_value(PARAM_INT, 'Model type', VALUE_OPTIONAL),
-                                                    'templateid' => new external_value(PARAM_INT, 'Model template id', VALUE_OPTIONAL),
-                                                    'langs' => new external_value(PARAM_RAW, 'Model langs', VALUE_OPTIONAL),
-                                                    'validation' => new external_value(PARAM_RAW, 'Model validation', VALUE_OPTIONAL),
-                                                    'repository' => new external_value(PARAM_RAW, 'Model validation', VALUE_OPTIONAL),
+                                                    'id' => new external_value(PARAM_INT, 'Instance id',
+                                                        VALUE_OPTIONAL),
+                                                    'idnumber' => new external_value(PARAM_RAW, 'Model name',
+                                                        VALUE_OPTIONAL),
+                                                    'name' => new external_value(PARAM_RAW, 'Model name',
+                                                        VALUE_OPTIONAL),
+                                                    'mode' => new external_value(PARAM_INT, 'Model mode',
+                                                        VALUE_OPTIONAL),
+                                                    'timeondemmand' => new external_value(PARAM_INT,
+                                                        'Model timeondemmand', VALUE_OPTIONAL),
+                                                    'type' => new external_value(PARAM_INT, 'Model type',
+                                                        VALUE_OPTIONAL),
+                                                    'templateid' => new external_value(PARAM_INT,
+                                                        'Model template id', VALUE_OPTIONAL),
+                                                    'langs' => new external_value(PARAM_RAW, 'Model langs',
+                                                        VALUE_OPTIONAL),
+                                                    'validation' => new external_value(PARAM_RAW,
+                                                        'Model validation', VALUE_OPTIONAL),
+                                                    'repository' => new external_value(PARAM_RAW,
+                                                        'Model validation', VALUE_OPTIONAL),
                                                 ],
                                                 'courses list', VALUE_OPTIONAL)
                             , '', VALUE_OPTIONAL),
@@ -227,7 +223,7 @@ class get_courses_as_teacher_external extends external_api {
                     'message' => new external_value(PARAM_RAW, 'Error message', VALUE_OPTIONAL),
                     'code' => new external_value(PARAM_RAW, 'Error code', VALUE_OPTIONAL),
                 ], 'Errors information', VALUE_OPTIONAL),
-            )
+            ]
         );
     }
 }

@@ -17,7 +17,9 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
+ *
  * @package   certifygenvalidation_csv
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -43,12 +45,12 @@ if ($ADMIN->fulltree) {
         new lang_string('enable', 'certifygenvalidation_csv'),
         new lang_string('enable_help', 'certifygenvalidation_csv'), 0));
 
-// FirmaCatalogService?wsdl
+// FirmaCatalogService?wsdl.
     $settings->add(new admin_setting_configtext('certifygenvalidation_csv/firmacatalogserviceurl',
         new lang_string('firmacatalogserviceurl', 'certifygenvalidation_csv'),
         new lang_string('firmacatalogserviceurl_help', 'certifygenvalidation_csv'), ""));
 
-// FirmaQueryCatalogService?wsdl
+// FirmaQueryCatalogService?wsdl.
     $settings->add(new admin_setting_configtext('certifygenvalidation_csv/firmaquerycatalogserviceurl',
         new lang_string('firmaquerycatalogserviceurl', 'certifygenvalidation_csv'),
         new lang_string('firmaquerycatalogserviceurl_help', 'certifygenvalidation_csv'), ""));
@@ -58,4 +60,3 @@ if ($ADMIN->fulltree) {
         new lang_string('appID', 'certifygenvalidation_csv'),
         new lang_string('appID_help', 'certifygenvalidation_csv'), ""));
 }
-//$ADMIN->add('modsettingcertifygencat', $settings);

@@ -22,6 +22,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -33,20 +34,25 @@ namespace mod_certifygen\forms;
 
 use coding_exception;
 use moodleform;
-
-class certificatestablefiltersform extends moodleform
-{
+/**
+ * Certificates table filters form
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class certificatestablefiltersform extends moodleform {
 
     /**
-     * @inheritDoc
+     * definition
      * @throws coding_exception
      */
-    protected function definition()
-    {
+    protected function definition() {
         $mform =& $this->_form;
 
         // Langs.
-        $choices = array();
+        $choices = [];
         $langs = $this->_customdata['langs'];
         $defaultlang = $this->_customdata['defaultlang'];
         $langstrings = get_string_manager()->get_list_of_translations();

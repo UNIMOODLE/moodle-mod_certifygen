@@ -33,15 +33,21 @@
 namespace certifygenrepository_localrepository\privacy;
 
 use core_privacy\local\metadata\null_provider;
-
-class provider implements null_provider
-{
+/**
+ * Implementation of the privacy subsystem plugin provider for the certifygen certifygenrepository_localrepository subplugin.
+ * @package    certifygenrepository_localrepository
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class provider implements null_provider {
 
     /**
-     * @inheritDoc
+     * Get reason
+     * @return string
      */
-    public static function get_reason(): string
-    {
+    public static function get_reason(): string {
         return 'privacy:metadata';
     }
 }

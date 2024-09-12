@@ -25,6 +25,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -36,8 +37,10 @@ namespace mod_certifygen;
 
 use coding_exception;
 use context_course;
+use core\invalid_persistent_exception;
 use core_course\customfield\course_handler;
 use dml_exception;
+use file_exception;
 use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_error;
@@ -45,17 +48,24 @@ use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 use stdClass;
+use stored_file_creation_exception;
 use tool_certificate\certificate;
 use tool_certificate\permission;
 
 defined('MOODLE_INTERNAL') || die;
+
 global $CFG;
 require_once($CFG->dirroot . '/grade/querylib.php');
 require_once($CFG->dirroot . '/user/lib.php');
 require_once($CFG->libdir . '/gradelib.php');
 
 /**
- * Class certifygen
+ * Certifygen
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class certifygen {
 
@@ -73,7 +83,7 @@ class certifygen {
      * @throws dml_exception
      */
     public static function get_user_certificate(int $instaceid, int $userid, int $courseid, int $templateid,
-                                                string $lang) :?stdClass {
+                                                string $lang): ?stdClass {
 
         global $DB;
 
@@ -81,18 +91,17 @@ class certifygen {
         $comparelangplaceholder = $DB->sql_compare_text(':lang');
         $comparecomp = $DB->sql_compare_text('ci.component');
         $comparecompplaceholder = $DB->sql_compare_text(':component');
-        $sql = "SELECT ci.* 
-                FROM {tool_certificate_issues} ci
-                INNER JOIN {certifygen_validations} cv ON (cv.issueid = ci.id AND cv.userid = ci.userid)
-                WHERE {$comparecomp} = {$comparecompplaceholder} 
-                    AND ci.courseid = :courseid 
-                    AND ci.templateid = :templateid 
-                    AND ci.userid = :userid
-                    AND ci.archived = 0 
-                    AND cv.certifygenid = :instanceid 
-                    AND {$comparelang} = {$comparelangplaceholder}
-                ORDER BY ci.id DESC";
-
+        $sql = "SELECT ci.*";
+        $sql .= " FROM {tool_certificate_issues} ci";
+        $sql .= " INNER JOIN {certifygen_validations} cv ON (cv.issueid = ci.id AND cv.userid = ci.userid)";
+        $sql .= " WHERE {$comparecomp} = {$comparecompplaceholder}";
+        $sql .= " AND ci.courseid = :courseid";
+        $sql .= " AND ci.templateid = :templateid";
+        $sql .= " AND ci.userid = :userid";
+        $sql .= " AND ci.archived = 0";
+        $sql .= " AND cv.certifygenid = :instanceid";
+        $sql .= " AND {$comparelang} = {$comparelangplaceholder}";
+        $sql .= " ORDER BY ci.id DESC";
         $params = [
             'component' => 'mod_certifygen',
             'instanceid' => $instaceid,
@@ -118,7 +127,8 @@ class certifygen {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public static function issue_certificate(int $instanceid, stdClass $user, int $templateid, stdClass $course, string $lang): int {
+    public static function issue_certificate(int $instanceid, stdClass $user, int $templateid, stdClass $course,
+                                             string $lang): int {
         if (self::get_user_certificate($instanceid, $user->id, $course->id, $templateid, $lang)) {
             return 0;
         }
@@ -132,8 +142,8 @@ class certifygen {
                 $expirydateoffset
             );
             return $template->issue_certificate($user->id, $expirydate, $issuedata, 'mod_certifygen', $course->id);
-        } catch(moodle_exception $e) {
-            error_log(__FUNCTION__ . ' ' . __LINE__. ' ERROR: '. var_export($e->getMessage(), true));
+        } catch (moodle_exception $e) {
+            debugging(__FUNCTION__ . ' ' . __LINE__. ' ERROR: '. $e->getMessage());
         }
         return 0;
     }
@@ -146,9 +156,9 @@ class certifygen {
      * @return array
      */
     private static function get_users_issued_select(int $courseid, int $templateid): array {
-        $sql = "SELECT DISTINCT ci.userid FROM {tool_certificate_issues} ci
-                WHERE component = :component AND courseid = :courseid AND templateid = :templateid
-                      AND archived = 0";
+        $sql = "SELECT DISTINCT ci.userid FROM {tool_certificate_issues} ci";
+        $sql .= " WHERE component = :component AND courseid = :courseid AND templateid = :templateid";
+        $sql .= " AND archived = 0";
         $params = ['component' => 'mod_certifygen', 'courseid' => $courseid,
             'templateid' => $templateid, ];
         return [$sql, $params];
@@ -194,17 +204,28 @@ class certifygen {
     }
 
     /**
+     * Get user certificate file url
+     * @param int $instanceid
+     * @param string $templateid
+     * @param int $userid
+     * @param int $courseid
+     * @param string $lang
+     * @return string
+     * @throws file_exception
+     * @throws stored_file_creation_exception
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      */
     public static function get_user_certificate_file_url(int $instanceid, string $templateid, int $userid,
-                                                         int $courseid, string $lang) : string {
+                                                         int $courseid, string $lang): string {
+        // Get user.
         $users = user_get_users_by_id([$userid]);
         $user = reset($users);
         $course = get_course($courseid);
-        certifygen::issue_certificate($instanceid, $user, $templateid, $course, $lang);
+        self::issue_certificate($instanceid, $user, $templateid, $course, $lang);
         $url = "";
+        // Get user certificate.
         if ($existingcertificate = self::get_user_certificate($instanceid, $userid, $course->id, $templateid, $lang)) {
             $issue = template::get_issue_from_code($existingcertificate->code);
             $context = context_course::instance($issue->courseid, IGNORE_MISSING) ?: null;
@@ -221,16 +242,25 @@ class certifygen {
     }
 
     /**
+     * get_user_certificate_file
+     * @param int $instanceid
+     * @param string $templateid
+     * @param int $userid
+     * @param int $courseid
+     * @param string $lang
+     * @return \stored_file|null
      * @throws coding_exception
      * @throws dml_exception
+     * @throws file_exception
      * @throws moodle_exception
+     * @throws stored_file_creation_exception
      */
-    public static function get_user_certificate_file(int $instanceid, string $templateid, int $userid, int $courseid, string $lang)
-    {
+    public static function get_user_certificate_file(int $instanceid, string $templateid, int $userid, int $courseid,
+                                                     string $lang) {
         $users = user_get_users_by_id([$userid]);
         $user = reset($users);
         $course = get_course($courseid);
-        certifygen::issue_certificate($instanceid, $user, $templateid, $course, $lang);
+        self::issue_certificate($instanceid, $user, $templateid, $course, $lang);
         if ($existingcertificate = self::get_user_certificate($instanceid, $userid, $course->id, $templateid, $lang)) {
 
             $issue = template::get_issue_from_code($existingcertificate->code);
@@ -265,11 +295,13 @@ class certifygen {
     }
 
     /**
+     * get_issues_for_course_by_lang
      * @param string $lang
+     * @param int $certifygenid
      * @param int $templateid
      * @param int $courseid
      * @param string $component
-     * @param int|null $userid
+     * @param int $userid
      * @param string $tifirst
      * @param string $tilast
      * @param int $limitfrom
@@ -278,9 +310,10 @@ class certifygen {
      * @return array
      * @throws dml_exception
      */
-    public static function get_issues_for_course_by_lang(string $lang, int $certifygenid, int $templateid, int $courseid, string $component,
-                                                         int $userid, string $tifirst, string $tilast,
-                                                         int $limitfrom, int $limitnum, string $sort = ''): array {
+    public static function get_issues_for_course_by_lang(string $lang, int $certifygenid, int $templateid, int $courseid,
+                                                         string $component, int $userid, string $tifirst,
+                                                         string $tilast, int $limitfrom, int $limitnum,
+                                                         string $sort = ''): array {
         global $DB;
 
         if (empty($sort)) {
@@ -310,23 +343,23 @@ class certifygen {
             $where = ' AND u.id = :userid';
         }
 
-        $sql = "SELECT us.userid, ci.id as issueid, ci.code, ci.emailed, ci.timecreated as ctimecreated, ci.userid, ci.templateid, ci.expires,
-       ci.courseid, ci.archived, cv.lang as clang, cv.status as cstatus, cv.id as validationid, us.*, us.courseid
-                    FROM (SELECT u.id AS userid, u.*, c.id as courseid
-                        FROM {user} u
-                        INNER JOIN {user_enrolments} ue ON ue.userid = u.id
-                        INNER JOIN {enrol} e ON e.id = ue.enrolid
-                        INNER JOIN {course} c ON c.id = e.courseid
-                        INNER JOIN {context} cont ON (cont.instanceid = c.id AND cont.contextlevel = 50)
-                        INNER JOIN {role_assignments} ra ON ( ra.contextid = cont.id AND  ra.userid = u.id)
-                        INNER JOIN {role} r ON r.id = ra.roleid
-                        WHERE r.shortname = 'student'
-                        AND c.id = :courseid $where
-                        ) AS us
-                    LEFT JOIN {certifygen_validations} cv ON (cv.userid = us.userid AND cv.lang = :lang  AND cv.certifygenid = :certifygenid)
-                    LEFT JOIN {tool_certificate_issues} ci ON (ci.userid = us.userid AND cv.issueid = ci.id AND ci.courseid = us.courseid 
-                        AND ci.templateid = :templateid AND ci.component = :component)
-                    ";
+        $sql = "SELECT us.userid, ci.id as issueid, ci.code, ci.emailed, ci.timecreated as ctimecreated, ci.userid,";
+        $sql .= "ci.templateid, ci.expires, ci.courseid, ci.archived, cv.lang as clang, cv.status as cstatus,";
+        $sql .= "cv.id as validationid, us.*, us.courseid, ci.courseid, ci.archived, cv.lang as clang,";
+        $sql .= "cv.status as cstatus, cv.id as validationid, us.*, us.courseid";
+        $sql .= " FROM (SELECT u.id AS userid, u.*, c.id as courseid";
+        $sql .= "         FROM {user} u";
+        $sql .= "         INNER JOIN {user_enrolments} ue ON ue.userid = u.id";
+        $sql .= "         INNER JOIN {enrol} e ON e.id = ue.enrolid";
+        $sql .= "         INNER JOIN {course} c ON c.id = e.courseid";
+        $sql .= "         INNER JOIN {context} cont ON (cont.instanceid = c.id AND cont.contextlevel = 50)";
+        $sql .= "         INNER JOIN {role_assignments} ra ON ( ra.contextid = cont.id AND  ra.userid = u.id)";
+        $sql .= "         INNER JOIN {role} r ON r.id = ra.roleid";
+        $sql .= "         WHERE r.shortname = 'student' AND c.id = :courseid $where ) AS us";
+        $sql .= " LEFT JOIN {certifygen_validations} cv ON (cv.userid = us.userid AND cv.lang = :lang  ";
+        $sql .= "         AND cv.certifygenid = :certifygenid)";
+        $sql .= " LEFT JOIN {tool_certificate_issues} ci ON (ci.userid = us.userid AND cv.issueid = ci.id ";
+        $sql .= "         AND ci.courseid = us.courseid AND ci.templateid = :templateid AND ci.component = :component)";
 
         return $DB->get_records_sql($sql, $params, $limitfrom, $limitnum);
     }
@@ -372,6 +405,7 @@ class certifygen {
     }
 
     /**
+     * count_issues_for_course_by_lang
      * @param int $courseid
      * @param string $tifirst
      * @param string $tilast
@@ -399,29 +433,32 @@ class certifygen {
             $where = ' AND u.id = :userid';
         }
 
-        $sql = "SELECT COUNT(u.id) as count
-                    FROM {user} u
-                    INNER JOIN {user_enrolments} ue ON ue.userid = u.id
-                    INNER JOIN {enrol} e ON e.id = ue.enrolid
-                    INNER JOIN {course} c ON c.id = e.courseid
-                    INNER JOIN {context} cont ON (cont.instanceid = c.id AND cont.contextlevel = 50)
-                    INNER JOIN {role_assignments} ra ON ( ra.contextid = cont.id AND  ra.userid = u.id)
-                    INNER JOIN {role} r ON r.id = ra.roleid
-                    WHERE r.shortname = 'student'
-                    AND c.id = :courseid $where";
-
+        $sql = "SELECT COUNT(u.id) as count";
+        $sql .= " FROM {user} u";
+        $sql .= " INNER JOIN {user_enrolments} ue ON ue.userid = u.id";
+        $sql .= " INNER JOIN {enrol} e ON e.id = ue.enrolid";
+        $sql .= " INNER JOIN {course} c ON c.id = e.courseid";
+        $sql .= " INNER JOIN {context} cont ON (cont.instanceid = c.id AND cont.contextlevel = 50)";
+        $sql .= " INNER JOIN {role_assignments} ra ON ( ra.contextid = cont.id AND  ra.userid = u.id)";
+        $sql .= " INNER JOIN {role} r ON r.id = ra.roleid";
+        $sql .= " WHERE r.shortname = 'student'";
+        $sql .= " AND c.id = :courseid $where";
         return $DB->count_records_sql($sql, $params);
     }
 
     /**
+     * start_emit_certificate_proccess
      * @param certifygen_validations $validation
      * @param certifygen_file $certifygenfile
      * @param certifygen_model $certifygenmodel
      * @return array
+     * @throws invalid_persistent_exception
      * @throws coding_exception
      * @throws dml_exception
      */
-    public static function start_emit_certificate_proccess(certifygen_validations $validation, certifygen_file $certifygenfile, certifygen_model $certifygenmodel) : array {
+    public static function start_emit_certificate_proccess(certifygen_validations $validation,
+                                                           certifygen_file $certifygenfile,
+                                                           certifygen_model $certifygenmodel): array {
         global $USER;
         $result = ['result' => true, 'message' => get_string('ok', 'mod_certifygen')];
 
@@ -431,7 +468,7 @@ class certifygen {
         if (get_config($validationplugin, 'enabled') === '1') {
             /** @var ICertificateValidation $subplugin */
             $subplugin = new $validationpluginclass();
-            $response = $subplugin->sendFile($certifygenfile);
+            $response = $subplugin->send_file($certifygenfile);
             if ($response['haserror']) {
                 if (!array_key_exists('message', $response)) {
                     $result['message'] = 'validation_plugin_send_file_error';
@@ -446,7 +483,7 @@ class certifygen {
                     'usermodified' => $USER->id,
                 ];
                 certifygen_error::manage_certifygen_error(0, (object)$data);
-            } else if (!$subplugin->checkStatus()) {
+            } else if (!$subplugin->check_status()) {
                 $validation->set('status', certifygen_validations::STATUS_VALIDATION_OK);
                 $validation->save();
             }
@@ -471,7 +508,7 @@ class certifygen {
             $repositorypluginclass = $repositoryplugin . '\\' . $repositoryplugin;
             /** @var ICertificateRepository $subplugin */
             $subplugin = new $repositorypluginclass();
-            $response = $subplugin->saveFile($response['newfile']);
+            $response = $subplugin->save_file($response['newfile']);
             if (!$response['haserror']) {
                 $validation->set('status', certifygen_validations::STATUS_FINISHED);
                 $validation->save();
@@ -494,6 +531,7 @@ class certifygen {
     }
 
     /**
+     * count_errors
      * @param string $userfullname
      * @param string $modelname
      * @return int
@@ -520,25 +558,25 @@ class certifygen {
         if (!empty($where)) {
             $wheresql = ' WHERE ' . $where;
         }
-        $sql = "SELECT COUNT(*)
-                FROM  mdl_certifygen_error ce
-                INNER JOIN mdl_certifygen_validations cv ON cv.id = ce.validationid
-                INNER JOIN mdl_certifygen_model cm ON cm.id = cv.modelid
-                INNER JOIN {user} u ON u.id = cv.userid
-                LEFT JOIN mdl_certifygen c ON c.id = cv.certifygenid
-                $wheresql
-                ";
+        $sql = "SELECT COUNT(*)";
+        $sql .= "FROM  {certifygen_error} ce";
+        $sql .= "INNER JOIN {certifygen_validations} cv ON cv.id = ce.validationid";
+        $sql .= "INNER JOIN {certifygen_model} cm ON cm.id = cv.modelid";
+        $sql .= "INNER JOIN {user} u ON u.id = cv.userid";
+        $sql .= "LEFT JOIN {certifygen} c ON c.id = cv.certifygenid";
+        $sql .= $wheresql;
 
         return $DB->count_records_sql($sql, $params);
     }
 
     /**
+     * get_errors
      * @param string $userfullname
      * @param string $modelname
      * @return array
      * @throws dml_exception
      */
-    public static function get_errors(string $userfullname = '', string $modelname = '') {
+    public static function get_errors(string $userfullname = '', string $modelname = ''): array {
         global $DB;
 
         $params = [];
@@ -560,18 +598,19 @@ class certifygen {
         if (!empty($where)) {
             $wheresql = ' WHERE ' . $where;
         }
-        $sql = "SELECT ce.id, ce.`status`, ce.code AS errorcode, ce.message AS errormessage, ce.timecreated, ce.validationid, 
-       cv.name AS teacherreportname,
-       c.name AS activityname,
-       cm.validation AS modelvalidation, cm.report AS modelreport, cm.repository AS modelrepository, cm.type AS modeltype, cm.name as modelname,
-       u.id as userid, u.picture, u.firstname, u.lastname, u.firstnamephonetic, u.lastnamephonetic, u.middlename, u.alternatename, u.imagealt, u.email
-                FROM  {certifygen_error} ce
-                INNER JOIN {certifygen_validations} cv ON cv.id = ce.validationid
-                INNER JOIN {certifygen_model} cm ON cm.id = cv.modelid
-                INNER JOIN {user} u ON u.id = cv.userid
-                LEFT JOIN {certifygen} c ON c.id = cv.certifygenid
-                $wheresql
-                ORDER BY ce.timecreated DESC";
+
+        $sql = "SELECT ce.id, ce.`status`, ce.code AS errorcode, ce.message AS errormessage, ce.timecreated,";
+        $sql .= "ce.validationid, cv.name AS teacherreportname, c.name AS activityname,cm.validation AS modelvalidation,";
+        $sql .= "cm.report AS modelreport, cm.repository AS modelrepository,cm.type AS modeltype, cm.name as modelname,";
+        $sql .= "u.id as userid, u.picture, u.firstname, u.lastname, u.firstnamephonetic, u.lastnamephonetic,";
+        $sql .= "u.middlename, u.alternatename, u.imagealt, u.email";
+        $sql .= "FROM  {certifygen_error} ce";
+        $sql .= "INNER JOIN {certifygen_validations} cv ON cv.id = ce.validationid";
+        $sql .= "INNER JOIN {certifygen_model} cm ON cm.id = cv.modelid";
+        $sql .= "INNER JOIN {user} u ON u.id = cv.userid";
+        $sql .= "LEFT JOIN {certifygen} c ON c.id = cv.certifygenid";
+        $sql .= $wheresql;
+        $sql .= "ORDER BY ce.timecreated DESC";
 
         return $DB->get_records_sql($sql, $params);
     }

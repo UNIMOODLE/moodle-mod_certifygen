@@ -20,6 +20,7 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos..
+
 /**
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
@@ -27,11 +28,7 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
 namespace mod_certifygen\external;
-
-
 use external_api;
 use external_function_parameters;
 use external_single_structure;
@@ -41,10 +38,20 @@ use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use certifygenfilter;
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->dirroot.'/user/lib.php');
 require_once($CFG->dirroot.'/mod/certifygen/lib.php');
 require_once($CFG->dirroot.'/mod/certifygen/classes/filters/certifygenfilter.php');
+/**
+ * Get certificate elements
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class get_json_certificate_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -64,6 +71,7 @@ class get_json_certificate_external extends external_api {
     }
 
     /**
+     * get_json_certificate
      * @param int $userid
      * @param string $userfield
      * @param int $idinstance
@@ -74,21 +82,24 @@ class get_json_certificate_external extends external_api {
      * @throws \invalid_parameter_exception
      * @throws \required_capability_exception
      */
-    public static function get_json_certificate(int $userid, string $userfield, int $idinstance, string $customfields, string $lang): array {
-        /**
-         * Devuelve un json con la información necesaria para el anterior servicio para
-         * confeccionar el certificado. El objetivo de este servicio es independizar el proceso de
-         * obtención de los datos del proceso de generación del documento con la presentación
-         * final.
-         */
-        // TODO:customfields... que modifica el fichero.
+    public static function get_json_certificate(int $userid, string $userfield, int $idinstance, string $customfields,
+                                                string $lang): array {
+        global $USER;
         $params = self::validate_parameters(
             self::get_json_certificate_parameters(),
             ['userid' => $userid, 'userfield' => $userfield, 'idinstance' => $idinstance,
                 'customfields' => $customfields, 'lang' => $lang]
         );
-        $context = \context_system::instance();
-        require_capability('mod/certifygen:manage', $context);
+
+        if ($USER->id != $userid) {
+            debugging("enttra en el if y no deberia");
+            $context = \context_system::instance();
+            if (!has_capability('mod/certifygen:manage', $context)) {
+                $result['result'] = false;
+                $result['message'] = get_string('nopermissiontoemitothercerts', 'mod_certifygen');
+                return $result;
+            }
+        }
         $result = ['json' => '', 'error' => []];
         $haserror = false;
         try {
@@ -153,7 +164,7 @@ class get_json_certificate_external extends external_api {
                 $result['json'] = json_encode($json);
             }
         } catch (\moodle_exception $e) {
-            error_log("error: ".var_export($e, true));
+            debugging(__FUNCTION__ . " error: ".$e->getMessage());
             unset($result['json']);
             $haserror = true;
             $result['error']['code'] = $e->errorcode;

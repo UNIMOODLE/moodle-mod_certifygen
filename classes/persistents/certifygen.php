@@ -25,6 +25,7 @@ namespace mod_certifygen\persistents;
 use core\persistent;
 
 /**
+ * Certifygen
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>

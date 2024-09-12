@@ -192,3 +192,4 @@ $string['certifygenerrors'] = 'Veure errors del certifygen';
 $string['idrequest'] = 'Id de sol·licitud';
 $string['validationplugin_not_enabled'] = 'Connector de validació no habilitat';
 $string['removefilters'] = 'Eliminar filtres';
+$string['nopermissiontorevokecerts'] = 'No tens permisos per revocar un certificat';

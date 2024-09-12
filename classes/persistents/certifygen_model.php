@@ -21,13 +21,21 @@
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
+/**
+ * certifygen_model
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 namespace mod_certifygen\persistents;
 use coding_exception;
 use core\invalid_persistent_exception;
 use core\persistent;
-use dml_exception;
 
 /**
+ * certifygen_model
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -40,9 +48,13 @@ class certifygen_model extends persistent {
      * @var string table
      */
     public const TABLE = 'certifygen_model';
+    /** @var int TYPE_ACTIVITY */
     public const TYPE_ACTIVITY = 1;
+    /** @var int TYPE_TEACHER_ALL_COURSES_USED */
     public const TYPE_TEACHER_ALL_COURSES_USED = 2;
+    /** @var int MODE_UNIQUE */
     public const MODE_UNIQUE = 1;
+    /** @var int MODE_PERIODIC */
     public const MODE_PERIODIC = 2;
     /**
      * Define properties
@@ -73,22 +85,22 @@ class certifygen_model extends persistent {
             ],
             'langs' => [
                 'type' => PARAM_TEXT,
-                'default' => NULL,
+                'default' => null,
                 'null' => NULL_ALLOWED,
             ],
             'validation' => [
                 'type' => PARAM_TEXT,
-                'default' => NULL,
+                'default' => null,
                 'null' => NULL_ALLOWED,
             ],
             'report' => [
                 'type' => PARAM_TEXT,
-                'default' => NULL,
+                'default' => null,
                 'null' => NULL_ALLOWED,
             ],
             'repository' => [
                 'type' => PARAM_TEXT,
-                'default' => NULL,
+                'default' => null,
                 'null' => NULL_NOT_ALLOWED,
             ],
             'usermodified' => [
@@ -98,12 +110,13 @@ class certifygen_model extends persistent {
     }
 
     /**
+     * save_model_object
      * @param object $data
      * @return self
      * @throws coding_exception
      * @throws invalid_persistent_exception
      */
-    public static function save_model_object( object $data) : self {
+    public static function save_model_object(object $data): self {
         global $USER;
         $modeldata = [
             'name' => $data->modelname,
@@ -112,9 +125,9 @@ class certifygen_model extends persistent {
             'mode' => $data->mode,
             'templateid' => $data->templateid ?? 0,
             'timeondemmand' => $data->timeondemmand ?? 0,
-            'langs' => empty($data->langs) ? NULL : implode(',', $data->langs),
-            'validation' => empty($data->validation) ? NULL : $data->validation,
-            'report' => empty($data->report) ? NULL : $data->report,
+            'langs' => empty($data->langs) ? null : implode(',', $data->langs),
+            'validation' => empty($data->validation) ? null : $data->validation,
+            'report' => empty($data->report) ? null : $data->report,
             'repository' => $data->repository,
             'usermodified' => $USER->id,
             'timecreated' => time(),
@@ -130,17 +143,18 @@ class certifygen_model extends persistent {
 
             return $model->create();
         } catch (\moodle_exception $e) {
-            error_log(__FUNCTION__ . ' error: '.var_export($e->getMessage(), true));
+            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             return false;
         }
 
     }
 
     /**
+     * get_model_languages
      * @return array
      * @throws coding_exception
      */
-    public function get_model_languages() : array {
+    public function get_model_languages(): array {
         $languages = $this->get('langs');
         if (empty($languages)) {
             return [];

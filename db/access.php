@@ -22,12 +22,15 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
     'mod/certifygen:addinstance' => [
@@ -66,15 +69,6 @@ $capabilities = [
             'student' => CAP_PROHIBIT,
         ],
     ],
-    'mod/certifygen:canmanagecertificates' => [
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => [
-            'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW,
-            'teacher' => CAP_PROHIBIT,
-        ],
-    ],
     'mod/certifygen:view' => [
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
@@ -90,7 +84,7 @@ $capabilities = [
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => [
-            'user' => CAP_ALLOW
+            'user' => CAP_ALLOW,
         ],
     ],
     'mod/certifygen:viewcontextcertificates' => [
@@ -116,4 +110,3 @@ $capabilities = [
         ],
     ],
 ];
-

@@ -20,6 +20,7 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos..
+
 /**
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
@@ -28,21 +29,29 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 namespace mod_certifygen\external;
-
-
 use external_api;
 use external_function_parameters;
 use external_multiple_structure;
 use external_single_structure;
 use external_value;
+use invalid_parameter_exception;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_context;
 use mod_certifygen\persistents\certifygen_model;
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->dirroot.'/user/lib.php');
+/**
+ * Get courses names
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class getcoursesnames_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -58,9 +67,10 @@ class getcoursesnames_external extends external_api {
     }
 
     /**
+     * Get courses names
      * @param string $coursesids
      * @return array[]
-     * @throws \invalid_parameter_exception
+     * @throws invalid_parameter_exception
      */
     public static function getcoursesnames(string $coursesids): array {
         self::validate_parameters(
@@ -91,7 +101,7 @@ class getcoursesnames_external extends external_api {
      * @return external_single_structure
      */
     public static function getcoursesnames_returns(): external_single_structure {
-        return new external_single_structure(array(
+        return new external_single_structure([
                 'list' => new external_multiple_structure( new external_single_structure(
                         [
                             'id' => new external_value(PARAM_INT, 'Course id'),
@@ -100,7 +110,7 @@ class getcoursesnames_external extends external_api {
                             'link' => new external_value(PARAM_RAW, 'Course link url'),
                         ], 'Course list')
                 ),
-            )
+            ]
         );
     }
 }

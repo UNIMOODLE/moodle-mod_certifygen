@@ -22,6 +22,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -33,24 +34,28 @@ namespace mod_certifygen\external;
 
 use coding_exception;
 use context_module;
-use context_system;
 use core\invalid_persistent_exception;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
-use mod_certifygen\certifygen_file;
-use mod_certifygen\interfaces\ICertificateReport;
-use mod_certifygen\interfaces\ICertificateValidation;
-use mod_certifygen\persistents\certifygen;
-use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 use tool_certificate\external\issues;
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->libdir . '/modinfolib.php');
+/**
+ * Reemit certificate
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class reemitcertificate_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -66,6 +71,7 @@ class reemitcertificate_external extends external_api {
     }
 
     /**
+     * Reemit certificate
      * @param int $id
      * @return array
      * @throws coding_exception
@@ -116,7 +122,7 @@ class reemitcertificate_external extends external_api {
                 $oldvalidation->delete();
             }
         } catch (moodle_exception $e) {
-            error_log(__FUNCTION__ . ' ' . ' error: '.var_export($e->getMessage(), true));
+            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $result['result'] = false;
             $result['message'] = $e->getMessage();
             $validation->set('status', certifygen_validations::STATUS_ERROR);

@@ -17,7 +17,9 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
+ *
  * @package   certifygenvalidation_webservice
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -25,11 +27,13 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 namespace certifygenvalidation_webservice;
+
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
-require_once $CFG->libdir . '/soaplib.php';
-require_once $CFG->libdir . '/pdflib.php';
+require_once($CFG->libdir . '/soaplib.php');
+require_once($CFG->libdir . '/pdflib.php');
 
 use certifygenvalidation_webservice\persistents\certifygenvalidationwebservice;
 use coding_exception;
@@ -44,18 +48,24 @@ use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 use moodle_url;
 use stored_file_creation_exception;
-
-class certifygenvalidation_webservice implements ICertificateValidation
-{
+/**
+ * certifygenvalidation_webservice
+ * @package    certifygenvalidation_webservice
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class certifygenvalidation_webservice implements ICertificateValidation {
 
     /**
+     * sendFile
      * @param certifygen_file $file
      * @return array
      */
-    public function sendFile(certifygen_file $file): array
-    {
+    public function send_file(certifygen_file $file): array {
         try {
-            // No tiene sentido enviar el fichero a ninguna parte
+            // No tiene sentido enviar el fichero a ninguna parte.
             $validation = new certifygen_validations($file->get_validationid());
             $validation->set('status', certifygen_validations::STATUS_IN_PROGRESS);
             return [
@@ -72,12 +82,12 @@ class certifygenvalidation_webservice implements ICertificateValidation
     }
 
     /**
+     * getFile
      * @param int $courseid
      * @param int $validationid
      * @return array
      */
-    public function getFile(int $courseid, int $validationid) : array
-    {
+    public function get_file(int $courseid, int $validationid): array {
         $result = ['error' => [], 'message' => 'ok'];
         try {
             $validation = new certifygen_validations($validationid);
@@ -87,7 +97,7 @@ class certifygenvalidation_webservice implements ICertificateValidation
             if (!empty($courseid)) {
                 $contextid = context_course::instance($courseid)->id;
             }
-            $file =  $fs->get_file($contextid, self::FILE_COMPONENT,
+            $file = $fs->get_file($contextid, self::FILE_COMPONENT,
                 self::FILE_AREA, $validationid, self::FILE_PATH, $code . '.pdf');
             if (!$file) {
                 $result['error']['code'] = 'file_not_found';
@@ -103,20 +113,21 @@ class certifygenvalidation_webservice implements ICertificateValidation
     }
 
     /**
+     * canRevoke
      * @param int $courseid
      * @return bool
      */
-    public function canRevoke(int $courseid): bool
-    {
+    public function can_revoke(int $courseid): bool {
         return false;
     }
 
     /**
+     * revoke
      * @param string $code
      * @return array
      */
     public function revoke(string $code) : array {
-        //TODO.
+        // TODO.
         return [
             'haserror' => false,
             'message' => '',
@@ -124,42 +135,42 @@ class certifygenvalidation_webservice implements ICertificateValidation
     }
 
     /**
+     * is_enabled
      * @return bool
      * @throws dml_exception
      */
-    public function is_enabled(): bool
-    {
+    public function is_enabled(): bool {
         return (int)get_config('certifygenvalidation_webservice', 'enabled');
     }
 
     /**
+     * checkStatus
      * @return bool
      */
-    public function checkStatus(): bool
-    {
+    public function check_status(): bool {
         return true;
     }
 
     /**
-     *
+     * getStatus
      * @param int $validationid
      * @param string $code
      * @return int
      */
-    public function getStatus(int $validationid, string $code): int
-    {
+    public function get_status(int $validationid, string $code): int {
         return certifygen_validations::STATUS_IN_PROGRESS;
     }
 
     /**
+     * checkfile
      * @return bool
      */
-    public function checkfile(): bool
-    {
+    public function checkfile(): bool {
         return true;
     }
 
     /**
+     * save_file_moodledata
      * @param int $validationid
      * @return void
      * @throws coding_exception
@@ -202,7 +213,7 @@ class certifygenvalidation_webservice implements ICertificateValidation
      * Returns an array of strings associated to certifiacte status to be shown on
      * activityteacher_table and profile_my_certificates_table
      */
-    public function getStatusMessages(): array {
+    public function get_status_messages(): array {
         return [
             certifygen_validations::STATUS_IN_PROGRESS => get_string('inprogress_msg', 'certifygenvalidation_webservice'),
         ];

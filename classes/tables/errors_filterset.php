@@ -32,24 +32,29 @@
 namespace mod_certifygen\tables;
 
 use core_table\local\filter\filterset;
-use core_table\local\filter\integer_filter;
 use core_table\local\filter\string_filter;
-
-class errors_filterset extends filterset
-{
+/**
+ * Errors filterset
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class errors_filterset extends filterset {
     /**
+     * get_required_filters
      * @return class-string[]
      */
-    public function get_required_filters(): array
-    {
+    public function get_required_filters(): array {
         return [];
     }
 
     /**
+     * get_optional_filters
      * @return array
      */
-    public function get_optional_filters(): array
-    {
+    public function get_optional_filters(): array {
         return [
             'modelname' => string_filter::class,
             'userfullname' => string_filter::class,

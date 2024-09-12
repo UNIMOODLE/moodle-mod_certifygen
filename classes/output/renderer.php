@@ -22,15 +22,15 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
 namespace mod_certifygen\output;
+use coding_exception;
 use dml_exception;
 use mod_certifygen\output\views\activity_view;
 use mod_certifygen\output\views\model_view;
@@ -42,14 +42,21 @@ use mod_certifygen\output\views\teacher_view;
 use mod_certifygen\output\views\associatemodelcontexts_view;
 use moodle_exception;
 use plugin_renderer_base;
-
+/**
+ * Renderer
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class renderer extends plugin_renderer_base {
 
     /**
-     * Activity view renderer
+     * Show errors view renderer
      * @param activity_view $view
      * @return string
-     * @throws \coding_exception
+     * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      */
@@ -61,7 +68,7 @@ class renderer extends plugin_renderer_base {
      * Activity view renderer
      * @param activity_view $view
      * @return string
-     * @throws \coding_exception
+     * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      */
@@ -71,6 +78,7 @@ class renderer extends plugin_renderer_base {
     }
 
     /**
+     * Model view renderer
      * @param model_view $view
      * @return string
      * @throws moodle_exception
@@ -82,6 +90,7 @@ class renderer extends plugin_renderer_base {
     }
 
     /**
+     * Associate model contexts view renderer
      * @param associatemodelcontexts_view $view
      * @return string
      * @throws moodle_exception
@@ -93,8 +102,11 @@ class renderer extends plugin_renderer_base {
     }
 
     /**
-     * @param mycertificates_view $view
+     * My certificates view renderer
+     * @param profile_my_certificates_view $view
      * @return string
+     * @throws coding_exception
+     * @throws dml_exception
      * @throws moodle_exception
      */
     public function render_profile_my_certificates_view(profile_my_certificates_view $view): string {

@@ -18,7 +18,9 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
+ * certifygenpdf
  * @package    certifygenreport_basic
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -27,59 +29,82 @@
  */
 
 namespace certifygenreport_basic;
+
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
-
 use pdf;
-
 require_once($CFG->dirroot . '/lib/pdflib.php');
-class certifygenpdf extends pdf
-{
+
+/**
+ * certifygenpdf
+ * @package    certifygenreport_basic
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class certifygenpdf extends pdf {
+    /** @var $footertext */
     private $footertext;
+
+    /**
+     * Set footer text
+     * @param $text
+     * @return void
+     */
     public function set_footer_text($text) {
         $this->footertext = $text;
     }
+
+    /**
+     * Footer
+     * @return void
+     */
     public function Footer() {
-        $cur_y = $this->y;
+        $cury = $this->y;
         $this->setTextColorArray($this->footer_text_color);
-        //set style for cell border
-        $line_width = (0.85 / $this->k);
-        $this->setLineStyle(array('width' => $line_width, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => $this->footer_line_color));
-        //print document barcode
+        // Set style for cell border.
+        $linewidth = (0.85 / $this->k);
+        $this->setLineStyle(['width' => $linewidth, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0,
+            'color' => $this->footer_line_color]);
+        // Print document barcode.
         $barcode = $this->getBarcode();
         if (!empty($barcode)) {
-            $this->Ln($line_width);
-            $barcode_width = round(($this->w - $this->original_lMargin - $this->original_rMargin) / 3);
-            $style = array(
-                'position' => $this->rtl?'R':'L',
-                'align' => $this->rtl?'R':'L',
+            $this->Ln($linewidth);
+            $barcodewidth = round(($this->w - $this->original_lMargin - $this->original_rMargin) / 3);
+            $style = [
+                'position' => $this->rtl ? 'R' : 'L',
+                'align' => $this->rtl ? 'R' : 'L',
                 'stretch' => false,
                 'fitwidth' => true,
                 'cellfitalign' => '',
                 'border' => false,
                 'padding' => 0,
-                'fgcolor' => array(0,0,0),
+                'fgcolor' => [0, 0, 0],
                 'bgcolor' => false,
-                'text' => false
-            );
-            $this->write1DBarcode($barcode, 'C128', '', $cur_y + $line_width, '', (($this->footer_margin / 3) - $line_width), 0.3, $style, '');
+                'text' => false,
+            ];
+            $this->write1DBarcode($barcode, 'C128', '', $cury + $linewidth, '',
+                (($this->footer_margin / 3) - $linewidth), 0.3, $style, '');
         }
-        $w_page = isset($this->l['w_page']) ? $this->l['w_page'].' ' : '';
+        $wpage = isset($this->l['w_page']) ? $this->l['w_page'].' ' : '';
         if (empty($this->pagegroups)) {
-            $pagenumtxt = $w_page.$this->getAliasNumPage().' / '.$this->getAliasNbPages();
+            $pagenumtxt = $wpage. $this->getAliasNumPage() . ' / ' . $this->getAliasNbPages();
         } else {
-            $pagenumtxt = $w_page.$this->getPageNumGroupAlias().' / '.$this->getPageGroupAlias();
+            $pagenumtxt = $wpage. $this->getPageNumGroupAlias() . ' / ' . $this->getPageGroupAlias();
         }
-        $this->setY($cur_y);
+        $this->setY($cury);
         if (!empty($this->footertext )) {
             $this->SetY(-25);
-            // Set font
+            // Set font.
             $this->SetFont('helvetica', 'I', 8);
-            // Page number
-            $this->Cell(0, 10, $this->footertext, 0, false, 'C', 0, '', 0, false, 'T', 'M');
-            //$this->writeHTML($this->footertext, true, false, false, false, 'C');
+            // Page number.
+            $this->Cell(0, 10, $this->footertext, 0, false, 'C', 0, '', 0,
+                false, 'T', 'M');
         }
 
-        //Print page number
+        // Print page number.
         if ($this->getRTL()) {
             $this->setX($this->original_rMargin);
             $this->Cell(0, 0, $pagenumtxt, 'T', 0, 'L');

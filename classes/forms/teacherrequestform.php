@@ -22,15 +22,17 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
 namespace mod_certifygen\forms;
+
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once("$CFG->dirroot/mod/certifygen/lib.php");
 
@@ -46,13 +48,21 @@ use moodle_exception;
 use moodle_url;
 use stdClass;
 
+/**
+ * Teacher request form
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class teacherrequestform extends dynamic_form {
 
     /**
+     * definition
      * @throws coding_exception|dml_exception
      */
-    protected function definition()
-    {
+    protected function definition() {
         $mform =& $this->_form;
 
         $mform->addElement('text', 'name', get_string('name', 'mod_certifygen'), ['size' => '64']);
@@ -70,7 +80,6 @@ class teacherrequestform extends dynamic_form {
             // Language: from model list languages.
             $mform->addElement('select', 'lang_'.$modelid, get_string('language'), $lang);
             $mform->setType('lang_'.$modelid, PARAM_RAW);
-//            $mform->addRule('lang_'.$modelid, get_string('required'), 'required');
             $mform->hideIf('lang_'.$modelid, 'modelid', 'noteq', $modelid);
         }
 
@@ -79,12 +88,12 @@ class teacherrequestform extends dynamic_form {
             'ajax' => 'mod_certifygen/form_mycourses_selector',
             'multiple' => true,
             'userid' => (int)$this->_ajaxformdata['userid'],
-            'valuehtmlcallback' => function($courseid) : string {
+            'valuehtmlcallback' => function($courseid): string {
                 $course = get_course($courseid);
                 $formated = format_text($course->fullname);
                 $formated = strip_tags($formated);
                 return $formated;
-            }
+            },
         ];
         $mform->addElement('autocomplete', 'courses',
             get_string('courseslist', 'mod_certifygen'), [], $options);
@@ -98,31 +107,31 @@ class teacherrequestform extends dynamic_form {
     }
 
     /**
+     * get_context_for_dynamic_submission
      * @throws dml_exception
      */
-    protected function get_context_for_dynamic_submission(): context
-    {
+    protected function get_context_for_dynamic_submission(): context {
         return context_system::instance();
     }
 
     /**
+     * check_access_for_dynamic_submission
      * @throws coding_exception
      * @throws moodle_exception
      * @throws dml_exception
      */
-    protected function check_access_for_dynamic_submission(): void
-    {
+    protected function check_access_for_dynamic_submission(): void {
         if (!has_capability('mod/certifygen:viewmycontextcertificates', $this->get_context_for_dynamic_submission())) {
             throw new moodle_exception('nopermissions', 'error', '', 'viewcontextcertificates');
         }
     }
 
     /**
+     * process_dynamic_submission
      * @throws coding_exception
      * @throws invalid_persistent_exception
      */
-    public function process_dynamic_submission()
-    {
+    public function process_dynamic_submission() {
         $formdata = (array) $this->get_data();
         $id = $formdata['id'];
         $data = new stdClass();
@@ -139,10 +148,10 @@ class teacherrequestform extends dynamic_form {
     }
 
     /**
+     * set_data_for_dynamic_submission
      * @throws coding_exception
      */
-    public function set_data_for_dynamic_submission(): void
-    {
+    public function set_data_for_dynamic_submission(): void {
         $data = [
             'id' => $this->_ajaxformdata['id'],
             'userid' => $this->_ajaxformdata['userid'],
@@ -157,13 +166,21 @@ class teacherrequestform extends dynamic_form {
     }
 
     /**
+     * get_page_url_for_dynamic_submission
      * @return moodle_url
      */
-    protected function get_page_url_for_dynamic_submission(): moodle_url
-    {
+    protected function get_page_url_for_dynamic_submission(): moodle_url {
         return new moodle_url('/mod/certifygen/mycertificates.php');
     }
-    function validation($data, $files) {
+
+    /**
+     * Validation
+     * @param $data
+     * @param $files
+     * @return array
+     * @throws coding_exception
+     */
+    public function validation($data, $files) {
         $errors = [];
 
         if (!array_key_exists('courses', $data)

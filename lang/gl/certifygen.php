@@ -64,7 +64,6 @@ defined('MOODLE_INTERNAL') || die();
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 ou posterior
  */
-
 // Esta liña protexe o arquivo de ser accedido directamente por un URL.
 defined('MOODLE_INTERNAL') || die();
 
@@ -222,3 +221,4 @@ $string['certifygenerrors'] = 'Consulta os erros de certifygen';
 $string['idrequest'] = 'Id de solicitude';
 $string['validationplugin_not_enabled'] = 'O complemento de validación non está activado';
 $string['removefilters'] = 'Eliminar filtros';
+$string['nopermissiontorevokecerts'] = 'Non tes permisos para revogar un certificado';

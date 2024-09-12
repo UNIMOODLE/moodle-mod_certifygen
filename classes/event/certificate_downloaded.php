@@ -35,21 +35,29 @@ use coding_exception;
 use context_module;
 use context_system;
 use core\event\base;
-use mod_book\event\chapter_created;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->dirroot . '/lib/modinfolib.php');
-class certificate_downloaded extends base
-{
+/**
+ * Certificate downloaded event
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class certificate_downloaded extends base {
 
     /**
-     * @inheritDoc
+     * init
+     * @return void
      */
-    protected function init()
-    {
+    protected function init() {
         $this->data['crud'] = 'c';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
         $this->data['objecttable'] = 'certifygen_validations';
@@ -64,6 +72,7 @@ class certificate_downloaded extends base
     }
 
     /**
+     * Create event form validation object
      * @throws coding_exception
      * @throws moodle_exception
      */
@@ -74,7 +83,7 @@ class certificate_downloaded extends base
             $context = context_module::instance($cm->id);
         }
         $model = new certifygen_model($validation->get('modelid'));
-        $data = array(
+        $data = [
             'context' => $context,
             'objectid' => $validation->get('id'),
             'other' => [
@@ -82,10 +91,10 @@ class certificate_downloaded extends base
                 'repository' => $model->get('repository'),
                 'report' => $model->get('report'),
             ],
-        );
+        ];
         /** @var certificate_issued $event */
         $event = self::create($data);
-        $event->add_record_snapshot('certifygen_validations', $validation);
+        $event->add_record_snapshot('certifygen_validations', $validation->to_record());
         return $event;
     }
 }

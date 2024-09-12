@@ -17,6 +17,7 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
@@ -24,9 +25,10 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
 namespace mod_certifygen\tables;
+
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once("$CFG->libdir/tablelib.php");
 require_once("$CFG->libdir/moodlelib.php");
@@ -34,13 +36,19 @@ require_once("$CFG->libdir/moodlelib.php");
 use coding_exception;
 use dml_exception;
 use mod_certifygen\certifygen;
-use mod_certifygen\persistents\certifygen_error;
-use mod_certifygen\persistents\certifygen_model;
-use mod_certifygen\template;
 use table_sql;
+/**
+ * showerrors_table
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class showerrors_table extends table_sql {
 
     /**
+     * Construct
      * @throws coding_exception
      */
     function __construct() {
@@ -48,7 +56,8 @@ class showerrors_table extends table_sql {
         $uniqueid = 'certifygen-showerrors-view';
         parent::__construct($uniqueid);
         // Define the list of columns to show.
-        $columns = ['user', 'status', 'message', 'model', 'type', 'validation', 'repository', 'report', 'name', 'validationid', 'timecreated'];
+        $columns = ['user', 'status', 'message', 'model', 'type', 'validation', 'repository', 'report', 'name',
+            'validationid', 'timecreated'];
         $this->define_columns($columns);
 
         // Define the titles of columns to show in header.
@@ -69,13 +78,13 @@ class showerrors_table extends table_sql {
     }
 
     /**
+     * query_db
      * @param int $pagesize
      * @param bool $useinitialsbar
      * @return void
      * @throws dml_exception
      */
-    public final function query_db($pagesize, $useinitialsbar = true): void
-    {
+    final public function query_db($pagesize, $useinitialsbar = true): void {
 
         $userfullname = $modelname = '';
         if ($this->filterset->has_filter('userfullname')) {
@@ -91,11 +100,11 @@ class showerrors_table extends table_sql {
     }
 
     /**
-     * @param $values
+     * User
+     * @param $row
      * @return string
-     * @throws coding_exception
      */
-    final function col_user($row) : string {
+    final public function col_user($row): string {
         global $OUTPUT;
         $data = [
             'id' => $row->userid,
@@ -113,38 +122,42 @@ class showerrors_table extends table_sql {
         return $OUTPUT->user_picture((object) $data, ['size' => 35, 'includefullname' => true]);
     }
     /**
+     * Type
      * @param $values
      * @return string
      * @throws coding_exception
      */
-    final function col_type($values) : string {
+    final public function col_type($values): string {
         return get_string('type_'. $values->modeltype, 'mod_certifygen');
     }
     /**
+     * Validation
      * @param $values
      * @return string
      * @throws coding_exception
      */
-    final function col_validation($values) : string {
+    final public function col_validation($values): string {
         return get_string('pluginname' , $values->modelvalidation);
     }
     /**
+     * Report
      * @param $values
      * @return string
      * @throws coding_exception
      */
-    final function col_report($values) : string {
+    final public function col_report($values): string {
         if (empty($values->modelreport)) {
             return '';
         }
         return get_string('pluginname' , $values->modelreport);
     }
     /**
+     * Repository
      * @param $values
      * @return string
      * @throws coding_exception
      */
-    final function col_repository($values) : string {
+    final public function col_repository($values): string {
         if (empty($values->modelrepository)) {
             return '';
         }
@@ -152,10 +165,11 @@ class showerrors_table extends table_sql {
     }
 
     /**
+     * Name
      * @param $values
      * @return string
      */
-    final function col_name($values) : string {
+    final public function col_name($values): string {
         if (!empty($values->teacherreportname)) {
             return $values->teacherreportname;
         } else {
@@ -163,44 +177,49 @@ class showerrors_table extends table_sql {
         }
     }
     /**
+     * Status
      * @param $values
      * @return string
      * @throws coding_exception
      */
-    final function col_status($values) : string {
+    final public function col_status($values): string {
         return get_string('status_'. $values->status, 'mod_certifygen');
     }
 
     /**
+     * Message
      * @param $values
      * @return string
      * @throws coding_exception
      */
-    final function col_message($values) : string {
+    final public function col_message($values): string {
         return $values->errormessage;
     }
     /**
+     * Model
      * @param $values
      * @return string
      * @throws coding_exception
      */
-    final function col_model($values) : string {
+    final public function col_model($values): string {
         return $values->modelname;
     }
     /**
+     * Validation id
      * @param $values
      * @return string
      * @throws coding_exception
      */
-    final function col_validationid($values) : string {
+    final public function col_validationid($values): string {
         return $values->validationid;
     }
     /**
+     * Timecreated
      * @param $values
      * @return string
      * @throws coding_exception
      */
-    final function col_timecreated($values) : string {
+    final public function col_timecreated($values): string {
         return userdate($values->timecreated);
     }
 }

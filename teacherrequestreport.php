@@ -34,6 +34,8 @@
 use mod_certifygen\output\views\profile_my_certificates_view;
 use mod_certifygen\persistents\certifygen_context;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once('../../config.php');
 global $CFG;
 require_once($CFG->dirroot. '/lib/formslib.php');

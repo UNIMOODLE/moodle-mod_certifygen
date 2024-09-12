@@ -22,27 +22,31 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 namespace mod_certifygen\forms;
 
 use coding_exception;
 use moodleform;
-
-class errorfiltersform extends moodleform
-{
-
+/**
+ * Error filters form
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class errorfiltersform extends moodleform {
     /**
-     * @inheritDoc
+     * Definition
      * @throws coding_exception
      */
-    protected function definition()
-    {
+    protected function definition() {
         $mform =& $this->_form;
         $customdata = $this->_customdata;
 
@@ -50,24 +54,24 @@ class errorfiltersform extends moodleform
         $mform->addElement('text', 'userfullname', get_string('fullnameuser'));
         $mform->setType('userfullname', PARAM_RAW);
         $mform->setDefault('userfullname', $customdata['userfullname']);
-        //Model name
+
+        // Model name.
         $mform->addElement('text', 'modelname', get_string('model', 'mod_certifygen'));
         $mform->setType('modelname', PARAM_RAW);
         $mform->setDefault('userfmodelnameullname', $customdata['modelname']);
 
         $this->add_action_buttons(false, get_string('filter', 'mod_certifygen'));
-        $html = '<div class="form-group row fitem femptylabel  ">';
-        $html .= '<div class="col-md-3 col-form-label d-flex pb-0 pr-md-0">
-        <div class="form-label-addon d-flex align-items-center align-self-start">';
+        $html = '<div class="form-group row fitem femptylabel">';
+        $html .= '<div class="col-md-3 col-form-label d-flex pb-0 pr-md-0">';
+        $html .= '<div class="form-label-addon d-flex align-items-center align-self-start">';
         $html .= '</div>';
         $html .= '</div>';
         $html .= '<div class="col-md-9 form-inline align-items-start felement">';
-        //$html .= '<input type="submit" class="btn btn-secondary form-control " data-action="removefilters" value="'.get_string('removefilters', 'mod_certifygen').'"/> ';
         $url = new \moodle_url('/mod/certifygen/showerrors.php');
-        $html .= '<a href="'. $url->out() .'" class="btn btn-secondary form-control " >'.get_string('removefilters', 'mod_certifygen').'</a> ';
+        $html .= '<a href="'. $url->out() .'" class="btn btn-secondary form-control " >'
+            . get_string('removefilters', 'mod_certifygen').'</a> ';
         $html .= '</div>';
         $html .= '</div>';
         $mform->addElement('html', $html);
-
     }
 }

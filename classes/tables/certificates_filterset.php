@@ -22,6 +22,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -34,24 +35,30 @@ namespace mod_certifygen\tables;
 use core_table\local\filter\filterset;
 use core_table\local\filter\integer_filter;
 use core_table\local\filter\string_filter;
-
-class certificates_filterset extends filterset
-{
+/**
+ * Certificates filterset
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class certificates_filterset extends filterset {
     /**
+     * get_required_filters
      * @return class-string[]
      */
-    public function get_required_filters(): array
-    {
+    public function get_required_filters(): array {
         return [
             'lang' => string_filter::class,
         ];
     }
 
     /**
+     * get_optional_filters
      * @return array
      */
-    public function get_optional_filters(): array
-    {
+    public function get_optional_filters(): array {
         return [
             'userid' => integer_filter::class,
             'tifirst' => string_filter::class,

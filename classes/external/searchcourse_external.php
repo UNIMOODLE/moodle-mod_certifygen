@@ -18,6 +18,15 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
+/**
+ * Search course
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 namespace mod_certifygen\external;
 
 use coding_exception;
@@ -33,11 +42,12 @@ use invalid_parameter_exception;
 use restricted_context_exception;
 
 /**
+ * Search course
  * @package    mod_certifygen
- * * @copyright  2024 Proyecto UNIMOODLE
- * * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
- * * @author     3IPUNT <contacte@tresipunt.com>
- * * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class searchcourse_external extends external_api {
 
@@ -53,6 +63,7 @@ class searchcourse_external extends external_api {
     }
 
     /**
+     * Search course
      * @param string $query
      * @return array
      * @throws coding_exception
@@ -73,10 +84,9 @@ class searchcourse_external extends external_api {
         require_capability('mod/certifygen:manage', $context);
 
         $likename = $DB->sql_like('c.fullname', ':fullname', false, true);
-        $sql = "SELECT id, fullname
-              FROM {course} c
-             WHERE $likename";
-
+        $sql = "SELECT id, fullname";
+        $sql .= " FROM {course} c";
+        $sql .= " WHERE $likename";
         $rs = $DB->get_recordset_sql($sql, ['fullname' => '%' . $query . '%']);
         $count = 0;
         $list = [];

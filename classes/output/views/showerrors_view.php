@@ -31,7 +31,6 @@
  */
 namespace mod_certifygen\output\views;
 use core_table\local\filter\filter;
-use core_table\local\filter\integer_filter;
 use core_table\local\filter\string_filter;
 use mod_certifygen\forms\errorfiltersform;
 use mod_certifygen\tables\errors_filterset;
@@ -39,14 +38,22 @@ use mod_certifygen\tables\showerrors_table;
 use renderable;
 use templatable;
 use renderer_base;
+/**
+ *
+ * @package    showerrors_view
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class showerrors_view  implements renderable, templatable {
-
-
     /**
-     * @inheritDoc
+     * export_for_template
+     * @param renderer_base $output
+     * @return \stdClass
+     * @throws \coding_exception
      */
-    public function export_for_template(renderer_base $output)
-    {
+    public function export_for_template(renderer_base $output) {
         $userfullname = optional_param('userfullname', '', PARAM_RAW);
         $modelname = optional_param('modelname', '', PARAM_RAW);
         $customdata = [
@@ -62,10 +69,10 @@ class showerrors_view  implements renderable, templatable {
         $tablelist = new showerrors_table();
         $filters = new errors_filterset();
         if (isset($data->userfullname) && !empty($data->userfullname)) {
-            $filters->add_filter(new string_filter('userfullname',filter::JOINTYPE_DEFAULT, [$data->userfullname]));
+            $filters->add_filter(new string_filter('userfullname', filter::JOINTYPE_DEFAULT, [$data->userfullname]));
         }
         if (isset($data->modelname) && !empty($data->modelname)) {
-            $filters->add_filter(new string_filter('modelname',filter::JOINTYPE_DEFAULT, [$data->modelname]));
+            $filters->add_filter(new string_filter('modelname', filter::JOINTYPE_DEFAULT, [$data->modelname]));
         }
         $tablelist->baseurl = new \moodle_url('/mod/certifygen/showerrors.php');
         $tablelist->set_filterset($filters);

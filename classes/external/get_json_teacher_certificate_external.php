@@ -20,6 +20,7 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos..
+
 /**
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
@@ -27,20 +28,25 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
 namespace mod_certifygen\external;
-
-
 use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
-use certifygenfilter;
+
+defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot.'/mod/certifygen/lib.php');
 require_once($CFG->dirroot.'/mod/certifygen/classes/filters/certifygenfilter.php');
+/**
+ * Get teacher certificate elements
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class get_json_teacher_certificate_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -52,13 +58,14 @@ class get_json_teacher_certificate_external extends external_api {
             [
                 'userid' => new external_value(PARAM_INT, 'user id'),
                 'userfield' => new external_value(PARAM_RAW, 'user field'),
-                'courses' => new external_value(PARAM_RAW, 'courses'), //TOO: arrays de ids.
+                'courses' => new external_value(PARAM_RAW, 'courses'),
                 'lang' => new external_value(PARAM_RAW, 'lang'),
             ]
         );
     }
 
     /**
+     * get_json_teacher_certificate
      * @param int $userid
      * @param string $userfield
      * @param string $courses
@@ -66,12 +73,6 @@ class get_json_teacher_certificate_external extends external_api {
      * @return string[]
      */
     public static function get_json_teacher_certificate(int $userid, string $userfield, string $courses, string $lang): array {
-        /**
-         * Devuelve un json con la información necesaria para el anterior servicio para
-         * confeccionar el certificado. El objetivo de este servicio es independizar el proceso de
-         * obtención de los datos del proceso de generación del documento con la presentación
-         * final.
-         */
         return ['json' => '{"elemento1":"imagen"}'];
     }
     /**

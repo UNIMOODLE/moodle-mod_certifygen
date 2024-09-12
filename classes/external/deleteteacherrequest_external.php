@@ -22,6 +22,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -38,12 +39,18 @@ use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
 use mod_certifygen\event\certificate_revoked;
-use mod_certifygen\interfaces\ICertificateReport;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
-
+/**
+ * Delete teacher request
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class deleteteacherrequest_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -59,6 +66,7 @@ class deleteteacherrequest_external extends external_api {
     }
 
     /**
+     * Delete teacher request
      * @param int $id
      * @return array
      * @throws invalid_parameter_exception
@@ -85,8 +93,7 @@ class deleteteacherrequest_external extends external_api {
                 if (get_config($validationplugin, 'enabled') === '1') {
                     /** @var ICertificateValidation $subplugin */
                     $subplugin = new $validationpluginclass();
-                    if ($subplugin->canRevoke(0)) {
-//                        $code = ICertificateReport::FILE_NAME_STARTSWITH . $id;
+                    if ($subplugin->can_revoke(0)) {
                         $output = $subplugin->revoke($request->get('code'));
                         if ($output['haserror']) {
                             $candelete = false;
@@ -108,7 +115,7 @@ class deleteteacherrequest_external extends external_api {
                         'validation' => $model->get('validation'),
                         'repository' => $model->get('repository'),
                         'report' => $model->get('report'),
-                    ]
+                    ],
                 ];
                 certificate_revoked::create($eventdata)->trigger();
                 $request->delete();
@@ -133,5 +140,4 @@ class deleteteacherrequest_external extends external_api {
             ]
         );
     }
-
 }

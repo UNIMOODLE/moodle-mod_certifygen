@@ -17,14 +17,15 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
+ *
  * @package   certifygenrepository_onedrive
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 namespace certifygenrepository_onedrive;
 
 use coding_exception;
@@ -38,24 +39,35 @@ use dml_missing_record_exception;
 use moodle_exception;
 use moodle_url;
 use repository_onedrive\rest;
-
-class onedriveconnection
-{
+/**
+ *
+ * @package   certifygenrepository_onedrive
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class onedriveconnection {
     /**
      * OAuth 2 Issuer
      * @var issuer
      */
     private $issuer = null;
+    /** @var null $client */
     private $client = null;
+    /** @var null $url */
     private $url = null;
-    private $enabled ;
+    /** @var bool $enabled */
+    private $enabled;
+    /** @var string SCOPES */
     const SCOPES = 'files.readwrite.all';
 
     /**
+     * Construct
      * @throws coding_exception
      * @throws dml_exception
      */
-    public function  __construct() {
+    public function __construct() {
 
         try {
             $this->issuer = api::get_issuer(get_config('onedrive', 'issuerid'));
@@ -70,9 +82,10 @@ class onedriveconnection
     }
 
     /**
+     * is_enabled
      * @return bool
      */
-    public function is_enabled() : bool {
+    public function is_enabled(): bool {
         return $this->enabled;
     }
     /**
@@ -81,8 +94,7 @@ class onedriveconnection
      * @param moodle_url $overrideurl - Use this url instead of the repo callback.
      * @return client
      */
-    protected function get_user_oauth_client($overrideurl = false): ?client
-    {
+    protected function get_user_oauth_client($overrideurl = false): ?client {
         if ($this->client) {
             return $this->client;
         }
@@ -97,6 +109,7 @@ class onedriveconnection
         return $this->client;
     }
     /**
+     * upload_file
      * @param string $onedrivepath
      * @param string $reportname
      * @param string $completefilepath
@@ -107,7 +120,8 @@ class onedriveconnection
      * @throws moodle_exception
      * @throws rest_exception|moodle_exception
      */
-    public function upload_file(string $onedrivepath, string $reportname, string $completefilepath, bool $replacefile = true) : void {
+    public function upload_file(string $onedrivepath, string $reportname, string $completefilepath,
+                                bool $replacefile = true): void {
 
         // Get a system and a user oauth client.
         /** @var \oauth2_client $systemauth */
@@ -124,7 +138,7 @@ class onedriveconnection
 
         $systemservice = new rest($systemauth);
         $parentid = 'root';
-        // Save the file in a specific onedrive folder
+        // Save the file in a specific onedrive folder.
         $parent = get_config('certifygenrepository_onedrive', 'folder');
         $onedrivepath = $parent . '/' . $onedrivepath;
         $allfolders = explode('/', $onedrivepath);
@@ -145,7 +159,7 @@ class onedriveconnection
         $filename = urlencode(clean_param($reportname, PARAM_PATH)) . '.csv';
         $path = $fullpath . $filename;
 
-        // Delete if it is necesary
+        // Delete if it is necesary.
         if ($replacefile) {
             $fileid = $this->get_file_id_by_path($systemservice, $path);
             if ($fileid) {
@@ -164,9 +178,10 @@ class onedriveconnection
     }
 
     /**
+     * get_link
      * @return string
      */
-    public function get_link() : string {
+    public function get_link(): string {
         return $this->url;
     }
 
@@ -184,7 +199,7 @@ class onedriveconnection
         $type = (isset($this->options['embed']) && $this->options['embed'] == true) ? 'embed' : 'view';
         $updateread = [
             'type' => $type,
-            'scope' => 'anonymous'
+            'scope' => 'anonymous',
         ];
         $params = ['fileid' => $fileid];
         $response = $client->call('create_link', $params, json_encode($updateread));
@@ -209,7 +224,7 @@ class onedriveconnection
      * @throws rest_exception
      */
     protected function upload_file_to_onedrive(rest $service, curl $curl, curl $authcurl,
-                                               string $filepath, string $mimetype, string $parentid, string $filename) : void {
+                                               string $filepath, string $mimetype, string $parentid, string $filename): void {
         // Start an upload session.
         // Docs https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/item_createuploadsession link.
         $params = ['parentid' => $parentid, 'filename' => urlencode($filename)];
@@ -285,13 +300,14 @@ class onedriveconnection
         try {
             $response = $client->call('get_file_by_path', ['fullpath' => $fullpath, '$select' => $fields]);
         } catch (rest_exception $re) {
-            error_log(__FUNCTION__ . ' ERROR: '. $re->getMessage());
+            debugging(__FUNCTION__ . ' e: ' . $re->getMessage());
             return false;
         }
         return $response->id;
     }
 
     /**
+     * delete_file_by_path
      * @param rest $client
      * @param $fullpath
      * @return false|void
@@ -300,11 +316,9 @@ class onedriveconnection
     protected function delete_file_by_path(rest $client, $fullpath) {
 
         try {
-//            $fields = "id";
-//            $client->call('delete_file_by_path', ['fullpath' => $fullpath, '$select' => $fields]);
             $client->call('delete_file_by_path', ['fullpath' => $fullpath]);
         } catch (rest_exception $re) {
-            error_log(__FUNCTION__ . ' ERROR: '. $re->getMessage());
+            debugging(__FUNCTION__ . ' e: ' . $re->getMessage());
             return false;
         }
     }
@@ -326,7 +340,7 @@ class onedriveconnection
         try {
             $created = $client->call('create_folder', $params, json_encode($folder));
         } catch (rest_exception $re) {
-            error_log(__FUNCTION__ . ' ERROR: '. $re->getMessage());
+            debugging(__FUNCTION__ . ' e: ' . $re->getMessage());
         }
 
         if (empty($created->id)) {

@@ -25,23 +25,29 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-use mod_certifygen\external\deletemodel_external;
-use mod_certifygen\external\emitcertificate_external;
-use mod_certifygen\external\revokecertificate_external;
+
 use mod_certifygen\external\searchcategory_external;
-use mod_certifygen\persistents\certifygen_model;
-use mod_certifygen\persistents\certifygen_validations;
+
+defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
 require_once($CFG->dirroot.'/lib/externallib.php');
-
+/**
+ * Search category
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class searchcategory_external_test extends advanced_testcase {
 
     /**
@@ -52,6 +58,7 @@ class searchcategory_external_test extends advanced_testcase {
     }
 
     /**
+     * Test
      * @return void
      */
     public function test_searchcategory_nopermission(): void {
@@ -79,6 +86,7 @@ class searchcategory_external_test extends advanced_testcase {
     }
 
     /**
+     * Test
      * @return void
      * @throws coding_exception
      * @throws dml_exception

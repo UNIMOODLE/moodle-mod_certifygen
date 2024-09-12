@@ -25,6 +25,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -35,10 +36,19 @@ use mod_certifygen\external\get_courses_as_student_external;
 use mod_certifygen\external\get_id_instance_certificate_external;
 use mod_certifygen\persistents\certifygen_model;
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
 require_once($CFG->dirroot.'/lib/externallib.php');
-
+/**
+ * Get id instance certificate test
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class get_id_instance_certificate_external_test extends advanced_testcase {
 
     /**
@@ -49,6 +59,7 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
     }
 
     /**
+     * Test
      * @return void
      * @throws coding_exception
      * @throws dml_exception
@@ -65,10 +76,10 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
         $course1 = self::getDataGenerator()->create_course();
         $course2 = self::getDataGenerator()->create_course();
 
-        // Enrol user in course1 as editingteacher
+        // Enrol user in course1 as editingteacher.
         self::getDataGenerator()->enrol_user($user1->id, $course1->id, 'student');
 
-        // Enrol user in course2 as student
+        // Enrol user in course2 as student.
         self::getDataGenerator()->enrol_user($user1->id, $course2->id, 'editingteacher');
         self::setUser($user1);
 
@@ -85,6 +96,7 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
     }
 
     /**
+     * Test
      * @return void
      * @throws coding_exception
      * @throws dml_exception
@@ -106,10 +118,10 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
         $course1 = self::getDataGenerator()->create_course();
         $course2 = self::getDataGenerator()->create_course();
 
-        // Enrol user in course1 as editingteacher
+        // Enrol user in course1 as editingteacher.
         self::getDataGenerator()->enrol_user($user1->id, $course1->id, 'student');
 
-        // Enrol user in course2 as student
+        // Enrol user in course2 as student.
         self::getDataGenerator()->enrol_user($user1->id, $course2->id, 'editingteacher');
 
         // Tests: Course with no mod_certifygen included.
@@ -186,6 +198,7 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
     }
 
     /**
+     * Test
      * @return void
      * @throws coding_exception
      * @throws dml_exception
@@ -220,10 +233,10 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
         $course1 = self::getDataGenerator()->create_course();
         $course2 = self::getDataGenerator()->create_course();
 
-        // Enrol user in course1 as editingteacher
+        // Enrol user in course1 as editingteacher.
         self::getDataGenerator()->enrol_user($user1->id, $course1->id, 'student');
 
-        // Enrol user in course2 as student
+        // Enrol user in course2 as student.
         self::getDataGenerator()->enrol_user($user1->id, $course2->id, 'editingteacher');
 
         // Tests: Course with no mod_certifygen included.
@@ -297,7 +310,7 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
         $this->assertEquals($model->get('langs'), $result['instances'][0]['instance']['modellangs']);
         $this->assertEquals($model->get('validation'), $result['instances'][0]['instance']['modelvalidation']);
 
-        // Tests: userid not corresponds with user dni
+        // Tests: userid not corresponds with user dni.
         $result = get_id_instance_certificate_external::get_id_instance_certificate($user1->id - 1, $dni, '');
         $this->assertIsArray($result);
         $this->assertArrayHasKey('error', $result);
@@ -307,6 +320,7 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
     }
 
     /**
+     * Test
      * @return void
      * @throws coding_exception
      * @throws dml_exception
@@ -348,15 +362,15 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
         $englishname = 'Titulo en ingles';
         $data = [
             'fullname' => '<span lang="es" class="multilang">' . $spanishname
-                . '</span><span lang="en" class="multilang">' . $englishname . '</span>'
+                . '</span><span lang="en" class="multilang">' . $englishname . '</span>',
         ];
         $course1 = self::getDataGenerator()->create_course($data);
         $course2 = self::getDataGenerator()->create_course();
 
-        // Enrol user in course1 as editingteacher
+        // Enrol user in course1 as editingteacher.
         self::getDataGenerator()->enrol_user($user1->id, $course1->id, 'student');
 
-        // Enrol user in course2 as student
+        // Enrol user in course2 as student.
         self::getDataGenerator()->enrol_user($user1->id, $course2->id, 'editingteacher');
 
         // Tests: Course with no mod_certifygen included.
@@ -430,7 +444,7 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
         $this->assertEquals($model->get('langs'), $result['instances'][0]['instance']['modellangs']);
         $this->assertEquals($model->get('validation'), $result['instances'][0]['instance']['modelvalidation']);
 
-        // Tests: userid not corresponds with user dni
+        // Tests: userid not corresponds with user dni.
         $result = get_id_instance_certificate_external::get_id_instance_certificate($user1->id - 1, $dni, '');
         $this->assertIsArray($result);
         $this->assertArrayHasKey('error', $result);

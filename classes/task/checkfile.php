@@ -25,6 +25,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -42,23 +43,31 @@ use mod_certifygen\persistents\certifygen_error;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_repository;
 use mod_certifygen\persistents\certifygen_validations;
-
-class checkfile extends scheduled_task
-{
-
+/**
+ * checkfile
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class checkfile extends scheduled_task {
     /**
-     * @inheritDoc
+     * get_name
+     * @return \lang_string|string
+     * @throws \coding_exception
      */
-    public function get_name()
-    {
+    public function get_name() {
         return get_string('checkfiletask', 'mod_certifygen');
     }
 
     /**
-     * @inheritDoc
+     * Execute
+     * @return void
+     * @throws \coding_exception
+     * @throws \core\invalid_persistent_exception
      */
-    public function execute()
-    {
+    public function execute() {
         global $USER;
         $validations = certifygen_validations::get_records(['status' => certifygen_validations::STATUS_VALIDATION_OK]);
         foreach ($validations as $validation) {
@@ -80,26 +89,26 @@ class checkfile extends scheduled_task
                     $certi = new certifygen($validation->get('certifygenid'));
                     $course = $certi->get('course');
                 }
-                $newfile = $subplugin->getFile($course, $validation->get('id'), $code);
+                $newfile = $subplugin->get_file($course, $validation->get('id'), $code);
                 if (array_key_exists('file', $newfile)) {
                     // Save on repository plugin.
                     $repositoryplugin = $model->get('repository');
                     $repositorypluginclass = $repositoryplugin . '\\' . $repositoryplugin;
                     /** @var ICertificateRepository $subplugin */
                     $subplugin = new $repositorypluginclass();
-                    $response = $subplugin->saveFile($newfile['file']);
+                    $response = $subplugin->save_file($newfile['file']);
                     if (!$response['haserror']) {
                         $validation->set('status', certifygen_validations::STATUS_VALIDATION_OK);
                         $validation->save();
                         $status = certifygen_validations::STATUS_FINISHED;
-                        if ($subplugin->saveFileUrl()) {
-                            $url = $subplugin->getFileUrl($validation);
+                        if ($subplugin->save_file_url()) {
+                            $url = $subplugin->get_file_url($validation);
                             if (!empty($url)) {
                                 $data = [
                                     'validationid' => $validation->get('id'),
                                     'userid' => $validation->get('userid'),
                                     'url' => $url,
-                                    'usermodified' => $validation->get('userid'), // should be cron user.
+                                    'usermodified' => $validation->get('userid'),
                                 ];
                                 // Save url.
                                 $repository = new certifygen_repository(0, (object) $data);
@@ -144,7 +153,7 @@ class checkfile extends scheduled_task
                     certifygen_error::manage_certifygen_error(0, (object)$data);
                 }
             } catch (\moodle_exception $e) {
-                error_log(__FUNCTION__ . ' e: '.var_export($e->getMessage(), true));
+                debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
                 $validation->set('status', certifygen_validations::STATUS_STORAGE_ERROR);
                 $validation->save();
                 $data = [

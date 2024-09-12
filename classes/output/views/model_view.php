@@ -29,10 +29,7 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
 namespace mod_certifygen\output\views;
-
 use dml_exception;
 use invalid_parameter_exception;
 use mod_certifygen\external\getmodellisttable_external;
@@ -40,12 +37,22 @@ use renderable;
 use stdClass;
 use templatable;
 use renderer_base;
-
+/**
+ * Model view
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class model_view implements renderable, templatable {
+    /** @var int $pagesize */
     private int $pagesize;
+    /** @var bool $useinitialsbar */
     private bool $useinitialsbar;
 
     /**
+     * __construct
      * @param int $pagesize
      * @param bool $useinitialsbar
      */
@@ -55,6 +62,7 @@ class model_view implements renderable, templatable {
     }
 
     /**
+     * export_for_template
      * @param renderer_base $output
      * @return stdClass
      * @throws dml_exception

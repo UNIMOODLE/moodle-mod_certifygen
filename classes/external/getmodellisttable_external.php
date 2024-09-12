@@ -20,18 +20,15 @@
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
 /**
  * @package    mod_certifygen
- * * @copyright  2024 Proyecto UNIMOODLE
- * * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
- * * @author     3IPUNT <contacte@tresipunt.com>
- * * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
 namespace mod_certifygen\external;
-
-
 use context_system;
 use dml_exception;
 use external_api;
@@ -43,7 +40,14 @@ use external_single_structure;
 use external_value;
 use required_capability_exception;
 use restricted_context_exception;
-
+/**
+ * Get model list table
+ * @package    mod_certifygen
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class getmodellisttable_external extends external_api {
     /**
      * Describes the external function parameters.
@@ -55,6 +59,7 @@ class getmodellisttable_external extends external_api {
     }
 
     /**
+     * Get model list table
      * @throws dml_exception
      * @throws invalid_parameter_exception
      * @throws restricted_context_exception|required_capability_exception
@@ -70,12 +75,12 @@ class getmodellisttable_external extends external_api {
         $tablelist = new modellist_table();
         $tablelist->baseurl = new moodle_url('/mod/certifygen/modelmanager.php');
         ob_start();
-        // TODO: optional_params 10 and true
+        // Optional_params 10 and true.
         $tablelist->out(10, true);
         $out1 = ob_get_contents();
         ob_end_clean();
         return [
-            'table' => $out1
+            'table' => $out1,
         ];
     }
     /**
