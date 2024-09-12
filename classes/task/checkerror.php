@@ -35,6 +35,9 @@
 namespace mod_certifygen\task;
 
 use core\task\scheduled_task;
+use mod_certifygen\interfaces\ICertificateRepository;
+use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 /**
@@ -73,14 +76,49 @@ class checkerror extends scheduled_task {
             try {
                 // All status except STATUS_STORAGE_ERROR - we can set STATUS_NOT_STARTED.
                 // For STATUS_STORAGE_ERROR, try to storage again.
-                $validation = new certifygen_validations($error->validationid);
-                if ($error->status == certifygen_validations::STATUS_STORAGE_ERROR) {
-                    $model = new certifygen_model($validation->modelid);
+                $validation = new certifygen_validations($error->id);
+                if ((int)$error->status === certifygen_validations::STATUS_STORAGE_ERROR) {
+                    $model = new certifygen_model($validation->get('modelid'));
+                    // Validation plugin.
+                    $validationplugin = $model->get('validation');
+                    $validationpluginclass = $validationplugin . '\\' . $validationplugin;
+                    if (get_config($validationplugin, 'enabled') === '1') {
+                        /** @var ICertificateValidation $subplugin */
+                        $subplugin = new $validationpluginclass();
+                        $courseid = 0;
+                        if ($model->get('type') == certifygen_model::TYPE_ACTIVITY) {
+                            $certifygen = new certifygen($error->certifygenid);
+                            $courseid = $certifygen->get('course');
+                        }
+                        $response = $subplugin->get_file($courseid, $error->id);
+                        if (!array_key_exists('file', $response)) {
+                            $validation->set('status', certifygen_validations::STATUS_NOT_STARTED);
+                            $validation->save();
+                            continue;
+                        }
+                        $repositoryplugin = $model->get('repository');
+                        if (get_config($validationplugin, 'enabled') === '1') {
+                            $repositorypluginclass = $repositoryplugin . '\\' . $repositoryplugin;
+                            /** @var ICertificateRepository $subplugin */
+                            $subplugin = new $repositorypluginclass();
+                            $response = $subplugin->save_file($response['file']);
+                            if (!$response['haserror']) {
+                                $validation->set('status', certifygen_validations::STATUS_FINISHED);
+                                $validation->save();
+                            } else {
+                                $validation->set('status', certifygen_validations::STATUS_NOT_STARTED);
+                                $validation->save();
+                            }
+                        }
+                    } else {
+                        continue;
+                    }
                 } else {
                     $validation->set('status', certifygen_validations::STATUS_NOT_STARTED);
+                    $validation->save();
                 }
             } catch (\moodle_exception $e) {
-
+                debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
                 continue;
             }
         }

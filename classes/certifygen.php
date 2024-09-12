@@ -344,9 +344,9 @@ class certifygen {
         }
 
         $sql = "SELECT us.userid, ci.id as issueid, ci.code, ci.emailed, ci.timecreated as ctimecreated, ci.userid,";
-        $sql .= "ci.templateid, ci.expires, ci.courseid, ci.archived, cv.lang as clang, cv.status as cstatus,";
-        $sql .= "cv.id as validationid, us.*, us.courseid, ci.courseid, ci.archived, cv.lang as clang,";
-        $sql .= "cv.status as cstatus, cv.id as validationid, us.*, us.courseid";
+        $sql .= " ci.templateid, ci.expires, ci.courseid, ci.archived, cv.lang as clang, cv.status as cstatus,";
+        $sql .= " cv.id as validationid, us.*, us.courseid, ci.courseid, ci.archived, cv.lang as clang,";
+        $sql .= " cv.status as cstatus, cv.id as validationid, us.*, us.courseid";
         $sql .= " FROM (SELECT u.id AS userid, u.*, c.id as courseid";
         $sql .= "         FROM {user} u";
         $sql .= "         INNER JOIN {user_enrolments} ue ON ue.userid = u.id";
@@ -559,11 +559,11 @@ class certifygen {
             $wheresql = ' WHERE ' . $where;
         }
         $sql = "SELECT COUNT(*)";
-        $sql .= "FROM  {certifygen_error} ce";
-        $sql .= "INNER JOIN {certifygen_validations} cv ON cv.id = ce.validationid";
-        $sql .= "INNER JOIN {certifygen_model} cm ON cm.id = cv.modelid";
-        $sql .= "INNER JOIN {user} u ON u.id = cv.userid";
-        $sql .= "LEFT JOIN {certifygen} c ON c.id = cv.certifygenid";
+        $sql .= " FROM  {certifygen_error} ce";
+        $sql .= " INNER JOIN {certifygen_validations} cv ON cv.id = ce.validationid";
+        $sql .= " INNER JOIN {certifygen_model} cm ON cm.id = cv.modelid";
+        $sql .= " INNER JOIN {user} u ON u.id = cv.userid";
+        $sql .= " LEFT JOIN {certifygen} c ON c.id = cv.certifygenid";
         $sql .= $wheresql;
 
         return $DB->count_records_sql($sql, $params);
@@ -600,15 +600,15 @@ class certifygen {
         }
 
         $sql = "SELECT ce.id, ce.`status`, ce.code AS errorcode, ce.message AS errormessage, ce.timecreated,";
-        $sql .= "ce.validationid, cv.name AS teacherreportname, c.name AS activityname,cm.validation AS modelvalidation,";
-        $sql .= "cm.report AS modelreport, cm.repository AS modelrepository,cm.type AS modeltype, cm.name as modelname,";
-        $sql .= "u.id as userid, u.picture, u.firstname, u.lastname, u.firstnamephonetic, u.lastnamephonetic,";
-        $sql .= "u.middlename, u.alternatename, u.imagealt, u.email";
-        $sql .= "FROM  {certifygen_error} ce";
-        $sql .= "INNER JOIN {certifygen_validations} cv ON cv.id = ce.validationid";
-        $sql .= "INNER JOIN {certifygen_model} cm ON cm.id = cv.modelid";
-        $sql .= "INNER JOIN {user} u ON u.id = cv.userid";
-        $sql .= "LEFT JOIN {certifygen} c ON c.id = cv.certifygenid";
+        $sql .= " ce.validationid, cv.name AS teacherreportname, c.name AS activityname,cm.validation AS modelvalidation,";
+        $sql .= " cm.report AS modelreport, cm.repository AS modelrepository,cm.type AS modeltype, cm.name as modelname,";
+        $sql .= " u.id as userid, u.picture, u.firstname, u.lastname, u.firstnamephonetic, u.lastnamephonetic,";
+        $sql .= " u.middlename, u.alternatename, u.imagealt, u.email";
+        $sql .= " FROM  {certifygen_error} ce";
+        $sql .= " INNER JOIN {certifygen_validations} cv ON cv.id = ce.validationid";
+        $sql .= " INNER JOIN {certifygen_model} cm ON cm.id = cv.modelid";
+        $sql .= " INNER JOIN {user} u ON u.id = cv.userid";
+        $sql .= " LEFT JOIN {certifygen} c ON c.id = cv.certifygenid ";
         $sql .= $wheresql;
         $sql .= "ORDER BY ce.timecreated DESC";
 

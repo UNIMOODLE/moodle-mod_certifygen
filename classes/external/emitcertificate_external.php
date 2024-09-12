@@ -132,7 +132,6 @@ class emitcertificate_external extends external_api {
             }
         }
         $validation = certifygen_validations::manage_validation($id, (object) $data);
-        error_log(__FUNCTION__ . ' validation: '.var_export($validation, true));
         try {
             // Step 2: Generate issue.
             $users = user_get_users_by_id([$userid]);

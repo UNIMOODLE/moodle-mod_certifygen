@@ -93,49 +93,62 @@ class checkfile extends scheduled_task {
                 if (array_key_exists('file', $newfile)) {
                     // Save on repository plugin.
                     $repositoryplugin = $model->get('repository');
-                    $repositorypluginclass = $repositoryplugin . '\\' . $repositoryplugin;
-                    /** @var ICertificateRepository $subplugin */
-                    $subplugin = new $repositorypluginclass();
-                    $response = $subplugin->save_file($newfile['file']);
-                    if (!$response['haserror']) {
-                        $validation->set('status', certifygen_validations::STATUS_VALIDATION_OK);
-                        $validation->save();
-                        $status = certifygen_validations::STATUS_FINISHED;
-                        if ($subplugin->save_file_url()) {
-                            $url = $subplugin->get_file_url($validation);
-                            if (!empty($url)) {
-                                $data = [
-                                    'validationid' => $validation->get('id'),
-                                    'userid' => $validation->get('userid'),
-                                    'url' => $url,
-                                    'usermodified' => $validation->get('userid'),
-                                ];
-                                // Save url.
-                                $repository = new certifygen_repository(0, (object) $data);
-                                $repository->save();
-                            } else {
-                                $status = certifygen_validations::STATUS_STORAGE_ERROR;
-                                $data = [
-                                    'validationid' => $validation->get('id'),
-                                    'status' => certifygen_validations::STATUS_STORAGE_ERROR,
-                                    'code' => 'empty_repository_url',
-                                    'message' => 'getFileUrl returns empty url',
-                                    'usermodified' => $USER->id,
-                                ];
-                                certifygen_error::manage_certifygen_error(0, (object)$data);
+                    if (get_config($repositoryplugin, 'enabled') === '1') {
+                        $repositorypluginclass = $repositoryplugin . '\\' . $repositoryplugin;
+                        /** @var ICertificateRepository $subplugin */
+                        $subplugin = new $repositorypluginclass();
+                        $response = $subplugin->save_file($newfile['file']);
+                        if (!$response['haserror']) {
+                            $validation->set('status', certifygen_validations::STATUS_VALIDATION_OK);
+                            $validation->save();
+                            $status = certifygen_validations::STATUS_FINISHED;
+                            if ($subplugin->save_file_url()) {
+                                $url = $subplugin->get_file_url($validation);
+                                if (!empty($url)) {
+                                    $data = [
+                                        'validationid' => $validation->get('id'),
+                                        'userid' => $validation->get('userid'),
+                                        'url' => $url,
+                                        'usermodified' => $validation->get('userid'),
+                                    ];
+                                    // Save url.
+                                    $repository = new certifygen_repository(0, (object) $data);
+                                    $repository->save();
+                                } else {
+                                    $status = certifygen_validations::STATUS_STORAGE_ERROR;
+                                    $data = [
+                                        'validationid' => $validation->get('id'),
+                                        'status' => certifygen_validations::STATUS_STORAGE_ERROR,
+                                        'code' => 'empty_repository_url',
+                                        'message' => 'getFileUrl returns empty url',
+                                        'usermodified' => $USER->id,
+                                    ];
+                                    certifygen_error::manage_certifygen_error(0, (object)$data);
+                                }
                             }
+                            // Save status.
+                            $validation->set('status', $status);
+                            $validation->save();
+                        } else {
+                            $validation->set('status', certifygen_validations::STATUS_STORAGE_ERROR);
+                            $validation->save();
+                            $data = [
+                                'validationid' => $validation->get('id'),
+                                'status' => certifygen_validations::STATUS_STORAGE_ERROR,
+                                'code' => 'saveFile_returns_error',
+                                'message' => 'saveFile returns error',
+                                'usermodified' => $USER->id,
+                            ];
+                            certifygen_error::manage_certifygen_error(0, (object)$data);
                         }
-                        // Save status.
-                        $validation->set('status', $status);
-                        $validation->save();
                     } else {
                         $validation->set('status', certifygen_validations::STATUS_STORAGE_ERROR);
                         $validation->save();
                         $data = [
                             'validationid' => $validation->get('id'),
                             'status' => certifygen_validations::STATUS_STORAGE_ERROR,
-                            'code' => 'saveFile_returns_error',
-                            'message' => 'saveFile returns error',
+                            'code' => 'validation_plugin_not_enabled',
+                            'message' => 'Certificate repository plugin is not enabled',
                             'usermodified' => $USER->id,
                         ];
                         certifygen_error::manage_certifygen_error(0, (object)$data);

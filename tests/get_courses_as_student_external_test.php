@@ -84,7 +84,6 @@ class get_courses_as_student_external_test extends advanced_testcase {
 
         // Tests.
         $result = get_courses_as_student_external::get_courses_as_student($user1->id, '', '');
-        error_log(__FUNCTION__ . ' courses: '.var_export($result, true));
         $this->assertIsArray($result);
         $this->assertArrayNotHasKey('courses', $result);
         $this->assertArrayHasKey('error', $result);
