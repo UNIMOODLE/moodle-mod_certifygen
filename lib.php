@@ -494,3 +494,29 @@ function mod_certifygen_are_there_any_certificate_emited(int $modelid): bool {
     $num = certifygen_validations::count_records_select($select, $params);
     return $num > 0;
 }
+
+/**
+ * mod_certifygen_are_there_any_certificate_emited_by_instanceid
+ * @param int $modelid
+ * @return bool
+ * @throws coding_exception
+ * @throws dml_exception
+ */
+function mod_certifygen_are_there_any_certificate_emited_by_instanceid(int $certifygenid): bool {
+    global $DB;
+
+    if (empty($certifygenid)) {
+        return false;
+    }
+
+    [$insql, $inparams] = $DB->get_in_or_equal(certifygen_validations::STATUS_NOT_STARTED, SQL_PARAMS_NAMED,
+        'param', false);
+    [$modelsql, $modelparams] = $DB->get_in_or_equal($certifygenid, SQL_PARAMS_NAMED, 'certifygenid');
+    $params = array_merge($inparams, $modelparams);
+    $inparams['certifygenid'] = $certifygenid;
+    $select = " status  $insql";
+    $select .= " AND certifygenid $modelsql";
+    $num = certifygen_validations::count_records_select($select, $params);
+
+    return $num > 0;
+}

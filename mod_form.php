@@ -38,6 +38,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
+require_once("$CFG->dirroot/mod/certifygen/lib.php");
 
 /**
  *  This class adds extra methods to form wrapper specific to be used for module add / update forms
@@ -59,29 +60,39 @@ class mod_certifygen_mod_form extends moodleform_mod {
         $mform->addRule('name', get_string('required'), 'required');
 
         $this->standard_intro_elements(get_string('introduction', 'mod_certifygen'));
-        $canmanagemodels = has_capability('mod/certifygen:manage', context_system::instance());
-        $activitymodels = mod_certifygen_get_activity_models($this->get_course()->id);
-        $templateoptions = ['' => get_string('chooseamodel', 'mod_certifygen')] + $activitymodels;
-        $manageurl = new moodle_url('/mod/certifygen/modelmanager.php');
-        $elements = [$mform->createElement('select', 'modelid', get_string('model', 'mod_certifygen'), $templateoptions)];
-        $mform->setType('modelid', PARAM_INT);
-        // Adding "Manage templates" link if user has capabilities to manage templates.
-        if ( $canmanagemodels ) {
-            $elements[] = $mform->createElement('static', 'managemodels', '',
-                $OUTPUT->action_link($manageurl, get_string('modelsmanager', 'mod_certifygen')));
-        }
-        $mform->addGroup($elements, 'models_group',
-            get_string('model', 'mod_certifygen'),
-            html_writer::div('', 'w-100'), false);
-        $mform->addRule('models_group', get_string('required'), 'required');
-        $rules = [];
-        $rules['modelid'][] = [null, 'required', null, 'client'];
-        $mform->addGroupRule('models_group', $rules);
 
-        if (!is_null($this->get_instance())) {
+        if (!is_null($this->get_instance())
+            && mod_certifygen_are_there_any_certificate_emited_by_instanceid($this->get_instance())) {
             $certifygen = new certifygen($this->get_instance());
-            $modelid = $certifygen->get('modelid');
-            $mform->setDefault('modelid', $modelid);
+            $model = new certifygen_model($certifygen->get('modelid'));
+            $htmlstring = get_string('model', 'mod_certifygen');
+            $htmlstring .= ': ' . $model->get('name');
+            $mform->addElement('html', '<div class="row p-4">' . $htmlstring . '</div>');
+        } else {
+            $canmanagemodels = has_capability('mod/certifygen:manage', context_system::instance());
+            $activitymodels = mod_certifygen_get_activity_models($this->get_course()->id);
+            $templateoptions = ['' => get_string('chooseamodel', 'mod_certifygen')] + $activitymodels;
+            $manageurl = new moodle_url('/mod/certifygen/modelmanager.php');
+            $elements = [$mform->createElement('select', 'modelid', get_string('model', 'mod_certifygen'), $templateoptions)];
+            $mform->setType('modelid', PARAM_INT);
+            // Adding "Manage templates" link if user has capabilities to manage templates.
+            if ( $canmanagemodels ) {
+                $elements[] = $mform->createElement('static', 'managemodels', '',
+                    $OUTPUT->action_link($manageurl, get_string('modelsmanager', 'mod_certifygen')));
+            }
+            $mform->addGroup($elements, 'models_group',
+                get_string('model', 'mod_certifygen'),
+                html_writer::div('', 'w-100'), false);
+            $mform->addRule('models_group', get_string('required'), 'required');
+            $rules = [];
+            $rules['modelid'][] = [null, 'required', null, 'client'];
+            $mform->addGroupRule('models_group', $rules);
+
+            if (!is_null($this->get_instance())) {
+                $certifygen = new certifygen($this->get_instance());
+                $modelid = $certifygen->get('modelid');
+                $mform->setDefault('modelid', $modelid);
+            }
         }
 
         // Course module elements.
