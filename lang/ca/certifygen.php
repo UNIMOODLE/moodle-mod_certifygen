@@ -193,3 +193,5 @@ $string['idrequest'] = 'Id de sol·licitud';
 $string['validationplugin_not_enabled'] = 'Connector de validació no habilitat';
 $string['removefilters'] = 'Eliminar filtres';
 $string['nopermissiontorevokecerts'] = 'No tens permisos per revocar un certificat';
+$string['certifygen:canemitotherscertificates'] = 'Podeu emetre certificats d\'altres usuaris';
+$string['certifygen:reemitcertificates'] = 'Podeu reemetre certificats';

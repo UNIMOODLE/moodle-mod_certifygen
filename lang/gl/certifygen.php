@@ -222,3 +222,5 @@ $string['idrequest'] = 'Id de solicitude';
 $string['validationplugin_not_enabled'] = 'O complemento de validación non está activado';
 $string['removefilters'] = 'Eliminar filtros';
 $string['nopermissiontorevokecerts'] = 'Non tes permisos para revogar un certificado';
+$string['certifygen:canemitotherscertificates'] = 'Pode emitir certificados a outros usuarios';
+$string['certifygen:reemitcertificates'] = 'Podes volver a emitir certificados';

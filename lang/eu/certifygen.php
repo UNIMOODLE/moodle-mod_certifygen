@@ -193,3 +193,5 @@ $string['idrequest'] = 'Eskaera id';
 $string['validationplugin_not_enabled'] = 'Baliozkotzeko plugina ez dago gaituta';
 $string['removefilters'] = 'Kendu iragazkiak';
 $string['nopermissiontorevokecerts'] = 'Ez duzu ziurtagiri bat baliogabetzeko baimenik';
+$string['certifygen:canemitotherscertificates'] = 'Ziurtagiriak eman ditzake beste erabiltzaile batzuei';
+$string['certifygen:reemitcertificates'] = 'Ziurtagiriak berriro eman ditzakezu';

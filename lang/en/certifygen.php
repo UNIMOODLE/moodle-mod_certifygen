@@ -188,3 +188,5 @@ $string['idrequest'] = 'Request id';
 $string['validationplugin_not_enabled'] = 'Validation plugin not enabled';
 $string['removefilters'] = 'Remove filters';
 $string['nopermissiontorevokecerts'] = 'You do not have permissions to revoke a certificate';
+$string['certifygen:canemitotherscertificates'] = 'You can issue certificates to other users';
+$string['certifygen:reemitcertificates'] = 'You can reissue certificates';

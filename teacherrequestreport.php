@@ -34,13 +34,11 @@
 use mod_certifygen\output\views\profile_my_certificates_view;
 use mod_certifygen\persistents\certifygen_context;
 
-defined('MOODLE_INTERNAL') || die();
-
 require_once('../../config.php');
-global $CFG;
+global $CFG, $PAGE, $OUTPUT, $USER;
 require_once($CFG->dirroot. '/lib/formslib.php');
 require_once('lib.php');
-global $PAGE, $OUTPUT, $USER;
+
 require_login();
 $context = context_system::instance();
 require_capability('mod/certifygen:viewcontextcertificates', $context);

@@ -95,7 +95,6 @@ $capabilities = [
             'student' => CAP_PROHIBIT,
             'teacher' => CAP_PROHIBIT,
             'editingteacher' => CAP_PROHIBIT,
-            'user' => CAP_PROHIBIT,
             'manager' => CAP_ALLOW,
         ],
     ],
