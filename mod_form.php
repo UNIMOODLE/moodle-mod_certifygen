@@ -61,7 +61,7 @@ class mod_certifygen_mod_form extends moodleform_mod {
 
         $this->standard_intro_elements(get_string('introduction', 'mod_certifygen'));
 
-        if (!is_null($this->get_instance())
+        if (!is_null($this->get_instance()) && !empty($this->get_instance())
             && mod_certifygen_are_there_any_certificate_emited_by_instanceid($this->get_instance())) {
             $certifygen = new certifygen($this->get_instance());
             $model = new certifygen_model($certifygen->get('modelid'));
