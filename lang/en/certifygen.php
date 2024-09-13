@@ -123,7 +123,6 @@ $string['status_8'] = 'Finished';
 $string['emitcertificate_title'] = 'Emit Certificate';
 $string['emitcertificate_body'] = 'Are you sure, you want to emit the certificate in {$a}?';
 $string['emitcertificate_error'] = 'There was an error trying to emit the certificate';
-$string['confirm'] = 'Confirm';
 $string['certificatenotfound'] = 'Certificate not found';
 $string['filter'] = 'Filter';
 $string['revokecertificate_title'] = 'Revoke Certificate';

@@ -33,40 +33,6 @@
 // This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
-
-// Este arquivo forma parte de Moodle - http://moodle.org/
-//
-// Moodle é un software libre: podes redistribuílo e/ou modificalo
-// baixo os termos da Licenza Pública Xeral de GNU tal como foi publicada pola
-// Free Software Foundation, ben a versión 3 da Licenza, ou
-// (a túa elección) calquera versión posterior.
-//
-// Moodle distribúese coa esperanza de que sexa útil,
-// pero SEN NINGUNHA GARANTÍA; nin sequera a garantía implícita de
-// COMERCIALIZACIÓN ou ADECUACIÓN A UN PROPÓSITO PARTICULAR. Vexa a
-// Licenza Pública Xeral de GNU para máis detalles.
-//
-// Deberías recibir unha copia da Licenza Pública Xeral de GNU
-// xunto con Moodle. Se non, vexa <http://www.gnu.org/licenses/>.
-// Proxecto implementado polo "Plan de Recuperación, Transformación e Resiliencia.
-// Financiado pola Unión Europea - Next GenerationEU".
-//
-// Producido polo Grupo Universitario UNIMOODLE: Universidades de
-// Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
-// Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
-// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria e Burgos.
-
-/**
- * Cadeas en galego
- * @package    mod_certifygen
- * @copyright  2024 Proxecto UNIMOODLE
- * @author     Grupo UNIMOODLE (Coordinador) <direccion.area.estrategia.digital@uva.es>
- * @author     3IPUNT <contacte@tresipunt.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 ou posterior
- */
-// Esta liña protexe o arquivo de ser accedido directamente por un URL.
-defined('MOODLE_INTERNAL') || die();
-
 $string['pluginname'] = 'Certificado Certifygen';
 $string['pluginadministration'] = 'Módulo de administración do Certificado de Unimoodle Certifygen';
 $string['pluginnamesettings'] = 'Configuración do Certificado Unimoodle Certifygen';
@@ -120,7 +86,7 @@ $string['mycertificates'] = 'Os meus Certificados de Unimoodle Certifygen';
 $string['deletemodeltitle'] = 'Borrando Modelo';
 $string['deletemodelbody'] = 'Estás seguro de querer borrar o modelo chamado "{$a}"?';
 $string['cannotdeletemodelcertemited'] = 'Non se pode borrar o modelo. Hai certificados asociados emitidos.';
-$string['confirm'] = 'Confirmar';
+$string['confirm'] = 'Aceptar';
 $string['errortitle'] = 'Erro';
 $string['model'] = 'Modelo';
 $string['contexts'] = 'Contextos';
@@ -157,7 +123,6 @@ $string['status_8'] = 'Finalizado';
 $string['emitcertificate_title'] = 'Emitir Certificado';
 $string['emitcertificate_body'] = 'Estás seguro de querer emitir o certificado en {$a}?';
 $string['emitcertificate_error'] = 'Houbo un erro intentando emitir o certificado';
-$string['confirm'] = 'Aceptar';
 $string['certificatenotfound'] = 'Non se atopa o certificado';
 $string['filter'] = 'Filtrar';
 $string['revokecertificate_title'] = 'Eliminar Certificado';
