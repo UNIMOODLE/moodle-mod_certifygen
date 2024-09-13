@@ -577,7 +577,7 @@ class certifygen {
      * @throws dml_exception
      */
     public static function get_errors(string $userfullname = '', string $modelname = '',
-                                      int $limitfrom, int $limitnum): array {
+                                      int $limitfrom = 0, int $limitnum = 0): array {
         global $DB;
 
         $params = [];
