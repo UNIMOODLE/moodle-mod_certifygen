@@ -61,7 +61,7 @@ $event = course_module_viewed::create([
 ]);
 $event->add_record_snapshot('course', $course);
 $event->add_record_snapshot('course_modules', $cm);
-$event->add_record_snapshot('certifygen', $cm->instance);
+$event->add_record_snapshot('certifygen', $certifygen);
 $event->trigger();
 
 $output = $PAGE->get_renderer('mod_certifygen');

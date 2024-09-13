@@ -31,7 +31,7 @@
 // This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2024070803;
+$plugin->version   = 2024091300;
 $plugin->requires  = 2022112802;
 $plugin->component = 'certifygenreport_basic';
 $plugin->dependencies = [
