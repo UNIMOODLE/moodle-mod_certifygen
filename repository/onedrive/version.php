@@ -31,7 +31,7 @@
 // This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2024082001;
+$plugin->version   = 2024091300;
 $plugin->requires  = 2022112802;
 $plugin->component = 'certifygenrepository_onedrive';
 $plugin->dependencies = [
