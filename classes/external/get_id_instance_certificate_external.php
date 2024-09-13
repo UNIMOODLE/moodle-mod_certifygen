@@ -30,6 +30,7 @@
  */
 
 namespace mod_certifygen\external;
+use cm_info;
 use dml_exception;
 use external_api;
 use external_function_parameters;
@@ -78,7 +79,6 @@ class get_id_instance_certificate_external extends external_api {
      */
     public static function get_id_instance_certificate(int $userid, string $userfield, string $lang): array {
 
-        // TODO: revisar el acceso a la actividad por cm_info->visible.
         $params = self::validate_parameters(
             self::get_id_instance_certificate_parameters(), ['userid' => $userid, 'userfield' => $userfield,
                 'lang' => $lang]
@@ -155,9 +155,12 @@ class get_id_instance_certificate_external extends external_api {
                             continue;
                         }
                         $data = get_course_and_cm_from_instance($activity->get('id'), 'certifygen', $activity->get('course'));
-                        /** @var \cm_info $cm */
+                        /** @var cm_info $cm */
                         $cm = $data[1];
                         if (!$cm->visible) {
+                            continue;
+                        }
+                        if (!$cm->available) {
                             continue;
                         }
                         $model = certifygen_model::get_record(['id' => $activity->get('modelid')]);
