@@ -154,6 +154,12 @@ class get_id_instance_certificate_external extends external_api {
                         if ($activity->get('course') != $enrolment->ctxinstance) {
                             continue;
                         }
+                        $data = get_course_and_cm_from_instance($activity->get('id'), 'certifygen', $activity->get('course'));
+                        /** @var \cm_info $cm */
+                        $cm = $data[1];
+                        if (!$cm->visible) {
+                            continue;
+                        }
                         $model = certifygen_model::get_record(['id' => $activity->get('modelid')]);
                         $actvname = $filter->filter($activity->get('name'));
                         $actvname = strip_tags($actvname);
@@ -161,6 +167,7 @@ class get_id_instance_certificate_external extends external_api {
                             'id' => $activity->get('id'),
                             'name' => $actvname,
                             'modelname' => $model->get('name'),
+                            'modelidnumber' => $model->get('idnumber'),
                             'modelmode' => $model->get('mode'),
                             'modeltimeondemmand' => $model->get('timeondemmand'),
                             'modeltype' => $model->get('type'),
@@ -210,6 +217,8 @@ class get_id_instance_certificate_external extends external_api {
                                     VALUE_OPTIONAL),
                                 'modelname' => new external_value(PARAM_RAW, 'Model name',
                                     VALUE_OPTIONAL),
+                                'modelidnumber' => new external_value(PARAM_RAW, 'Model name',
+                                    VALUE_OPTIONAL),
                                 'modelmode' => new external_value(PARAM_INT, 'Model mode',
                                     VALUE_OPTIONAL),
                                 'modeltimeondemmand' => new external_value(PARAM_INT, 'Model timeondemmand',
@@ -221,6 +230,8 @@ class get_id_instance_certificate_external extends external_api {
                                 'modellangs' => new external_value(PARAM_RAW, 'Model langs',
                                     VALUE_OPTIONAL),
                                 'modelvalidation' => new external_value(PARAM_RAW, 'Model validation',
+                                    VALUE_OPTIONAL),
+                                'modelrepository' => new external_value(PARAM_RAW, 'Model repository',
                                     VALUE_OPTIONAL),
                             ], 'Module Instance information', VALUE_OPTIONAL),
                         ], 'Module Instances list', VALUE_OPTIONAL)
