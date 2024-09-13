@@ -68,6 +68,8 @@ class mod_certifygen_mod_form extends moodleform_mod {
             $htmlstring = get_string('model', 'mod_certifygen');
             $htmlstring .= ': ' . $model->get('name');
             $mform->addElement('html', '<div class="row p-4">' . $htmlstring . '</div>');
+            $mform->addElement('hidden', 'modelid', $certifygen->get('modelid'));
+            $mform->setType('modelid', PARAM_INT);
         } else {
             $canmanagemodels = has_capability('mod/certifygen:manage', context_system::instance());
             $activitymodels = mod_certifygen_get_activity_models($this->get_course()->id);
