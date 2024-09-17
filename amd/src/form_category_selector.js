@@ -23,6 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+import jQuery from 'jquery';
 import Ajax from 'core/ajax';
 import {render as renderTemplate} from 'core/templates';
 import {get_string as getString} from 'core/str';
@@ -43,7 +44,6 @@ export async function transport(selector, query, callback, failure) {
         } catch (e) {
             failure(e);
         }
-
     } else {
         const request = {
             methodname: 'mod_certifygen_searchcategory',
@@ -58,8 +58,8 @@ export async function transport(selector, query, callback, failure) {
             if (response.overflow) {
                 const msg = await getString('toomanycategoriestoshow', 'mod_certifygen', '>' + response.maxusersperpage);
                 callback(msg);
-
             } else {
+                jQuery('.modal-dialog-scrollable .modal-body').css('overflow-y', 'unset');
                 let labels = [];
                 response.list.forEach(category => {
                     labels.push(renderTemplate('mod_certifygen/form_category_selector_suggestion', category));
@@ -72,7 +72,6 @@ export async function transport(selector, query, callback, failure) {
 
                 callback(response.list);
             }
-
         } catch (e) {
             failure(e);
         }
@@ -91,7 +90,6 @@ export function processResults(selector, results) {
 
     if (!Array.isArray(results)) {
         return results;
-
     } else {
         return results.map(result => ({value: result.id, label: result.label}));
     }

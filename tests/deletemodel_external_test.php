@@ -66,11 +66,14 @@ class deletemodel_external_test extends advanced_testcase {
     public function test_deletemodel(): void {
         global $DB;
 
-        $user = $this->getDataGenerator()->create_user(
-            ['username' => 'test_manager_1', 'firstname' => 'test',
-                'lastname' => 'manager 1', 'email' => 'test_manager_1@fake.es']);
+        $user = $this->getDataGenerator()->create_user([
+                'username' => 'test_manager_1',
+                 'firstname' => 'test',
+                'lastname' => 'manager 1',
+                'email' => 'test_manager_1@fake.es',
+                ]);
 
-        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        $managerrole = $DB->get_record('role', ['shortname' => 'manager']);
         $this->getDataGenerator()->role_assign($managerrole->id, $user->id);
 
         $this->setUser($user);

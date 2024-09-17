@@ -36,7 +36,6 @@ let TEMPLATES = {
 };
 const ModelManagement = () => {
     jQuery(ACTION.DELETE_MODEL).on('click', DeleteModel);
-    // jQuery(ACTION.CREATE_MODEL).on('click', CreateModel);
     jQuery(ACTION.EDIT_MODEL).on('click', EditModel);
     jQuery(ACTION.ASSIGN_CONTEXTS).on('click', AssignContext.bind(this));
 };
@@ -49,22 +48,25 @@ const AssignContext = (e) => {
     let modelid = event.currentTarget.getAttribute('data-modelid');
     let name = event.currentTarget.getAttribute('data-name');
     const modalCForm = new ModalForm({
-        // Name of the class where form is defined (must extend \core_form\dynamic_form):
+        // Name of the class where form is defined (must extend \core_form\dynamic_form).
         formClass: "mod_certifygen\\forms\\associatecontextform",
-        // Add as many arguments as you need, they will be passed to the form:
+        // Add as many arguments as you need, they will be passed to the form.
         args: {id: id, modelid: modelid},
-        // Pass any configuration settings to the modal dialogue, for example, the title:
+        // Pass any configuration settings to the modal dialogue, for example, the title.
         modalConfig: {title: getString('assigncontextto', 'mod_certifygen', name)},
-        // DOM element that should get the focus after the modal dialogue is closed:
+        // DOM element that should get the focus after the modal dialogue is closed.
         returnFocus: element,
     });
-    // Listen to events if you want to execute something on form submit. Event detail will contain everything the process()
-    // function returned:
+    // Listen to events if you want to execute something on form submit.
+    // Event detail will contain everything the process().
     modalCForm.addEventListener(modalCForm.events.FORM_SUBMITTED, (result) => {
         mainElement.setAttribute('data-id', result.detail);
     });
     // Show the form.
-    modalCForm.show();
+    modalCForm.show().then(() => {
+        jQuery('.modal').addClass('assignContextModal');
+    });
+
 };
 const EditModel = (e) => {
     e.preventDefault();
@@ -74,17 +76,16 @@ const EditModel = (e) => {
         id = event.currentTarget.getAttribute('data-id');
     }
     const modalForm = new ModalForm({
-        // Name of the class where form is defined (must extend \core_form\dynamic_form):
+        // Name of the class where form is defined (must extend \core_form\dynamic_form).
         formClass: "mod_certifygen\\forms\\modelform",
-        // Add as many arguments as you need, they will be passed to the form:
+        // Add as many arguments as you need, they will be passed to the form.
         args: {id},
-        // Pass any configuration settings to the modal dialogue, for example, the title:
+        // Pass any configuration settings to the modal dialogue, for example, the title.
         modalConfig: {title: getString('create_model', 'mod_certifygen')},
-        // DOM element that should get the focus after the modal dialogue is closed:
+        // DOM element that should get the focus after the modal dialogue is closed.
         returnFocus: element,
     });
-    // Listen to events if you want to execute something on form submit. Event detail will contain everything the process()
-    // function returned:
+    // Listen to events if you want to execute something on form submit. Event detail will contain everything the process().
     modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, () => {
         // Recargar la tabla.
         reloadModelListTable();
@@ -94,14 +95,14 @@ const EditModel = (e) => {
     modalForm.show();
 };
 const reloadModelListTable = () => {
-    Templates.render(TEMPLATES.LOADING, {visible: true}).done(function(html) {
+    Templates.render(TEMPLATES.LOADING, {visible: true}).done(function (html) {
         let identifier = jQuery(REGION.LIST_TABLE);
         identifier.append(html);
         let request = {
             methodname: SERVICES.GET_LIST_TABLE,
             args: {}
         };
-        Ajax.call([request])[0].done(function(data) {
+        Ajax.call([request])[0].done(function (data) {
             Templates.render(TEMPLATES.MODELLISTTABLE, data).then((html, js) => {
                 identifier.html(html);
                 Templates.runTemplateJS(js);
@@ -134,7 +135,7 @@ const DeleteModel = (event) => {
                         id: modelId,
                     }
                 };
-                Ajax.call([request])[0].done(function(response) {
+                Ajax.call([request])[0].done(function (response) {
                     if (response.result == 1) {
                         // Remove tr.
                         jQuery(event.currentTarget).parent().parent().remove();
@@ -155,7 +156,7 @@ const DeleteModel = (event) => {
             });
             return modal;
         });
-    }).done(function(modal) {
+    }).done(function (modal) {
         modal.show();
     }).fail(Notification.exception);
 };
