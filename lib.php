@@ -38,6 +38,7 @@ use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_context;
 use mod_certifygen\persistents\certifygen_model;
+use mod_certifygen\persistents\certifygen_repository;
 use mod_certifygen\persistents\certifygen_validations;
 use tool_certificate\permission;
 
@@ -121,9 +122,13 @@ function certifygen_delete_instance($id): bool {
     // Delete a certifygen.
     $certifygen = new certifygen($id);
 
-    // Delete a certifygen_validations.
+    // Delete a certifygen_validations and certifygen_repository.
     $validations = certifygen_validations::get_records(['certifygenid' => $id]);
     foreach ($validations as $validation) {
+        $repostoryrecords = certifygen_repository::get_records(['validationid' => $validation->get('id')]);
+        foreach ($repostoryrecords as $repostoryrecord) {
+            $repostoryrecord->delete();
+        }
         $validation->delete();
     }
     return $certifygen->delete();
