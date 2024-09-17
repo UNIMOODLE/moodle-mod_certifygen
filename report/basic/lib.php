@@ -86,5 +86,5 @@ function certifygenreport_basic_pluginfile(
     }
 
     // We can now send the file back to the browser - in this case with a cache lifetime of 1 day and no filtering.
-    send_stored_file($file,  null, 0, $forcedownload, $options);
+    send_stored_file($file, null, 0, $forcedownload, $options);
 }

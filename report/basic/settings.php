@@ -34,36 +34,51 @@
 defined('MOODLE_INTERNAL') || die();
 
 // Enlace principal de settings.
-$ADMIN->add('modsettingcertifygencat',
-    new admin_category('certifygenreport_basic_cat',
-        get_string('pluginname', 'certifygenreport_basic')));
+$ADMIN->add(
+    'modsettingcertifygencat',
+    new admin_category(
+        'certifygenreport_basic_cat',
+        get_string('pluginname', 'certifygenreport_basic')
+    )
+);
 
 // Certifygenreport_basic settings.
 $settings = new admin_settingpage(
     'modsettingcertifygenreportbasic',
     get_string('pluginnamesettings', 'certifygenreport_basic'),
-    'moodle/site:config');
+    'moodle/site:config'
+);
 if ($ADMIN->fulltree) {
-
     // Habilitar.
-    $settings->add(new admin_setting_configcheckbox('certifygenreport_basic/enabled',
+    $settings->add(new admin_setting_configcheckbox(
+        'certifygenreport_basic/enabled',
         new lang_string('enable', 'certifygenreport_basic'),
-        new lang_string('enable_help', 'certifygenreport_basic'), 0));
+        new lang_string('enable_help', 'certifygenreport_basic'),
+        0
+    ));
 
     // Logo.
     $name = new lang_string('logo', 'certifygenreport_basic');
     $desc = new lang_string('logo_desc', 'certifygenreport_basic');
-    $setting = new admin_setting_configstoredfile('certifygenreport_basic/logo',
+    $setting = new admin_setting_configstoredfile(
+        'certifygenreport_basic/logo',
         $name,
-        $desc, 'logo', 0, ['accepted_types' => ['.png']]);
+        $desc,
+        'logo',
+        0,
+        ['accepted_types' => ['.png']]
+    );
     $settings->add($setting);
 
     // Footer.
     $name = new lang_string('footer', 'certifygenreport_basic');
     $desc = new lang_string('footer_desc', 'certifygenreport_basic');
-    $setting = new admin_setting_confightmleditor('certifygenreport_basic/footer',
+    $setting = new admin_setting_confightmleditor(
+        'certifygenreport_basic/footer',
         $name,
-        $desc, '');
+        $desc,
+        ''
+    );
     $settings->add($setting);
     $settings->add($setting);
 }

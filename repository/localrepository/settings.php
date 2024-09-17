@@ -34,18 +34,25 @@
 defined('MOODLE_INTERNAL') || die();
 
 // Main link.
-$ADMIN->add('modsettingcertifygencat',
-    new admin_category('certifygenrepository_localrepository_cat',
-        get_string('pluginname', 'certifygenrepository_localrepository')));
+$ADMIN->add(
+    'modsettingcertifygencat',
+    new admin_category(
+        'certifygenrepository_localrepository_cat',
+        get_string('pluginname', 'certifygenrepository_localrepository')
+    )
+);
 
 $settings = new admin_settingpage(
     'modsettingcertifygenrepositorylocalrepository',
     get_string('pluginnamesettings', 'certifygenrepository_localrepository'),
-    'moodle/site:config');
+    'moodle/site:config'
+);
 if ($ADMIN->fulltree) {
-
     // Enable.
-    $settings->add(new admin_setting_configcheckbox('certifygenrepository_localrepository/enabled',
+    $settings->add(new admin_setting_configcheckbox(
+        'certifygenrepository_localrepository/enabled',
         new lang_string('enable', 'certifygenrepository_localrepository'),
-        new lang_string('enable_help', 'certifygenrepository_localrepository'), 0));
+        new lang_string('enable_help', 'certifygenrepository_localrepository'),
+        0
+    ));
 }

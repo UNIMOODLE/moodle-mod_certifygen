@@ -35,10 +35,13 @@
 
 namespace mod_certifygen\task;
 
+use coding_exception;
 use core\task\scheduled_task;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
+use moodle_exception;
+
 /**
  * checkstatus
  * @package    mod_certifygen
@@ -50,10 +53,10 @@ use mod_certifygen\persistents\certifygen_validations;
 class checkstatus extends scheduled_task {
     /**
      * Name
-     * @return \lang_string|string
-     * @throws \coding_exception
+     * @return string
+     * @throws coding_exception
      */
-    public function get_name() {
+    public function get_name(): string {
         return get_string('checkstatustask', 'mod_certifygen');
     }
 
@@ -85,7 +88,7 @@ class checkstatus extends scheduled_task {
                     $validation->set('status', $newstatus);
                     $validation->save();
                 }
-            } catch (\moodle_exception $e) {
+            } catch (moodle_exception $e) {
                 debugging(__FUNCTION__ . 'e: ' . $e->getMessage());
             }
         }

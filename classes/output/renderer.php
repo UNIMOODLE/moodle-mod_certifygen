@@ -34,11 +34,8 @@ use coding_exception;
 use dml_exception;
 use mod_certifygen\output\views\activity_view;
 use mod_certifygen\output\views\model_view;
-use mod_certifygen\output\views\mycertificates_view;
 use mod_certifygen\output\views\profile_my_certificates_view;
 use mod_certifygen\output\views\showerrors_view;
-use mod_certifygen\output\views\student_view;
-use mod_certifygen\output\views\teacher_view;
 use mod_certifygen\output\views\associatemodelcontexts_view;
 use moodle_exception;
 use plugin_renderer_base;
@@ -51,10 +48,9 @@ use plugin_renderer_base;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class renderer extends plugin_renderer_base {
-
     /**
      * Show errors view renderer
-     * @param activity_view $view
+     * @param showerrors_view $view
      * @return string
      * @throws coding_exception
      * @throws dml_exception

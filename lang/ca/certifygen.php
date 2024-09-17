@@ -189,4 +189,3 @@ $string['removefilters'] = 'Eliminar filtres';
 $string['nopermissiontorevokecerts'] = 'No tens permisos per revocar un certificat';
 $string['certifygen:canemitotherscertificates'] = 'Pot emetre certificats d’altres usuaris';
 $string['certifygen:reemitcertificates'] = 'Pot tornar a emetre certificats';
-

@@ -47,7 +47,7 @@ use stored_file;
  */
 class certifygenrepository_csv implements ICertificateRepository {
     /** @var string $url */
-    private $url = '';
+    private string $url = '';
     /**
      * getFileUrl
      * @param certifygen_validations $validation
@@ -86,12 +86,11 @@ class certifygenrepository_csv implements ICertificateRepository {
      * @return array
      */
     public function save_file(stored_file $file): array {
-        $result = [
-            'result' => true,
-            'haserror' => false,
-            'message' => 'ok',
+        return [
+                'result' => true,
+                'haserror' => false,
+                'message' => 'ok',
         ];
-        return $result;
     }
 
     /**

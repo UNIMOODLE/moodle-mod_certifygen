@@ -55,8 +55,10 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading($strcertifygens, 2);
 
 if (! $certifygens = get_all_instances_in_course("certifygen", $course)) {
-    notice(get_string('thereareno', 'moodle', $strcertifygens),
-        "../../course/view.php?id=$course->id");
+    notice(
+        get_string('thereareno', 'moodle', $strcertifygens),
+        "../../course/view.php?id=$course->id"
+    );
     die;
 }
 $strname  = get_string("name");
@@ -70,10 +72,12 @@ foreach ($certifygens as $instanceid => $certifygen) {
     $context = context_module::instance($cm->id);
     $class = $certifygen->visible ? null : ['class' => 'dimmed']; // Hidden modules are dimmed.
     $link = html_writer::link(new moodle_url('view.php', ['id' => $cm->id]), format_string($certifygen->name), $class);
-    $courselink = html_writer::link(new moodle_url('/course/view.php', ['id' => $course->id]),
-        format_string($course->fullname), $class);
+    $courselink = html_writer::link(
+        new moodle_url('/course/view.php', ['id' => $course->id]),
+        format_string($course->fullname),
+        $class
+    );
     $table->data[] = [$link, $courselink];
 }
 echo html_writer::table($table);
 echo $OUTPUT->footer();
-

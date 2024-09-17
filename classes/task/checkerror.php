@@ -34,12 +34,16 @@
 
 namespace mod_certifygen\task;
 
+use coding_exception;
 use core\task\scheduled_task;
+use dml_exception;
 use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
+use moodle_exception;
+
 /**
  * checkerror
  * @package    mod_certifygen
@@ -49,25 +53,24 @@ use mod_certifygen\persistents\certifygen_validations;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class checkerror extends scheduled_task {
-
     /**
      * get_name
-     * @return \lang_string|string
-     * @throws \coding_exception
+     * @return string
+     * @throws coding_exception
      */
-    public function get_name() {
+    public function get_name(): string {
         return get_string('checkerrortask', 'mod_certifygen');
     }
 
     /**
      * execute
      * @return void
-     * @throws \coding_exception
-     * @throws \dml_exception
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function execute() {
         global $DB;
-        list($insql, $inparams) = $DB->get_in_or_equal(certifygen_validations::get_status_error(), SQL_PARAMS_NAMED);
+        [$insql, $inparams] = $DB->get_in_or_equal(certifygen_validations::get_status_error(), SQL_PARAMS_NAMED);
         $errors = $DB->get_records_select('certifygen_validations', ' status ' . $insql, $inparams);
         if (count($errors) == 0) {
             return;
@@ -117,7 +120,7 @@ class checkerror extends scheduled_task {
                     $validation->set('status', certifygen_validations::STATUS_NOT_STARTED);
                     $validation->save();
                 }
-            } catch (\moodle_exception $e) {
+            } catch (moodle_exception $e) {
                 debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
                 continue;
             }

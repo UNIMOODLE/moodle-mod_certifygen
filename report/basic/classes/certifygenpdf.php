@@ -45,15 +45,15 @@ require_once($CFG->dirroot . '/lib/pdflib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class certifygenpdf extends pdf {
-    /** @var $footertext */
-    private $footertext;
+    /** @var string $footertext */
+    private string $footertext;
 
     /**
      * Set footer text
      * @param $text
      * @return void
      */
-    public function set_footer_text($text) {
+    public function set_footer_text($text): void {
         $this->footertext = $text;
     }
 
@@ -61,7 +61,7 @@ class certifygenpdf extends pdf {
      * Footer
      * @return void
      */
-    public function Footer() {
+    public function footer() {
         $cury = $this->y;
         $this->setTextColorArray($this->footer_text_color);
         // Set style for cell border.
@@ -85,23 +85,44 @@ class certifygenpdf extends pdf {
                 'bgcolor' => false,
                 'text' => false,
             ];
-            $this->write1DBarcode($barcode, 'C128', '', $cury + $linewidth, '',
-                (($this->footer_margin / 3) - $linewidth), 0.3, $style, '');
+            $this->write1DBarcode(
+                $barcode,
+                'C128',
+                '',
+                $cury + $linewidth,
+                '',
+                (($this->footer_margin / 3) - $linewidth),
+                0.3,
+                $style,
+                ''
+            );
         }
-        $wpage = isset($this->l['w_page']) ? $this->l['w_page'].' ' : '';
+        $wpage = isset($this->l['w_page']) ? $this->l['w_page'] . ' ' : '';
         if (empty($this->pagegroups)) {
-            $pagenumtxt = $wpage. $this->getAliasNumPage() . ' / ' . $this->getAliasNbPages();
+            $pagenumtxt = $wpage . $this->getAliasNumPage() . ' / ' . $this->getAliasNbPages();
         } else {
-            $pagenumtxt = $wpage. $this->getPageNumGroupAlias() . ' / ' . $this->getPageGroupAlias();
+            $pagenumtxt = $wpage . $this->getPageNumGroupAlias() . ' / ' . $this->getPageGroupAlias();
         }
         $this->setY($cury);
-        if (!empty($this->footertext )) {
+        if (!empty($this->footertext)) {
             $this->SetY(-25);
             // Set font.
             $this->SetFont('helvetica', 'I', 8);
             // Page number.
-            $this->Cell(0, 10, $this->footertext, 0, false, 'C', 0, '', 0,
-                false, 'T', 'M');
+            $this->Cell(
+                0,
+                10,
+                $this->footertext,
+                0,
+                false,
+                'C',
+                0,
+                '',
+                0,
+                false,
+                'T',
+                'M'
+            );
         }
 
         // Print page number.
@@ -110,7 +131,7 @@ class certifygenpdf extends pdf {
             $this->Cell(0, 0, $pagenumtxt, 'T', 0, 'L');
         } else {
             $this->setX($this->original_lMargin);
-            $this->Cell(0, 0, $this->getAliasRightShift().$pagenumtxt, 'T', 0, 'R');
+            $this->Cell(0, 0, $this->getAliasRightShift() . $pagenumtxt, 'T', 0, 'R');
         }
     }
 }

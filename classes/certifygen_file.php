@@ -39,10 +39,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
 use coding_exception;
-use context;
-use dml_exception;
 use mod_certifygen\persistents\certifygen_model;
-use mod_certifygen\task\checkstatus;
 use moodle_url;
 use stdClass;
 use stored_file;
@@ -70,7 +67,6 @@ class certifygen_file {
 
     /**
      * certifygen_file
-     * @throws coding_exception
      */
     public function __construct(stored_file $file, int $userid, string $lang, int $modelid, int $validationid) {
         $this->file = $file;
@@ -115,7 +111,6 @@ class certifygen_file {
     /**
      * get_metadata
      * @return array
-     * @throws dml_exception
      */
     public function get_metadata(): array {
         return $this->metadata;
@@ -128,8 +123,14 @@ class certifygen_file {
     public function get_file_url(): string {
         $file = $this->get_file();
         $name = $file->get_filename();
-        return moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(),
-            $file->get_itemid(), $file->get_filepath(), $name);
+        return moodle_url::make_pluginfile_url(
+            $file->get_contextid(),
+            $file->get_component(),
+            $file->get_filearea(),
+            $file->get_itemid(),
+            $file->get_filepath(),
+            $name
+        );
     }
 
     /**

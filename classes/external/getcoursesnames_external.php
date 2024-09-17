@@ -36,14 +36,13 @@ use external_multiple_structure;
 use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
-use mod_certifygen\persistents\certifygen;
-use mod_certifygen\persistents\certifygen_context;
-use mod_certifygen\persistents\certifygen_model;
+use moodle_exception;
+use moodle_url;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/user/lib.php');
+require_once($CFG->dirroot . '/user/lib.php');
 /**
  * Get courses names
  * @package    mod_certifygen
@@ -74,21 +73,22 @@ class getcoursesnames_external extends external_api {
      */
     public static function getcoursesnames(string $coursesids): array {
         self::validate_parameters(
-            self::getcoursesnames_parameters(), ['coursesids' => $coursesids]
+            self::getcoursesnames_parameters(),
+            ['coursesids' => $coursesids]
         );
         $list = [];
         $coursesarray = explode(',', $coursesids);
         foreach ($coursesarray as $courseid) {
             try {
                 $course = get_course($courseid);
-                $url = new \moodle_url('/course/view.php', ['id' => $courseid]);
+                $url = new moodle_url('/course/view.php', ['id' => $courseid]);
                 $list[] = [
                     'id' => $courseid,
                     'shortname' => $course->shortname,
                     'fullname' => $course->fullname,
                     'link' => $url->out(),
                 ];
-            } catch (\moodle_exception $e) {
+            } catch (moodle_exception $e) {
                 continue;
             }
         }
@@ -102,15 +102,15 @@ class getcoursesnames_external extends external_api {
      */
     public static function getcoursesnames_returns(): external_single_structure {
         return new external_single_structure([
-                'list' => new external_multiple_structure( new external_single_structure(
-                        [
+                'list' => new external_multiple_structure(new external_single_structure(
+                    [
                             'id' => new external_value(PARAM_INT, 'Course id'),
                             'shortname' => new external_value(PARAM_RAW, 'Course shortname'),
                             'fullname' => new external_value(PARAM_RAW, 'Course fullname'),
                             'link' => new external_value(PARAM_RAW, 'Course link url'),
-                        ], 'Course list')
-                ),
-            ]
-        );
+                    ],
+                    'Course list'
+                )),
+            ]);
     }
 }

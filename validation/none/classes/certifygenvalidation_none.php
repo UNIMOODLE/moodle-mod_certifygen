@@ -27,9 +27,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace certifygenvalidation_none;
+
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
-require_once $CFG->libdir . '/soaplib.php';
-require_once $CFG->libdir . '/pdflib.php';
+require_once($CFG->libdir . '/soaplib.php');
+require_once($CFG->libdir . '/pdflib.php');
 
 use certifygenvalidation_none\persistents\certifygenvalidationwebservice;
 use coding_exception;
@@ -48,16 +51,13 @@ use moodle_exception;
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class certifygenvalidation_none implements ICertificateValidation
-{
-
+class certifygenvalidation_none implements ICertificateValidation {
     /**
      * Send file
      * @param certifygen_file $file
      * @return array
      */
-    public function send_file(certifygen_file $file): array
-    {
+    public function send_file(certifygen_file $file): array {
         try {
             // Change context.
             $fs = get_file_storage();
@@ -73,7 +73,7 @@ class certifygenvalidation_none implements ICertificateValidation
                 'filearea' => self::FILE_AREA_VALIDATED,
                 'itemid' => $file->get_validationid(),
                 'filepath' => self::FILE_PATH,
-                'filename' => $file->get_file()->get_filename()
+                'filename' => $file->get_file()->get_filename(),
             ];
             $newfile = $fs->create_file_from_storedfile($filerecord, $file->get_file());
             // Change status.
@@ -84,13 +84,12 @@ class certifygenvalidation_none implements ICertificateValidation
                 'message' => 'ok',
                 'newfile' => $newfile,
             ];
-        } catch(moodle_exception $e) {
+        } catch (moodle_exception $e) {
             return [
                 'haserror' => true,
                 'message' => $e->getMessage(),
             ];
         }
-
     }
 
     /**
@@ -99,8 +98,7 @@ class certifygenvalidation_none implements ICertificateValidation
      * @param int $validationid
      * @return array
      */
-    public function get_file(int $courseid, int $validationid) : array
-    {
+    public function get_file(int $courseid, int $validationid): array {
         return ['error' => [], 'message' => 'ok'];
     }
 
@@ -110,8 +108,7 @@ class certifygenvalidation_none implements ICertificateValidation
      * @return bool
      * @throws coding_exception
      */
-    public function can_revoke(int $courseid): bool
-    {
+    public function can_revoke(int $courseid): bool {
         if ($courseid) {
             return has_capability('tool/certificate:issue', context_course::instance($courseid));
         } else {
@@ -124,7 +121,7 @@ class certifygenvalidation_none implements ICertificateValidation
      * @param string $code
      * @return array
      */
-    public function revoke(string $code) : array {
+    public function revoke(string $code): array {
         return [
             'haserror' => false,
             'message' => '',
@@ -136,8 +133,7 @@ class certifygenvalidation_none implements ICertificateValidation
      * @return bool
      * @throws dml_exception
      */
-    public function is_enabled(): bool
-    {
+    public function is_enabled(): bool {
         return (int)get_config('certifygenvalidation_none', 'enabled');
     }
 
@@ -145,8 +141,7 @@ class certifygenvalidation_none implements ICertificateValidation
      * Check status
      * @return bool
      */
-    public function check_status(): bool
-    {
+    public function check_status(): bool {
         return false;
     }
 
@@ -156,8 +151,7 @@ class certifygenvalidation_none implements ICertificateValidation
      * @param string $code
      * @return int
      */
-    public function get_status(int $validationid, string $code): int
-    {
+    public function get_status(int $validationid, string $code): int {
         return certifygen_validations::STATUS_VALIDATION_OK;
     }
 
@@ -165,8 +159,7 @@ class certifygenvalidation_none implements ICertificateValidation
      * Check file
      * @return bool
      */
-    public function checkfile(): bool
-    {
+    public function checkfile(): bool {
         return false;
     }
     /**

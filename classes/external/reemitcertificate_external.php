@@ -34,7 +34,6 @@ namespace mod_certifygen\external;
 
 use coding_exception;
 use context_module;
-use core\invalid_persistent_exception;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
@@ -76,14 +75,14 @@ class reemitcertificate_external extends external_api {
      * @return array
      * @throws coding_exception
      * @throws invalid_parameter_exception
-     * @throws invalid_persistent_exception
      */
     public static function reemitcertificate(int $id): array {
 
         global $PAGE, $USER;
 
         self::validate_parameters(
-            self::reemitcertificate_parameters(), ['id' => $id]
+            self::reemitcertificate_parameters(),
+            ['id' => $id]
         );
         $result = ['result' => true, 'message' => get_string('ok', 'mod_certifygen')];
         $validation = null;
@@ -111,9 +110,15 @@ class reemitcertificate_external extends external_api {
             require_capability('mod/certifygen:reemitcertificates', $context);
 
             // Delete old issue and file.
-            issues::revoke_issue( $oldvalidation->get('issueid'));
-            $result = emitcertificate_external::emitcertificate($validation->get('id'), $validation->get('certifygenid'),
-                $validation->get('modelid'), $validation->get('lang'), $validation->get('userid'), $course->id);
+            issues::revoke_issue($oldvalidation->get('issueid'));
+            $result = emitcertificate_external::emitcertificate(
+                $validation->get('id'),
+                $validation->get('certifygenid'),
+                $validation->get('modelid'),
+                $validation->get('lang'),
+                $validation->get('userid'),
+                $course->id
+            );
 
             if (!$result['result']) {
                 $validation->delete();

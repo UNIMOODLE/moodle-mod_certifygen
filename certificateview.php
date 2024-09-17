@@ -1,6 +1,6 @@
 <?php
 // This file is part of the mod_certifygen plugin for Moodle - http://moodle.org/
-// 
+//
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -54,8 +54,10 @@ if ($preview) {
     $issue = \mod_certifygen\template::get_issue_from_code($issuecode);
     $context = \context_course::instance($issue->courseid, IGNORE_MISSING) ?: null;
     $template = $issue ? \mod_certifygen\template::instance($issue->templateid, (object) ['lang' => $lang]) : null;
-    if ($template && (\tool_certificate\permission::can_verify() ||
-            \tool_certificate\permission::can_view_issue($template, $issue, $context))) {
+    if (
+        $template && (\tool_certificate\permission::can_verify() ||
+            \tool_certificate\permission::can_view_issue($template, $issue, $context))
+    ) {
         $url = $template->get_issue_file_url($issue);
 
         redirect($url);

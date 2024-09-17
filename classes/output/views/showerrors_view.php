@@ -30,12 +30,15 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_certifygen\output\views;
+use coding_exception;
 use core_table\local\filter\filter;
 use core_table\local\filter\string_filter;
 use mod_certifygen\forms\errorfiltersform;
 use mod_certifygen\tables\errors_filterset;
 use mod_certifygen\tables\showerrors_table;
+use moodle_url;
 use renderable;
+use stdClass;
 use templatable;
 use renderer_base;
 /**
@@ -46,12 +49,12 @@ use renderer_base;
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class showerrors_view  implements renderable, templatable {
+class showerrors_view implements renderable, templatable {
     /**
      * export_for_template
      * @param renderer_base $output
-     * @return \stdClass
-     * @throws \coding_exception
+     * @return stdClass
+     * @throws coding_exception
      */
     public function export_for_template(renderer_base $output) {
         $userfullname = optional_param('userfullname', '', PARAM_RAW);
@@ -61,7 +64,7 @@ class showerrors_view  implements renderable, templatable {
             'modelname' => $modelname,
         ];
         // Form.
-        $url = new \moodle_url('/mod/certifygen/showerrors.php');
+        $url = new moodle_url('/mod/certifygen/showerrors.php');
         $mform = new errorfiltersform($url->out(), $customdata);
         $data = $mform->get_data();
 
@@ -74,13 +77,13 @@ class showerrors_view  implements renderable, templatable {
         if (isset($data->modelname) && !empty($data->modelname)) {
             $filters->add_filter(new string_filter('modelname', filter::JOINTYPE_DEFAULT, [$data->modelname]));
         }
-        $tablelist->baseurl = new \moodle_url('/mod/certifygen/showerrors.php');
+        $tablelist->baseurl = new moodle_url('/mod/certifygen/showerrors.php');
         $tablelist->set_filterset($filters);
         ob_start();
         $tablelist->out(10, false);
         $out1 = ob_get_contents();
         ob_end_clean();
-        $data = new \stdClass();
+        $data = new stdClass();
         $data->table = $out1;
         $data->form = $mform->render();
         return $data;

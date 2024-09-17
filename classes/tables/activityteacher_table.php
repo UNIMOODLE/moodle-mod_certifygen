@@ -59,7 +59,7 @@ use table_sql;
 class activityteacher_table extends table_sql {
     /** @var int $courseid */
     private int $courseid;
-    /** @var context_module|bool|\context $context */
+    /** @var context_module $context */
     private context_module $context;
     /** @var int $templateid */
     private int $templateid;
@@ -161,8 +161,10 @@ class activityteacher_table extends table_sql {
      */
     public function col_revoke($row): string {
         global $USER;
-        if ($USER->id != $row->id
-            && !has_capability('mod/certifygen:canmanagecertificates', $this->context, $USER->id)) {
+        if (
+            $USER->id != $row->id
+            && !has_capability('mod/certifygen:canmanagecertificates', $this->context, $USER->id)
+        ) {
             return '';
         }
         if (!$this->canrevoke) {
@@ -173,10 +175,10 @@ class activityteacher_table extends table_sql {
             $status = certifygen_validations::STATUS_NOT_STARTED;
         }
         if ($status == certifygen_validations::STATUS_FINISHED) {
-            return '<span class="likelink" data-action="revoke-certificate" data-username="'. $row->firstname. ' '
-                . $row->lastname .'" data-issueid="'. $row->issueid.'" data-modelid="'. $this->modelid
-                .'" data-courseid="'. $this->courseid.'" data-userid="'. $row->id.'" data-cmid="'. $this->cmid .'"
-                data-lang="'. $this->lang .'" data-langstring="'. $this->langstring .'"  >' .
+            return '<span class="likelink" data-action="revoke-certificate" data-username="' . $row->firstname . ' '
+                . $row->lastname . '" data-issueid="' . $row->issueid . '" data-modelid="' . $this->modelid
+                . '" data-courseid="' . $this->courseid . '" data-userid="' . $row->id . '" data-cmid="' . $this->cmid . '"
+                data-lang="' . $this->lang . '" data-langstring="' . $this->langstring . '"  >' .
                 get_string('revoke', 'tool_certificate') . '</span>';
         }
         return '';
@@ -197,7 +199,7 @@ class activityteacher_table extends table_sql {
             $tooltip = $this->statusmessages[$row->cstatus];
             $status = '<button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="'
                 . $tooltip . '">'
-                . get_string('status_'.$row->cstatus, 'mod_certifygen') . '</button>';
+                . get_string('status_' . $row->cstatus, 'mod_certifygen') . '</button>';
         }
         return $status;
     }
@@ -219,7 +221,6 @@ class activityteacher_table extends table_sql {
      * @param $row
      * @return string
      * @throws coding_exception
-     * @throws dml_exception
      */
     public function col_download($row): string {
         $status = $row->cstatus;
@@ -228,10 +229,10 @@ class activityteacher_table extends table_sql {
         }
         if ($status == certifygen_validations::STATUS_FINISHED) {
             return '<span data-courseid="' . $row->courseid . '" data-instanceid="' . $this->instanceid
-                . '" data-modelid="' . $this->modelid . '" data-id="'. $row->validationid
-                . '" data-action="download-certificate" data-userid="'. $row->id .'" data-code="'
-                . $row->code .'" data-lang="'. $this->lang .'" data-langstring="'. $this->langstring
-                .'"  data-cmid="'. $this->cmid .'" class="btn btn-primary">'
+                . '" data-modelid="' . $this->modelid . '" data-id="' . $row->validationid
+                . '" data-action="download-certificate" data-userid="' . $row->id . '" data-code="'
+                . $row->code . '" data-lang="' . $this->lang . '" data-langstring="' . $this->langstring
+                . '"  data-cmid="' . $this->cmid . '" class="btn btn-primary">'
                 . get_string('download') . '</span>';
         }
         return '';
@@ -240,15 +241,16 @@ class activityteacher_table extends table_sql {
      * Issue
      * @param $row
      * @return string
-     * @throws dml_exception
      * @throws moodle_exception
      * @throws coding_exception
      */
     public function col_emit($row): string {
         global $USER;
 
-        if ($USER->id != $row->id
-        && !has_capability('mod/certifygen:canmanagecertificates', $this->context, $USER->id)) {
+        if (
+            $USER->id != $row->id
+            && !has_capability('mod/certifygen:canmanagecertificates', $this->context, $USER->id)
+        ) {
             return '';
         }
 
@@ -260,16 +262,18 @@ class activityteacher_table extends table_sql {
         }
 
         if ($status == certifygen_validations::STATUS_NOT_STARTED) {
-            return '<span data-courseid="' . $row->courseid . '" data-modelid="' . $this->modelid . '" data-id="'. $id .
-                '" data-action="emit-certificate" data-userid="'. $row->userid .'" data-lang="'. $this->lang .'" 
-                data-langstring="'. $this->langstring .'"  data-cmid="'. $this->cmid .'" data-instanceid="'
-                . $this->instanceid .'" class="btn btn-primary">'
+            return '<span data-courseid="' . $row->courseid . '" data-modelid="' . $this->modelid . '" data-id="' . $id .
+                '" data-action="emit-certificate" data-userid="' . $row->userid . '" data-lang="' . $this->lang . '" 
+                data-langstring="' . $this->langstring . '"  data-cmid="' . $this->cmid . '" data-instanceid="'
+                . $this->instanceid . '" class="btn btn-primary">'
                 . get_string('emit', 'mod_certifygen') . '</span>';
         }
         // Re-emit.
-        if ($row->cstatus == certifygen_validations::STATUS_FINISHED
+        if (
+            $row->cstatus == certifygen_validations::STATUS_FINISHED
             && $this->model->get('mode') == certifygen_model::MODE_PERIODIC
-        && has_capability('mod/certifygen:reemitcertificates', $this->context)) {
+            && has_capability('mod/certifygen:reemitcertificates', $this->context)
+        ) {
             $today = time();
             $dif = $today - $row->timecreated;
             $difindays = abs($dif / (60 * 60 * 24));
@@ -313,10 +317,19 @@ class activityteacher_table extends table_sql {
 
         $this->pagesize($pagesize, $total);
 
-        $this->rawdata = certifygen::get_issues_for_course_by_lang($params['lang'], $this->instanceid,
-            $this->templateid, $this->courseid,
-            'mod_certifygen', $userid, $tifirst, $tilast, $this->get_page_start(),
-            $this->get_page_size(), $this->get_sql_sort());
+        $this->rawdata = certifygen::get_issues_for_course_by_lang(
+            $params['lang'],
+            $this->instanceid,
+            $this->templateid,
+            $this->courseid,
+            'mod_certifygen',
+            $userid,
+            $tifirst,
+            $tilast,
+            $this->get_page_start(),
+            $this->get_page_size(),
+            $this->get_sql_sort()
+        );
 
         // Set initial bars.
         $this->initialbars($total > $pagesize);

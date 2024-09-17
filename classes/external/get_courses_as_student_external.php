@@ -30,24 +30,26 @@
  */
 namespace mod_certifygen\external;
 use certifygenfilter;
+use context_course;
 use context_system;
 use core_completion_external;
+use dml_exception;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_multiple_structure;
 use external_value;
+use invalid_parameter_exception;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_context;
-use mod_certifygen\persistents\certifygen_model;
 use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/user/lib.php');
-require_once($CFG->dirroot.'/mod/certifygen/classes/filters/certifygenfilter.php');
-require_once($CFG->dirroot.'/mod/certifygen/lib.php');
+require_once($CFG->dirroot . '/user/lib.php');
+require_once($CFG->dirroot . '/mod/certifygen/classes/filters/certifygenfilter.php');
+require_once($CFG->dirroot . '/mod/certifygen/lib.php');
 /**
  * Get courses as student
  * @package    mod_certifygen
@@ -78,14 +80,14 @@ class get_courses_as_student_external extends external_api {
      * @param string $userfield
      * @param string $lang
      * @return array
-     * @throws \dml_exception
-     * @throws \invalid_parameter_exception
-     * @throws \required_capability_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
      */
     public static function get_courses_as_student(int $userid, string $userfield, string $lang): array {
 
         $params = self::validate_parameters(
-            self::get_courses_as_student_parameters(), ['userid' => $userid, 'userfield' => $userfield, 'lang' => $lang]
+            self::get_courses_as_student_parameters(),
+            ['userid' => $userid, 'userfield' => $userfield, 'lang' => $lang]
         );
         $context = context_system::instance();
         $results = ['courses' => [], 'student' => [], 'error' => []];
@@ -133,7 +135,7 @@ class get_courses_as_student_external extends external_api {
             // Get courses with a certifygen_model asociated where the user is student.
             $enrolments = enrol_get_all_users_courses($userid, true);
             foreach ($enrolments as $enrolment) {
-                $coursecontext = \context_course::instance($enrolment->ctxinstance);
+                $coursecontext = context_course::instance($enrolment->ctxinstance);
                 if (has_capability('moodle/course:managegroups', $coursecontext, $userid)) {
                     continue;
                 }
@@ -149,7 +151,7 @@ class get_courses_as_student_external extends external_api {
                     $completion = core_completion_external::get_course_completion_status($enrolment->ctxinstance, $userid);
                     $completed = $completion['completionstatus']['completed'];
                 } catch (moodle_exception $e) {
-                    //debugging(__FUNCTION__ . ' completion error: '.$e->getMessage());
+                    // debugging(__FUNCTION__ . ' completion error: '.$e->getMessage());
                 }
 
                 $modellist = certifygen_context::get_course_valid_modelids($enrolment->ctxinstance);
@@ -165,7 +167,8 @@ class get_courses_as_student_external extends external_api {
             }
             $results['courses'] = $courses;
         } catch (moodle_exception $e) {
-            $haserror = true;$results['error']['code'] = $e->getCode();
+            $haserror = true;
+            $results['error']['code'] = $e->getCode();
             $results['error']['message'] = $e->getMessage();
         }
         if (!$haserror) {
@@ -180,7 +183,8 @@ class get_courses_as_student_external extends external_api {
      */
     public static function get_courses_as_student_returns(): external_single_structure {
         return new external_single_structure([
-                'courses' => new external_multiple_structure( new external_single_structure(
+                'courses' => new external_multiple_structure(
+                    new external_single_structure(
                         [
                             'id'   => new external_value(PARAM_RAW, 'Course id'),
                             'shortname'   => new external_value(PARAM_RAW, 'Course shortname'),
@@ -188,19 +192,25 @@ class get_courses_as_student_external extends external_api {
                             'categoryid' => new external_value(PARAM_INT, 'Course category id'),
                             'completed' => new external_value(PARAM_BOOL, 'student has course completed '),
                             'modellist' => new external_value(PARAM_RAW, 'model id list separated by commas.'),
-                        ], 'course info')
-                , 'courses list', VALUE_OPTIONAL),
-                'student' => new external_single_structure (
+                        ],
+                        'course info'
+                    ),
+                    'courses list',
+                    VALUE_OPTIONAL
+                ),
+                'student' => new external_single_structure(
                     [
                         'fullname' => new external_value(PARAM_RAW, 'User fullname'),
                         'id' => new external_value(PARAM_INT, 'User id'),
                         'userfield' => new external_value(PARAM_RAW, 'User id', VALUE_OPTIONAL),
-                    ], 'Student info', VALUE_OPTIONAL),
+                    ],
+                    'Student info',
+                    VALUE_OPTIONAL
+                ),
                 'error' => new external_single_structure([
                     'message' => new external_value(PARAM_RAW, 'Error message', VALUE_OPTIONAL),
                     'code' => new external_value(PARAM_RAW, 'Error code', VALUE_OPTIONAL),
                 ], 'Errors information', VALUE_OPTIONAL),
-            ]
-        );
+            ]);
     }
 }

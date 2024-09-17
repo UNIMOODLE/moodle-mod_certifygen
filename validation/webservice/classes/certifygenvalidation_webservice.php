@@ -35,7 +35,6 @@ global $CFG;
 require_once($CFG->libdir . '/soaplib.php');
 require_once($CFG->libdir . '/pdflib.php');
 
-use certifygenvalidation_webservice\persistents\certifygenvalidationwebservice;
 use coding_exception;
 use context_course;
 use context_system;
@@ -46,7 +45,6 @@ use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
-use moodle_url;
 use stored_file_creation_exception;
 /**
  * certifygenvalidation_webservice
@@ -57,7 +55,6 @@ use stored_file_creation_exception;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class certifygenvalidation_webservice implements ICertificateValidation {
-
     /**
      * sendFile
      * @param certifygen_file $file
@@ -72,13 +69,12 @@ class certifygenvalidation_webservice implements ICertificateValidation {
                 'haserror' => false,
                 'message' => 'ok',
             ];
-        } catch(moodle_exception $e) {
+        } catch (moodle_exception $e) {
             return [
                 'haserror' => true,
                 'message' => $e->getMessage(),
             ];
         }
-
     }
 
     /**
@@ -97,15 +93,21 @@ class certifygenvalidation_webservice implements ICertificateValidation {
             if (!empty($courseid)) {
                 $contextid = context_course::instance($courseid)->id;
             }
-            $file = $fs->get_file($contextid, self::FILE_COMPONENT,
-                self::FILE_AREA, $validationid, self::FILE_PATH, $code . '.pdf');
+            $file = $fs->get_file(
+                $contextid,
+                self::FILE_COMPONENT,
+                self::FILE_AREA,
+                $validationid,
+                self::FILE_PATH,
+                $code . '.pdf'
+            );
             if (!$file) {
                 $result['error']['code'] = 'file_not_found';
                 $result['error']['message'] = 'file_not_found';
                 return $result;
             }
             $result['file'] = $file;
-        } catch(moodle_exception $exception) {
+        } catch (moodle_exception $exception) {
             $result['error']['code'] = $exception->getCode();
             $result['error']['message'] = $exception->getMessage();
         }
@@ -126,8 +128,7 @@ class certifygenvalidation_webservice implements ICertificateValidation {
      * @param string $code
      * @return array
      */
-    public function revoke(string $code) : array {
-        // TODO.
+    public function revoke(string $code): array {
         return [
             'haserror' => false,
             'message' => '',
@@ -178,7 +179,7 @@ class certifygenvalidation_webservice implements ICertificateValidation {
      * @throws file_exception
      * @throws stored_file_creation_exception
      */
-    public function save_file_moodledata(int $validationid) {
+    public function save_file_moodledata(int $validationid): void {
         $validation = new certifygen_validations($validationid);
         $code = certifygen_validations::get_certificate_code($validation);
         $context = context_system::instance();
@@ -191,16 +192,17 @@ class certifygenvalidation_webservice implements ICertificateValidation {
             $itemid = $validation->get('issueid');
         }
         // Search for original certificate.
-        $filerecord =  [
+        $filerecord = [
             'contextid' => $context->id,
             'component' => self::FILE_COMPONENT,
             'filearea' => self::FILE_AREA,
             'itemid' => $validationid,
             'filepath' => self::FILE_PATH,
-            'filename' => $code . '.pdf'
+            'filename' => $code . '.pdf',
         ];
         $fs = get_file_storage();
-        $original = $fs->get_file(context_system::instance()->id,
+        $original = $fs->get_file(
+            context_system::instance()->id,
             self::FILE_COMPONENT,
             $filearea,
             $itemid,

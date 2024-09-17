@@ -31,28 +31,45 @@
 defined('MOODLE_INTERNAL') || die();
 
 // Enlace principal de settings.
-$ADMIN->add('modsettingcertifygencat',
-    new admin_category('certifygenvalidationcmd_cat',
-        get_string('pluginname', 'certifygenvalidation_cmd')));
+$ADMIN->add(
+    'modsettingcertifygencat',
+    new admin_category(
+        'certifygenvalidationcmd_cat',
+        get_string('pluginname', 'certifygenvalidation_cmd')
+    )
+);
 // Certifygenreport_basic settings.
 $settings = new admin_settingpage(
     'modsettingcertifygenvalidationcmd',
     get_string('pluginnamesettings', 'certifygenvalidation_cmd'),
-    'moodle/site:config');
+    'moodle/site:config'
+);
 if ($ADMIN->fulltree) {
-    $settings->add(new admin_setting_configcheckbox('certifygenvalidation_cmd/enabled',
+    $settings->add(new admin_setting_configcheckbox(
+        'certifygenvalidation_cmd/enabled',
         new lang_string('enable', 'certifygenvalidation_cmd'),
-        new lang_string('enable_help', 'certifygenvalidation_cmd'), 0));
+        new lang_string('enable_help', 'certifygenvalidation_cmd'),
+        0
+    ));
 
-    $settings->add(new admin_setting_configtext('certifygenvalidation_cmd/path',
+    $settings->add(new admin_setting_configtext(
+        'certifygenvalidation_cmd/path',
         new lang_string('path', 'certifygenvalidation_cmd'),
-        new lang_string('path_help', 'certifygenvalidation_cmd'), ""));
+        new lang_string('path_help', 'certifygenvalidation_cmd'),
+        ""
+    ));
 
-    $settings->add(new admin_setting_configtext('certifygenvalidation_cmd/originalfilespath',
+    $settings->add(new admin_setting_configtext(
+        'certifygenvalidation_cmd/originalfilespath',
         new lang_string('originalfilespath', 'certifygenvalidation_cmd'),
-        new lang_string('originalfilespath_help', 'certifygenvalidation_cmd'), ""));
+        new lang_string('originalfilespath_help', 'certifygenvalidation_cmd'),
+        ""
+    ));
 
-    $settings->add(new admin_setting_configtext('certifygenvalidation_cmd/validatedfilespath',
+    $settings->add(new admin_setting_configtext(
+        'certifygenvalidation_cmd/validatedfilespath',
         new lang_string('validatedfilespath', 'certifygenvalidation_cmd'),
-        new lang_string('validatedfilespath_help', 'certifygenvalidation_cmd'), ""));
+        new lang_string('validatedfilespath_help', 'certifygenvalidation_cmd'),
+        ""
+    ));
 }

@@ -31,18 +31,25 @@
 defined('MOODLE_INTERNAL') || die();
 
 // Enlace principal de settings.
-$ADMIN->add('modsettingcertifygencat',
-    new admin_category('certifygenvalidation_none_cat',
-        get_string('pluginname', 'certifygenvalidation_none')));
+$ADMIN->add(
+    'modsettingcertifygencat',
+    new admin_category(
+        'certifygenvalidation_none_cat',
+        get_string('pluginname', 'certifygenvalidation_none')
+    )
+);
 
 // Certifygenreport_basic settings.
 $settings = new admin_settingpage(
     'modsettingcertifygenvalidationnone',
     get_string('pluginnamesettings', 'certifygenvalidation_none'),
-    'moodle/site:config');
+    'moodle/site:config'
+);
 if ($ADMIN->fulltree) {
-    $settings->add(new admin_setting_configcheckbox('certifygenvalidation_none/enabled',
+    $settings->add(new admin_setting_configcheckbox(
+        'certifygenvalidation_none/enabled',
         new lang_string('enable', 'certifygenvalidation_none'),
-        new lang_string('enable_help', 'certifygenvalidation_none'), 0));
-
+        new lang_string('enable_help', 'certifygenvalidation_none'),
+        0
+    ));
 }

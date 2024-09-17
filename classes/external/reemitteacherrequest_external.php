@@ -34,17 +34,15 @@ namespace mod_certifygen\external;
 
 use coding_exception;
 use context_system;
-use core\invalid_persistent_exception;
+use dml_exception;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
-use mod_certifygen\certifygen_file;
-use mod_certifygen\interfaces\ICertificateReport;
-use mod_certifygen\interfaces\ICertificateValidation;
-use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
+use moodle_exception;
+
 /**
  * Re emit teacher certificate
  * @package    mod_certifygen
@@ -71,20 +69,20 @@ class reemitteacherrequest_external extends external_api {
      * Reemit certificate
      * @param int $id
      * @return array
-     * @throws \dml_exception
+     * @throws dml_exception
      * @throws coding_exception
      * @throws invalid_parameter_exception
-     * @throws invalid_persistent_exception
      */
     public static function reemitteacherrequest(int $id): array {
 
         global $PAGE, $USER;
         $PAGE->set_context(context_system::instance());
         self::validate_parameters(
-            self::reemitteacherrequest_parameters(), ['id' => $id]
+            self::reemitteacherrequest_parameters(),
+            ['id' => $id]
         );
         $result = ['result' => true, 'message' => get_string('ok', 'mod_certifygen')];
-
+        $teacherrequest = null;
         try {
             // Step 1: Copy data from the old validation id.
             $oldvalidation  = new certifygen_validations($id);

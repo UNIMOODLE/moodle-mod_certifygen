@@ -35,6 +35,7 @@ namespace certifygenvalidation_webservice\external;
 use certifygenfilter;
 use certifygenvalidation_webservice\certifygenvalidation_none;
 use certifygenvalidation_webservice\certifygenvalidation_webservice;
+use context_system;
 use external_api;
 use external_function_parameters;
 use external_multiple_structure;
@@ -49,9 +50,9 @@ use moodle_exception;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/user/lib.php');
-require_once($CFG->dirroot.'/mod/certifygen/lib.php');
-require_once($CFG->dirroot.'/mod/certifygen/classes/filters/certifygenfilter.php');
+require_once($CFG->dirroot . '/user/lib.php');
+require_once($CFG->dirroot . '/mod/certifygen/lib.php');
+require_once($CFG->dirroot . '/mod/certifygen/classes/filters/certifygenfilter.php');
 /**
  * get_user_requests_external
  * @package    certifygenvalidation_webservice
@@ -86,10 +87,11 @@ class get_user_requests_external extends external_api {
      */
     public static function get_user_requests(int $userid, string $userfield, string $lang): array {
         $params = self::validate_parameters(
-            self::get_user_requests_parameters(), ['userid' => $userid, 'userfield' => $userfield, 'lang' => $lang]
+            self::get_user_requests_parameters(),
+            ['userid' => $userid, 'userfield' => $userfield, 'lang' => $lang]
         );
         try {
-            $context = \context_system::instance();
+            $context = context_system::instance();
             require_capability('mod/certifygen:manage', $context);
             // Is plugin enabled?
             $wsplugin = new certifygenvalidation_webservice();
@@ -106,7 +108,7 @@ class get_user_requests_external extends external_api {
                 return $uparam;
             }
             // Filter to return course names in $lang language.
-            $filter = new certifygenfilter(\context_system::instance(), [], $lang);
+            $filter = new certifygenfilter(context_system::instance(), [], $lang);
             $requests = certifygen_validations::get_records(['userid' => $params['userid']]);
             $userrequest = [];
             foreach ($requests as $request) {
@@ -151,12 +153,14 @@ class get_user_requests_external extends external_api {
                     $instance['name'] = $actvname;
                     $urequest['instance'] = $instance;
                 }
-                $modeldata = array_merge((array)$model->to_record(),
-                    ['typedesc' => get_string('type_'. $model->get('type'), 'mod_certifygen')]);
+                $modeldata = array_merge(
+                    (array)$model->to_record(),
+                    ['typedesc' => get_string('type_' . $model->get('type'), 'mod_certifygen')]
+                );
                 $urequest['model'] = $modeldata;
                 $urequest['lang'] = $request->get('lang');
                 $urequest['status'] = (int)$request->get('status');
-                $urequest['statusdesc'] = get_string('status_'. $request->get('status'), 'mod_certifygen');
+                $urequest['statusdesc'] = get_string('status_' . $request->get('status'), 'mod_certifygen');
                 $userrequest[] = $urequest;
             }
         } catch (moodle_exception $exception) {
@@ -175,7 +179,8 @@ class get_user_requests_external extends external_api {
      */
     public static function get_user_requests_returns(): external_single_structure {
         return new external_single_structure([
-            'requests' => new external_multiple_structure( new external_single_structure(
+            'requests' => new external_multiple_structure(
+                new external_single_structure(
                     [
                         'id' => new external_value(PARAM_RAW, 'Request id'),
                         'name' => new external_value(PARAM_RAW, 'Request name - (only on teacher requests)', VALUE_OPTIONAL),
@@ -189,7 +194,9 @@ class get_user_requests_external extends external_api {
                             'shortname' => new external_value(PARAM_RAW, 'Course shortname', VALUE_OPTIONAL),
                             'fullname' => new external_value(PARAM_RAW, 'Course fullname', VALUE_OPTIONAL),
                             ], 'Course information', VALUE_OPTIONAL),
-                        'only for teachers requests', VALUE_OPTIONAL),
+                            'only for teachers requests',
+                            VALUE_OPTIONAL
+                        ),
                         'instance'   => new external_single_structure([
                             'id' => new external_value(PARAM_INT, 'Instance id', VALUE_OPTIONAL),
                             'name' => new external_value(PARAM_RAW, 'Instance name', VALUE_OPTIONAL),
@@ -208,8 +215,13 @@ class get_user_requests_external extends external_api {
                             'report' => new external_value(PARAM_RAW, 'Instance name', VALUE_OPTIONAL),
                             'repository' => new external_value(PARAM_RAW, 'Instance name', VALUE_OPTIONAL),
                         ], 'Model information'),
-                    ], 'User requests list', VALUE_OPTIONAL)
-                , '', VALUE_OPTIONAL),
+                    ],
+                    'User requests list',
+                    VALUE_OPTIONAL
+                ),
+                '',
+                VALUE_OPTIONAL
+            ),
             'error' => new external_single_structure([
                 'message' => new external_value(PARAM_RAW, 'Error message'),
                 'code' => new external_value(PARAM_RAW, 'Error code'),

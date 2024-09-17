@@ -80,5 +80,3 @@ interface ICertificateRepository {
      */
     public function get_consistent_validation_plugins(): array;
 }
-
-

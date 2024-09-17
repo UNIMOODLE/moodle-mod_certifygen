@@ -46,7 +46,6 @@ use core_user;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class searchforuserform extends moodleform {
-
     /**
      * Definition
      * @return void
@@ -59,7 +58,7 @@ class searchforuserform extends moodleform {
         $options = [
             'ajax' => 'core_user/form_user_selector',
             'multiple' => false,
-            'valuehtmlcallback' => function($userid) use ($context): string {
+            'valuehtmlcallback' => function ($userid) use ($context): string {
                 $user = core_user::get_user($userid);
                 return fullname($user, has_capability('moodle/site:viewfullnames', $context));
             },

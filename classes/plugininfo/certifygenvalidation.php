@@ -31,10 +31,8 @@
 
 namespace mod_certifygen\plugininfo;
 use admin_settingpage;
-use coding_exception;
 use core\plugininfo\base;
 use core_plugin_manager;
-use dml_exception;
 use moodle_exception;
 use moodle_url;
 use part_of_admin_tree;
@@ -49,12 +47,9 @@ use part_of_admin_tree;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class certifygenvalidation extends base {
-
     /**
      * Finds all enabled plugins, the result may include missing plugins.
      * @return array
-     * @throws coding_exception
-     * @throws dml_exception
      */
     public static function get_enabled_plugins(): array {
 
@@ -76,8 +71,10 @@ class certifygenvalidation extends base {
      * @throws moodle_exception
      */
     public static function get_manage_url(): moodle_url {
-        return new moodle_url('/mod/certifygen/adminmanageplugins.php',
-            ['subtype' => 'certifygenvalidation']);
+        return new moodle_url(
+            '/mod/certifygen/adminmanageplugins.php',
+            ['subtype' => 'certifygenvalidation']
+        );
     }
 
     /**
@@ -98,8 +95,12 @@ class certifygenvalidation extends base {
         if (!$hassiteconfig || !file_exists($this->full_path('settings.php'))) {
             return;
         }
-        $settings = new admin_settingpage($this->component, $this->displayname, 'moodle/site:config',
-            $this->is_enabled() === false);
+        $settings = new admin_settingpage(
+            $this->component,
+            $this->displayname,
+            'moodle/site:config',
+            $this->is_enabled() === false
+        );
         include($this->full_path('settings.php')); // This may also set $settings to null.
         if ($settings) {
             $ADMIN->add($parentnodename, $settings);

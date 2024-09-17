@@ -29,9 +29,11 @@
 namespace certifygenrepository_onedrive;
 
 use coding_exception;
+use core\oauth2\rest_exception;
 use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\persistents\certifygen_repository;
 use mod_certifygen\persistents\certifygen_validations;
+use moodle_exception;
 use stored_file;
 /**
  * certifygenrepository_onedrive
@@ -43,7 +45,7 @@ use stored_file;
  */
 class certifygenrepository_onedrive implements ICertificateRepository {
     /** @var string $url */
-    private $url = '';
+    private string $url = '';
     /**
      * getFileUrl
      * @param certifygen_validations $validation
@@ -53,7 +55,8 @@ class certifygenrepository_onedrive implements ICertificateRepository {
     public function get_file_url(certifygen_validations $validation): string {
         if (empty($this->url)) {
             $certrepository = certifygen_repository::get_record(
-                ['validationid' => $validation->get('id'), 'userid' => $validation->get('userid')]);
+                ['validationid' => $validation->get('id'), 'userid' => $validation->get('userid')]
+            );
             if ($certrepository) {
                 return $certrepository->get('url');
             }
@@ -66,10 +69,10 @@ class certifygenrepository_onedrive implements ICertificateRepository {
      * saveFile
      * @param stored_file $file
      * @return array
-     * @throws \core\oauth2\rest_exception
+     * @throws rest_exception
      */
     public function save_file(stored_file $file): array {
-        global $CFG, $USER;
+        global $CFG;
         $result = [
             'result' => true,
             'haserror' => false,
@@ -88,8 +91,8 @@ class certifygenrepository_onedrive implements ICertificateRepository {
             $this->url = $connection->get_link();
             // Delete temp file.
             unlink($completefilepath);
-            //$file->delete(); //TODO: uncomment.
-        } catch (\moodle_exception $e) {
+            $file->delete();
+        } catch (moodle_exception $e) {
             $result['result'] = false;
             $result['haserror'] = true;
             $result['message'] = $e->getMessage();
@@ -103,11 +106,11 @@ class certifygenrepository_onedrive implements ICertificateRepository {
      * @throws \dml_exception
      */
     public function is_enabled(): bool {
-//        $enabled = (int) get_config('certifygenrepository_onedrive', 'enabled');
-//        $connection = new onedriveconnection();
-//        if ($enabled && $connection->is_enabled()) {
-//            return true;
-//        }
+// $enabled = (int) get_config('certifygenrepository_onedrive', 'enabled');
+// $connection = new onedriveconnection();
+// if ($enabled && $connection->is_enabled()) {
+// return true;
+// }
         return false;
     }
 

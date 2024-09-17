@@ -43,11 +43,10 @@ namespace mod_certifygen\event;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class course_module_viewed extends \core\event\course_module_viewed {
-
     /**
      * Init method.
      */
-    protected function init() {
+    protected function init(): void {
         $this->data['objecttable'] = 'certifygen';
         $this->data['crud'] = 'r';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;

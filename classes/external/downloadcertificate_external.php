@@ -83,10 +83,16 @@ class downloadcertificate_external extends external_api {
      * @return array
      * @throws invalid_parameter_exception
      */
-    public static function downloadcertificate(int $validationid, int $instanceid, int $modelid, string $code,
-                                               int $courseid): array {
+    public static function downloadcertificate(
+        int $validationid,
+        int $instanceid,
+        int $modelid,
+        string $code,
+        int $courseid
+    ): array {
         self::validate_parameters(
-            self::downloadcertificate_parameters(), ['id' => $validationid, 'instanceid' => $instanceid,
+            self::downloadcertificate_parameters(),
+            ['id' => $validationid, 'instanceid' => $instanceid,
                 'modelid' => $modelid, 'code' => $code, 'courseid' => $courseid]
         );
         global $USER;
@@ -97,19 +103,19 @@ class downloadcertificate_external extends external_api {
             $validation = new certifygen_validations($validationid);
             [$course, $cm] = get_course_and_cm_from_instance($instanceid, 'certifygen');
             $context = context_module::instance($cm->id);
-            if ($USER->id != $validation->get('userid')
-                && !has_capability('mod/certifygen:canemitotherscertificates', $context)) {
+            if (
+                $USER->id != $validation->get('userid')
+                && !has_capability('mod/certifygen:canemitotherscertificates', $context)
+            ) {
                 $result['result'] = false;
                 $result['message'] = get_string('nopermissiontodownloadothercerts', 'mod_certifygen');
                 return $result;
             }
             if (is_null($validation)) {
-                $result = ['result' => false, 'message' => 'notfound', 'url' => ''];
-                return $result;
+                return ['result' => false, 'message' => 'notfound', 'url' => ''];
             }
             if ($validation->get('status') != certifygen_validations::STATUS_FINISHED) {
-                $result = ['result' => false, 'message' => 'statusnotfinished', 'url' => ''];
-                return $result;
+                return ['result' => false, 'message' => 'statusnotfinished', 'url' => ''];
             }
             // Step 2: call to getfile from repositoryplugin.
             $certifygenmodel = new certifygen_model($validation->get('modelid'));

@@ -36,6 +36,7 @@ use mod_certifygen\interfaces\ICertificateReport;
 use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_validations;
+use moodle_exception;
 use moodle_url;
 use stored_file;
 /**
@@ -64,16 +65,26 @@ class certifygenrepository_localrepository implements ICertificateRepository {
         }
         $itemid = (int) $validation->get('id');
         $fs = get_file_storage();
-        $file = $fs->get_file($contextid, ICertificateReport::FILE_COMPONENT,
-            ICertificateRepository::FILE_AREA, $itemid,
+        $file = $fs->get_file(
+            $contextid,
+            ICertificateReport::FILE_COMPONENT,
+            ICertificateRepository::FILE_AREA,
+            $itemid,
             ICertificateRepository::FILE_PATH,
-            $code);
+            $code
+        );
 
         if (empty($file)) {
             return '';
         }
-        return moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(),
-            $file->get_itemid(), $file->get_filepath(), $file->get_filename())->out();
+        return moodle_url::make_pluginfile_url(
+            $file->get_contextid(),
+            $file->get_component(),
+            $file->get_filearea(),
+            $file->get_itemid(),
+            $file->get_filepath(),
+            $file->get_filename()
+        )->out();
     }
 
     /**
@@ -100,7 +111,7 @@ class certifygenrepository_localrepository implements ICertificateRepository {
             ];
             $fs->create_file_from_storedfile($filerecord, $file);
             $file->delete();
-        } catch (\moodle_exception $e) {
+        } catch (moodle_exception $e) {
             $result['result'] = false;
             $result['haserror'] = true;
             $result['message'] = $e->getMessage();

@@ -34,19 +34,26 @@
 defined('MOODLE_INTERNAL') || die();
 
 // Main link.
-$ADMIN->add('modsettingcertifygencat',
-    new admin_category('certifygenrepository_csv_cat',
-        get_string('pluginname', 'certifygenrepository_csv')));
+$ADMIN->add(
+    'modsettingcertifygencat',
+    new admin_category(
+        'certifygenrepository_csv_cat',
+        get_string('pluginname', 'certifygenrepository_csv')
+    )
+);
 
 $settings = new admin_settingpage(
     'modsettingcertifygenrepositorycsv',
     get_string('pluginnamesettings', 'certifygenrepository_csv'),
-    'moodle/site:config');
+    'moodle/site:config'
+);
 
 if ($ADMIN->fulltree) {
-
     // Enable.
-    $settings->add(new admin_setting_configcheckbox('certifygenrepository_csv/enabled',
+    $settings->add(new admin_setting_configcheckbox(
+        'certifygenrepository_csv/enabled',
         new lang_string('enable', 'certifygenrepository_csv'),
-        new lang_string('enable_help', 'certifygenrepository_csv'), 0));
+        new lang_string('enable_help', 'certifygenrepository_csv'),
+        0
+    ));
 }

@@ -39,8 +39,8 @@ use mod_certifygen\persistents\certifygen_model;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot.'/lib/externallib.php');
+require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
+require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Get id instance certificate test
  * @package    mod_certifygen
@@ -50,7 +50,6 @@ require_once($CFG->dirroot.'/lib/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_id_instance_certificate_external_test extends advanced_testcase {
-
     /**
      * Test set up.
      */
@@ -69,8 +68,12 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
     public function test_get_id_instance_certificate_nopermission(): void {
 
         // Create user.
-        $user1 = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_1', 'firstname' => 'test', 'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+        $user1 = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_1',
+                'firstname' => 'test',
+                'lastname' => 'user 1',
+                'email' => 'test_user_1@fake.es',
+                ]);
 
         // Create courses.
         $course1 = self::getDataGenerator()->create_course();
@@ -92,7 +95,6 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
         $this->assertArrayHasKey('message', $result['error']);
         $this->assertEquals('nopermissiontogetcourses', $result['error']['code']);
         $this->assertEquals(get_string('nopermissiontogetcourses', 'mod_certifygen'), $result['error']['message']);
-
     }
 
     /**
@@ -107,10 +109,14 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
         global $DB;
 
         // Create user.
-        $user1 = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_1', 'firstname' => 'test', 'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+        $user1 = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_1',
+                'firstname' => 'test',
+                'lastname' => 'user 1',
+                'email' => 'test_user_1@fake.es',
+                ]);
         $manager = $this->getDataGenerator()->create_user();
-        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        $managerrole = $DB->get_record('role', ['shortname' => 'manager']);
         $this->getDataGenerator()->role_assign($managerrole->id, $manager->id);
         $this->setUser($manager);
 
@@ -147,8 +153,9 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
             'name' => 'Test 1,',
             'course' => $course1->id,
             'modelid' => $model->get('id'),
+            'instance' => 0,
         ];
-        $modcertifygen = self::getDataGenerator()->create_module('certifygen', $datamodule, $datamodule);
+        $modcertifygen = self::getDataGenerator()->create_module('certifygen', $datamodule);
         $cm = get_coursemodule_from_instance('certifygen', $modcertifygen->id, $course1->id, false, MUST_EXIST);
 
         // Tests: Course with no mod_certifygen included.
@@ -213,19 +220,25 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
             ['shortname' => 'DNI',
                 'name' => 'DNI',
                 'categoryid' => $category->id,
-                'required' => 1, 'visible' => 1, 'locked' => 0, 'datatype' => 'text', 'defaultdata' => null]);
+                'required' => 1, 'visible' => 1,
+                'locked' => 0,
+                'datatype' => 'text',
+                'defaultdata' => null,
+            ]
+        );
 
         // Configure the platform.
-        set_config('userfield',  'profile_' . $field->id, 'mod_certifygen');
+        set_config('userfield', 'profile_' . $field->id, 'mod_certifygen');
 
         // Create user.
         $dni = '123456789P';
         $user1 = $this->getDataGenerator()->create_user(
             ['username' => 'test_user_1', 'firstname' => 'test', 'lastname' => 'user 1',
                 'email' => 'test_user_1@fake.es',
-                'profile_field_DNI' => $dni]);
+            'profile_field_DNI' => $dni]
+        );
         $manager = $this->getDataGenerator()->create_user();
-        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        $managerrole = $DB->get_record('role', ['shortname' => 'manager']);
         $this->getDataGenerator()->role_assign($managerrole->id, $manager->id);
         $this->setUser($manager);
 
@@ -263,7 +276,7 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
             'course' => $course1->id,
             'modelid' => $model->get('id'),
         ];
-        $modcertifygen = self::getDataGenerator()->create_module('certifygen', $datamodule, $datamodule);
+        $modcertifygen = self::getDataGenerator()->create_module('certifygen', $datamodule);
         $cm = get_coursemodule_from_instance('certifygen', $modcertifygen->id, $course1->id, false, MUST_EXIST);
 
         // Tests: Course with no mod_certifygen included.
@@ -341,19 +354,21 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
             ['shortname' => 'DNI',
                 'name' => 'DNI',
                 'categoryid' => $category->id,
-                'required' => 1, 'visible' => 1, 'locked' => 0, 'datatype' => 'text', 'defaultdata' => null]);
+            'required' => 1, 'visible' => 1, 'locked' => 0, 'datatype' => 'text', 'defaultdata' => null]
+        );
 
         // Configure the platform.
-        set_config('userfield',  'profile_' . $field->id, 'mod_certifygen');
+        set_config('userfield', 'profile_' . $field->id, 'mod_certifygen');
 
         // Create user.
         $dni = '123456789P';
         $user1 = $this->getDataGenerator()->create_user(
             ['username' => 'test_user_1', 'firstname' => 'test', 'lastname' => 'user 1',
                 'email' => 'test_user_1@fake.es',
-                'profile_field_DNI' => $dni]);
+            'profile_field_DNI' => $dni]
+        );
         $manager = $this->getDataGenerator()->create_user();
-        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        $managerrole = $DB->get_record('role', ['shortname' => 'manager']);
         $this->getDataGenerator()->role_assign($managerrole->id, $manager->id);
         $this->setUser($manager);
 
@@ -397,7 +412,7 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
             'course' => $course1->id,
             'modelid' => $model->get('id'),
         ];
-        $modcertifygen = self::getDataGenerator()->create_module('certifygen', $datamodule, $datamodule);
+        $modcertifygen = self::getDataGenerator()->create_module('certifygen', $datamodule);
         $cm = get_coursemodule_from_instance('certifygen', $modcertifygen->id, $course1->id, false, MUST_EXIST);
 
         // Tests: Course with no mod_certifygen included.

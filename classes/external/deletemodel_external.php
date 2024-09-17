@@ -36,6 +36,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 use context_system;
+use dml_exception;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
@@ -68,14 +69,16 @@ class deletemodel_external extends external_api {
 
     /**
      * Delete model
+     *
      * @param int $id
      * @return array
-     * @throws invalid_parameter_exception
+     * @throws invalid_parameter_exception|dml_exception
      */
     public static function deletemodel(int $id): array {
 
         self::validate_parameters(
-            self::deletemodel_parameters(), ['id' => $id]
+            self::deletemodel_parameters(),
+            ['id' => $id]
         );
         $context = context_system::instance();
         $result = ['result' => true, 'message' => 'OK'];

@@ -39,7 +39,6 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use required_capability_exception;
-use restricted_context_exception;
 /**
  * Get model list table
  * @package    mod_certifygen
@@ -62,12 +61,13 @@ class getmodellisttable_external extends external_api {
      * Get model list table
      * @throws dml_exception
      * @throws invalid_parameter_exception
-     * @throws restricted_context_exception|required_capability_exception
+     * @throws required_capability_exception
      */
     public static function getmodellisttable(): array {
         global $PAGE;
         self::validate_parameters(
-            self::getmodellisttable_parameters(), []
+            self::getmodellisttable_parameters(),
+            []
         );
         $context = context_system::instance();
         $PAGE->set_context($context);

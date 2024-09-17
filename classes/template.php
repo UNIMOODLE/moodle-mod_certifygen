@@ -34,7 +34,6 @@
 namespace mod_certifygen;
 
 use coding_exception;
-use context_course;
 use context_system;
 use core\lock\lock;
 use core\message\message;
@@ -75,8 +74,10 @@ class template extends \tool_certificate\template {
         if ($obj !== null) {
             $lang = $obj->lang;
             // Ignore fields that are not properties.
-            $data = (object)array_intersect_key((array)$obj,
-                \tool_certificate\persistent\template::properties_definition());
+            $data = (object)array_intersect_key(
+                (array)$obj,
+                \tool_certificate\persistent\template::properties_definition()
+            );
         }
         $t = new self();
         $t->persistent = new \tool_certificate\persistent\template($id, $data);
@@ -174,7 +175,6 @@ class template extends \tool_certificate\template {
         );
 
         if (!$file) {
-
             $file = $this->create_issue_file($issue);
         }
         return $file;
@@ -192,8 +192,14 @@ class template extends \tool_certificate\template {
         $file = $this->get_issue_file($issue);
         // We add timemodified instead of issue id to prevent caching of changed certificate.
         // The callback tool_certificate_pluginfile() ignores the itemid and only takes the code.
-        return moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(),
-            $file->get_itemid(), $file->get_filepath(), $issue->code . '.pdf');
+        return moodle_url::make_pluginfile_url(
+            $file->get_contextid(),
+            $file->get_component(),
+            $file->get_filearea(),
+            $file->get_itemid(),
+            $file->get_filepath(),
+            $issue->code . '.pdf'
+        );
     }
 
     /**
@@ -221,8 +227,14 @@ class template extends \tool_certificate\template {
         $fs = get_file_storage();
 
         // If file exists and $regenerate=true, delete current issue file.
-        $storedfile = $fs->get_file($file->contextid, $file->component, $file->filearea, $file->itemid, $file->filepath,
-            $file->filename);
+        $storedfile = $fs->get_file(
+            $file->contextid,
+            $file->component,
+            $file->filearea,
+            $file->itemid,
+            $file->filepath,
+            $file->filename
+        );
         if ($storedfile && $regenerate) {
             $storedfile->delete();
         }
@@ -242,14 +254,19 @@ class template extends \tool_certificate\template {
      * @return int The ID of the issue
      * @throws coding_exception
      * @throws dml_exception
-     * @throws file_exception
      * @throws stored_file_creation_exception
      * @uses \tool_tenant\config::push_for_user()
      * @uses \tool_tenant\config::pop()
      *
      */
-    public function issue_certificate($userid, $expires = null, array $data = [], $component = 'mod_certifygen',
-                                      $courseid = null, ?lock $lock = null): int {
+    public function issue_certificate(
+        $userid,
+        $expires = null,
+        array $data = [],
+        $component = 'mod_certifygen',
+        $courseid = null,
+        ?lock $lock = null
+    ): int {
         global $DB;
 
         $issue = new stdClass();

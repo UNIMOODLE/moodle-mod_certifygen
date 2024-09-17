@@ -34,16 +34,18 @@ namespace certifygenreport_basic\output;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/user/lib.php');
+require_once($CFG->dirroot . '/user/lib.php');
 
 use certifygenreport_basic\useofthecoursealgorithm;
 use coding_exception;
 use context_course;
 use context_system;
+use core_course_category;
 use dml_exception;
 use moodle_exception;
 use moodle_url;
 use renderable;
+use renderer_base;
 use stdClass;
 use templatable;
 /**
@@ -61,6 +63,8 @@ class report_view implements renderable, templatable {
     private bool $showtext;
     /** @var bool $showendtext */
     private bool $showendtext;
+    /** @var array $courses */
+    private array $courses;
     /** @var string REPORT_COMPONENT */
     const REPORT_COMPONENT = 'certifygenreport_basic';
     /** @var string REPORT_FILEAREA */
@@ -83,12 +87,13 @@ class report_view implements renderable, templatable {
     }
     /**
      * export_for_template
-     * @param \renderer_base $output
+     * @param renderer_base $output
      * @return stdClass
      * @throws coding_exception
      * @throws dml_exception
+     * @throws moodle_exception
      */
-    public function export_for_template(\renderer_base $output) {
+    public function export_for_template(renderer_base $output): stdClass {
         $user = user_get_users_by_id([$this->userid]);
         $user = reset($user);
         $name = fullname($user);
@@ -97,7 +102,7 @@ class report_view implements renderable, templatable {
         $data->logosrc = $url;
         if ($this->showtext) {
             $data->hastext = true;
-            $data->text = get_string('reporttext', 'certifygenreport_basic', (object)['teacher' => $name] );
+            $data->text = get_string('reporttext', 'certifygenreport_basic', (object)['teacher' => $name]);
         }
         if ($this->showendtext) {
             $data->hasendtext = true;
@@ -155,7 +160,7 @@ class report_view implements renderable, templatable {
      */
     private function get_course_details_string(stdClass $course): string {
         $detail = '';
-        $category = \core_course_category::get($course->category);
+        $category = core_course_category::get($course->category);
         $data = ['name' => strip_tags(format_text($category->name))];
         $detail .= get_string('cdetail_1', 'certifygenreport_basic', (object)$data);
         if ($course->startdate > 0) {
@@ -175,8 +180,7 @@ class report_view implements renderable, templatable {
      */
     private function get_course_teachers(int $courseid): array {
         $context = context_course::instance($courseid);
-        $teachers = get_enrolled_users($context, 'moodle/course:managegroups');
-        return $teachers;
+        return get_enrolled_users($context, 'moodle/course:managegroups');
     }
 
     /**
@@ -239,12 +243,17 @@ class report_view implements renderable, templatable {
      * @throws dml_exception
      */
     public function get_logo_url(): string {
-        global $OUTPUT, $CFG;
         $fs = get_file_storage();
         $context = context_system::instance();
         $filename = get_config('certifygenreport_basic', 'logo');
-        $logo = $fs->get_file($context->id, self::REPORT_COMPONENT, self::REPORT_FILEAREA, 0,
-            '/', $filename);
+        $logo = $fs->get_file(
+            $context->id,
+            self::REPORT_COMPONENT,
+            self::REPORT_FILEAREA,
+            0,
+            '/',
+            $filename
+        );
         if (!$logo) {
             return '';
         }

@@ -31,12 +31,13 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_certifygen\forms\searchforuserform;
 use mod_certifygen\output\views\profile_my_certificates_view;
 use mod_certifygen\persistents\certifygen_context;
 
 require_once('../../config.php');
 global $CFG, $PAGE, $OUTPUT, $USER;
-require_once($CFG->dirroot. '/lib/formslib.php');
+require_once($CFG->dirroot . '/lib/formslib.php');
 require_once('lib.php');
 
 require_login();
@@ -50,7 +51,7 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('teachercertificates', 'mod_certifygen'), 2, 'mb-5');
 
 if (certifygen_context::exists_system_context_model()) {
-    $form = new \mod_certifygen\forms\searchforuserform();
+    $form = new searchforuserform();
     echo $form->display();
     if ($data = $form->get_data()) {
         $output = $PAGE->get_renderer('mod_certifygen');

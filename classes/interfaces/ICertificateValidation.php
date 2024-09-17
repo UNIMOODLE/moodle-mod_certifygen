@@ -104,4 +104,3 @@ interface ICertificateValidation {
      */
     public function get_status_messages(): array;
 }
-

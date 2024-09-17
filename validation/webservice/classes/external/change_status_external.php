@@ -34,15 +34,18 @@ namespace certifygenvalidation_webservice\external;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/user/lib.php');
-require_once($CFG->dirroot.'/mod/certifygen/classes/filters/certifygenfilter.php');
-require_once($CFG->dirroot.'/mod/certifygen/lib.php');
+require_once($CFG->dirroot . '/user/lib.php');
+require_once($CFG->dirroot . '/mod/certifygen/classes/filters/certifygenfilter.php');
+require_once($CFG->dirroot . '/mod/certifygen/lib.php');
 
 use certifygenvalidation_webservice\certifygenvalidation_webservice;
+use coding_exception;
+use context_system;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
+use invalid_parameter_exception;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
@@ -77,15 +80,16 @@ class change_status_external extends external_api {
      * @param string $userfield
      * @param int $requestid
      * @return array|array[]
-     * @throws \coding_exception
-     * @throws \invalid_parameter_exception
+     * @throws coding_exception
+     * @throws invalid_parameter_exception
      */
     public static function change_status(int $userid, string $userfield, int $requestid): array {
         $params = self::validate_parameters(
-            self::change_status_parameters(), ['userid' => $userid, 'userfield' => $userfield, 'requestid' => $requestid]
+            self::change_status_parameters(),
+            ['userid' => $userid, 'userfield' => $userfield, 'requestid' => $requestid]
         );
         try {
-            $context = \context_system::instance();
+            $context = context_system::instance();
             require_capability('mod/certifygen:manage', $context);
             $results = [];
             // Choose user parameter.
@@ -141,7 +145,7 @@ class change_status_external extends external_api {
         return [
             'requestid' => $params['requestid'],
             'newstatus' => certifygen_validations::STATUS_VALIDATION_OK,
-            'newstatusdesc' => get_string('status_'. $request->get('status'), 'mod_certifygen'),
+            'newstatusdesc' => get_string('status_' . $request->get('status'), 'mod_certifygen'),
         ];
     }
     /**

@@ -30,20 +30,25 @@
  */
 namespace mod_certifygen\external;
 use certifygenfilter;
+use context_course;
+use context_system;
+use dml_exception;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_multiple_structure;
 use external_value;
+use invalid_parameter_exception;
 use mod_certifygen\persistents\certifygen_context;
 use mod_certifygen\persistents\certifygen_model;
+use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/user/lib.php');
-require_once($CFG->dirroot.'/mod/certifygen/classes/filters/certifygenfilter.php');
-require_once($CFG->dirroot.'/mod/certifygen/lib.php');
+require_once($CFG->dirroot . '/user/lib.php');
+require_once($CFG->dirroot . '/mod/certifygen/classes/filters/certifygenfilter.php');
+require_once($CFG->dirroot . '/mod/certifygen/lib.php');
 /**
  * Get courses as teacher
  * @package    mod_certifygen
@@ -74,16 +79,16 @@ class get_courses_as_teacher_external extends external_api {
      * @param string $userfield
      * @param string $lang
      * @return array
-     * @throws \dml_exception
-     * @throws \invalid_parameter_exception
-     * @throws \required_capability_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
      */
     public static function get_courses_as_teacher(int $userid, string $userfield, string $lang): array {
 
         $params = self::validate_parameters(
-            self::get_courses_as_teacher_parameters(), ['userid' => $userid, 'userfield' => $userfield, 'lang' => $lang]
+            self::get_courses_as_teacher_parameters(),
+            ['userid' => $userid, 'userfield' => $userfield, 'lang' => $lang]
         );
-        $context = \context_system::instance();
+        $context = context_system::instance();
         $results = ['courses' => [], 'teacher' => [], 'error' => []];
         $haserror = false;
         $courses = [];
@@ -126,11 +131,11 @@ class get_courses_as_teacher_external extends external_api {
                 return $results;
             }
             // Filter to return course names in $lang language.
-            $filter = new certifygenfilter(\context_system::instance(), [], $lang);
+            $filter = new certifygenfilter(context_system::instance(), [], $lang);
             // Get courses with a certifygen_model asociated where the user is editingteacher.
             $enrolments = enrol_get_all_users_courses($userid, true);
             foreach ($enrolments as $enrolment) {
-                $coursecontext = \context_course::instance($enrolment->ctxinstance);
+                $coursecontext = context_course::instance($enrolment->ctxinstance);
                 if (!has_capability('moodle/course:managegroups', $coursecontext, $userid)) {
                     continue;
                 }
@@ -156,7 +161,7 @@ class get_courses_as_teacher_external extends external_api {
                 ];
             }
             $results['courses'] = $courses;
-        } catch (\moodle_exception $e) {
+        } catch (moodle_exception $e) {
             unset($results['courses']);
             unset($results['teacher']);
             $haserror = true;
@@ -179,51 +184,100 @@ class get_courses_as_teacher_external extends external_api {
                     new external_single_structure(
                         [
                             'id'   => new external_value(PARAM_RAW, 'Course id', VALUE_OPTIONAL),
-                            'shortname'   => new external_value(PARAM_RAW, 'Course shortname',
-                                VALUE_OPTIONAL),
-                            'fullname' => new external_value(PARAM_RAW, 'Course fullname',
-                                VALUE_OPTIONAL),
-                            'categoryid' => new external_value(PARAM_INT, 'Course category id',
-                                VALUE_OPTIONAL),
+                            'shortname'   => new external_value(
+                                PARAM_RAW,
+                                'Course shortname',
+                                VALUE_OPTIONAL
+                            ),
+                            'fullname' => new external_value(
+                                PARAM_RAW,
+                                'Course fullname',
+                                VALUE_OPTIONAL
+                            ),
+                            'categoryid' => new external_value(
+                                PARAM_INT,
+                                'Course category id',
+                                VALUE_OPTIONAL
+                            ),
                             'models' => new external_multiple_structure(
-                                            new external_single_structure(
-                                                [
-                                                    'id' => new external_value(PARAM_INT, 'Instance id',
-                                                        VALUE_OPTIONAL),
-                                                    'idnumber' => new external_value(PARAM_RAW, 'Model name',
-                                                        VALUE_OPTIONAL),
-                                                    'name' => new external_value(PARAM_RAW, 'Model name',
-                                                        VALUE_OPTIONAL),
-                                                    'mode' => new external_value(PARAM_INT, 'Model mode',
-                                                        VALUE_OPTIONAL),
-                                                    'timeondemmand' => new external_value(PARAM_INT,
-                                                        'Model timeondemmand', VALUE_OPTIONAL),
-                                                    'type' => new external_value(PARAM_INT, 'Model type',
-                                                        VALUE_OPTIONAL),
-                                                    'templateid' => new external_value(PARAM_INT,
-                                                        'Model template id', VALUE_OPTIONAL),
-                                                    'langs' => new external_value(PARAM_RAW, 'Model langs',
-                                                        VALUE_OPTIONAL),
-                                                    'validation' => new external_value(PARAM_RAW,
-                                                        'Model validation', VALUE_OPTIONAL),
-                                                    'repository' => new external_value(PARAM_RAW,
-                                                        'Model validation', VALUE_OPTIONAL),
+                                new external_single_structure(
+                                    [
+                                                    'id' => new external_value(
+                                                        PARAM_INT,
+                                                        'Instance id',
+                                                        VALUE_OPTIONAL
+                                                    ),
+                                                    'idnumber' => new external_value(
+                                                        PARAM_RAW,
+                                                        'Model name',
+                                                        VALUE_OPTIONAL
+                                                    ),
+                                                    'name' => new external_value(
+                                                        PARAM_RAW,
+                                                        'Model name',
+                                                        VALUE_OPTIONAL
+                                                    ),
+                                                    'mode' => new external_value(
+                                                        PARAM_INT,
+                                                        'Model mode',
+                                                        VALUE_OPTIONAL
+                                                    ),
+                                                    'timeondemmand' => new external_value(
+                                                        PARAM_INT,
+                                                        'Model timeondemmand',
+                                                        VALUE_OPTIONAL
+                                                    ),
+                                                    'type' => new external_value(
+                                                        PARAM_INT,
+                                                        'Model type',
+                                                        VALUE_OPTIONAL
+                                                    ),
+                                                    'templateid' => new external_value(
+                                                        PARAM_INT,
+                                                        'Model template id',
+                                                        VALUE_OPTIONAL
+                                                    ),
+                                                    'langs' => new external_value(
+                                                        PARAM_RAW,
+                                                        'Model langs',
+                                                        VALUE_OPTIONAL
+                                                    ),
+                                                    'validation' => new external_value(
+                                                        PARAM_RAW,
+                                                        'Model validation',
+                                                        VALUE_OPTIONAL
+                                                    ),
+                                                    'repository' => new external_value(
+                                                        PARAM_RAW,
+                                                        'Model validation',
+                                                        VALUE_OPTIONAL
+                                                    ),
                                                 ],
-                                                'courses list', VALUE_OPTIONAL)
-                            , '', VALUE_OPTIONAL),
+                                    'courses list',
+                                    VALUE_OPTIONAL
+                                ),
+                                '',
+                                VALUE_OPTIONAL
+                            ),
                         ],
-                        'courses list', VALUE_OPTIONAL)
-                , '', VALUE_OPTIONAL),
-                'teacher' => new external_single_structure (
+                        'courses list',
+                        VALUE_OPTIONAL
+                    ),
+                    '',
+                    VALUE_OPTIONAL
+                ),
+                'teacher' => new external_single_structure(
                     [
                         'fullname' => new external_value(PARAM_RAW, 'User fullname', VALUE_OPTIONAL),
                         'id' => new external_value(PARAM_INT, 'User id', VALUE_OPTIONAL),
-                    ], 'Student info', VALUE_OPTIONAL),
+                    ],
+                    'Student info',
+                    VALUE_OPTIONAL
+                ),
                 'error' => new external_single_structure([
                     'message' => new external_value(PARAM_RAW, 'Error message', VALUE_OPTIONAL),
                     'code' => new external_value(PARAM_RAW, 'Error code', VALUE_OPTIONAL),
                 ], 'Errors information', VALUE_OPTIONAL),
-            ]
-        );
+            ]);
     }
 }

@@ -43,5 +43,3 @@ $string['originalfilespath'] = 'Jatorrizko Fitxategien Bidea';
 $string['originalfilespath_help'] = 'Ziurtagiri jatorrizkoak gordetzeko zerbitzuko bidea';
 $string['validatedfilespath'] = 'Balioztatutako Fitxategien Bidea';
 $string['validatedfilespath_help'] = 'Balioztatutako ziurtagiriak gordetzeko zerbitzuko bidea';
-
-

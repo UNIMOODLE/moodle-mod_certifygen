@@ -39,6 +39,7 @@ use external_multiple_structure;
 use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
+use required_capability_exception;
 use restricted_context_exception;
 
 /**
@@ -50,7 +51,6 @@ use restricted_context_exception;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class searchcourse_external extends external_api {
-
     /**
      * Describes the external function parameters.
      *
@@ -64,12 +64,13 @@ class searchcourse_external extends external_api {
 
     /**
      * Search course
+     *
      * @param string $query
      * @return array
      * @throws coding_exception
      * @throws dml_exception
      * @throws invalid_parameter_exception
-     * @throws restricted_context_exception|\required_capability_exception
+     * @throws restricted_context_exception|required_capability_exception
      */
     public static function searchcourse(string $query): array {
         global $DB, $CFG;
@@ -83,7 +84,7 @@ class searchcourse_external extends external_api {
         self::validate_context($context);
         require_capability('mod/certifygen:manage', $context);
 
-        $likename = $DB->sql_like('c.fullname', ':fullname', false, true);
+        $likename = $DB->sql_like('c.fullname', ':fullname', false);
         $sql = "SELECT id, fullname";
         $sql .= " FROM {course} c";
         $sql .= " WHERE $likename";

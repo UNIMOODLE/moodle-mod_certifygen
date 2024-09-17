@@ -31,13 +31,13 @@
  */
 namespace mod_certifygen\privacy;
 use coding_exception;
+use context;
 use context_course;
 use context_module;
 use context_system;
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\approved_userlist;
-use core_privacy\local\request\context;
 use core_privacy\local\request\contextlist;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
@@ -61,10 +61,9 @@ require_once($CFG->dirroot . '/lib/modinfolib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements
+    \core_privacy\local\request\core_userlist_provider,
     \core_privacy\local\metadata\provider,
-    \core_privacy\local\request\plugin\provider,
-    \core_privacy\local\request\core_userlist_provider {
-
+    \core_privacy\local\request\plugin\provider {
     /**
      * get_metadata
      * @param collection $collection
@@ -85,8 +84,11 @@ class provider implements
             'timecreated' => 'privacy:metadata:timecreated',
             'timemodified' => 'privacy:metadata:timemodified',
         ];
-        $collection->add_database_table('certifygen_validations', $validations,
-            'privacy:metadata:certifygen_validations');
+        $collection->add_database_table(
+            'certifygen_validations',
+            $validations,
+            'privacy:metadata:certifygen_validations'
+        );
         return $collection;
     }
 
@@ -136,8 +138,10 @@ class provider implements
             $context = context_system::instance();
             $code = certifygen_validations::get_certificate_code($validation);
             if (!empty($validation->get('certifygenid'))) {
-                [$course, $cm] = get_course_and_cm_from_instance((int)$validation->get('certifygenid'),
-                    'certifygen');
+                [$course, $cm] = get_course_and_cm_from_instance(
+                    (int)$validation->get('certifygenid'),
+                    'certifygen'
+                );
                 $context = context_module::instance($cm->id);
             }
             $certifygenmodel = new certifygen_model($validation->get('modelid'));
@@ -150,7 +154,7 @@ class provider implements
             }
             $data = [
                 'code' => $code,
-                'status' => get_string('status_'.$validation->get('status'), 'mod_certifygen'),
+                'status' => get_string('status_' . $validation->get('status'), 'mod_certifygen'),
                 'url' => $url,
                 'timecreated' => $validation->get('timecreated'),
             ];
@@ -159,19 +163,21 @@ class provider implements
             }
             $alldata[] = $data;
             writer::with_context($context)->export_data(
-                [get_string('pluginname', 'mod_certifygen')], (object) $alldata);
+                [get_string('pluginname', 'mod_certifygen')],
+                (object) $alldata
+            );
         }
     }
 
     /**
      * delete_data_for_all_users_in_context
-     * @param \context $context
+     * @param context $context
      * @return mixed
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public static function delete_data_for_all_users_in_context(\context $context) {
+    public static function delete_data_for_all_users_in_context(context $context) {
         global $DB;
 
         $fs = get_file_storage();
@@ -247,22 +253,28 @@ class provider implements
     /**
      * delete_data_for_users
      * @param approved_userlist $userlist
-     * @return mixed
+     * @return void
      * @throws coding_exception
      * @throws dml_exception
+     * @throws moodle_exception
      */
     public static function delete_data_for_users(approved_userlist $userlist) {
         global $DB;
 
         $context = $userlist->get_context();
-        if (!$context instanceof context_system
-        && !$context instanceof context_module) {
+        if (
+            !$context instanceof context_system
+            && !$context instanceof context_module
+        ) {
             return;
         }
-        list($userinsql, $userinparams) = $DB->get_in_or_equal($userlist->get_userids(), SQL_PARAMS_NAMED);
+        [$userinsql, $userinparams] = $DB->get_in_or_equal($userlist->get_userids(), SQL_PARAMS_NAMED);
 
-        $validations = $DB->get_records_select('certifygen_validations', ' userid ' . $userinsql,
-            $userinparams);
+        $validations = $DB->get_records_select(
+            'certifygen_validations',
+            ' userid ' . $userinsql,
+            $userinparams
+        );
         foreach ($validations as $validation) {
             self::remove_validation_data($validation);
         }
@@ -286,11 +298,11 @@ class provider implements
         }
         $filearea = '';
         $status = $validation->get('status');
-        switch ($status){
+        switch ($status) {
             case certifygen_validations::STATUS_VALIDATION_OK:
             case certifygen_validations::STATUS_STORAGE_ERROR:
                 $filearea = ICertificateValidation::FILE_AREA_VALIDATED;
-            break;
+                break;
             case certifygen_validations::STATUS_FINISHED:
                 $filearea = ICertificateRepository::FILE_AREA;
                 break;
@@ -303,15 +315,21 @@ class provider implements
                 $fs->delete_area_files($context->id, 'mod_certifygen', $filearea, $validation->get('id'));
             }
             if (empty($validation->get('certifygenid'))) {
-                $fs->delete_area_files($context->id, 'mod_certifygen', 'certifygenreport',
-                    $validation->get('id'));
+                $fs->delete_area_files(
+                    $context->id,
+                    'mod_certifygen',
+                    'certifygenreport',
+                    $validation->get('id')
+                );
             } else {
-                $fs->delete_area_files(context_system::instance()->id, 'mod_certifygen', 'issues',
-                    $validation->get('id'));
-
+                $fs->delete_area_files(
+                    context_system::instance()->id,
+                    'mod_certifygen',
+                    'issues',
+                    $validation->get('id')
+                );
             }
         } catch (moodle_exception $e) {
-            // por si no existe el fichero...
             debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
         }
 

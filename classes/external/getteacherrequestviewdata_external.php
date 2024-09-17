@@ -31,6 +31,7 @@
 
 namespace mod_certifygen\external;
 
+use coding_exception;
 use context_system;
 use dml_exception;
 use external_api;
@@ -39,6 +40,8 @@ use mod_certifygen\output\views\profile_my_certificates_view;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
+use moodle_exception;
+
 /**
  * Get teacher request view data
  * @package    mod_certifygen
@@ -63,13 +66,16 @@ class getteacherrequestviewdata_external extends external_api {
      * Get teacher request view data
      * @param int $userid
      * @return array
+     * @throws coding_exception
+     * @throws moodle_exception
      * @throws dml_exception
      * @throws invalid_parameter_exception
      */
     public static function getteacherrequestviewdata(int $userid): array {
         global $PAGE;
         self::validate_parameters(
-            self::getteacherrequestviewdata_parameters(), ['userid' => $userid]
+            self::getteacherrequestviewdata_parameters(),
+            ['userid' => $userid]
         );
         $PAGE->set_context(context_system::instance());
         $view = new profile_my_certificates_view($userid);

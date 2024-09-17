@@ -29,21 +29,27 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_certifygen\external;
+use coding_exception;
+use context_course;
+use context_system;
+use dml_exception;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
+use invalid_parameter_exception;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use certifygenfilter;
+use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/user/lib.php');
-require_once($CFG->dirroot.'/mod/certifygen/lib.php');
-require_once($CFG->dirroot.'/mod/certifygen/classes/filters/certifygenfilter.php');
+require_once($CFG->dirroot . '/user/lib.php');
+require_once($CFG->dirroot . '/mod/certifygen/lib.php');
+require_once($CFG->dirroot . '/mod/certifygen/classes/filters/certifygenfilter.php');
 /**
  * Get certificate elements
  * @package    mod_certifygen
@@ -72,18 +78,24 @@ class get_json_certificate_external extends external_api {
 
     /**
      * get_json_certificate
+     *
      * @param int $userid
      * @param string $userfield
      * @param int $idinstance
      * @param string $customfields
      * @param string $lang
      * @return array
-     * @throws \dml_exception
-     * @throws \invalid_parameter_exception
-     * @throws \required_capability_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws coding_exception
      */
-    public static function get_json_certificate(int $userid, string $userfield, int $idinstance, string $customfields,
-                                                string $lang): array {
+    public static function get_json_certificate(
+        int $userid,
+        string $userfield,
+        int $idinstance,
+        string $customfields,
+        string $lang
+    ): array {
         global $USER;
         $params = self::validate_parameters(
             self::get_json_certificate_parameters(),
@@ -93,7 +105,7 @@ class get_json_certificate_external extends external_api {
 
         if ($USER->id != $userid) {
             debugging("enttra en el if y no deberia");
-            $context = \context_system::instance();
+            $context = context_system::instance();
             if (!has_capability('mod/certifygen:manage', $context)) {
                 $result['result'] = false;
                 $result['message'] = get_string('nopermissiontoemitothercerts', 'mod_certifygen');
@@ -122,7 +134,7 @@ class get_json_certificate_external extends external_api {
             $certifygen = new certifygen($params['idinstance']);
 
             // Is user enrolled on this course as student?
-            $context = \context_course::instance($certifygen->get('course'));
+            $context = context_course::instance($certifygen->get('course'));
             if (has_capability('moodle/course:managegroups', $context, $userid)) {
                 unset($result['json']);
                 $result['error']['code'] = 'user_not_enrolled_on_idinstance_course_as_student';
@@ -137,8 +149,14 @@ class get_json_certificate_external extends external_api {
             $validation = certifygen_validations::get_validation_by_lang_and_instance($lang, $idinstance, $userid);
             if (is_null($validation)) {
                 // Emit certificate.
-                $result = emitcertificate_external::emitcertificate(0, $idinstance, $model->get('id'), $lang,
-                    $userid, $certifygen->get('course'));
+                $result = emitcertificate_external::emitcertificate(
+                    0,
+                    $idinstance,
+                    $model->get('id'),
+                    $lang,
+                    $userid,
+                    $certifygen->get('course')
+                );
                 if (!$result['result']) {
                     $result['error']['code'] = 'certificate_can_not_be_emited';
                     $result['error']['message'] = $result['message'];
@@ -148,8 +166,13 @@ class get_json_certificate_external extends external_api {
             }
 
             // Get json.
-            $issue = \mod_certifygen\certifygen::get_user_certificate($idinstance, $userid, $certifygen->get('course'),
-            $model->get('templateid'), $validation->get('lang'));
+            $issue = \mod_certifygen\certifygen::get_user_certificate(
+                $idinstance,
+                $userid,
+                $certifygen->get('course'),
+                $model->get('templateid'),
+                $validation->get('lang')
+            );
             if (is_null($issue)) {
                 $haserror = true;
                 $result['error']['code'] = 'issue_not_found';
@@ -157,14 +180,14 @@ class get_json_certificate_external extends external_api {
             } else {
                 // Filter multilang course name.
                 // Filter to return course names in $lang language.
-                $filter = new certifygenfilter(\context_system::instance(), [], $lang);
+                $filter = new certifygenfilter(context_system::instance(), [], $lang);
                 $json = json_decode($issue->data);
                 $json->courseshortname = $filter->filter($json->courseshortname);
                 $json->coursefullname = $filter->filter($json->coursefullname);
                 $result['json'] = json_encode($json);
             }
-        } catch (\moodle_exception $e) {
-            debugging(__FUNCTION__ . " error: ".$e->getMessage());
+        } catch (moodle_exception $e) {
+            debugging(__FUNCTION__ . " error: " . $e->getMessage());
             unset($result['json']);
             $haserror = true;
             $result['error']['code'] = $e->errorcode;
@@ -189,7 +212,6 @@ class get_json_certificate_external extends external_api {
                     'message' => new external_value(PARAM_CLEANFILE, 'Error message'),
                     'code' => new external_value(PARAM_RAW, 'Error code'),
                 ], 'Errors information', VALUE_OPTIONAL),
-            ],
-        );
+            ]);
     }
 }

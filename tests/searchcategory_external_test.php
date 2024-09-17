@@ -33,13 +33,20 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_certifygen;
+use advanced_testcase;
+use coding_exception;
+use dml_exception;
+use invalid_parameter_exception;
 use mod_certifygen\external\searchcategory_external;
+use moodle_exception;
+use restricted_context_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot.'/lib/externallib.php');
+require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
+require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Search category
  * @package    mod_certifygen
@@ -49,7 +56,6 @@ require_once($CFG->dirroot.'/lib/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class searchcategory_external_test extends advanced_testcase {
-
     /**
      * Test set up.
      */
@@ -66,7 +72,8 @@ class searchcategory_external_test extends advanced_testcase {
         // Create user and enrol as teacher.
         $user = $this->getDataGenerator()->create_user(
             ['username' => 'test_user_2', 'firstname' => 'test',
-                'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
+            'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']
+        );
 
         // Login as user.
         $this->setUser($user);
@@ -79,7 +86,7 @@ class searchcategory_external_test extends advanced_testcase {
         $haserror = false;
         try {
             searchcategory_external::searchcategory('Prim');
-        } catch (moodle_exception $e) {
+        } catch (moodle_exception) {
             $haserror = true;
         }
         $this->assertTrue($haserror);
@@ -91,20 +98,21 @@ class searchcategory_external_test extends advanced_testcase {
      * @throws coding_exception
      * @throws dml_exception
      * @throws invalid_parameter_exception
-     * @throws moodle_exception
      * @throws restricted_context_exception
+     * @throws moodle_exception
      */
     public function test_searchcategory(): void {
         global $DB;
         $manager = $this->getDataGenerator()->create_user();
-        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        $managerrole = $DB->get_record('role', ['shortname' => 'manager']);
         $this->getDataGenerator()->role_assign($managerrole->id, $manager->id);
         $this->setUser($manager);
 
         // Create user and enrol as teacher.
-        $user = $this->getDataGenerator()->create_user(
+        $this->getDataGenerator()->create_user(
             ['username' => 'test_user_2', 'firstname' => 'test',
-                'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
+            'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']
+        );
 
         $name1 = 'Primaria 1';
         $category1 = self::getDataGenerator()->create_category(['name' => $name1]);

@@ -51,12 +51,11 @@ require_once($CFG->dirroot . '/lib/modinfolib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class certificate_issued extends base {
-
     /**
      * init
      * @return void
      */
-    protected function init() {
+    protected function init(): void {
         $this->data['crud'] = 'c';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
         $this->data['objecttable'] = 'certifygen_validations';
@@ -66,7 +65,7 @@ class certificate_issued extends base {
      *
      * @return string
      */
-    public function get_description() {
+    public function get_description(): string {
         return "The user with id '$this->userid' has issued a certificate";
     }
 

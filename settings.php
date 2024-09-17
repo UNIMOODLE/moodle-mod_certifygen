@@ -34,10 +34,14 @@
 defined('MOODLE_INTERNAL') || die();
 
 // Enlace principal de settings.
-$ADMIN->add('modsettings',
-    new admin_category('modsettingcertifygencat',
+$ADMIN->add(
+    'modsettings',
+    new admin_category(
+        'modsettingcertifygencat',
         get_string('modulename', 'certifygen'),
-  $module->is_enabled() === false));
+        $module->is_enabled() === false
+    )
+);
 
 // Certifygen settings.
 $settings = new admin_settingpage('modsettingcertifygen', get_string('pluginnamesettings', 'mod_certifygen'), 'moodle/site:config');
@@ -55,7 +59,8 @@ if ($ADMIN->fulltree) {
             $options['profile_' . $customfield->id] = $customfield->name;
         }
     }
-    $settings->add(new admin_setting_configselect('mod_certifygen/userfield',
+    $settings->add(new admin_setting_configselect(
+        'mod_certifygen/userfield',
         new lang_string('userfield', 'mod_certifygen'),
         new lang_string('userfield_desc', 'mod_certifygen'),
         '',
@@ -65,24 +70,40 @@ if ($ADMIN->fulltree) {
 $ADMIN->add('modsettingcertifygencat', $settings);
 
 // Category certifygencat for extra links.
-$ADMIN->add('root',
-    new admin_category('certifygencat', get_string('pluginname', 'mod_certifygen'),
-        $module->is_enabled() === false),
-    'location');
+$ADMIN->add(
+    'root',
+    new admin_category(
+        'certifygencat',
+        get_string('pluginname', 'mod_certifygen'),
+        $module->is_enabled() === false
+    ),
+    'location'
+);
 // Model manager page access.
-$modelsmanagersettings = new admin_externalpage('certifygenmodelsmanager',
+$modelsmanagersettings = new admin_externalpage(
+    'certifygenmodelsmanager',
     get_string('modelsmanager', 'mod_certifygen'),
-    '/mod/certifygen/modelmanager.php',  'moodle/site:config', $module->is_enabled() === false);
+    '/mod/certifygen/modelmanager.php',
+    'moodle/site:config',
+    $module->is_enabled() === false
+);
 $ADMIN->add('certifygencat', $modelsmanagersettings);
 // See teacher requests.
-$teacherrequestreportsettings = new admin_externalpage('certifygenteacherrequestreport',
+$teacherrequestreportsettings = new admin_externalpage(
+    'certifygenteacherrequestreport',
     get_string('certifygenteacherrequestreport', 'mod_certifygen'),
-    '/mod/certifygen/teacherrequestreport.php',  'mod/certifygen:viewcontextcertificates', $module->is_enabled() === false);
+    '/mod/certifygen/teacherrequestreport.php',
+    'mod/certifygen:viewcontextcertificates',
+    $module->is_enabled() === false
+);
 $ADMIN->add('certifygencat', $teacherrequestreportsettings);
 
-$errorspage = new admin_externalpage('certifygenerrors',
+$errorspage = new admin_externalpage(
+    'certifygenerrors',
     get_string('certifygenerrors', 'mod_certifygen'),
-    '/mod/certifygen/showerrors.php',  'mod/certifygen:manage');
+    '/mod/certifygen/showerrors.php',
+    'mod/certifygen:manage'
+);
 $ADMIN->add('modsettingcertifygencat', $errorspage);
 
 // Subplugins settings.

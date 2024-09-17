@@ -36,9 +36,11 @@
 namespace mod_certifygen;
 
 use coding_exception;
+use context;
 use context_course;
 use core\invalid_persistent_exception;
 use core_course\customfield\course_handler;
+use core_user\fields;
 use dml_exception;
 use file_exception;
 use mod_certifygen\interfaces\ICertificateRepository;
@@ -48,9 +50,11 @@ use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 use stdClass;
+use stored_file;
 use stored_file_creation_exception;
 use tool_certificate\certificate;
 use tool_certificate\permission;
+use user_picture;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -68,7 +72,6 @@ require_once($CFG->libdir . '/gradelib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class certifygen {
-
     /**
      * Returns the record for the certificate user has in a given course
      *
@@ -82,8 +85,13 @@ class certifygen {
      * @return stdClass|null
      * @throws dml_exception
      */
-    public static function get_user_certificate(int $instaceid, int $userid, int $courseid, int $templateid,
-                                                string $lang): ?stdClass {
+    public static function get_user_certificate(
+        int $instaceid,
+        int $userid,
+        int $courseid,
+        int $templateid,
+        string $lang
+    ): ?stdClass {
 
         global $DB;
 
@@ -123,12 +131,16 @@ class certifygen {
      * @param stdClass $course
      * @param string $lang
      * @return int
-     * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public static function issue_certificate(int $instanceid, stdClass $user, int $templateid, stdClass $course,
-                                             string $lang): int {
+    public static function issue_certificate(
+        int $instanceid,
+        stdClass $user,
+        int $templateid,
+        stdClass $course,
+        string $lang
+    ): int {
         if (self::get_user_certificate($instanceid, $user->id, $course->id, $templateid, $lang)) {
             return 0;
         }
@@ -143,7 +155,7 @@ class certifygen {
             );
             return $template->issue_certificate($user->id, $expirydate, $issuedata, 'mod_certifygen', $course->id);
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' ' . __LINE__. ' ERROR: '. $e->getMessage());
+            debugging(__FUNCTION__ . ' ' . __LINE__ . ' ERROR: ' . $e->getMessage());
         }
         return 0;
     }
@@ -176,8 +188,11 @@ class certifygen {
         global $DB;
 
         // Get user course completion date.
-        $result = $DB->get_field('course_completions', 'timecompleted',
-            ['course' => $course->id, 'userid' => $user->id]);
+        $result = $DB->get_field(
+            'course_completions',
+            'timecompleted',
+            ['course' => $course->id, 'userid' => $user->id]
+        );
         $completiondate = $result ? userdate($result, get_string('strftimedatefullshort')) : '';
 
         // Get user course grade.
@@ -217,8 +232,13 @@ class certifygen {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public static function get_user_certificate_file_url(int $instanceid, string $templateid, int $userid,
-                                                         int $courseid, string $lang): string {
+    public static function get_user_certificate_file_url(
+        int $instanceid,
+        string $templateid,
+        int $userid,
+        int $courseid,
+        string $lang
+    ): string {
         // Get user.
         $users = user_get_users_by_id([$userid]);
         $user = reset($users);
@@ -230,8 +250,10 @@ class certifygen {
             $issue = template::get_issue_from_code($existingcertificate->code);
             $context = context_course::instance($issue->courseid, IGNORE_MISSING) ?: null;
             $template = $issue ? template::instance($issue->templateid, (object) ['lang' => $lang]) : null;
-            if ($template && (permission::can_verify() ||
-                    permission::can_view_issue($template, $issue, $context))) {
+            if (
+                $template && (permission::can_verify() ||
+                    permission::can_view_issue($template, $issue, $context))
+            ) {
                 $url = $template->get_issue_file_url($issue);
                 $url = $url->out();
             } else {
@@ -248,27 +270,33 @@ class certifygen {
      * @param int $userid
      * @param int $courseid
      * @param string $lang
-     * @return \stored_file|null
+     * @return stored_file|null
      * @throws coding_exception
      * @throws dml_exception
      * @throws file_exception
      * @throws moodle_exception
      * @throws stored_file_creation_exception
      */
-    public static function get_user_certificate_file(int $instanceid, string $templateid, int $userid, int $courseid,
-                                                     string $lang) {
+    public static function get_user_certificate_file(
+        int $instanceid,
+        string $templateid,
+        int $userid,
+        int $courseid,
+        string $lang
+    ) {
         $users = user_get_users_by_id([$userid]);
         $user = reset($users);
         $course = get_course($courseid);
         self::issue_certificate($instanceid, $user, $templateid, $course, $lang);
         if ($existingcertificate = self::get_user_certificate($instanceid, $userid, $course->id, $templateid, $lang)) {
-
             $issue = template::get_issue_from_code($existingcertificate->code);
             $context = context_course::instance($issue->courseid, IGNORE_MISSING) ?: null;
 
             $template = $issue ? template::instance($issue->templateid, (object) ['lang' => $lang]) : null;
-            if ($template && (permission::can_verify() ||
-                    permission::can_view_issue($template, $issue, $context))) {
+            if (
+                $template && (permission::can_verify() ||
+                    permission::can_view_issue($template, $issue, $context))
+            ) {
                 return $template->get_issue_file($issue);
             } else {
                 throw new moodle_exception('certificatenotfound', 'mod_certifygen');
@@ -310,10 +338,19 @@ class certifygen {
      * @return array
      * @throws dml_exception
      */
-    public static function get_issues_for_course_by_lang(string $lang, int $certifygenid, int $templateid, int $courseid,
-                                                         string $component, int $userid, string $tifirst,
-                                                         string $tilast, int $limitfrom, int $limitnum,
-                                                         string $sort = ''): array {
+    public static function get_issues_for_course_by_lang(
+        string $lang,
+        int $certifygenid,
+        int $templateid,
+        int $courseid,
+        string $component,
+        int $userid,
+        string $tifirst,
+        string $tilast,
+        int $limitfrom,
+        int $limitnum,
+        string $sort = ''
+    ): array {
         global $DB;
 
         if (empty($sort)) {
@@ -332,7 +369,6 @@ class certifygen {
         if (!empty($tifirst)) {
             $params['tifirst'] = $tifirst . '%';
             $where .= ' AND ' . $DB->sql_like('u.firstname', ':tifirst');
-
         }
         if (!empty($tilast)) {
             $params['tilast'] = $tilast . '%';
@@ -367,22 +403,21 @@ class certifygen {
     /**
      * Get extra fields for select query of certificates.
      *
-     * @param \context $context
+     * @param context $context
      * @return string
      * @throws coding_exception
      */
-    public static function get_extra_user_fields(\context $context): string {
+    public static function get_extra_user_fields(context $context): string {
         global $CFG;
 
         if ($CFG->version < 2021050700) {
             // Moodle 3.9-3.10.
             $extrafields = get_extra_user_fields($context);
-            $userfields = \user_picture::fields('u', $extrafields);
-
+            $userfields = user_picture::fields('u', $extrafields);
         } else {
             // Moodle 3.11 and above.
-            $extrafields = \core_user\fields::for_identity($context, false)->get_required_fields();
-            $userfields = \core_user\fields::for_userpic()->including(...$extrafields)
+            $extrafields = fields::for_identity($context, false)->get_required_fields();
+            $userfields = fields::for_userpic()->including(...$extrafields)
                 ->get_sql('u', false, '', '', false)->selects;
         }
 
@@ -400,8 +435,12 @@ class certifygen {
      * @return string
      */
     public static function get_users_subquery(string $usertablealias = 'u', bool $canseeall = true): string {
-        return component_class_callback('tool_tenant\\tenancy', 'get_users_subquery',
-            [$canseeall, false, $usertablealias.'.id'], '1=1');
+        return component_class_callback(
+            'tool_tenant\\tenancy',
+            'get_users_subquery',
+            [$canseeall, false, $usertablealias . '.id'],
+            '1=1'
+        );
     }
 
     /**
@@ -422,7 +461,6 @@ class certifygen {
         ];
         if (!empty($tifirst)) {
             $where .= " AND u.firstname LIKE '$tifirst%'";
-
         }
         if (!empty($tilast)) {
             $where .= " AND u.firstname LIKE '%$tilast'";
@@ -456,9 +494,11 @@ class certifygen {
      * @throws coding_exception
      * @throws dml_exception
      */
-    public static function start_emit_certificate_proccess(certifygen_validations $validation,
-                                                           certifygen_file $certifygenfile,
-                                                           certifygen_model $certifygenmodel): array {
+    public static function start_emit_certificate_proccess(
+        certifygen_validations $validation,
+        certifygen_file $certifygenfile,
+        certifygen_model $certifygenmodel
+    ): array {
         global $USER;
         $result = ['result' => true, 'message' => get_string('ok', 'mod_certifygen')];
 
@@ -547,7 +587,6 @@ class certifygen {
         }
         if (!empty($userfullname)) {
             $fullname = $DB->sql_fullname('u.firstname', 'u.lastname');
-            $params['search'] = '%' . $userfullname . '%';
             if (!empty($where)) {
                 $where .= ' AND ';
             }
@@ -573,11 +612,17 @@ class certifygen {
      * get_errors
      * @param string $userfullname
      * @param string $modelname
+     * @param int $limitfrom
+     * @param int $limitnum
      * @return array
      * @throws dml_exception
      */
-    public static function get_errors(string $userfullname = '', string $modelname = '',
-                                      int $limitfrom = 0, int $limitnum = 0): array {
+    public static function get_errors(
+        string $userfullname = '',
+        string $modelname = '',
+        int $limitfrom = 0,
+        int $limitnum = 0
+    ): array {
         global $DB;
 
         $params = [];

@@ -42,12 +42,12 @@
 <div data-region="activity-view" {{#isstudent}} class="student"{{/isstudent}}>
     <h3 class="mt-5 mb-5">
         {{#isstudent}}
-            {{#str}} mycertificate, mod_certifygen {{/str}}</h3>
+            {{#str}} mycertificate, mod_certifygen {{/str}}
         {{/isstudent}}
         {{^isstudent}}
-            {{#str}} certificatelist, mod_certifygen {{/str}}</h3>
+            {{#str}} certificatelist, mod_certifygen {{/str}}
         {{/isstudent}}
-
+    </h3>
     {{#form}}
         <div>
             {{{ form }}}

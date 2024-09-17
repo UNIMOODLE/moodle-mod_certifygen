@@ -34,6 +34,7 @@ use dml_exception;
 use invalid_parameter_exception;
 use mod_certifygen\external\getmodellisttable_external;
 use renderable;
+use required_capability_exception;
 use stdClass;
 use templatable;
 use renderer_base;
@@ -65,6 +66,7 @@ class model_view implements renderable, templatable {
      * export_for_template
      * @param renderer_base $output
      * @return stdClass
+     * @throws required_capability_exception
      * @throws dml_exception
      * @throws invalid_parameter_exception
      */

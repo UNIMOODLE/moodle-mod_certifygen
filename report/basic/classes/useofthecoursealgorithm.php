@@ -31,6 +31,7 @@
 namespace certifygenreport_basic;
 
 use dml_exception;
+use moodle_exception;
 use stdClass;
 /**
  * useofthecoursealgorithm
@@ -41,7 +42,6 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class useofthecoursealgorithm {
-
     /** @var int L1 */
     private const  L1 = 0;
     /** @var int L2 */
@@ -56,51 +56,51 @@ class useofthecoursealgorithm {
     private const  H2 = 10;
     /** @var int LOW */
     private const LOW = 'L';
-    /** @var int MEDIUM */
-    private const  MEDIUM = 'M';
-    /** @var int HIGH */
+    /** @var string MEDIUM */
+    private const MEDIUM = 'M';
+    /** @var string HIGH */
     private const  HIGH = 'H';
     /** @var int $numstudents */
     private int $numstudents;
     /** @var int $courseid */
     private int $courseid;
-    /** @var int $course */
+    /** @var stdClass $course */
     private stdClass $course;
     /** @var int $resources */
     private int $resources;
-    /** @var int $resourceslevel */
+    /** @var string $resourceslevel */
     private string $resourceslevel;
-    /** @var int $resourceviews */
+    /** @var array $resourceviews */
     private array $resourceviews;
-    /** @var int $resourceviewslevel */
+    /** @var string $resourceviewslevel */
     private string $resourceviewslevel;
     /** @var int $forumnews */
     private int $forumnews;
-    /** @var int $forumnewslevel */
+    /** @var string $forumnewslevel */
     private string $forumnewslevel;
     /** @var int $forums */
     private int $forums;
-    /** @var int $forumslevel */
+    /** @var string $forumslevel */
     private string $forumslevel;
     /** @var int $foruminteractions */
     private int $foruminteractions;
-    /** @var int $foruminteractionslevel */
+    /** @var string $foruminteractionslevel */
     private string $foruminteractionslevel;
     /** @var int $assigns */
     private int $assigns;
-    /** @var int $assignslevel */
+    /** @var string $assignslevel */
     private string $assignslevel;
-    /** @var int $assignsubmissions */
+    /** @var array $assignsubmissions */
     private array $assignsubmissions;
-    /** @var int $assignsubmissionslevel */
+    /** @var string $assignsubmissionslevel */
     private string $assignsubmissionslevel;
     /** @var int $gradeitems */
     private int $gradeitems;
-    /** @var int $gradeitemslevel */
+    /** @var string $gradeitemslevel */
     private string $gradeitemslevel;
     /** @var int $gradefeedback */
     private int $gradefeedback;
-    /** @var int $gradefeedbacklevel */
+    /** @var string $gradefeedbacklevel */
     private string $gradefeedbacklevel;
 
     /**
@@ -108,7 +108,7 @@ class useofthecoursealgorithm {
      * @param int $courseid
      * @param int $numstudents
      * @throws dml_exception
-     * @throws \moodle_exception
+     * @throws moodle_exception
      */
     public function __construct(int $courseid, int $numstudents) {
         $this->courseid = $courseid;
@@ -117,13 +117,12 @@ class useofthecoursealgorithm {
         if ($this->numstudents == 0) {
             debugging(__CLASS__ . '  courseid '  . $courseid);
             debugging(__CLASS__ . '  numstudents '  . $numstudents);
-            throw new \moodle_exception('cannotusealgorith_nostudents', 'certifygenreport_basic');
+            throw new moodle_exception('cannotusealgorith_nostudents', 'certifygenreport_basic');
         }
     }
     /**
      * get_course_info
      * @return void
-     * @throws dml_exception
      */
     private function get_course_info(): void {
         $this->get_resources();
@@ -139,7 +138,6 @@ class useofthecoursealgorithm {
     /**
      * get_course_type
      * @return string
-     * @throws dml_exception
      */
     public function get_course_type(): string {
         $this->get_course_info();
@@ -231,7 +229,7 @@ class useofthecoursealgorithm {
             $sql .= " AND cm.visible=1";
             $this->resources = $DB->count_records_sql($sql, ['courseid' => $this->courseid]);
             $this->resourceslevel = $this->get_item_level($this->resources);
-        } catch (\moodle_exception $e) {
+        } catch (moodle_exception $e) {
             debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $this->resources = 0;
             $this->resourceslevel = self::LOW;
@@ -266,7 +264,7 @@ class useofthecoursealgorithm {
             }
             $sum = $sum / $this->numstudents;
             $this->resourceviewslevel = $this->get_item_level($sum);
-        } catch (\moodle_exception $e) {
+        } catch (moodle_exception $e) {
             debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $this->resourceviews = [];
             $this->resourceviewslevel = self::LOW;
@@ -288,7 +286,7 @@ class useofthecoursealgorithm {
             $sql .= " AND m.name IN ('forum') AND cm.visible=1";
             $this->forums = $DB->count_records_sql($sql, ['courseid' => $this->courseid]);
             $this->forumslevel = $this->get_item_level($this->forums);
-        } catch (\moodle_exception $e) {
+        } catch (moodle_exception $e) {
             debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $this->forums = 0;
             $this->forumslevel = self::LOW;
@@ -311,7 +309,7 @@ class useofthecoursealgorithm {
             $this->forumnews = $DB->count_records_sql($sql, ['courseid' => $this->courseid,
                 'courseid2' => $this->courseid]);
             $this->forumnewslevel = $this->get_item_level($this->forumnews);
-        } catch (\moodle_exception $e) {
+        } catch (moodle_exception $e) {
             debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $this->forumnews = 0;
             $this->forumnewslevel = self::LOW;
@@ -344,9 +342,9 @@ class useofthecoursealgorithm {
                 $this->foruminteractions = $foruminteractions->total;
             }
             $this->foruminteractionslevel = $this->get_item_level($this->foruminteractions);
-        } catch (\moodle_exception $e) {
+        } catch (moodle_exception $e) {
             debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
-            $this->foruminteractions = [];
+            $this->foruminteractions = 0;
             $this->foruminteractionslevel = self::LOW;
         }
     }
@@ -373,9 +371,9 @@ class useofthecoursealgorithm {
                 $this->assigns = $assigns->media;
             }
             $this->assignslevel = $this->get_item_level($this->assigns);
-        } catch (\moodle_exception $e) {
+        } catch (moodle_exception $e) {
             debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
-            $this->assigns = [];
+            $this->assigns = 0;
             $this->assignslevel = self::LOW;
         }
     }
@@ -403,7 +401,7 @@ class useofthecoursealgorithm {
             }
             $sum = $sum / $this->numstudents;
             $this->assignsubmissionslevel = $this->get_item_level($sum);
-        } catch (\moodle_exception $e) {
+        } catch (moodle_exception $e) {
             debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $this->assignsubmissions = [];
             $this->assignsubmissionslevel = self::LOW;
@@ -431,9 +429,9 @@ class useofthecoursealgorithm {
                 $this->gradeitems = $gradeitems->total;
             }
             $this->gradeitemslevel = $this->get_item_level($this->gradeitems);
-        } catch (\moodle_exception $e) {
+        } catch (moodle_exception $e) {
             debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
-            $this->gradeitems = [];
+            $this->gradeitems = 0;
             $this->gradeitemslevel = self::LOW;
         }
     }
@@ -461,7 +459,7 @@ class useofthecoursealgorithm {
                 $this->gradefeedback = $gradefeedback->total;
             }
             $this->gradefeedbacklevel = $this->get_item_level($this->gradefeedback);
-        } catch (\moodle_exception $e) {
+        } catch (moodle_exception $e) {
             debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $this->gradefeedback = 0;
             $this->gradefeedbacklevel = self::LOW;

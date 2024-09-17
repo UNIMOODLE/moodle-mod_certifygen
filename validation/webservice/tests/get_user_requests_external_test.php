@@ -315,7 +315,7 @@ class get_user_requests_external_test extends advanced_testcase {
             'course' => $course->id,
             'modelid' => $model->get('id'),
         ];
-        $modcertifygen = self::getDataGenerator()->create_module('certifygen', $datamodule, $datamodule);
+        $modcertifygen = self::getDataGenerator()->create_module('certifygen', $datamodule);
         $cm = get_coursemodule_from_instance('certifygen', $modcertifygen->id, $course->id, false, MUST_EXIST);
 
         // Create users.

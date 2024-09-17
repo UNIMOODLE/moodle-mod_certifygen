@@ -41,8 +41,8 @@ use mod_certifygen\persistents\certifygen_validations;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot.'/lib/externallib.php');
+require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
+require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Issue certifiacte test
  * @package    mod_certifygen
@@ -52,7 +52,6 @@ require_once($CFG->dirroot.'/lib/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class emitcertificate_external_test extends advanced_testcase {
-
     /**
      * Test set up.
      */
@@ -94,13 +93,15 @@ class emitcertificate_external_test extends advanced_testcase {
             'course' => $course->id,
             'modelid' => $model->get('id'),
         ];
-        $modcertifygen = self::getDataGenerator()->create_module('certifygen', $datamodule, $datamodule);
+        $modcertifygen = self::getDataGenerator()->create_module('certifygen', $datamodule);
+
         $cm = get_coursemodule_from_instance('certifygen', $modcertifygen->id, $course->id, false, MUST_EXIST);
 
         // Create users.
         $student = $this->getDataGenerator()->create_user(
             ['username' => 'test_user_1', 'firstname' => 'test',
-                'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+            'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']
+        );
 
         // Enrol into the course as student.
         self::getDataGenerator()->enrol_user($student->id, $course->id, 'student');
@@ -160,16 +161,18 @@ class emitcertificate_external_test extends advanced_testcase {
             'course' => $course->id,
             'modelid' => $model->get('id'),
         ];
-        $modcertifygen = self::getDataGenerator()->create_module('certifygen', $datamodule, $datamodule);
+        $modcertifygen = self::getDataGenerator()->create_module('certifygen', $datamodule);
         $cm = get_coursemodule_from_instance('certifygen', $modcertifygen->id, $course->id, false, MUST_EXIST);
 
         // Create users.
         $student = $this->getDataGenerator()->create_user(
             ['username' => 'test_user_1', 'firstname' => 'test',
-                'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+            'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']
+        );
         $student2 = $this->getDataGenerator()->create_user(
             ['username' => 'test_user_2', 'firstname' => 'test',
-                'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
+            'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']
+        );
 
         // Enrol into the course as student.
         self::getDataGenerator()->enrol_user($student->id, $course->id, 'student');

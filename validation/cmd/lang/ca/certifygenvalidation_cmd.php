@@ -43,5 +43,3 @@ $string['originalfilespath'] = 'Ruta d\'Arxius Originals';
 $string['originalfilespath_help'] = 'Ruta al servidor per allotjar els certificats originals';
 $string['validatedfilespath'] = 'Ruta d\'Arxius Validats';
 $string['validatedfilespath_help'] = 'Ruta al servidor per allotjar els certificats validats';
-
-

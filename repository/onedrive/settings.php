@@ -34,20 +34,27 @@
 defined('MOODLE_INTERNAL') || die();
 
 // Main link.
-$ADMIN->add('modsettingcertifygencat',
-    new admin_category('certifygenrepository_onedrive_cat',
-        get_string('pluginname', 'certifygenrepository_onedrive')));
+$ADMIN->add(
+    'modsettingcertifygencat',
+    new admin_category(
+        'certifygenrepository_onedrive_cat',
+        get_string('pluginname', 'certifygenrepository_onedrive')
+    )
+);
 
 $settings = new admin_settingpage(
     'modsettingcertifygenrepositoryonedrive',
     get_string('pluginnamesettings', 'certifygenrepository_onedrive'),
-    'moodle/site:config');
+    'moodle/site:config'
+);
 if ($ADMIN->fulltree) {
-
     // Enable.
-    $settings->add(new admin_setting_configcheckbox('certifygenrepository_onedrive/enabled',
+    $settings->add(new admin_setting_configcheckbox(
+        'certifygenrepository_onedrive/enabled',
         new lang_string('enable', 'certifygenrepository_onedrive'),
-        new lang_string('enable_help', 'certifygenrepository_onedrive'), 0));
+        new lang_string('enable_help', 'certifygenrepository_onedrive'),
+        0
+    ));
     // Onedrive folder.
     $settings->add(new admin_setting_configtext(
         'certifygenrepository_onedrive/folder',

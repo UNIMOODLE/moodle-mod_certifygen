@@ -37,14 +37,13 @@ use mod_certifygen\persistents\certifygen_model;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/course/moodleform_mod.php');
+require_once($CFG->dirroot . '/course/moodleform_mod.php');
 require_once("$CFG->dirroot/mod/certifygen/lib.php");
 
 /**
  *  This class adds extra methods to form wrapper specific to be used for module add / update forms
  */
 class mod_certifygen_mod_form extends moodleform_mod {
-
     /**
      * definition
      * @return void
@@ -61,8 +60,10 @@ class mod_certifygen_mod_form extends moodleform_mod {
 
         $this->standard_intro_elements(get_string('introduction', 'mod_certifygen'));
 
-        if (!is_null($this->get_instance()) && !empty($this->get_instance())
-            && mod_certifygen_are_there_any_certificate_emited_by_instanceid($this->get_instance())) {
+        if (
+            !is_null($this->get_instance()) && !empty($this->get_instance())
+            && mod_certifygen_are_there_any_certificate_emited_by_instanceid($this->get_instance())
+        ) {
             $certifygen = new certifygen($this->get_instance());
             $model = new certifygen_model($certifygen->get('modelid'));
             $htmlstring = get_string('model', 'mod_certifygen');
@@ -78,13 +79,21 @@ class mod_certifygen_mod_form extends moodleform_mod {
             $elements = [$mform->createElement('select', 'modelid', get_string('model', 'mod_certifygen'), $templateoptions)];
             $mform->setType('modelid', PARAM_INT);
             // Adding "Manage templates" link if user has capabilities to manage templates.
-            if ( $canmanagemodels ) {
-                $elements[] = $mform->createElement('static', 'managemodels', '',
-                    $OUTPUT->action_link($manageurl, get_string('modelsmanager', 'mod_certifygen')));
+            if ($canmanagemodels) {
+                $elements[] = $mform->createElement(
+                    'static',
+                    'managemodels',
+                    '',
+                    $OUTPUT->action_link($manageurl, get_string('modelsmanager', 'mod_certifygen'))
+                );
             }
-            $mform->addGroup($elements, 'models_group',
+            $mform->addGroup(
+                $elements,
+                'models_group',
                 get_string('model', 'mod_certifygen'),
-                html_writer::div('', 'w-100'), false);
+                html_writer::div('', 'w-100'),
+                false
+            );
             $mform->addRule('models_group', get_string('required'), 'required');
             $rules = [];
             $rules['modelid'][] = [null, 'required', null, 'client'];

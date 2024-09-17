@@ -31,8 +31,8 @@
  */
 namespace mod_certifygen\persistents;
 use coding_exception;
-use core\invalid_persistent_exception;
 use core\persistent;
+use moodle_exception;
 
 /**
  * certifygen_model
@@ -43,7 +43,6 @@ use core\persistent;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class certifygen_model extends persistent {
-
     /**
      * @var string table
      */
@@ -113,8 +112,6 @@ class certifygen_model extends persistent {
      * save_model_object
      * @param object $data
      * @return self
-     * @throws coding_exception
-     * @throws invalid_persistent_exception
      */
     public static function save_model_object(object $data): self {
         global $USER;
@@ -142,11 +139,10 @@ class certifygen_model extends persistent {
             }
 
             return $model->create();
-        } catch (\moodle_exception $e) {
+        } catch (moodle_exception $e) {
             debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             return false;
         }
-
     }
 
     /**

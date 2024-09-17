@@ -29,10 +29,13 @@
  */
 namespace certifygenreport_basic;
 use certifygenreport_basic\output\report_view;
+use coding_exception;
 use context_system;
 use dml_exception;
 use mod_certifygen\interfaces\ICertificateReport;
 use mod_certifygen\persistents\certifygen_validations;
+use moodle_exception;
+
 /**
  * certifygenreport_basic
  * @package    certifygenreport_basic
@@ -42,7 +45,6 @@ use mod_certifygen\persistents\certifygen_validations;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class certifygenreport_basic implements ICertificateReport {
-
     /**
      * is_enabled
      * @return bool
@@ -61,7 +63,6 @@ class certifygenreport_basic implements ICertificateReport {
      * @param certifygen_validations $teacherrequest
      * @return array
      * @throws coding_exception
-     * @throws dml_exception
      */
     public function create_file(certifygen_validations $teacherrequest): array {
         global $PAGE;
@@ -87,14 +88,14 @@ class certifygenreport_basic implements ICertificateReport {
             } else {
                 // Course blocks.
                 $numblocks = (int) (count($courselist) / report_view::MAX_NUMBER_COURSES);
-                $showendtext = false; // only on last page, true.
-                for($i = 0; $i <= $numblocks; $i++) {
+                $showendtext = false; // Only on last page, true.
+                for ($i = 0; $i <= $numblocks; $i++) {
                     if ($i == $numblocks) {
                         $showendtext = true;
                     }
                     $offset = $i * report_view::MAX_NUMBER_COURSES;
                     $coursespagelist = array_slice($courselist, $offset, report_view::MAX_NUMBER_COURSES);
-                    $view = new report_view($teacherrequest->get('userid'), $coursespagelist, $i==0, $showendtext);
+                    $view = new report_view($teacherrequest->get('userid'), $coursespagelist, $i == 0, $showendtext);
                     $content = $renderer->render($view);
                     $doc->writeHTML($content);
                     if ($i < $numblocks) {
@@ -102,7 +103,7 @@ class certifygenreport_basic implements ICertificateReport {
                     }
                 }
             }
-            $res = $doc->Output($teacherrequest->get('code') .'_'.time().'.pdf', 'S');
+            $res = $doc->Output($teacherrequest->get('code') . '_' . time() . '.pdf', 'S');
             $fs = get_file_storage();
             $context = context_system::instance();
             $filerecord = [
@@ -113,8 +114,14 @@ class certifygenreport_basic implements ICertificateReport {
                 'filename' => $teacherrequest->get('code') . '.pdf',
                 'filepath' => self::FILE_PATH,
             ];
-            $file = $fs->get_file($filerecord['contextid'], $filerecord['component'], $filerecord['filearea'], $filerecord['itemid'],
-                $filerecord['filepath'], $filerecord['filename']);
+            $file = $fs->get_file(
+                $filerecord['contextid'],
+                $filerecord['component'],
+                $filerecord['filearea'],
+                $filerecord['itemid'],
+                $filerecord['filepath'],
+                $filerecord['filename']
+            );
             if (!$file) {
                 $file = $fs->create_file_from_string($filerecord, $res);
             }

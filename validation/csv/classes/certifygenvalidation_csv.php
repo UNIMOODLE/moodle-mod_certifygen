@@ -101,8 +101,12 @@ class certifygenvalidation_csv implements ICertificateValidation {
                     'message' => curl_error($curl),
                 ];
             }
-            $xml = simplexml_load_string($response, null, null,
-                'http://schemas.xmlsoap.org/soap/envelope/');
+            $xml = simplexml_load_string(
+                $response,
+                null,
+                null,
+                'http://schemas.xmlsoap.org/soap/envelope/'
+            );
             $ns = $xml->getNamespaces(true);
             $soap = $xml->children($ns['soap']);
             $res = $soap->Body->children($ns['ns2']);
@@ -147,7 +151,6 @@ class certifygenvalidation_csv implements ICertificateValidation {
                 'message' => $e->getMessage(),
             ];
         }
-
     }
 
     /**
@@ -177,7 +180,7 @@ xmlns:fir="http://firma.ws.producto.com/">
                <avisoFinCircuito>false</avisoFinCircuito>
                <avisoFinFirmante>false</avisoFinFirmante>
                <!--Optional:-->
-               <avisoURL>'. $avisourl .'</avisoURL>
+               <avisoURL>' . $avisourl . '</avisoURL>
             </avisos>
             <!--Optional:-->
             <!--Zero or more repetitions:-->
@@ -220,7 +223,7 @@ xmlns:fir="http://firma.ws.producto.com/">
      * @param string $code
      * @return string
      */
-    private function create_params_getFileContent(string $code): string {
+    private function create_params_getfilecontent(string $code): string {
 
         return '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" 
 xmlns:fir="http://firma.ws.producto.com/">
@@ -241,7 +244,6 @@ xmlns:fir="http://firma.ws.producto.com/">
       </fir:obtenerContenidoDocumento>
    </soapenv:Body>
 </soapenv:Envelope>';
-
     }
 
     /**
@@ -315,13 +317,17 @@ xmlns:fir="http://firma.ws.producto.com/">
                     'message' => curl_error($curl),
                 ];
             }
-            $xml = simplexml_load_string($response, null, null,
-                'http://schemas.xmlsoap.org/soap/envelope/');
+            $xml = simplexml_load_string(
+                $response,
+                null,
+                null,
+                'http://schemas.xmlsoap.org/soap/envelope/'
+            );
             $ns = $xml->getNamespaces(true);
             $soap = $xml->children($ns['soap']);
             $res = $soap->Body->children($ns['ns2']);
-            $obtenerContenidoDocumentoResponse = $res->obtenerContenidoDocumentoResponse->children();
-            $obtenercontenidodocumentorc = $obtenerContenidoDocumentoResponse->children();
+            $obtenercontenidodocumentoresponse = $res->obtenerContenidoDocumentoResponse->children();
+            $obtenercontenidodocumentorc = $obtenercontenidodocumentoresponse->children();
             $resultado = (string) $obtenercontenidodocumentorc->resultado;
             if ($resultado === 'KO') {
                 $codeerror = (string) $obtenercontenidodocumentorc->error->children()->codError;
@@ -341,14 +347,13 @@ xmlns:fir="http://firma.ws.producto.com/">
                 'message' => 'ok',
                 'file' => $file,
             ];
-        } catch (SoapFault $e ) {
+        } catch (SoapFault $e) {
             debugging(__FUNCTION__ . ' SoapFault error: ' . $e->getMessage());
             $message = $e->getMessage();
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $message = $e->getMessage();
-//            $connection = new SoapFault('client', 'Could not connect to the service');
+// $connection = new SoapFault('client', 'Could not connect to the service');
         }
         return [
             'haserror' => $haserror,
@@ -393,13 +398,17 @@ xmlns:fir="http://firma.ws.producto.com/">
                     'message' => curl_error($curl),
                 ];
             }
-            $xml = simplexml_load_string($response, null, null,
-                'http://schemas.xmlsoap.org/soap/envelope/');
+            $xml = simplexml_load_string(
+                $response,
+                null,
+                null,
+                'http://schemas.xmlsoap.org/soap/envelope/'
+            );
             $ns = $xml->getNamespaces(true);
             $soap = $xml->children($ns['soap']);
             $res = $soap->Body->children($ns['ns2']);
-            $obtenerContenidoDocumentoResponse = $res->obtenerDocumentosFirmadosResponse->children();
-            $obtenercontenidodocumentorc = $obtenerContenidoDocumentoResponse->children();
+            $obtenercontenidodocumentoresponse = $res->obtenerDocumentosFirmadosResponse->children();
+            $obtenercontenidodocumentorc = $obtenercontenidodocumentoresponse->children();
             $resultado = (string) $obtenercontenidodocumentorc->resultado;
             if ($resultado === 'KO') {
                 $codeerror = (string) $obtenercontenidodocumentorc->error->children()->codError;
@@ -416,28 +425,25 @@ xmlns:fir="http://firma.ws.producto.com/">
                 'haserror' => false,
                 'url' => $url,
             ];
-        } catch (coding_exception $e ) {
+        } catch (coding_exception $e) {
             debugging(__FUNCTION__ . ' coding_exception error: ' . $e->getMessage());
             return [
                 'haserror' => true,
                 'message' => $e->getMessage(),
             ];
-        }
-        catch (moodle_exception $e ) {
+        } catch (moodle_exception $e) {
             debugging(__FUNCTION__ . '  moodle_exception error: ' . $e->getMessage());
             return [
                 'haserror' => true,
                 'message' => $e->getMessage(),
             ];
-        }
-        catch (SoapFault $e ) {
+        } catch (SoapFault $e) {
             debugging(__FUNCTION__ . ' SoapFault error: ' . $e->getMessage());
             return [
                 'haserror' => true,
                 'message' => $e->getMessage(),
             ];
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             return [
                 'haserror' => true,
@@ -480,9 +486,16 @@ xmlns:fir="http://firma.ws.producto.com/">
             'filename' => $code . '.pdf',
         ];
 
-        if ($file = $fs->get_file($filerecord['contextid'], $filerecord['component'], $filerecord['filearea'],
-            $filerecord['itemid'],
-            $filerecord['filepath'], $filerecord['filename'])) {
+        if (
+            $file = $fs->get_file(
+                $filerecord['contextid'],
+                $filerecord['component'],
+                $filerecord['filearea'],
+                $filerecord['itemid'],
+                $filerecord['filepath'],
+                $filerecord['filename']
+            )
+        ) {
             $file->delete();
         }
         return $fs->create_file_from_string($filerecord, $content);
@@ -550,7 +563,7 @@ xmlns:fir="http://firma.ws.producto.com/">
             <!--Zero or more repetitions:-->
             <identificadores>
                <!--Optional:-->
-               <token>'. $code . '</token>
+               <token>' . $code . '</token>
                <version>1</version>
             </identificadores>
          </request>
@@ -595,8 +608,12 @@ xmlns:fir="http://firma.ws.producto.com/">
                     'message' => curl_error($curl),
                 ];
             }
-            $xml = simplexml_load_string($response, null, null,
-                'http://schemas.xmlsoap.org/soap/envelope/');
+            $xml = simplexml_load_string(
+                $response,
+                null,
+                null,
+                'http://schemas.xmlsoap.org/soap/envelope/'
+            );
             $ns = $xml->getNamespaces(true);
             $soap = $xml->children($ns['soap']);
             $res = $soap->Body->children($ns['ns2']);
@@ -607,14 +624,18 @@ xmlns:fir="http://firma.ws.producto.com/">
                 $codeerror = (string) $anularpeticionresponsechildren->error->children()->codError;
                 $descerror = (string) $anularpeticionresponsechildren->error->children()->descError;
                 debugging(__FUNCTION__ . '  moodle_exception error: ' . $descerror);
-                throw new moodle_exception('revokeerror', 'certifygenvalidation_csv', '', null,
-                    $codeerror . ' - ' . $descerror);
+                throw new moodle_exception(
+                    'revokeerror',
+                    'certifygenvalidation_csv',
+                    '',
+                    null,
+                    $codeerror . ' - ' . $descerror
+                );
             }
-        } catch (SoapFault $e ) {
+        } catch (SoapFault $e) {
             $haserror = true;
             debugging(__FUNCTION__ . '  SoapFault error: ' . $e->getMessage());
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $haserror = true;
             debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
         }
@@ -709,11 +730,10 @@ xmlns:fir="http://firma.ws.producto.com/">
                 return certifygen_validations::STATUS_VALIDATION_ERROR;
             }
             return certifygen_validations::STATUS_IN_PROGRESS;
-        } catch (SoapFault $e ) {
+        } catch (SoapFault $e) {
             $haserror = true;
             debugging(__FUNCTION__ . '  SoapFault error: ' . $e->getMessage());
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $haserror = true;
             debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
         }

@@ -31,6 +31,7 @@ namespace mod_certifygen\external;
 
 use coding_exception;
 use context_system;
+use core_course_category;
 use dml_exception;
 use external_api;
 use external_description;
@@ -40,6 +41,7 @@ use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
 use mod_certifygen\persistents\certifygen_context;
+use moodle_exception;
 use restricted_context_exception;
 
 /**
@@ -51,7 +53,6 @@ use restricted_context_exception;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class searchmycourses_external extends external_api {
-
     /**
      * Describes the external function parameters.
      *
@@ -71,7 +72,7 @@ class searchmycourses_external extends external_api {
      * @param int $userid
      * @param int $modelid
      * @return array
-     * @throws \moodle_exception
+     * @throws moodle_exception
      * @throws coding_exception
      * @throws dml_exception
      * @throws invalid_parameter_exception
@@ -98,7 +99,7 @@ class searchmycourses_external extends external_api {
         if ((int)$modelcontext->get('type') === certifygen_context::CONTEXT_TYPE_COURSE) {
             $courseids = $modelcontext->get('contextids');
             $courseids = explode(',', $courseids);
-            [$insql, $inparams] = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'param');
+            [$insql, $inparams] = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED);
             if (!empty($courseids)) {
                 $wherecourse = " AND c.id $insql";
                 $params = array_merge($params, $inparams);
@@ -108,7 +109,7 @@ class searchmycourses_external extends external_api {
             $categoryids = explode(',', $categoryids);
             $allcids = $categoryids;
             foreach ($categoryids as $categoryid) {
-                $category = \core_course_category::get($categoryid);
+                $category = core_course_category::get($categoryid);
                 $ids = $category->get_all_children_ids();
                 foreach ($ids as $id) {
                     if (!in_array($id, $allcids)) {
@@ -117,12 +118,12 @@ class searchmycourses_external extends external_api {
                 }
             }
             if (!empty($allcids)) {
-                [$insql, $inparams] = $DB->get_in_or_equal($allcids, SQL_PARAMS_NAMED, 'param');
+                [$insql, $inparams] = $DB->get_in_or_equal($allcids, SQL_PARAMS_NAMED);
                 $params = array_merge($params, $inparams);
                 $wherecategory = " AND c.category $insql";
             }
         }
-        $likename = $DB->sql_like('c.fullname', ':fullname', false, true);
+        $likename = $DB->sql_like('c.fullname', ':fullname', false);
         $sql = "SELECT c.id, c.fullname";
         $sql .= " FROM  {user_enrolments} ue ";
         $sql .= " INNER JOIN {enrol} e ON e.id = ue.enrolid";

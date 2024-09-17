@@ -32,6 +32,7 @@
 
 namespace certifygenreport_basic\output;
 use coding_exception;
+use dml_exception;
 use plugin_renderer_base;
 use moodle_exception;
 /**
@@ -43,7 +44,6 @@ use moodle_exception;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class renderer extends plugin_renderer_base {
-
     /**
      * Activity view renderer
      * @param report_view $view

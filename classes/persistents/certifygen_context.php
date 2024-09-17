@@ -47,7 +47,6 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class certifygen_context extends persistent {
-
     /**
      * @var string table
      */
@@ -119,16 +118,16 @@ class certifygen_context extends persistent {
         $mcontexts = [
             certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
         ];
-        list($minsql, $minparams) = $DB->get_in_or_equal($mcontexts, SQL_PARAMS_NAMED);
+        [$minsql, $minparams] = $DB->get_in_or_equal($mcontexts, SQL_PARAMS_NAMED);
         $ccontexts = [
             self::CONTEXT_TYPE_CATEGORY,
             self::CONTEXT_TYPE_COURSE,
         ];
-        list($cinsql, $cinparams) = $DB->get_in_or_equal($ccontexts, SQL_PARAMS_NAMED);
+        [$cinsql, $cinparams] = $DB->get_in_or_equal($ccontexts, SQL_PARAMS_NAMED);
         $scontexts = [
             self::CONTEXT_TYPE_SYSTEM,
         ];
-        list($sinsql, $sinparams) = $DB->get_in_or_equal($scontexts, SQL_PARAMS_NAMED);
+        [$sinsql, $sinparams] = $DB->get_in_or_equal($scontexts, SQL_PARAMS_NAMED);
 
         $sql = "SELECT count(*) as total";
         $sql .= " FROM {certifygen_model} m";
@@ -291,8 +290,9 @@ class certifygen_context extends persistent {
 
     /**
      * get_system_context_modelids_and_langs
+     *
      * @return array[]
-     * @throws dml_exception
+     * @throws dml_exception|coding_exception
      */
     public static function get_system_context_modelids_and_langs(): array {
         global $DB;
@@ -301,7 +301,7 @@ class certifygen_context extends persistent {
         $contexts = [
             certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
         ];
-        list($insql, $inparams) = $DB->get_in_or_equal($contexts, SQL_PARAMS_NAMED);
+        [$insql, $inparams] = $DB->get_in_or_equal($contexts, SQL_PARAMS_NAMED);
         $sql = "SELECT m.id as modelid, m.name, m.langs";
         $sql .= " FROM {certifygen_model} m";
         $sql .= " INNER JOIN {certifygen_context} c ON c.modelid = m.id";

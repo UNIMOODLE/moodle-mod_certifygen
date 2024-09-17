@@ -31,6 +31,7 @@ namespace mod_certifygen\persistents;
 use coding_exception;
 use core\invalid_persistent_exception;
 use core\persistent;
+use core_text;
 use dml_exception;
 use stdClass;
 /**
@@ -152,7 +153,7 @@ class certifygen_validations extends persistent {
      * @return string
      * @throws dml_exception
      */
-    public static function generate_code($userid = null): string {
+    public static function generate_code(int $userid = null): string {
         global $DB;
         $uniquecodefound = false;
         $user = $userid ? $DB->get_record('user', ['id' => $userid]) : null;
@@ -170,21 +171,21 @@ class certifygen_validations extends persistent {
     /**
      * Generates a 10-digit code of random numbers and firstname, lastname initials if userid is passed as parameter.
      *
-     * @param \stdClass|null $user
+     * @param stdClass|null $user
      * @return string
      */
-    private static function generate_code_string(\stdClass $user = null): string {
+    private static function generate_code_string(stdClass $user = null): string {
         $code = '';
         for ($i = 1; $i <= 10; $i++) {
             $code .= mt_rand(0, 9);
         }
         if ($user) {
             foreach ([$user->firstname, $user->lastname] as $item) {
-                $initial = \core_text::substr(\core_text::strtoupper(\core_text::specialtoascii($item)), 0, 1);
-                $code .= preg_match('/[A-Z0-9]/', $initial) ? $initial : \core_text::strtoupper(random_string(1));
+                $initial = core_text::substr(core_text::strtoupper(core_text::specialtoascii($item)), 0, 1);
+                $code .= preg_match('/[A-Z0-9]/', $initial) ? $initial : core_text::strtoupper(random_string(1));
             }
         } else {
-            $code .= \core_text::strtoupper(random_string(2));
+            $code .= core_text::strtoupper(random_string(2));
         }
         return $code;
     }
@@ -280,8 +281,13 @@ class certifygen_validations extends persistent {
      * @return false|mixed
      * @throws dml_exception
      */
-    public static function get_request_by_data_for_teachers(int $userid, string $courses, string $lang,
-                                                            int $modelid, string $name) {
+    public static function get_request_by_data_for_teachers(
+        int $userid,
+        string $courses,
+        string $lang,
+        int $modelid,
+        string $name
+    ) {
         global $DB;
         $comparename = $DB->sql_compare_text('ct.name');
         $comparenameplaceholder = $DB->sql_compare_text(':name');
@@ -322,9 +328,12 @@ class certifygen_validations extends persistent {
         $code = $validation->get('code');
         if (!empty($validation->get('certifygenid'))) {
             global $DB;
-            $code = $DB->get_field('tool_certificate_issues', 'code',
+            $code = $DB->get_field(
+                'tool_certificate_issues',
+                'code',
                 ['userid' => $validation->get('userid'),
-                    'id' => $validation->get('issueid')]);
+                'id' => $validation->get('issueid')]
+            );
         }
         return $code;
     }

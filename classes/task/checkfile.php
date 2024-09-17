@@ -35,6 +35,8 @@
 
 namespace mod_certifygen\task;
 
+use coding_exception;
+use core\invalid_persistent_exception;
 use core\task\scheduled_task;
 use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\interfaces\ICertificateValidation;
@@ -43,6 +45,8 @@ use mod_certifygen\persistents\certifygen_error;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_repository;
 use mod_certifygen\persistents\certifygen_validations;
+use moodle_exception;
+
 /**
  * checkfile
  * @package    mod_certifygen
@@ -54,18 +58,18 @@ use mod_certifygen\persistents\certifygen_validations;
 class checkfile extends scheduled_task {
     /**
      * get_name
-     * @return \lang_string|string
-     * @throws \coding_exception
+     * @return string
+     * @throws coding_exception
      */
-    public function get_name() {
+    public function get_name(): string {
         return get_string('checkfiletask', 'mod_certifygen');
     }
 
     /**
      * Execute
      * @return void
-     * @throws \coding_exception
-     * @throws \core\invalid_persistent_exception
+     * @throws coding_exception
+     * @throws invalid_persistent_exception
      */
     public function execute() {
         global $USER;
@@ -83,13 +87,12 @@ class checkfile extends scheduled_task {
                 if (!$subplugin->checkFile()) {
                     continue;
                 }
-                $code = certifygen_validations::get_certificate_code($validation);
                 $course = 0;
                 if (!empty($validation->get('certifygenid'))) {
                     $certi = new certifygen($validation->get('certifygenid'));
                     $course = $certi->get('course');
                 }
-                $newfile = $subplugin->get_file($course, $validation->get('id'), $code);
+                $newfile = $subplugin->get_file($course, $validation->get('id'));
                 if (array_key_exists('file', $newfile)) {
                     // Save on repository plugin.
                     $repositoryplugin = $model->get('repository');
@@ -165,7 +168,7 @@ class checkfile extends scheduled_task {
                     ];
                     certifygen_error::manage_certifygen_error(0, (object)$data);
                 }
-            } catch (\moodle_exception $e) {
+            } catch (moodle_exception $e) {
                 debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
                 $validation->set('status', certifygen_validations::STATUS_STORAGE_ERROR);
                 $validation->save();

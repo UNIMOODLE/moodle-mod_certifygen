@@ -55,7 +55,6 @@ use moodle_url;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class associatecontextform extends dynamic_form {
-
     /**
      * definition
      * @throws coding_exception
@@ -73,36 +72,58 @@ class associatecontextform extends dynamic_form {
         $mform->setType('id', PARAM_INT);
 
         // Context type: course or category.
-        $mform->addElement('select', 'ctype', get_string('chooseacontexttype', 'mod_certifygen'),
-            mod_certifygen_get_context_types());
+        $mform->addElement(
+            'select',
+            'ctype',
+            get_string('chooseacontexttype', 'mod_certifygen'),
+            mod_certifygen_get_context_types()
+        );
         $mform->setType('ctype', PARAM_INT);
 
         // Select for categories.
         $options = [
             'ajax' => 'mod_certifygen/form_category_selector',
             'multiple' => true,
-            'valuehtmlcallback' => function($categoryid): string {
+            'valuehtmlcallback' => function ($categoryid): string {
                 $category = core_course_category::get($categoryid);
                 return $category->name;
             },
         ];
-        $mform->addElement('autocomplete', 'categorycontext',
-            get_string('categorycontext', 'mod_certifygen'), [], $options)->setHiddenLabel(true);
-        $mform->hideIf('categorycontext', 'ctype', 'in',
-            [certifygen_context::CONTEXT_TYPE_COURSE, certifygen_context::CONTEXT_TYPE_SYSTEM]);
+        $mform->addElement(
+            'autocomplete',
+            'categorycontext',
+            get_string('categorycontext', 'mod_certifygen'),
+            [],
+            $options
+        )->setHiddenLabel(true);
+        $mform->hideIf(
+            'categorycontext',
+            'ctype',
+            'in',
+            [certifygen_context::CONTEXT_TYPE_COURSE, certifygen_context::CONTEXT_TYPE_SYSTEM]
+        );
         // Select for courses.
         $options = [
             'ajax' => 'mod_certifygen/form_course_selector',
             'multiple' => true,
-            'valuehtmlcallback' => function($courseid): string {
+            'valuehtmlcallback' => function ($courseid): string {
                 $course = get_course($courseid);
                 return $course->fullname;
             },
         ];
-        $mform->addElement('autocomplete', 'coursecontext',
-            get_string('coursecontext', 'mod_certifygen'), [], $options)->setHiddenLabel(true);
-        $mform->hideIf('coursecontext', 'ctype', 'in',
-            [certifygen_context::CONTEXT_TYPE_CATEGORY, certifygen_context::CONTEXT_TYPE_SYSTEM]);
+        $mform->addElement(
+            'autocomplete',
+            'coursecontext',
+            get_string('coursecontext', 'mod_certifygen'),
+            [],
+            $options
+        )->setHiddenLabel(true);
+        $mform->hideIf(
+            'coursecontext',
+            'ctype',
+            'in',
+            [certifygen_context::CONTEXT_TYPE_CATEGORY, certifygen_context::CONTEXT_TYPE_SYSTEM]
+        );
     }
 
     /**

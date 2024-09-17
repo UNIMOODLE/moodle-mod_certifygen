@@ -36,8 +36,12 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
 
+use coding_exception;
+use dml_exception;
 use mod_certifygen\persistents\certifygen_context;
 use mod_certifygen\tables\profile_my_certificates_table;
+use moodle_exception;
+use moodle_url;
 use renderable;
 use stdClass;
 use templatable;
@@ -74,16 +78,16 @@ class profile_my_certificates_view implements renderable, templatable {
      * export_for_template
      * @param renderer_base $output
      * @return stdClass
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \moodle_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public function export_for_template(renderer_base $output): stdClass {
         global $USER;
         $data = new stdClass();
 
         $tablelist = new profile_my_certificates_table($this->userid);
-        $tablelist->baseurl = new \moodle_url('/mod/certifygen/mycertificates.php');
+        $tablelist->baseurl = new moodle_url('/mod/certifygen/mycertificates.php');
         ob_start();
         // TODO: optional_params 10 and true.
         $tablelist->out($this->pagesize, false);

@@ -46,8 +46,6 @@ use invalid_parameter_exception;
 use mod_certifygen\certifygen;
 use mod_certifygen\certifygen_file;
 use mod_certifygen\event\certificate_issued;
-use mod_certifygen\interfaces\ICertificateRepository;
-use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_error;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
@@ -92,12 +90,19 @@ class emitcertificate_external extends external_api {
      * @throws invalid_parameter_exception
      * @throws invalid_persistent_exception|moodle_exception
      */
-    public static function emitcertificate(int $id, int $instanceid, int $modelid, string $lang, int $userid,
-                                           int $courseid): array {
+    public static function emitcertificate(
+        int $id,
+        int $instanceid,
+        int $modelid,
+        string $lang,
+        int $userid,
+        int $courseid
+    ): array {
         global $USER;
 
         self::validate_parameters(
-            self::emitcertificate_parameters(), ['id' => $id, 'instanceid' => $instanceid, 'modelid' => $modelid,
+            self::emitcertificate_parameters(),
+            ['id' => $id, 'instanceid' => $instanceid, 'modelid' => $modelid,
                 'lang' => $lang, 'userid' => $userid, 'courseid' => $courseid]
         );
 
@@ -124,8 +129,10 @@ class emitcertificate_external extends external_api {
         ];
         if ($id > 0) {
             $validation  = new certifygen_validations($id);
-            if ($validation->get('status') != certifygen_validations::STATUS_NOT_STARTED
-            && $validation->get('status') != certifygen_validations::STATUS_ERROR) {
+            if (
+                $validation->get('status') != certifygen_validations::STATUS_NOT_STARTED
+                && $validation->get('status') != certifygen_validations::STATUS_ERROR
+            ) {
                 $result['result'] = false;
                 $result['message'] = 'Certificate can not be emitted again';
                 return $result;
@@ -137,16 +144,28 @@ class emitcertificate_external extends external_api {
             $users = user_get_users_by_id([$userid]);
             $user = reset($users);
             $certifygenmodel = new certifygen_model($modelid);
-            $issueid = certifygen::issue_certificate($instanceid, $user, $certifygenmodel->get('templateid'), $course,
-                $lang);
+            $issueid = certifygen::issue_certificate(
+                $instanceid,
+                $user,
+                $certifygenmodel->get('templateid'),
+                $course,
+                $lang
+            );
             $saved = false;
             if ($issueid) {
                 $saved = true;
                 $validation->set('issueid', $issueid);
                 $validation->save();
             }
-            if ($existingcertificate = certifygen::get_user_certificate($instanceid, $userid, $courseid,
-                $certifygenmodel->get('templateid'), $lang)) {
+            if (
+                $existingcertificate = certifygen::get_user_certificate(
+                    $instanceid,
+                    $userid,
+                    $courseid,
+                    $certifygenmodel->get('templateid'),
+                    $lang
+                )
+            ) {
                 if (!$saved) {
                     $saved = true;
                     $validation->set('issueid', $existingcertificate->id);
@@ -155,8 +174,13 @@ class emitcertificate_external extends external_api {
             }
 
             // Step 3: Generate the tool_certificate certificate.
-            $file = certifygen::get_user_certificate_file($instanceid, $certifygenmodel->get('templateid'), $userid,
-                $courseid, $lang);
+            $file = certifygen::get_user_certificate_file(
+                $instanceid,
+                $certifygenmodel->get('templateid'),
+                $userid,
+                $courseid,
+                $lang
+            );
             if (is_null($file)) {
                 $result['result'] = false;
                 $result['message'] = 'File not found';
@@ -181,8 +205,13 @@ class emitcertificate_external extends external_api {
                     'course_shortname' => $course->shortname,
                     'filename' => str_replace('.pdf', '', $file->get_filename()),
                 ];
-                $certdata = get_json_certificate_external::get_json_certificate($userid, '', $instanceid,
-                    '', $validation->get('lang'));
+                $certdata = get_json_certificate_external::get_json_certificate(
+                    $userid,
+                    '',
+                    $instanceid,
+                    '',
+                    $validation->get('lang')
+                );
                 if (array_key_exists('json', $certdata) && !empty($certdata['json'])) {
                     $certdata = (array)json_decode($certdata['json']);
                     $data = array_merge($data, $certdata);

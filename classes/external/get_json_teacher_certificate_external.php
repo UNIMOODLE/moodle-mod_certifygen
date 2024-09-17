@@ -37,8 +37,8 @@ use external_value;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/mod/certifygen/lib.php');
-require_once($CFG->dirroot.'/mod/certifygen/classes/filters/certifygenfilter.php');
+require_once($CFG->dirroot . '/mod/certifygen/lib.php');
+require_once($CFG->dirroot . '/mod/certifygen/classes/filters/certifygenfilter.php');
 /**
  * Get teacher certificate elements
  * @package    mod_certifygen
@@ -83,7 +83,6 @@ class get_json_teacher_certificate_external extends external_api {
     public static function get_json_teacher_certificate_returns(): external_single_structure {
         return new external_single_structure([
                 'json' => new external_value(PARAM_RAW, 'Certificate elements in a json'),
-            ]
-        );
+            ]);
     }
 }

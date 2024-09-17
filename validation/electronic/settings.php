@@ -31,19 +31,27 @@
 defined('MOODLE_INTERNAL') || die();
 
 // Enlace principal de settings.
-$ADMIN->add('modsettingcertifygencat',
-    new admin_category('certifygenvalidation_electronic_cat',
-        get_string('pluginname', 'certifygenvalidation_electronic')));
+$ADMIN->add(
+    'modsettingcertifygencat',
+    new admin_category(
+        'certifygenvalidation_electronic_cat',
+        get_string('pluginname', 'certifygenvalidation_electronic')
+    )
+);
 
 // Certifygenreport_basic settings.
 $settings = new admin_settingpage(
     'modsettingcertifygenvalidationelectronic',
     get_string('pluginnamesettings', 'certifygenvalidation_electronic'),
-    'moodle/site:config');
+    'moodle/site:config'
+);
 if ($ADMIN->fulltree) {
-    $settings->add(new admin_setting_configcheckbox('certifygenvalidation_electronic/enabled',
+    $settings->add(new admin_setting_configcheckbox(
+        'certifygenvalidation_electronic/enabled',
         new lang_string('enable', 'certifygenvalidation_electronic'),
-        new lang_string('enable_help', 'certifygenvalidation_electronic'), 0));
+        new lang_string('enable_help', 'certifygenvalidation_electronic'),
+        0
+    ));
     $settings->add(new admin_setting_configtext(
         'certifygenvalidation_electronic/path',
         new lang_string('path', 'certifygenvalidation_electronic'),

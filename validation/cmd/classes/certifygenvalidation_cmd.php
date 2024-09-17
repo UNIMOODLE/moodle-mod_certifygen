@@ -38,14 +38,13 @@ use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
-use moodle_url;
 use stored_file;
 use stored_file_creation_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot. '/user/lib.php');
+require_once($CFG->dirroot . '/user/lib.php');
 /**
  * certifygenvalidation_cmd
  * @package   certifygenvalidation_cmd
@@ -55,7 +54,6 @@ require_once($CFG->dirroot. '/user/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class certifygenvalidation_cmd implements ICertificateValidation {
-
     /**
      * Send File
      * @param certifygen_file $file
@@ -130,9 +128,10 @@ class certifygenvalidation_cmd implements ICertificateValidation {
 
     /**
      * Save file
+     * @param string $validatedfile
      * @param certifygen_file $file
-     * @param $content
-     * @return void
+     * @return stored_file
+     * @throws coding_exception
      * @throws dml_exception
      * @throws file_exception
      * @throws stored_file_creation_exception
@@ -147,19 +146,20 @@ class certifygenvalidation_cmd implements ICertificateValidation {
         $cv = new certifygen_validations($file->get_validationid());
         if (!empty($cv->get('certifygenid'))) {
             $cert = new certifygen($cv->get('certifygenid'));
-            $context = \context_course::instance($cert->get('course'));
+            $context = context_course::instance($cert->get('course'));
         }
         $filerecord = self::get_filerecord_array(
             $context->id,
             $file->get_validationid(),
-            $file->get_file()->get_filename());
+            $file->get_file()->get_filename()
+        );
 
         return $fs->create_file_from_string($filerecord, $validatedfile);
     }
 
     /**
      * Get file record
-     * @param int $courseid
+     * @param int $contextid
      * @param int $validationid
      * @param string $filename
      * @return array
@@ -179,8 +179,7 @@ class certifygenvalidation_cmd implements ICertificateValidation {
      * Get File
      * @param int $courseid
      * @param int $validationid
-     * @param string $code
-     * @return stored_file
+     * @return array
      */
     public function get_file(int $courseid, int $validationid): array {
         $result = ['error' => [], 'message' => 'ok'];
@@ -192,8 +191,14 @@ class certifygenvalidation_cmd implements ICertificateValidation {
             if (!empty($courseid)) {
                 $contextid = context_course::instance($courseid)->id;
             }
-            $file = $fs->get_file($contextid, self::FILE_COMPONENT,
-                self::FILE_AREA, $validationid, self::FILE_PATH, $code);
+            $file = $fs->get_file(
+                $contextid,
+                self::FILE_COMPONENT,
+                self::FILE_AREA,
+                $validationid,
+                self::FILE_PATH,
+                $code
+            );
             $result['file'] = $file;
         } catch (moodle_exception $exception) {
             $result['error']['code'] = $exception->getCode();
@@ -209,30 +214,6 @@ class certifygenvalidation_cmd implements ICertificateValidation {
      */
     public function can_revoke(int $courseid): bool {
         return false;
-    }
-
-    /**
-     * Get file url
-     * @param int $courseid
-     * @param int $validationid
-     * @param string $code
-     * @return string
-     */
-    public function get_file_url(int $courseid, int $validationid, string $code): string {
-        $newfile = $this->get_file($courseid, $validationid, $code);
-        if (!$newfile) {
-            return '';
-        }
-        $url = moodle_url::make_pluginfile_url(
-            $newfile->get_contextid(),
-            $newfile->get_component(),
-            $newfile->get_filearea(),
-            $newfile->get_itemid(),
-            $newfile->get_filepath(),
-            $newfile->get_filename(),
-            false                     // Do not force download of the file.
-        );
-        return $url->out();
     }
 
     /**

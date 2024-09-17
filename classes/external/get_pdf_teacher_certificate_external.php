@@ -31,21 +31,25 @@
  */
 namespace mod_certifygen\external;
 
+use coding_exception;
+use context_course;
+use context_system;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
-use mod_certifygen\interfaces\ICertificateReport;
+use invalid_parameter_exception;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
+use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/user/lib.php');
-require_once($CFG->dirroot.'/mod/certifygen/lib.php');
-require_once($CFG->dirroot.'/mod/certifygen/classes/filters/certifygenfilter.php');
+require_once($CFG->dirroot . '/user/lib.php');
+require_once($CFG->dirroot . '/mod/certifygen/lib.php');
+require_once($CFG->dirroot . '/mod/certifygen/classes/filters/certifygenfilter.php');
 /**
  * Get teacher certificate (issue it if it is not already created)
  * @package    mod_certifygen
@@ -82,18 +86,24 @@ class get_pdf_teacher_certificate_external extends external_api {
      * @param int $modelid
      * @param string $lang
      * @return array|array[]
-     * @throws \coding_exception
-     * @throws \invalid_parameter_exception
+     * @throws coding_exception
+     * @throws invalid_parameter_exception
      */
-    public static function get_pdf_teacher_certificate(int $userid, string $userfield, string $name, string $courses,
-                                                       int $modelid, string $lang): array {
+    public static function get_pdf_teacher_certificate(
+        int $userid,
+        string $userfield,
+        string $name,
+        string $courses,
+        int $modelid,
+        string $lang
+    ): array {
         $params = self::validate_parameters(
             self::get_pdf_teacher_certificate_parameters(),
             ['userid' => $userid, 'userfield' => $userfield, 'name' => $name, 'courses' => $courses,
                 'modelid' => $modelid, 'lang' => $lang]
         );
         try {
-            $context = \context_system::instance();
+            $context = context_system::instance();
             require_capability('mod/certifygen:manage', $context);
             // Choose user parameter.
             $uparam = mod_certifygen_validate_user_parameters_for_ws($params['userid'], $params['userfield']);
@@ -113,7 +123,7 @@ class get_pdf_teacher_certificate_external extends external_api {
             // Is user enrolled on this course as teacher?
             $coursesarray = explode(',', $courses);
             foreach ($coursesarray as $course) {
-                $context = \context_course::instance($course);
+                $context = context_course::instance($course);
                 if (!has_capability('moodle/course:managegroups', $context, $userid)) {
                     $result['error']['code'] = 'user_not_enrolled_as_teacher';
                     $result['error']['message'] = 'User not enrolled on course id=' . $course . ', as teacher';
@@ -161,11 +171,10 @@ class get_pdf_teacher_certificate_external extends external_api {
                 // Get file.
                 $validationplugin = $certifygenmodel->get('validation');
                 $validationpluginclass = $validationplugin . '\\' . $validationplugin;
-                $code = $trequest->get('code') . '.pdf';
                 if (get_config($validationplugin, 'enabled') === '1') {
                     /** @var ICertificateValidation $subplugin */
                     $subplugin = new $validationpluginclass();
-                    $fileresult = $subplugin->get_file(0, $trequest->get('id'), $code);
+                    $fileresult = $subplugin->get_file(0, $trequest->get('id'));
                     if (!array_key_exists('file', $fileresult)) {
                         $result['error'] = $fileresult['error'];
                         return $result;
@@ -181,8 +190,7 @@ class get_pdf_teacher_certificate_external extends external_api {
                 $result['error']['message'] = 'Certificate validation status is: ' . $trequest->get('status');
                 return $result;
             }
-
-        } catch (\moodle_exception $e) {
+        } catch (moodle_exception $e) {
             $result['error']['code'] = 'teacherrequest_pdf_can_not_be_obtained';
             $result['error']['message'] = $e->getMessage();
             return $result;
@@ -209,7 +217,10 @@ class get_pdf_teacher_certificate_external extends external_api {
                     'status'   => new external_value(PARAM_INT, 'Teacher request status'),
                     'file' => new external_value(PARAM_CLEANFILE, 'certificate'),
                     'reporttype' => new external_value(PARAM_INT, 'model type'),
-                ], 'Certificate info', VALUE_OPTIONAL),
+                ],
+                'Certificate info',
+                VALUE_OPTIONAL
+            ),
             'error' => new external_single_structure([
                 'message' => new external_value(PARAM_RAW, 'Error message'),
                 'code' => new external_value(PARAM_RAW, 'Error code'),

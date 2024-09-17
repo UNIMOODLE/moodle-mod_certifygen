@@ -57,7 +57,6 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class teacherrequestform extends dynamic_form {
-
     /**
      * definition
      * @throws coding_exception|dml_exception
@@ -70,17 +69,21 @@ class teacherrequestform extends dynamic_form {
 
         // Model list.
         [$modelids, $langs] = certifygen_context::get_system_context_modelids_and_langs();
-        $mform->addElement('select', 'modelid',
-            get_string('model', 'mod_certifygen'), $modelids);
+        $mform->addElement(
+            'select',
+            'modelid',
+            get_string('model', 'mod_certifygen'),
+            $modelids
+        );
         $mform->setType('modelid', PARAM_INT);
         $mform->addRule('modelid', get_string('required'), 'required');
 
         // Language.
         foreach ($langs as $modelid => $lang) {
             // Language: from model list languages.
-            $mform->addElement('select', 'lang_'.$modelid, get_string('language'), $lang);
-            $mform->setType('lang_'.$modelid, PARAM_RAW);
-            $mform->hideIf('lang_'.$modelid, 'modelid', 'noteq', $modelid);
+            $mform->addElement('select', 'lang_' . $modelid, get_string('language'), $lang);
+            $mform->setType('lang_' . $modelid, PARAM_RAW);
+            $mform->hideIf('lang_' . $modelid, 'modelid', 'noteq', $modelid);
         }
 
         // Course list.
@@ -88,15 +91,20 @@ class teacherrequestform extends dynamic_form {
             'ajax' => 'mod_certifygen/form_mycourses_selector',
             'multiple' => true,
             'userid' => (int)$this->_ajaxformdata['userid'],
-            'valuehtmlcallback' => function($courseid): string {
+            'valuehtmlcallback' => function ($courseid): string {
                 $course = get_course($courseid);
                 $formated = format_text($course->fullname);
                 $formated = strip_tags($formated);
                 return $formated;
             },
         ];
-        $mform->addElement('autocomplete', 'courses',
-            get_string('courseslist', 'mod_certifygen'), [], $options);
+        $mform->addElement(
+            'autocomplete',
+            'courses',
+            get_string('courseslist', 'mod_certifygen'),
+            [],
+            $options
+        );
         $mform->addRule('courses', get_string('required'), 'required');
 
         // Hidden elements.
@@ -128,8 +136,9 @@ class teacherrequestform extends dynamic_form {
 
     /**
      * process_dynamic_submission
+     *
      * @throws coding_exception
-     * @throws invalid_persistent_exception
+     * @throws invalid_persistent_exception|dml_exception
      */
     public function process_dynamic_submission() {
         $formdata = (array) $this->get_data();
@@ -183,8 +192,10 @@ class teacherrequestform extends dynamic_form {
     public function validation($data, $files) {
         $errors = [];
 
-        if (!array_key_exists('courses', $data)
-            || (array_key_exists('courses', $data) && empty($data['courses']))) {
+        if (
+            !array_key_exists('courses', $data)
+            || (array_key_exists('courses', $data) && empty($data['courses']))
+        ) {
             $errors['courses'] = get_string('required');
         }
 

@@ -30,9 +30,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_certifygen\external;
-use coding_exception;
 use context_system;
-use core\invalid_persistent_exception;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
@@ -42,6 +40,8 @@ use mod_certifygen\event\certificate_downloaded;
 use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
+use moodle_exception;
+
 /**
  * Download teacher certificate
  * @package    mod_certifygen
@@ -68,14 +68,13 @@ class downloadteachercertificate_external extends external_api {
      * Download teacher certificate
      * @param int $id
      * @return array
-     * @throws coding_exception
      * @throws invalid_parameter_exception
-     * @throws invalid_persistent_exception
      */
     public static function downloadteachercertificate(int $id): array {
         global $USER;
         self::validate_parameters(
-            self::downloadteachercertificate_parameters(), ['id' => $id]
+            self::downloadteachercertificate_parameters(),
+            ['id' => $id]
         );
 
         $result = ['result' => true, 'message' => 'OK', 'url' => ''];
@@ -84,20 +83,20 @@ class downloadteachercertificate_external extends external_api {
             // Step 1: verified status finished.
             $trequest = new certifygen_validations($id);
             $context = context_system::instance();
-            if ($USER->id != $trequest->get('userid')
-            && !has_capability('mod/certifygen:canemitotherscertificates', $context)) {
+            if (
+                $USER->id != $trequest->get('userid')
+                && !has_capability('mod/certifygen:canemitotherscertificates', $context)
+            ) {
                 $result['result'] = false;
                 $result['message'] = get_string('nopermissiontodownloadothercerts', 'mod_certifygen');
                 return $result;
             }
 
             if (is_null($trequest)) {
-                $result = ['result' => false, 'message' => 'notfound', 'url' => ''];
-                return $result;
+                return ['result' => false, 'message' => 'notfound', 'url' => ''];
             }
             if ($trequest->get('status') != certifygen_validations::STATUS_FINISHED) {
-                $result = ['result' => false, 'message' => 'statusnotfinished', 'url' => ''];
-                return $result;
+                return ['result' => false, 'message' => 'statusnotfinished', 'url' => ''];
             }
             // Step 2: call to getfile from repositoryplugin.
             $certifygenmodel = new certifygen_model($trequest->get('modelid'));

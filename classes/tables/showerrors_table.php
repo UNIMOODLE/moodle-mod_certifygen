@@ -35,6 +35,7 @@ require_once("$CFG->libdir/moodlelib.php");
 
 use coding_exception;
 use dml_exception;
+use html_writer;
 use mod_certifygen\certifygen;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
@@ -49,7 +50,6 @@ use table_sql;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class showerrors_table extends table_sql {
-
     /**
      * Construct
      * @throws coding_exception
@@ -100,8 +100,12 @@ class showerrors_table extends table_sql {
 
         $total = certifygen::count_errors($userfullname, $modelname);
         $this->pagesize($pagesize, $total);
-        $this->rawdata = certifygen::get_errors($userfullname, $modelname, $this->get_page_start(),
-            $this->get_page_size());
+        $this->rawdata = certifygen::get_errors(
+            $userfullname,
+            $modelname,
+            $this->get_page_start(),
+            $this->get_page_size()
+        );
     }
 
     /**
@@ -149,9 +153,15 @@ class showerrors_table extends table_sql {
             $response = $subplugin->get_file($courseid, $row->validationid);
             if (array_key_exists('file', $response)) {
                 $file = $response['file'];
-                $url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(),
-                    $file->get_itemid(), $file->get_filepath(), $file->get_filename())->out();
-                return \html_writer::link($url, get_string('download'));
+                $url = moodle_url::make_pluginfile_url(
+                    $file->get_contextid(),
+                    $file->get_component(),
+                    $file->get_filearea(),
+                    $file->get_itemid(),
+                    $file->get_filepath(),
+                    $file->get_filename()
+                )->out();
+                return html_writer::link($url, get_string('download'));
             }
         }
         return '';
@@ -163,7 +173,7 @@ class showerrors_table extends table_sql {
      * @throws coding_exception
      */
     final public function col_type($values): string {
-        return get_string('type_'. $values->modeltype, 'mod_certifygen');
+        return get_string('type_' . $values->modeltype, 'mod_certifygen');
     }
     /**
      * Validation
@@ -172,7 +182,7 @@ class showerrors_table extends table_sql {
      * @throws coding_exception
      */
     final public function col_validation($values): string {
-        return get_string('pluginname' , $values->modelvalidation);
+        return get_string('pluginname', $values->modelvalidation);
     }
     /**
      * Report
@@ -184,7 +194,7 @@ class showerrors_table extends table_sql {
         if (empty($values->modelreport)) {
             return '';
         }
-        return get_string('pluginname' , $values->modelreport);
+        return get_string('pluginname', $values->modelreport);
     }
     /**
      * Repository
@@ -196,7 +206,7 @@ class showerrors_table extends table_sql {
         if (empty($values->modelrepository)) {
             return '';
         }
-        return get_string('pluginname' , $values->modelrepository);
+        return get_string('pluginname', $values->modelrepository);
     }
 
     /**
@@ -218,14 +228,13 @@ class showerrors_table extends table_sql {
      * @throws coding_exception
      */
     final public function col_status($values): string {
-        return get_string('status_'. $values->status, 'mod_certifygen');
+        return get_string('status_' . $values->status, 'mod_certifygen');
     }
 
     /**
      * Message
      * @param $values
      * @return string
-     * @throws coding_exception
      */
     final public function col_message($values): string {
         return $values->errormessage;
@@ -234,7 +243,6 @@ class showerrors_table extends table_sql {
      * Model
      * @param $values
      * @return string
-     * @throws coding_exception
      */
     final public function col_model($values): string {
         return $values->modelname;
@@ -243,7 +251,6 @@ class showerrors_table extends table_sql {
      * Validation id
      * @param $values
      * @return string
-     * @throws coding_exception
      */
     final public function col_validationid($values): string {
         return $values->validationid;
@@ -252,7 +259,6 @@ class showerrors_table extends table_sql {
      * Timecreated
      * @param $values
      * @return string
-     * @throws coding_exception
      */
     final public function col_timecreated($values): string {
         return userdate($values->timecreated);

@@ -32,8 +32,6 @@ use mod_certifygen\persistents\certifygen_validations;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_certifygen_generator extends testing_module_generator {
-
-
     /**
      * create_model
      * @param int $type
@@ -60,7 +58,7 @@ class mod_certifygen_generator extends testing_module_generator {
             'report' => $report,
             'repository' => 'certifygenrepository_localrepository',
         ];
-        $model = new certifygen_model(0,  (object)$data);
+        $model = new certifygen_model(0, (object)$data);
         return $model->create();
     }
 
@@ -79,8 +77,8 @@ class mod_certifygen_generator extends testing_module_generator {
         $this->install_language_package('es');
 
         // Configure the platform.
-        set_config('enabled',  1, 'certifygenrepository_localrepository');
-        set_config('enabled',  1, 'certifygenvalidation_none');
+        set_config('enabled', 1, 'certifygenrepository_localrepository');
+        set_config('enabled', 1, 'certifygenvalidation_none');
         $data = [
             'name' => $name,
             'idnumber' => '',

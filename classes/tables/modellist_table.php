@@ -46,7 +46,6 @@ use table_sql;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class modellist_table extends table_sql {
-
     /**
      * Construct
      * @throws coding_exception
@@ -80,8 +79,13 @@ class modellist_table extends table_sql {
         $total = certifygen_model::count_records();
 
         $this->pagesize($pagesize, $total);
-        $this->rawdata = certifygen_model::get_records([],
-            $this->get_sql_sort(), 'ASC', $this->get_page_start(), $this->get_page_size());
+        $this->rawdata = certifygen_model::get_records(
+            [],
+            $this->get_sql_sort(),
+            'ASC',
+            $this->get_page_start(),
+            $this->get_page_size()
+        );
 
         // Set initial bars.
         if ($useinitialsbar) {
@@ -96,7 +100,7 @@ class modellist_table extends table_sql {
      * @throws coding_exception
      */
     final public function col_type($values): string {
-        return get_string('type_'. $values->get('type'), 'mod_certifygen');
+        return get_string('type_' . $values->get('type'), 'mod_certifygen');
     }
 
     /**
@@ -138,7 +142,7 @@ class modellist_table extends table_sql {
      * @throws coding_exception
      */
     final public function col_deletemodel($values): string {
-        return '<span class="likelink" data-id="'. $values->get('id') . '" data-name="'. $values->get('name')
+        return '<span class="likelink" data-id="' . $values->get('id') . '" data-name="' . $values->get('name')
             . '" data-action="delete-model">'
             . get_string('delete', 'mod_certifygen') . '</span>';
     }
@@ -150,8 +154,8 @@ class modellist_table extends table_sql {
      * @throws coding_exception
      */
     final public function col_editmodel($values): string {
-        return '<span class="likelink" data-action="edit-model" data-id="'. $values->get('id') . '">'
-            . get_string('edit', 'mod_certifygen').'</span>';
+        return '<span class="likelink" data-action="edit-model" data-id="' . $values->get('id') . '">'
+            . get_string('edit', 'mod_certifygen') . '</span>';
     }
 
     /**
@@ -170,7 +174,7 @@ class modellist_table extends table_sql {
             $contextid = 0;
         }
         return '<span class="likelink" data-action="assign-context" data-id="' . $contextid . '" data-modelid="'
-            . $values->get('id') . '" data-name="'. $values->get('name') . '">'
-            . get_string('assigncontext', 'mod_certifygen').'</span>';
+            . $values->get('id') . '" data-name="' . $values->get('name') . '">'
+            . get_string('assigncontext', 'mod_certifygen') . '</span>';
     }
 }

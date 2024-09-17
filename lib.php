@@ -113,10 +113,8 @@ function certifygen_update_instance($data, $mform): bool {
 
 /**
  * Delete certifygen instance.
- *
- * @param stdClass $data
- * @param mod_certifygen_mod_form $mform
- * @return bool Success/Fail
+ * @param $id
+ * @return bool
  * @throws coding_exception
  */
 function certifygen_delete_instance($id): bool {
@@ -149,10 +147,12 @@ function mod_certifygen_get_modes(): array {
  */
 function mod_certifygen_get_types(): array {
     return [
-        certifygen_model::TYPE_ACTIVITY => get_string('type_'. certifygen_model::TYPE_ACTIVITY,
-            'mod_certifygen'),
+        certifygen_model::TYPE_ACTIVITY => get_string(
+            'type_' . certifygen_model::TYPE_ACTIVITY,
+            'mod_certifygen'
+        ),
         certifygen_model::TYPE_TEACHER_ALL_COURSES_USED =>
-            get_string('type_'. certifygen_model::TYPE_TEACHER_ALL_COURSES_USED, 'mod_certifygen'),
+            get_string('type_' . certifygen_model::TYPE_TEACHER_ALL_COURSES_USED, 'mod_certifygen'),
     ];
 }
 /**
@@ -191,7 +191,6 @@ function mod_certifygen_get_activity_models(int $courseid): array {
  * Get certifygen model validation types
  * @return array
  * @throws coding_exception
- * @throws dml_exception
  */
 function mod_certifygen_get_validation(): array {
 
@@ -277,23 +276,30 @@ function mod_certifygen_get_templates(int $courseid = 0): array {
 
 /**
  * mod_certifygen_myprofile_navigation
+ *
  * @param tree $tree
  * @param $user
  * @param $iscurrentuser
  * @param $course
  * @return void
- * @throws coding_exception
+ * @throws coding_exception|dml_exception
  */
-function mod_certifygen_myprofile_navigation(core_user\output\myprofile\tree $tree, $user, $iscurrentuser, $course) {
+function mod_certifygen_myprofile_navigation(core_user\output\myprofile\tree $tree, $user, $iscurrentuser, $course): void {
 
     global $USER;
-    if ($USER->id == $user->id
-        && certifygen_context::can_i_see_teacherrequestlink($user->id)) {
-
+    if (
+        $USER->id == $user->id
+        && certifygen_context::can_i_see_teacherrequestlink($user->id)
+    ) {
             $link = get_string('mycertificates', 'mod_certifygen');
             $url = new moodle_url('/mod/certifygen/mycertificates.php');
-            $node = new core_user\output\myprofile\node('miscellaneous', 'modcertifygenmy', $link,
-                null, $url);
+            $node = new core_user\output\myprofile\node(
+                'miscellaneous',
+                'modcertifygenmy',
+                $link,
+                null,
+                $url
+            );
             $tree->add_node($node);
     }
 }
@@ -320,18 +326,20 @@ function mod_certifygen_pluginfile(
     array $args,
     bool $forcedownload,
     array $options
-    ) {
+) {
 
     if ($context->contextlevel != CONTEXT_COURSE && $context->contextlevel != CONTEXT_SYSTEM) {
         return false;
     }
 
     // Make sure the filearea is one of those used by the plugin.
-    if ($filearea !== ICertificateValidation::FILE_AREA &&
+    if (
+        $filearea !== ICertificateValidation::FILE_AREA &&
         $filearea !== ICertificateReport::FILE_AREA &&
         $filearea !== ICertificateRepository::FILE_AREA &&
-        $filearea !== ICertificateValidation::FILE_AREA_VALIDATED
-        && $filearea !== 'issues') {
+        $filearea !== ICertificateValidation::FILE_AREA_VALIDATED &&
+        $filearea !== 'issues'
+    ) {
         return false;
     }
 
@@ -362,14 +370,20 @@ function mod_certifygen_pluginfile(
 
     // Retrieve the file from the Files API.
     $fs = get_file_storage();
-    $file = $fs->get_file($context->id, ICertificateValidation::FILE_COMPONENT, $filearea, $itemid,
-        $filepath, $filename);
+    $file = $fs->get_file(
+        $context->id,
+        ICertificateValidation::FILE_COMPONENT,
+        $filearea,
+        $itemid,
+        $filepath,
+        $filename
+    );
     if (!$file) {
         // The file does not exist.
         return false;
     }
     // We can now send the file back to the browser - in this case with a cache lifetime of 1 day and no filtering.
-    send_stored_file($file,  null, 0, $forcedownload, $options);
+    send_stored_file($file, null, 0, $forcedownload, $options);
 }
 
 /**
@@ -396,8 +410,12 @@ function mod_certifygen_get_lang_selected(certifygen_model $model): string {
  * @return string
  * @throws coding_exception
  */
-function mod_certifygen_get_certificates_table_form(certifygen_model $model, moodle_url $url, string $defaultlang = '',
-                                                    string $role = 'student'): string {
+function mod_certifygen_get_certificates_table_form(
+    certifygen_model $model,
+    moodle_url $url,
+    string $defaultlang = '',
+    string $role = 'student'
+): string {
 
     if (empty($defaultlang)) {
         $defaultlang = mod_certifygen_get_lang_selected($model);
@@ -439,7 +457,7 @@ function mod_certifygen_validate_user_parameters_for_ws(int $userid, string $use
             $id = $DB->get_field('user', 'id', ['email' => $userfield]);
         } else if ($fieldid === 'idnumber') {
             $id = $DB->get_field('user', 'id', ['idnumber' => $userfield]);
-        } else if (substr( $fieldid, 0, 8 ) === "profile_") {
+        } else if (substr($fieldid, 0, 8) === "profile_") {
             $fieldid = explode('_', $fieldid);
             $fieldid = $fieldid[1];
             $select = 'fieldid = :fieldid';
@@ -484,8 +502,12 @@ function mod_certifygen_are_there_any_certificate_emited(int $modelid): bool {
         return false;
     }
 
-    [$insql, $inparams] = $DB->get_in_or_equal(certifygen_validations::STATUS_NOT_STARTED, SQL_PARAMS_NAMED,
-        'param', false);
+    [$insql, $inparams] = $DB->get_in_or_equal(
+        certifygen_validations::STATUS_NOT_STARTED,
+        SQL_PARAMS_NAMED,
+        'param',
+        false
+    );
     [$modelsql, $modelparams] = $DB->get_in_or_equal($modelid, SQL_PARAMS_NAMED, 'modelid');
     $params = array_merge($inparams, $modelparams);
     $inparams['modelid'] = $modelid;
@@ -497,7 +519,7 @@ function mod_certifygen_are_there_any_certificate_emited(int $modelid): bool {
 
 /**
  * mod_certifygen_are_there_any_certificate_emited_by_instanceid
- * @param int $modelid
+ * @param int $certifygenid
  * @return bool
  * @throws coding_exception
  * @throws dml_exception
@@ -509,8 +531,12 @@ function mod_certifygen_are_there_any_certificate_emited_by_instanceid(int $cert
         return false;
     }
 
-    [$insql, $inparams] = $DB->get_in_or_equal(certifygen_validations::STATUS_NOT_STARTED, SQL_PARAMS_NAMED,
-        'param', false);
+    [$insql, $inparams] = $DB->get_in_or_equal(
+        certifygen_validations::STATUS_NOT_STARTED,
+        SQL_PARAMS_NAMED,
+        'param',
+        false
+    );
     [$modelsql, $modelparams] = $DB->get_in_or_equal($certifygenid, SQL_PARAMS_NAMED, 'certifygenid');
     $params = array_merge($inparams, $modelparams);
     $inparams['certifygenid'] = $certifygenid;

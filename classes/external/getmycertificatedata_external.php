@@ -39,18 +39,12 @@ use coding_exception;
 use context_system;
 use dml_exception;
 use external_api;
-use external_multiple_structure;
 use invalid_parameter_exception;
 use mod_certifygen\output\views\activity_view;
-use mod_certifygen\output\views\mycertificates_view;
-use mod_certifygen\output\views\profile_my_certificates_view;
-use mod_certifygen\output\views\student_view;
-use mod_certifygen\persistents\certifygen_model;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
 use moodle_exception;
-use moodle_url;
 /**
  * Get my certificate data
  * @package    mod_certifygen
@@ -89,16 +83,26 @@ class getmycertificatedata_external extends external_api {
     public static function getmycertificatedata(int $modelid, int $courseid, int $cmid, string $lang): array {
         global $PAGE, $DB;
         self::validate_parameters(
-            self::getmycertificatedata_parameters(), ['modelid' => $modelid, 'courseid' => $courseid, 'cmid' => $cmid,
+            self::getmycertificatedata_parameters(),
+            ['modelid' => $modelid, 'courseid' => $courseid, 'cmid' => $cmid,
                 'lang' => $lang]
         );
         $PAGE->set_context(context_system::instance());
         if ($cmid > 0) {
-            $cm = get_coursemodule_from_id('certifygen', $cmid, 0, false,
-                MUST_EXIST);
+            $cm = get_coursemodule_from_id(
+                'certifygen',
+                $cmid,
+                0,
+                false,
+                MUST_EXIST
+            );
             $certifygen = $DB->get_record('certifygen', ['id' => $cm->instance], '*', MUST_EXIST);
-            $certifygenmodel = $DB->get_record('certifygen_model', ['id' => $certifygen->modelid], '*',
-                MUST_EXIST);
+            $certifygenmodel = $DB->get_record(
+                'certifygen_model',
+                ['id' => $certifygen->modelid],
+                '*',
+                MUST_EXIST
+            );
             $view = new activity_view($courseid, $certifygenmodel->templateid, $cm, $lang);
         } else {
             // Creo q este caso no se usa en este serivicio. mando error para controlarlo.

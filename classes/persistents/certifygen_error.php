@@ -34,7 +34,6 @@ namespace mod_certifygen\persistents;
 use coding_exception;
 use core\invalid_persistent_exception;
 use core\persistent;
-use dml_exception;
 use stdClass;
 /**
  * certifygen_error

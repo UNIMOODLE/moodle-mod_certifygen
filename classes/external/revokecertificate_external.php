@@ -37,6 +37,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
 use coding_exception;
+use context_course;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
@@ -46,6 +47,9 @@ use mod_certifygen\event\certificate_revoked;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
+use required_capability_exception;
+use tool_certificate\template;
+
 /**
  * Revoke certificate
  * @package    mod_certifygen
@@ -83,7 +87,8 @@ class revokecertificate_external extends external_api {
         global $DB, $USER;
 
         self::validate_parameters(
-            self::revokecertificate_parameters(), ['issueid' => $issueid, 'userid' => $userid, 'modelid' => $modelid]
+            self::revokecertificate_parameters(),
+            ['issueid' => $issueid, 'userid' => $userid, 'modelid' => $modelid]
         );
         $result = ['result' => true, 'message' => get_string('ok', 'mod_certifygen')];
 
@@ -102,13 +107,17 @@ class revokecertificate_external extends external_api {
             }
             // Step 2: Remove tool_certificate_issues record.
             $issue = $DB->get_record('tool_certificate_issues', ['id' => $issueid], '*', MUST_EXIST);
-            $template = \tool_certificate\template::instance($issue->templateid);
+            $template = template::instance($issue->templateid);
             // Make sure the user has the required capabilities.
-            $context = \context_course::instance($issue->courseid, IGNORE_MISSING) ?: $template->get_context();
+            $context = context_course::instance($issue->courseid, IGNORE_MISSING) ?: $template->get_context();
             self::validate_context($context);
             if (!$template->can_revoke($issue->userid, $context)) {
-                throw new \required_capability_exception($template->get_context(), 'tool/certificate:issue',
-                    'nopermissions', 'error');
+                throw new required_capability_exception(
+                    $template->get_context(),
+                    'tool/certificate:issue',
+                    'nopermissions',
+                    'error'
+                );
             }
 
             // Step 4: Delete the issue.

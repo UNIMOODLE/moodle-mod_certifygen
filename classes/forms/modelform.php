@@ -46,6 +46,7 @@ use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\persistents\certifygen_model;
 use moodle_exception;
 use moodle_url;
+use stdClass;
 use tool_certificate\permission;
 use function get_string_manager;
 /**
@@ -57,7 +58,6 @@ use function get_string_manager;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class modelform extends dynamic_form {
-
     /**
      * Definition
      * @throws coding_exception|dml_exception
@@ -70,26 +70,41 @@ class modelform extends dynamic_form {
             $model = new certifygen_model($modelid);
         }
         // Model Name.
-        $mform->addElement('text', 'modelname',
-            get_string('modelname', 'mod_certifygen'), ['size' => '70']);
+        $mform->addElement(
+            'text',
+            'modelname',
+            get_string('modelname', 'mod_certifygen'),
+            ['size' => '70']
+        );
         $mform->setType('modelname', PARAM_RAW);
         $mform->addRule('modelname', get_string('required'), 'required');
 
         // Model idnumber.
-        $mform->addElement('text', 'modelidnumber',
-            get_string('modelidnumber', 'mod_certifygen'), ['size' => '70']);
+        $mform->addElement(
+            'text',
+            'modelidnumber',
+            get_string('modelidnumber', 'mod_certifygen'),
+            ['size' => '70']
+        );
         $mform->setType('modelidnumber', PARAM_RAW);
 
         // Model mode.
-        $mform->addElement('select', 'mode',
-            get_string('mode', 'mod_certifygen'), mod_certifygen_get_modes());
+        $mform->addElement(
+            'select',
+            'mode',
+            get_string('mode', 'mod_certifygen'),
+            mod_certifygen_get_modes()
+        );
         $mform->setType('mode', PARAM_INT);
         $mform->addHelpButton('mode', 'mode', 'mod_certifygen');
         $mform->addRule('mode', get_string('required'), 'required');
 
         // Timeondemmand.
-        $mform->addElement('duration', 'timeondemmand',
-            get_string('timeondemmand', 'mod_certifygen'));
+        $mform->addElement(
+            'duration',
+            'timeondemmand',
+            get_string('timeondemmand', 'mod_certifygen')
+        );
         $mform->setType('timeondemmand', PARAM_INT);
         $mform->addHelpButton('timeondemmand', 'timeondemmand', 'mod_certifygen');
         $mform->hideIf('timeondemmand', 'mode', 'eq', certifygen_model::MODE_UNIQUE);
@@ -98,12 +113,17 @@ class modelform extends dynamic_form {
         // Model type.
         $cemited = mod_certifygen_are_there_any_certificate_emited($modelid);
         if (!$cemited) {
-            $mform->addElement('select', 'type',
-                get_string('type', 'mod_certifygen'), mod_certifygen_get_types());
+            $mform->addElement(
+                'select',
+                'type',
+                get_string('type', 'mod_certifygen'),
+                mod_certifygen_get_types()
+            );
             $mform->setType('type', PARAM_INT);
             $mform->addHelpButton('type', 'type', 'mod_certifygen');
             $mform->addRule('type', get_string('required'), 'required');
         } else {
+            $model = new certifygen_model($modelid);
             $typestring = get_string('type_' . $model->get('type'), 'mod_certifygen');
             $html = get_string('type', 'mod_certifygen') . ' : ' . $typestring;
             $html = html_writer::div($html, 'w-100');
@@ -117,20 +137,36 @@ class modelform extends dynamic_form {
             $canmanagetemplates = permission::can_manage_anywhere();
             $templateoptions = ['' => get_string('chooseatemplate', 'mod_certifygen')] + $templates;
             $manageurl = new moodle_url('/admin/tool/certificate/manage_templates.php');
-            $elements = [$mform->createElement('select', 'templateid',
-                get_string('template', 'mod_certifygen'), $templateoptions)];
+            $elements = [$mform->createElement(
+                'select',
+                'templateid',
+                get_string('template', 'mod_certifygen'),
+                $templateoptions
+            )];
             $mform->setType('templateid', PARAM_INT);
 
             // Adding "Manage templates" link if user has capabilities to manage templates.
             if ($canmanagetemplates && !empty($templates)) {
-                $elements[] = $mform->createElement('static', 'managetemplates', '',
-                    $OUTPUT->action_link($manageurl, get_string('managetemplates', 'mod_certifygen')));
+                $elements[] = $mform->createElement(
+                    'static',
+                    'managetemplates',
+                    '',
+                    $OUTPUT->action_link($manageurl, get_string('managetemplates', 'mod_certifygen'))
+                );
             }
-            $mform->addGroup($elements, 'template_group', get_string('template', 'mod_certifygen'),
-                html_writer::div('', 'w-100'), false);
-            $mform->hideIf('template_group', 'type', 'noteq',
-                certifygen_model::TYPE_ACTIVITY);
-
+            $mform->addGroup(
+                $elements,
+                'template_group',
+                get_string('template', 'mod_certifygen'),
+                html_writer::div('', 'w-100'),
+                false
+            );
+            $mform->hideIf(
+                'template_group',
+                'type',
+                'noteq',
+                certifygen_model::TYPE_ACTIVITY
+            );
         } else if ($model->get('templateid')) {
             $html = get_string('template', 'mod_certifygen') . ' : '
                 . $templates[(int)$model->get('templateid')];
@@ -159,8 +195,12 @@ class modelform extends dynamic_form {
         // Validation.
         $types = mod_certifygen_get_validation();
         if (!$cemited) {
-            $mform->addElement('select', 'validation',
-                get_string('validation', 'mod_certifygen'), $types);
+            $mform->addElement(
+                'select',
+                'validation',
+                get_string('validation', 'mod_certifygen'),
+                $types
+            );
             $mform->setType('validation', PARAM_RAW);
             $mform->addRule('validation', get_string('required'), 'required');
         } else {
@@ -172,8 +212,12 @@ class modelform extends dynamic_form {
         // Report (only for teacher model type).
         $types = mod_certifygen_get_report();
         if (!$cemited) {
-            $mform->addElement('select', 'report', get_string('report', 'mod_certifygen'),
-                $types);
+            $mform->addElement(
+                'select',
+                'report',
+                get_string('report', 'mod_certifygen'),
+                $types
+            );
             $mform->setType('report', PARAM_RAW);
             $mform->hideIf('report', 'type', 'eq', certifygen_model::TYPE_ACTIVITY);
         } else {
@@ -187,8 +231,12 @@ class modelform extends dynamic_form {
         $types = mod_certifygen_get_repositories();
 
         if (!$cemited) {
-            $mform->addElement('select', 'repository',
-                get_string('repository', 'mod_certifygen'), $types);
+            $mform->addElement(
+                'select',
+                'repository',
+                get_string('repository', 'mod_certifygen'),
+                $types
+            );
             $mform->setType('repository', PARAM_RAW);
             $mform->addRule('repository', get_string('required'), 'required');
         } else {
@@ -252,8 +300,7 @@ class modelform extends dynamic_form {
                     'timeondemmand' => $model->get('timeondemmand'),
                     'langs' => $model->get('langs'),
                     'validation' => $model->get('validation'),
-            ]
-            );
+            ]);
         }
     }
 
@@ -275,22 +322,27 @@ class modelform extends dynamic_form {
     public function validation($data, $files) {
         $errors = [];
 
-        if (!array_key_exists('langs', $data)
-        || (array_key_exists('langs', $data) && empty($data['langs']))) {
+        if (
+            !array_key_exists('langs', $data)
+            || (array_key_exists('langs', $data) && empty($data['langs']))
+        ) {
             $errors['langs'] = get_string('required');
         }
-        // Confirm validation-repository plugins selected
+        // Confirm validation-repository plugins selected.
         $repositoryplugin = $data['repository'];
         $repositorypluginclass = $repositoryplugin . '\\' . $repositoryplugin;
         /** @var ICertificateRepository $subplugin */
         $subplugin = new $repositorypluginclass();
         $validplugins = $subplugin->get_consistent_validation_plugins();
         if (!empty($validplugins) && !in_array($data['validation'], $validplugins)) {
-            $a = new \stdClass();
+            $a = new stdClass();
             $a->validation = get_string('pluginname', $data['validation']);
             $a->repository = get_string('pluginname', $repositoryplugin);
-            $errors['repository'] = get_string('repositorynotvalidwithvalidationplugin',
-                'mod_certifygen', $a);
+            $errors['repository'] = get_string(
+                'repositorynotvalidwithvalidationplugin',
+                'mod_certifygen',
+                $a
+            );
         }
         return $errors;
     }

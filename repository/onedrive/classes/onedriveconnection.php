@@ -33,11 +33,13 @@ use core\oauth2\api;
 use core\oauth2\client;
 use core\oauth2\issuer;
 use core\oauth2\rest_exception;
+use core_filetypes;
 use curl;
 use dml_exception;
 use dml_missing_record_exception;
 use moodle_exception;
 use moodle_url;
+use oauth2_client;
 use repository_onedrive\rest;
 /**
  *
@@ -120,11 +122,15 @@ class onedriveconnection {
      * @throws moodle_exception
      * @throws rest_exception|moodle_exception
      */
-    public function upload_file(string $onedrivepath, string $reportname, string $completefilepath,
-                                bool $replacefile = true): void {
+    public function upload_file(
+        string $onedrivepath,
+        string $reportname,
+        string $completefilepath,
+        bool $replacefile = true
+    ): void {
 
         // Get a system and a user oauth client.
-        /** @var \oauth2_client $systemauth */
+        /** @var oauth2_client $systemauth */
         $systemauth = api::get_system_oauth_client($this->issuer);
         if ($systemauth === false) {
             $details = 'Cannot connect as system user';
@@ -223,8 +229,15 @@ class onedriveconnection {
      * @throws moodle_exception
      * @throws rest_exception
      */
-    protected function upload_file_to_onedrive(rest $service, curl $curl, curl $authcurl,
-                                               string $filepath, string $mimetype, string $parentid, string $filename): void {
+    protected function upload_file_to_onedrive(
+        rest $service,
+        curl $curl,
+        curl $authcurl,
+        string $filepath,
+        string $mimetype,
+        string $parentid,
+        string $filename
+    ): void {
         // Start an upload session.
         // Docs https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/item_createuploadsession link.
         $params = ['parentid' => $parentid, 'filename' => urlencode($filename)];
@@ -275,7 +288,7 @@ class onedriveconnection {
      */
     protected function get_mimetype_from_filename($filename) {
         $mimetype = 'application/unknown';
-        $types = \core_filetypes::get_types();
+        $types = core_filetypes::get_types();
         $fileextension = '.bin';
         if (strpos($filename, '.') !== false) {
             $fileextension = substr($filename, strrpos($filename, '.') + 1);

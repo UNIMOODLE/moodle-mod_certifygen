@@ -31,6 +31,8 @@
 
 namespace mod_certifygen\external;
 use cm_info;
+use context_course;
+use context_system;
 use dml_exception;
 use external_api;
 use external_function_parameters;
@@ -41,13 +43,14 @@ use invalid_parameter_exception;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
 use certifygenfilter;
+use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/user/lib.php');
-require_once($CFG->dirroot.'/mod/certifygen/lib.php');
-require_once($CFG->dirroot.'/mod/certifygen/classes/filters/certifygenfilter.php');
+require_once($CFG->dirroot . '/user/lib.php');
+require_once($CFG->dirroot . '/mod/certifygen/lib.php');
+require_once($CFG->dirroot . '/mod/certifygen/classes/filters/certifygenfilter.php');
 /**
  * Get instances where there is a mod_certifygen
  * @package    mod_certifygen
@@ -80,10 +83,11 @@ class get_id_instance_certificate_external extends external_api {
     public static function get_id_instance_certificate(int $userid, string $userfield, string $lang): array {
 
         $params = self::validate_parameters(
-            self::get_id_instance_certificate_parameters(), ['userid' => $userid, 'userfield' => $userfield,
+            self::get_id_instance_certificate_parameters(),
+            ['userid' => $userid, 'userfield' => $userfield,
                 'lang' => $lang]
         );
-        $context = \context_system::instance();
+        $context = context_system::instance();
         $results = ['error' => []];
         $haserror = false;
         $instances = [];
@@ -118,11 +122,11 @@ class get_id_instance_certificate_external extends external_api {
             }
 
             // Filter to return course names in $lang language.
-            $filter = new certifygenfilter(\context_system::instance(), [], $lang);
+            $filter = new certifygenfilter(context_system::instance(), [], $lang);
 
             // Get all mod_certifygen activities.
             $allactivities = certifygen::get_records();
-            $courseids = array_map(function($activity) {
+            $courseids = array_map(function ($activity) {
                 return $activity->get('course');
             }, $allactivities);
 
@@ -132,7 +136,7 @@ class get_id_instance_certificate_external extends external_api {
                 if (!in_array($enrolment->ctxinstance, $courseids)) {
                     continue;
                 }
-                $coursecontext = \context_course::instance( $enrolment->ctxinstance);
+                $coursecontext = context_course::instance($enrolment->ctxinstance);
                 $roles = get_users_roles($coursecontext, [$userid]);
                 $roles = reset($roles);
                 foreach ($roles as $role) {
@@ -184,9 +188,10 @@ class get_id_instance_certificate_external extends external_api {
                 }
             }
             $results['instances'] = $instances;
-        } catch (\moodle_exception $e) {
+        } catch (moodle_exception $e) {
             unset($results['instances']);
-            $haserror = true;$results['error']['code'] = $e->getCode();
+            $haserror = true;
+            $results['error']['code'] = $e->getCode();
             $results['error']['message'] = $e->getMessage();
         }
 
@@ -202,48 +207,95 @@ class get_id_instance_certificate_external extends external_api {
      */
     public static function get_id_instance_certificate_returns(): external_single_structure {
         return new external_single_structure([
-                'instances' => new external_multiple_structure( new external_single_structure(
+                'instances' => new external_multiple_structure(
+                    new external_single_structure(
                         [
                             'course'   => new external_single_structure([
                                 'id' => new external_value(PARAM_INT, 'Course id', VALUE_OPTIONAL),
-                                'shortname' => new external_value(PARAM_RAW, 'Course shortname',
-                                    VALUE_OPTIONAL),
-                                'fullname' => new external_value(PARAM_RAW, 'Course fullname',
-                                    VALUE_OPTIONAL),
-                                'categoryid' => new external_value(PARAM_INT, 'Category id',
-                                    VALUE_OPTIONAL),
+                                'shortname' => new external_value(
+                                    PARAM_RAW,
+                                    'Course shortname',
+                                    VALUE_OPTIONAL
+                                ),
+                                'fullname' => new external_value(
+                                    PARAM_RAW,
+                                    'Course fullname',
+                                    VALUE_OPTIONAL
+                                ),
+                                'categoryid' => new external_value(
+                                    PARAM_INT,
+                                    'Category id',
+                                    VALUE_OPTIONAL
+                                ),
                             ], 'Course information', VALUE_OPTIONAL),
                             'instance'   => new external_single_structure([
-                                'id' => new external_value(PARAM_INT, 'Instance id',
-                                    VALUE_OPTIONAL),
-                                'name' => new external_value(PARAM_RAW, 'Instance name',
-                                    VALUE_OPTIONAL),
-                                'modelname' => new external_value(PARAM_RAW, 'Model name',
-                                    VALUE_OPTIONAL),
-                                'modelidnumber' => new external_value(PARAM_RAW, 'Model name',
-                                    VALUE_OPTIONAL),
-                                'modelmode' => new external_value(PARAM_INT, 'Model mode',
-                                    VALUE_OPTIONAL),
-                                'modeltimeondemmand' => new external_value(PARAM_INT, 'Model timeondemmand',
-                                    VALUE_OPTIONAL),
-                                'modeltype' => new external_value(PARAM_INT, 'Model type',
-                                    VALUE_OPTIONAL),
-                                'modeltemplateid' => new external_value(PARAM_INT, 'Model template id',
-                                    VALUE_OPTIONAL),
-                                'modellangs' => new external_value(PARAM_RAW, 'Model langs',
-                                    VALUE_OPTIONAL),
-                                'modelvalidation' => new external_value(PARAM_RAW, 'Model validation',
-                                    VALUE_OPTIONAL),
-                                'modelrepository' => new external_value(PARAM_RAW, 'Model repository',
-                                    VALUE_OPTIONAL),
+                                'id' => new external_value(
+                                    PARAM_INT,
+                                    'Instance id',
+                                    VALUE_OPTIONAL
+                                ),
+                                'name' => new external_value(
+                                    PARAM_RAW,
+                                    'Instance name',
+                                    VALUE_OPTIONAL
+                                ),
+                                'modelname' => new external_value(
+                                    PARAM_RAW,
+                                    'Model name',
+                                    VALUE_OPTIONAL
+                                ),
+                                'modelidnumber' => new external_value(
+                                    PARAM_RAW,
+                                    'Model name',
+                                    VALUE_OPTIONAL
+                                ),
+                                'modelmode' => new external_value(
+                                    PARAM_INT,
+                                    'Model mode',
+                                    VALUE_OPTIONAL
+                                ),
+                                'modeltimeondemmand' => new external_value(
+                                    PARAM_INT,
+                                    'Model timeondemmand',
+                                    VALUE_OPTIONAL
+                                ),
+                                'modeltype' => new external_value(
+                                    PARAM_INT,
+                                    'Model type',
+                                    VALUE_OPTIONAL
+                                ),
+                                'modeltemplateid' => new external_value(
+                                    PARAM_INT,
+                                    'Model template id',
+                                    VALUE_OPTIONAL
+                                ),
+                                'modellangs' => new external_value(
+                                    PARAM_RAW,
+                                    'Model langs',
+                                    VALUE_OPTIONAL
+                                ),
+                                'modelvalidation' => new external_value(
+                                    PARAM_RAW,
+                                    'Model validation',
+                                    VALUE_OPTIONAL
+                                ),
+                                'modelrepository' => new external_value(
+                                    PARAM_RAW,
+                                    'Model repository',
+                                    VALUE_OPTIONAL
+                                ),
                             ], 'Module Instance information', VALUE_OPTIONAL),
-                        ], 'Module Instances list', VALUE_OPTIONAL)
-                    , '', VALUE_OPTIONAL),
+                        ],
+                        'Module Instances list',
+                        VALUE_OPTIONAL
+                    ),
+                    '',
+                    VALUE_OPTIONAL
+                ),
                 'error' => new external_single_structure([
                     'message' => new external_value(PARAM_RAW, 'Error message'),
                     'code' => new external_value(PARAM_RAW, 'Error code'),
                 ], 'Errors information', VALUE_OPTIONAL),
-            ]
-        );
+            ]);
     }
 }

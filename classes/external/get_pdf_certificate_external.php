@@ -29,19 +29,25 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_certifygen\external;
+use context_course;
+use context_system;
+use dml_exception;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
+use invalid_parameter_exception;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
+use moodle_exception;
+use required_capability_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/user/lib.php');
-require_once($CFG->dirroot.'/mod/certifygen/lib.php');
+require_once($CFG->dirroot . '/user/lib.php');
+require_once($CFG->dirroot . '/mod/certifygen/lib.php');
 /**
  * Get studetns certificate (issue it if it is not already created)
  * @package    mod_certifygen
@@ -76,20 +82,24 @@ class get_pdf_certificate_external extends external_api {
      * @param string $lang
      * @param string $customfields
      * @return array
-     * @throws \dml_exception
-     * @throws \invalid_parameter_exception
-     * @throws \required_capability_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws required_capability_exception
      */
-    public static function get_pdf_certificate(int $userid, string $userfield, int $idinstance, string $lang,
-                                               string $customfields): array {
+    public static function get_pdf_certificate(
+        int $userid,
+        string $userfield,
+        int $idinstance,
+        string $lang,
+        string $customfields
+    ): array {
 
-        // TODO:customfields... que modifica el fichero.
         $params = self::validate_parameters(
             self::get_pdf_certificate_parameters(),
             ['userid' => $userid, 'userfield' => $userfield, 'idinstance' => $idinstance, 'lang' => $lang,
                 'customfields' => $customfields]
         );
-        $context = \context_system::instance();
+        $context = context_system::instance();
         require_capability('mod/certifygen:manage', $context);
         $result = ['file' => '', 'error' => []];
         $haserror = false;
@@ -113,7 +123,7 @@ class get_pdf_certificate_external extends external_api {
             $certifygen = new certifygen($params['idinstance']);
 
             // Is user enrolled on this course as student?
-            $context = \context_course::instance($certifygen->get('course'));
+            $context = context_course::instance($certifygen->get('course'));
             if (has_capability('moodle/course:managegroups', $context, $userid)) {
                 unset($result['json']);
                 $result['error']['code'] = 'user_not_enrolled_on_idinstance_course_as_student';
@@ -128,8 +138,14 @@ class get_pdf_certificate_external extends external_api {
             $validation = certifygen_validations::get_validation_by_lang_and_instance($lang, $idinstance, $userid);
             if (is_null($validation)) {
                 // Emit certificate.
-                $result = emitcertificate_external::emitcertificate(0, $idinstance, $model->get('id'), $lang,
-                    $userid, $certifygen->get('course'));
+                $result = emitcertificate_external::emitcertificate(
+                    0,
+                    $idinstance,
+                    $model->get('id'),
+                    $lang,
+                    $userid,
+                    $certifygen->get('course')
+                );
                 if (!$result['result']) {
                     $result['error']['code'] = 'certificate_can_not_be_emited';
                     $result['error']['message'] = $result['message'];
@@ -139,8 +155,13 @@ class get_pdf_certificate_external extends external_api {
             // TODO: devolver el del plugin de almacenamiento si es q existe.
             // esta mal, VER LA PETICION DEL PROFE.
             // Process status.
-            $file = \mod_certifygen\certifygen::get_user_certificate_file($idinstance, $model->get('templateid'), $userid,
-                $certifygen->get('course'), $lang);
+            $file = \mod_certifygen\certifygen::get_user_certificate_file(
+                $idinstance,
+                $model->get('templateid'),
+                $userid,
+                $certifygen->get('course'),
+                $lang
+            );
             if (is_null($file)) {
                 $haserror = true;
                 $result['error']['code'] = 'file_not_found';
@@ -148,7 +169,7 @@ class get_pdf_certificate_external extends external_api {
             } else {
                 $result['file'] = $file->get_contenthash();
             }
-        } catch (\moodle_exception $e) {
+        } catch (moodle_exception $e) {
             debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             unset($result['file']);
             $haserror = true;
@@ -176,7 +197,6 @@ class get_pdf_certificate_external extends external_api {
                     'message' => new external_value(PARAM_CLEANFILE, 'Error message'),
                     'code' => new external_value(PARAM_RAW, 'Error code'),
                 ], 'Errors information', VALUE_OPTIONAL),
-            ]
-        );
+            ]);
     }
 }

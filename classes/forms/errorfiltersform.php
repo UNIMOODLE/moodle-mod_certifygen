@@ -32,6 +32,7 @@
 namespace mod_certifygen\forms;
 
 use coding_exception;
+use moodle_url;
 use moodleform;
 /**
  * Error filters form
@@ -67,9 +68,9 @@ class errorfiltersform extends moodleform {
         $html .= '</div>';
         $html .= '</div>';
         $html .= '<div class="col-md-9 form-inline align-items-start felement">';
-        $url = new \moodle_url('/mod/certifygen/showerrors.php');
-        $html .= '<a href="'. $url->out() .'" class="btn btn-secondary form-control " >'
-            . get_string('removefilters', 'mod_certifygen').'</a> ';
+        $url = new moodle_url('/mod/certifygen/showerrors.php');
+        $html .= '<a href="' . $url->out() . '" class="btn btn-secondary form-control " >'
+            . get_string('removefilters', 'mod_certifygen') . '</a> ';
         $html .= '</div>';
         $html .= '</div>';
         $mform->addElement('html', $html);

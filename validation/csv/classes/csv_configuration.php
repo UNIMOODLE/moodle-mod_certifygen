@@ -27,31 +27,38 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace certifygenvalidation_csv;
+use dml_exception;
+
 /**
  * csv_configuration
+ *
  * @package   certifygenvalidation_csv
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class csv_configuration
-{
-
-    private bool $pluginenable;
+class csv_configuration {
+    /** @var bool $pluginenabled */
+    private bool $pluginenabled;
+    /** @var bool $wsdlenabled */
     private bool $wsdlenabled;
+    /** @var bool $querywsdlenabled */
     private bool $querywsdlenabled;
+    /** @var bool $appidenabled */
     private bool $appidenabled;
-    private string $appId;
+    /** @var string $appid*/
+    private string $appid;
+    /** @var string|false|mixed|object $wsdl */
     private string $wsdl;
+    /** @var string|false|mixed|object $querywsdl */
     private string $querywsdl;
 
     /**
      * Construct
-     * @throws \dml_exception
+     * @throws dml_exception
      */
-    public function __construct()
-    {
+    public function __construct() {
         $this->pluginenabled = get_config('certifygenvalidation_csv', 'enabled') == '1';
         $wsdl = get_config('certifygenvalidation_csv', 'firmacatalogserviceurl');
         $this->wsdlenabled = !empty($wsdl);
@@ -60,7 +67,7 @@ class csv_configuration
         $appid = get_config('certifygenvalidation_csv', 'appID');
         $this->appidenabled = !empty($appid);
         if ($this->is_enabled()) {
-            $this->appId = $appid;
+            $this->appid = $appid;
             $this->wsdl = $wsdl;
             $this->querywsdl = $querywsdl;
         }
@@ -70,7 +77,7 @@ class csv_configuration
      * is enabled
      * @return bool
      */
-    public function is_enabled() : bool {
+    public function is_enabled(): bool {
         return $this->querywsdlenabled && $this->wsdlenabled && $this->appidenabled;
     }
 
@@ -78,15 +85,15 @@ class csv_configuration
      * ge appid
      * @return string
      */
-    public function get_appid() : string {
-        return $this->appId;
+    public function get_appid(): string {
+        return $this->appid;
     }
 
     /**
      * Get wuerywsdl
      * @return string
      */
-    public function get_querywsdl() : string {
+    public function get_querywsdl(): string {
         return $this->querywsdl;
     }
 
@@ -94,7 +101,7 @@ class csv_configuration
      * Get wsdl
      * @return string
      */
-    public function get_wsdl() : string {
+    public function get_wsdl(): string {
         return $this->wsdl;
     }
 }
