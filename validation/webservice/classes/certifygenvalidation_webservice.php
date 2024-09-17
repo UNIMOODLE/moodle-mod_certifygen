@@ -184,7 +184,7 @@ class certifygenvalidation_webservice implements ICertificateValidation {
         $code = certifygen_validations::get_certificate_code($validation);
         $context = context_system::instance();
         $filearea  = 'certifygenreport';
-        $itemid = $validation;
+        $itemid = $validationid;
         if (!empty($validation->get('certifygenid'))) {
             $cert = new certifygen($validation->get('certifygenid'));
             $context = context_course::instance($cert->get('course'));
