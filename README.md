@@ -46,7 +46,6 @@ to complete the installation from the command line.
 * certifygenvalidation_cmd 
 * certifygenvalidation_csv
 * certifygenvalidation_electronic
-* certifygenvalidation_cmd 
 * certifygenvalidation_none
 ### certifygenreport ###
 * certifygenreport_basic 
