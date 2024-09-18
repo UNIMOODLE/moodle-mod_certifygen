@@ -38,8 +38,8 @@ use mod_certifygen\persistents\certifygen_model;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot.'/lib/externallib.php');
+require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
+require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Get teacher request view data test
  * @package    mod_certifygen
@@ -49,7 +49,6 @@ require_once($CFG->dirroot.'/lib/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class getteacherrequestviewdata_external_test extends advanced_testcase {
-
     /**
      * Test set up.
      */
@@ -63,6 +62,7 @@ class getteacherrequestviewdata_external_test extends advanced_testcase {
      * @throws coding_exception
      * @throws dml_exception
      * @throws invalid_parameter_exception
+     * @throws moodle_exception
      */
     public function test_getteacherrequestviewdata(): void {
 
@@ -72,7 +72,7 @@ class getteacherrequestviewdata_external_test extends advanced_testcase {
 
         // Create model.
         $modgenerator = $this->getDataGenerator()->get_plugin_generator('mod_certifygen');
-        $model = $modgenerator->create_model_by_name(
+        $modgenerator->create_model_by_name(
             certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
             $certificate1->get_id(),
             certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
@@ -82,13 +82,19 @@ class getteacherrequestviewdata_external_test extends advanced_testcase {
         $course = self::getDataGenerator()->create_course();
 
         // Create users.
-        $teacher = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_1', 'firstname' => 'test',
-                'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+        $teacher = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_1',
+                'firstname' => 'test',
+                'lastname' => 'user 1',
+                'email' => 'test_user_1@fake.es',
+                ]);
         // Create manager.
-        $manager = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_2', 'firstname' => 'test',
-                'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
+        $manager = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_2',
+                'firstname' => 'test',
+                'lastname' => 'user 2',
+                'email' => 'test_user_2@fake.es',
+                ]);
         $context = context_system::instance();
         $this->getDataGenerator()->role_assign('manager', $manager->id, $context->id);
 
@@ -150,18 +156,24 @@ class getteacherrequestviewdata_external_test extends advanced_testcase {
         $modgenerator->assign_model_coursecontext($model->get('id'), $course->id);
 
         // Create user and enrol as teacher.
-        $teacher = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_1', 'firstname' => 'test',
-                'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+        $teacher = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_1',
+                'firstname' => 'test',
+                'lastname' => 'user 1',
+                'email' => 'test_user_1@fake.es',
+                ]);
         $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'editingteacher');
 
         // Create teacherrequest.
         $modgenerator->create_teacher_request($model->get('id'), $course->id, $teacher->id);
 
         // Create manager.
-        $manager = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_2', 'firstname' => 'test',
-                'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
+        $manager = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_2',
+                'firstname' => 'test',
+                'lastname' => 'user 2',
+                'email' => 'test_user_2@fake.es',
+                ]);
         $context = context_system::instance();
         $this->getDataGenerator()->role_assign('manager', $manager->id, $context->id);
 

@@ -27,8 +27,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use advanced_testcase;
 use certifygenvalidation_webservice\external\change_status_external;
+use core\invalid_persistent_exception;
 use mod_certifygen\external\emitteacherrequest_external;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
@@ -36,9 +36,9 @@ use mod_certifygen\persistents\certifygen_validations;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot.'/mod/certifygen/tests/generator/lib.php');
-require_once($CFG->dirroot.'/lib/externallib.php');
+require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
+require_once($CFG->dirroot . '/mod/certifygen/tests/generator/lib.php');
+require_once($CFG->dirroot . '/lib/externallib.php');
 
 /**
  * change_status_external_test
@@ -49,7 +49,6 @@ require_once($CFG->dirroot.'/lib/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class change_status_external_test extends advanced_testcase {
-
     /**
      * Test set up.
      */
@@ -60,10 +59,10 @@ class change_status_external_test extends advanced_testcase {
     /**
      * Test
      * @return void
-     * @throws \coding_exception
-     * @throws \core\invalid_persistent_exception
-     * @throws \dml_exception
-     * @throws \invalid_parameter_exception
+     * @throws invalid_persistent_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
      */
     public function test_1(): void {
 
@@ -75,6 +74,9 @@ class change_status_external_test extends advanced_testcase {
         $certificate1 = $templategenerator->create_template((object)['name' => 'Certificate 1']);
 
         // Create model.
+        set_config('enabled', 1, 'certifygenvalidation_webservice');
+        set_config('enabled', 1, 'certifygenreport_basic');
+        set_config('enabled', 1, 'certifygenrepository_localrepository');
         $modgenerator = $this->getDataGenerator()->get_plugin_generator('mod_certifygen');
         $data = [
             'name' => 'model1',
@@ -93,14 +95,23 @@ class change_status_external_test extends advanced_testcase {
         $modgenerator->assign_model_coursecontext($model->get('id'), $course->id);
 
         // Create user and enrol as teacher.
-        $teacher = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_1', 'firstname' => 'test',
-                'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+        $teacher = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_1',
+                'firstname' => 'test',
+                'lastname' => 'user 1',
+                'email' => 'test_user_1@fake.es',
+                ]);
         $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'editingteacher');
-        $student = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_2', 'firstname' => 'test',
-                'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
+        $student = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_2',
+                'firstname' => 'test',
+                'lastname' => 'user 2',
+                'email' => 'test_user_2@fake.es',
+                ]);
         $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
+
+        // Login as $teacher.
+        $this->setUser($teacher);
 
         // Create request.
         $teacherrequest = $modgenerator->create_teacher_request($model->get('id'), $course->id, $teacher->id);
@@ -109,12 +120,17 @@ class change_status_external_test extends advanced_testcase {
         // Emit certificate.
         emitteacherrequest_external::emitteacherrequest($teacherrequest->get('id'));
 
+        // Test status.
         $teacherrequest = new certifygen_validations($teacherrequest->get('id'));
-
         self::assertEquals(certifygen_validations::STATUS_IN_PROGRESS, $teacherrequest->get('status'));
 
         // Validate.
-        $result = change_status_external::change_status($teacher->id, '' , $teacherrequest->get('id'));
+        $this->setAdminUser();
+        $result = change_status_external::change_status(
+            $teacher->id,
+            '',
+            $teacherrequest->get('id')
+        );
 
         // Tests.
         self::assertIsArray($result);
@@ -123,16 +139,20 @@ class change_status_external_test extends advanced_testcase {
         self::assertArrayHasKey('newstatusdesc', $result);
         self::assertEquals($teacherrequest->get('id'), $result['requestid']);
         self::assertEquals(certifygen_validations::STATUS_VALIDATION_OK, $result['newstatus']);
-        self::assertEquals(get_string('status_'. certifygen_validations::STATUS_VALIDATION_OK, 'mod_certifygen'), $result['newstatusdesc']);
+        self::assertEquals(
+            get_string('status_' . certifygen_validations::STATUS_VALIDATION_OK, 'mod_certifygen'),
+            $result['newstatusdesc']
+        );
     }
 
     /**
      * Test
+     *
      * @return void
-     * @throws \coding_exception
-     * @throws \core\invalid_persistent_exception
-     * @throws \dml_exception
-     * @throws \invalid_parameter_exception
+     * @throws coding_exception
+     * @throws invalid_persistent_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
      */
     public function test_2(): void {
 
@@ -144,6 +164,9 @@ class change_status_external_test extends advanced_testcase {
         $certificate1 = $templategenerator->create_template((object)['name' => 'Certificate 1']);
 
         // Create model.
+        set_config('enabled', 1, 'certifygenvalidation_webservice');
+        set_config('enabled', 1, 'certifygenreport_basic');
+        set_config('enabled', 1, 'certifygenrepository_localrepository');
         $modgenerator = $this->getDataGenerator()->get_plugin_generator('mod_certifygen');
         $data = [
             'name' => 'model1',
@@ -162,13 +185,20 @@ class change_status_external_test extends advanced_testcase {
         $modgenerator->assign_model_coursecontext($model->get('id'), $course->id);
 
         // Create user and enrol as teacher.
-        $teacher = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_1', 'firstname' => 'test',
-                'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+        $teacher = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_1',
+                'firstname' => 'test',
+                'lastname' => 'user 1',
+                'email' => 'test_user_1@fake.es',
+                ]);
         $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'editingteacher');
-        $student = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_2', 'firstname' => 'test',
-                'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
+        $student = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_2',
+                'firstname' => 'test',
+                'lastname' => 'user 2',
+                'email' => 'test_user_2@fake.es',
+                ]);
+        $this->setUser($teacher);
         $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
 
         // Create request.
@@ -182,7 +212,12 @@ class change_status_external_test extends advanced_testcase {
         self::assertEquals(certifygen_validations::STATUS_IN_PROGRESS, $teacherrequest->get('status'));
 
         // Validate.
-        $result = change_status_external::change_status($student->id, '' , $teacherrequest->get('id'));
+        $this->setAdminUser();
+        $result = change_status_external::change_status(
+            $student->id,
+            '',
+            $teacherrequest->get('id')
+        );
 
         // Tests.
         self::assertIsArray($result);
@@ -195,9 +230,10 @@ class change_status_external_test extends advanced_testcase {
 
     /**
      * Test
+     *
      * @return void
-     * @throws \coding_exception
-     * @throws \invalid_parameter_exception
+     * @throws coding_exception
+     * @throws invalid_parameter_exception
      */
     public function test_3(): void {
 
@@ -205,17 +241,27 @@ class change_status_external_test extends advanced_testcase {
         $course = self::getDataGenerator()->create_course();
 
         // Create user and enrol as teacher.
-        $teacher = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_1', 'firstname' => 'test',
-                'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+        $teacher = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_1',
+                'firstname' => 'test',
+                'lastname' => 'user 1',
+                'email' => 'test_user_1@fake.es',
+                ]);
         $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'editingteacher');
-        $student = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_2', 'firstname' => 'test',
-                'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
+        $student = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_2',
+                'firstname' => 'test',
+                'lastname' => 'user 2',
+                'email' => 'test_user_2@fake.es',
+                ]);
         $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
-
+        $this->setAdminUser();
         // Validate.
-        $result = change_status_external::change_status($student->id, '' , 9999);
+        $result = change_status_external::change_status(
+            $student->id,
+            '',
+            9999
+        );
 
         // Tests.
         self::assertIsArray($result);

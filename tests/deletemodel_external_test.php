@@ -38,8 +38,8 @@ use mod_certifygen\persistents\certifygen_model;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot.'/lib/externallib.php');
+require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
+require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Delete model test
  * @package    mod_certifygen
@@ -108,9 +108,10 @@ class deletemodel_external_test extends advanced_testcase {
 
     /**
      * test
+     *
      * @return void
      * @throws coding_exception
-     * @throws invalid_parameter_exception
+     * @throws invalid_parameter_exception|dml_exception
      */
     public function test_deletemodel2(): void {
 

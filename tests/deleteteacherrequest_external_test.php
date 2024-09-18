@@ -40,8 +40,8 @@ use mod_certifygen\persistents\certifygen_validations;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot.'/lib/externallib.php');
+require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
+require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Delete teacher request test
  * @package    mod_certifygen
@@ -84,7 +84,12 @@ class deleteteacherrequest_external_test extends advanced_testcase {
         $courses = implode(',', $courses);
 
         // Create TEACHER.
-        $user = $this->getDataGenerator()->create_user(['username' => 'test_user_1', 'firstname' => 'test', 'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+        $user = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_1',
+                'firstname' => 'test',
+                'lastname' => 'user 1',
+                'email' => 'test_user_1@fake.es',
+        ]);
         self::getDataGenerator()->enrol_user($user->id, $course1->id, 'editingteacher');
 
         $this->setUser($user);

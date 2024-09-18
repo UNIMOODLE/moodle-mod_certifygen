@@ -33,6 +33,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\invalid_persistent_exception;
 use mod_certifygen\external\emitcertificate_external;
 use mod_certifygen\external\revokecertificate_external;
 use mod_certifygen\persistents\certifygen_model;
@@ -41,8 +42,8 @@ use mod_certifygen\persistents\certifygen_validations;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot.'/lib/externallib.php');
+require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
+require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Revoke certificate
  * @package    mod_certifygen
@@ -52,7 +53,6 @@ require_once($CFG->dirroot.'/lib/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class revokecertificate_external_test extends advanced_testcase {
-
     /** @var string|mixed $lang */
     private string $lang;
     /** @var int $userid */
@@ -71,11 +71,13 @@ class revokecertificate_external_test extends advanced_testcase {
     /**
      * Test: student can not revoke
      * @return void
+     * @throws invalid_persistent_exception
      * @throws coding_exception
      * @throws invalid_parameter_exception
+     * @throws moodle_exception
      */
     public function test_revokecertificate(): void {
-        // Emit a certificate
+        // Emit a certificate.
         // Create template.
         $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
         $certificate1 = $templategenerator->create_template((object)['name' => 'Certificate 1']);
@@ -106,17 +108,23 @@ class revokecertificate_external_test extends advanced_testcase {
         $cm = get_coursemodule_from_instance('certifygen', $modcertifygen->id, $course->id, false, MUST_EXIST);
 
         // Create users.
-        $student = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_1', 'firstname' => 'test',
-                'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+        $student = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_1',
+                'firstname' => 'test',
+                'lastname' => 'user 1',
+                'email' => 'test_user_1@fake.es',
+                ]);
         $this->userid = $student->id;
         // Enrol into the course as student.
         self::getDataGenerator()->enrol_user($student->id, $course->id, 'student');
 
         // Create user and enrol as teacher.
-        $teacher = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_2', 'firstname' => 'test',
-                'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
+        $teacher = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_2',
+                'firstname' => 'test',
+                'lastname' => 'user 2',
+                'email' => 'test_user_2@fake.es',
+                ]);
         $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'editingteacher');
 
         // Login as student.
@@ -138,11 +146,15 @@ class revokecertificate_external_test extends advanced_testcase {
         self::assertFalse($result['result']);
         self::assertEquals(get_string('nopermissiontorevokecerts', 'mod_certifygen'), $result['message']);
     }
+
     /**
      * Test: manager can revoke
      * @return void
+     * @throws invalid_persistent_exception
      * @throws coding_exception
+     * @throws dml_exception
      * @throws invalid_parameter_exception
+     * @throws moodle_exception
      */
     public function test_revokecertificate_2(): void {
         global $DB;
@@ -177,22 +189,31 @@ class revokecertificate_external_test extends advanced_testcase {
         $cm = get_coursemodule_from_instance('certifygen', $modcertifygen->id, $course->id, false, MUST_EXIST);
 
         // Create users.
-        $student = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_1', 'firstname' => 'test',
-                'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+        $student = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_1',
+                'firstname' => 'test',
+                'lastname' => 'user 1',
+                'email' => 'test_user_1@fake.es',
+                ]);
         $this->userid = $student->id;
         // Enrol into the course as student.
         self::getDataGenerator()->enrol_user($student->id, $course->id, 'student');
 
         // Create user and enrol as teacher.
-        $teacher = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_2', 'firstname' => 'test',
-                'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
+        $teacher = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_2',
+                'firstname' => 'test',
+                'lastname' => 'user 2',
+                'email' => 'test_user_2@fake.es',
+                ]);
         $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'editingteacher');
 
-        $manager = $this->getDataGenerator()->create_user(
-            ['username' => 'test_manager_1', 'firstname' => 'test',
-                'lastname' => 'manager 1', 'email' => 'test_manager_1@fake.es']);
+        $manager = $this->getDataGenerator()->create_user([
+                'username' => 'test_manager_1',
+                'firstname' => 'test',
+                'lastname' => 'manager 1',
+                'email' => 'test_manager_1@fake.es',
+                ]);
         $managerrole = $DB->get_record('role', ['shortname' => 'manager']);
         $this->getDataGenerator()->role_assign($managerrole->id, $manager->id);
 

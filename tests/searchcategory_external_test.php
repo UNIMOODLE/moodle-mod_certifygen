@@ -86,7 +86,7 @@ class searchcategory_external_test extends advanced_testcase {
         $haserror = false;
         try {
             searchcategory_external::searchcategory('Prim');
-        } catch (moodle_exception) {
+        } catch (moodle_exception $e) {
             $haserror = true;
         }
         $this->assertTrue($haserror);

@@ -39,8 +39,8 @@ use mod_certifygen\persistents\certifygen_model;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot.'/lib/externallib.php');
+require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
+require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Get my certificate data test
  * @package    mod_certifygen
@@ -50,7 +50,6 @@ require_once($CFG->dirroot.'/lib/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class getmycertificatedata_external_test extends advanced_testcase {
-
     /**
      * Test set up.
      */
@@ -96,9 +95,12 @@ class getmycertificatedata_external_test extends advanced_testcase {
         $cm = get_coursemodule_from_instance('certifygen', $modcertifygen->id, $course->id, false, MUST_EXIST);
 
         // Create users.
-        $student = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_1', 'firstname' => 'test',
-                'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+        $student = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_1',
+                'firstname' => 'test',
+                'lastname' => 'user 1',
+                'email' => 'test_user_1@fake.es',
+                ]);
 
         // Login as student.
         $this->setUser($student);

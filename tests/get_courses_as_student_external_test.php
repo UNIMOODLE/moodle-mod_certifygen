@@ -38,8 +38,8 @@ use mod_certifygen\persistents\certifygen_model;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot.'/lib/externallib.php');
+require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
+require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Get courses as student test
  * @package    mod_certifygen
@@ -49,7 +49,6 @@ require_once($CFG->dirroot.'/lib/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_courses_as_student_external_test extends advanced_testcase {
-
     /**
      * Test set up.
      */
@@ -63,14 +62,16 @@ class get_courses_as_student_external_test extends advanced_testcase {
      * @throws coding_exception
      * @throws dml_exception
      * @throws invalid_parameter_exception
-     * @throws required_capability_exception
      */
     public function test_get_courses_as_student_nopermission(): void {
-        global $DB;
 
         // Create user.
-        $user1 = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_1', 'firstname' => 'test', 'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+        $user1 = $this->getDataGenerator()->create_user([
+           'username' => 'test_user_1',
+           'firstname' => 'test',
+           'lastname' => 'user 1',
+           'email' => 'test_user_1@fake.es',
+                ]);
 
         // Create courses.
         $course1 = self::getDataGenerator()->create_course();
@@ -100,15 +101,18 @@ class get_courses_as_student_external_test extends advanced_testcase {
      * @throws coding_exception
      * @throws dml_exception
      * @throws invalid_parameter_exception
-     * @throws required_capability_exception
      */
     public function test_get_courses_as_student_with_no_certifygen(): void {
         global $DB;
         // Create user.
-        $user1 = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_1', 'firstname' => 'test', 'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+        $user1 = $this->getDataGenerator()->create_user([
+            'username' => 'test_user_1',
+            'firstname' => 'test',
+            'lastname' => 'user 1',
+            'email' => 'test_user_1@fake.es',
+                ]);
 
-        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        $managerrole = $DB->get_record('role', ['shortname' => 'manager']);
         $this->getDataGenerator()->role_assign($managerrole->id, $user1->id);
         $this->setUser($user1);
 
@@ -146,10 +150,14 @@ class get_courses_as_student_external_test extends advanced_testcase {
     public function test_get_courses_as_student(): void {
         global $DB;
         // Create user.
-        $user1 = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_1', 'firstname' => 'test', 'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+        $user1 = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_1',
+                'firstname' => 'test',
+                'lastname' => 'user 1',
+                'email' => 'test_user_1@fake.es',
+                ]);
         $manager = $this->getDataGenerator()->create_user();
-        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        $managerrole = $DB->get_record('role', ['shortname' => 'manager']);
         $this->getDataGenerator()->role_assign($managerrole->id, $manager->id);
         $this->setUser($manager);
 
@@ -202,7 +210,7 @@ class get_courses_as_student_external_test extends advanced_testcase {
         $this->assertEquals($course1->shortname, $result['courses'][0]['shortname']);
         $this->assertEquals($course1->fullname, $result['courses'][0]['fullname']);
         $this->assertEquals($course1->category, $result['courses'][0]['categoryid']);
-        $this->assertEquals(false, $result['courses'][0]['completed']);
+        $this->assertFalse($result['courses'][0]['completed']);
         $this->assertEquals($model->get('id'), $result['courses'][0]['modellist']);
         $this->assertArrayHasKey('student', $result);
         $this->assertArrayHasKey('id', $result['student']);
@@ -223,23 +231,31 @@ class get_courses_as_student_external_test extends advanced_testcase {
         global $DB;
         // Create user profile fields.
         $category = self::getDataGenerator()->create_custom_profile_field_category(['name' => 'Category 1']);
-        $field = self::getDataGenerator()->create_custom_profile_field(
-            ['shortname' => 'DNI',
+        $field = self::getDataGenerator()->create_custom_profile_field([
+                'shortname' => 'DNI',
                 'name' => 'DNI',
                 'categoryid' => $category->id,
-                'required' => 1, 'visible' => 1, 'locked' => 0, 'datatype' => 'text', 'defaultdata' => null]);
+                'required' => 1,
+                'visible' => 1,
+                'locked' => 0,
+                'datatype' => 'text',
+                'defaultdata' => null,
+                ]);
 
         // Configure the platform.
         set_config('userfield', 'profile_' . $field->id, 'mod_certifygen');
 
         // Create user.
         $dni = '123456789P';
-        $user1 = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_1', 'firstname' => 'test',
-                'lastname' => 'user 1', 'email' => 'test_user_1@fake.es',
-                'profile_field_DNI' => $dni]);
+        $user1 = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_1',
+                'firstname' => 'test',
+                'lastname' => 'user 1',
+                'email' => 'test_user_1@fake.es',
+                'profile_field_DNI' => $dni,
+                ]);
         $manager = $this->getDataGenerator()->create_user();
-        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        $managerrole = $DB->get_record('role', ['shortname' => 'manager']);
         $this->getDataGenerator()->role_assign($managerrole->id, $manager->id);
         $this->setUser($manager);
 
@@ -292,7 +308,7 @@ class get_courses_as_student_external_test extends advanced_testcase {
         $this->assertEquals($course1->shortname, $result['courses'][0]['shortname']);
         $this->assertEquals($course1->fullname, $result['courses'][0]['fullname']);
         $this->assertEquals($course1->category, $result['courses'][0]['categoryid']);
-        $this->assertEquals(false, $result['courses'][0]['completed']);
+        $this->assertFalse($result['courses'][0]['completed']);
         $this->assertEquals($model->get('id'), $result['courses'][0]['modellist']);
         $this->assertArrayHasKey('student', $result);
         $this->assertArrayHasKey('id', $result['student']);
@@ -316,11 +332,14 @@ class get_courses_as_student_external_test extends advanced_testcase {
 
         // Create user.
         $field = 'test_user_1';
-        $user1 = $this->getDataGenerator()->create_user(
-            ['username' => $field, 'firstname' => 'test',
-                'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+        $user1 = $this->getDataGenerator()->create_user([
+                'username' => $field,
+                'firstname' => 'test',
+                'lastname' => 'user 1',
+                'email' => 'test_user_1@fake.es',
+                ]);
         $manager = $this->getDataGenerator()->create_user();
-        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        $managerrole = $DB->get_record('role', ['shortname' => 'manager']);
         $this->getDataGenerator()->role_assign($managerrole->id, $manager->id);
         $this->setUser($manager);
         $id = (int) $user1->id;
@@ -373,7 +392,7 @@ class get_courses_as_student_external_test extends advanced_testcase {
         $this->assertEquals($course1->shortname, $result['courses'][0]['shortname']);
         $this->assertEquals($course1->fullname, $result['courses'][0]['fullname']);
         $this->assertEquals($course1->category, $result['courses'][0]['categoryid']);
-        $this->assertEquals(false, $result['courses'][0]['completed']);
+        $this->assertFalse($result['courses'][0]['completed']);
         $this->assertEquals($model->get('id'), $result['courses'][0]['modellist']);
         $this->assertArrayHasKey('student', $result);
         $this->assertArrayHasKey('id', $result['student']);
@@ -423,11 +442,14 @@ class get_courses_as_student_external_test extends advanced_testcase {
         filter_set_global_state('multilang', TEXTFILTER_ON);
 
         // Create user.
-        $user1 = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_1', 'firstname' => 'test',
-                'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+        $user1 = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_1',
+                'firstname' => 'test',
+                'lastname' => 'user 1',
+                'email' => 'test_user_1@fake.es',
+                ]);
         $manager = $this->getDataGenerator()->create_user();
-        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        $managerrole = $DB->get_record('role', ['shortname' => 'manager']);
         $this->getDataGenerator()->role_assign($managerrole->id, $manager->id);
         $this->setUser($manager);
 
@@ -486,7 +508,7 @@ class get_courses_as_student_external_test extends advanced_testcase {
         $this->assertEquals($course1->shortname, $result['courses'][0]['shortname']);
         $this->assertEquals($englishname, $result['courses'][0]['fullname']);
         $this->assertEquals($course1->category, $result['courses'][0]['categoryid']);
-        $this->assertEquals(false, $result['courses'][0]['completed']);
+        $this->assertFalse($result['courses'][0]['completed']);
         $this->assertEquals($model->get('id'), $result['courses'][0]['modellist']);
         $this->assertArrayHasKey('student', $result);
         $this->assertArrayHasKey('id', $result['student']);

@@ -32,7 +32,6 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-use mod_certifygen\external\get_courses_as_student_external;
 use mod_certifygen\external\get_id_instance_certificate_external;
 use mod_certifygen\persistents\certifygen_model;
 
@@ -63,7 +62,6 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
      * @throws coding_exception
      * @throws dml_exception
      * @throws invalid_parameter_exception
-     * @throws required_capability_exception
      */
     public function test_get_id_instance_certificate_nopermission(): void {
 
@@ -174,7 +172,7 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
         $this->assertEquals($course1->id, $result['instances'][0]['course']['id']);
 
         // Filter to return course names in $lang language.
-        $filter = new certifygenfilter(\context_system::instance(), [], $lang);
+        $filter = new certifygenfilter(context_system::instance(), [], $lang);
         $coursefullname = $filter->filter($course1->fullname);
         $coursefullname = strip_tags($coursefullname);
         $courseshortname = $filter->filter($course1->shortname);
@@ -294,7 +292,7 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
         $this->assertArrayHasKey('categoryid', $result['instances'][0]['course']);
         $this->assertEquals($course1->id, $result['instances'][0]['course']['id']);
         // Filter to return course names in $lang language.
-        $filter = new certifygenfilter(\context_system::instance(), [], $lang);
+        $filter = new certifygenfilter(context_system::instance(), [], $lang);
         $coursefullname = $filter->filter($course1->fullname);
         $coursefullname = strip_tags($coursefullname);
         $courseshortname = $filter->filter($course1->shortname);
@@ -430,9 +428,7 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
         $this->assertArrayHasKey('categoryid', $result['instances'][0]['course']);
         $this->assertEquals($course1->id, $result['instances'][0]['course']['id']);
         // Filter to return course names in $lang language.
-        $filter = new certifygenfilter(\context_system::instance(), [], $lang);
-        $coursefullname = $filter->filter($course1->fullname);
-        $coursefullname = strip_tags($coursefullname);
+        $filter = new certifygenfilter(context_system::instance(), [], $lang);
         $courseshortname = $filter->filter($course1->shortname);
         $courseshortname = strip_tags($courseshortname);
         $this->assertEquals($courseshortname, $result['instances'][0]['course']['shortname']);

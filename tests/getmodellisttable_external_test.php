@@ -39,8 +39,8 @@ use mod_certifygen\persistents\certifygen_model;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot.'/lib/externallib.php');
+require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
+require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Get model list table test
  * @package    mod_certifygen
@@ -50,7 +50,6 @@ require_once($CFG->dirroot.'/lib/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class getmodellisttable_external_test extends advanced_testcase {
-
     /**
      * Test set up.
      */
@@ -87,7 +86,7 @@ class getmodellisttable_external_test extends advanced_testcase {
     public function test_getmodellisttable(): void {
         global $DB;
         $manager = $this->getDataGenerator()->create_user();
-        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        $managerrole = $DB->get_record('role', ['shortname' => 'manager']);
         $this->getDataGenerator()->role_assign($managerrole->id, $manager->id);
         $this->setUser($manager);
 
@@ -115,9 +114,9 @@ class getmodellisttable_external_test extends advanced_testcase {
         $pos = strpos($result['table'], $findme);
         self::assertEquals(0, $pos);
         $count = substr_count($result['table'], '<tr>');
-        self::assertEquals(1, $count); // tr on thead
+        self::assertEquals(1, $count);
         $count = substr_count($result['table'], '<tr class=""');
-        self::assertEquals(1, $count); // tr on tbody
+        self::assertEquals(1, $count);
 
         // Create another model.
         $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
@@ -137,8 +136,8 @@ class getmodellisttable_external_test extends advanced_testcase {
         $pos = strpos($result['table'], $findme);
         self::assertEquals(0, $pos);
         $count = substr_count($result['table'], '<tr>');
-        self::assertEquals(1, $count); // tr on thead
+        self::assertEquals(1, $count);
         $count = substr_count($result['table'], '<tr class=""');
-        self::assertEquals(2, $count); // tr on tbody
+        self::assertEquals(2, $count);
     }
 }

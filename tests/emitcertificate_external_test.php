@@ -62,9 +62,10 @@ class emitcertificate_external_test extends advanced_testcase {
     /**
      * test
      * @return void
-     * @throws invalid_persistent_exception
      * @throws coding_exception
      * @throws invalid_parameter_exception
+     * @throws invalid_persistent_exception
+     * @throws moodle_exception
      */
     public function test_emitcertificate(): void {
 
@@ -124,16 +125,16 @@ class emitcertificate_external_test extends advanced_testcase {
         self::assertArrayHasKey('message', $result);
         self::assertTrue($result['result']);
         self::assertEquals(get_string('ok', 'mod_certifygen'), $result['message']);
-        // TODO change to STATUS_VALIDATION_OK
         self::assertEquals(certifygen_validations::STATUS_FINISHED, $validation->get('status'));
     }
 
     /**
      * test
      * @return void
-     * @throws invalid_persistent_exception
      * @throws coding_exception
      * @throws invalid_parameter_exception
+     * @throws invalid_persistent_exception
+     * @throws moodle_exception
      */
     public function test_emitcertificate_2(): void {
 
@@ -196,12 +197,14 @@ class emitcertificate_external_test extends advanced_testcase {
         self::assertFalse($result['result']);
         self::assertEquals(get_string('nopermissiontoemitothercerts', 'mod_certifygen'), $result['message']);
     }
+
     /**
      * Test: validation ws + localrepository.
      * @return void
-     * @throws invalid_persistent_exception
      * @throws coding_exception
      * @throws invalid_parameter_exception
+     * @throws invalid_persistent_exception
+     * @throws moodle_exception
      */
     public function test_emitcertificate_3(): void {
 

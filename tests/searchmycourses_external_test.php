@@ -33,22 +33,15 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace tests;
-
-use advanced_testcase;
-use coding_exception;
-use dml_exception;
-use invalid_parameter_exception;
 use mod_certifygen\external\searchmycourses_external;
 use mod_certifygen\persistents\certifygen_model;
-use moodle_exception;
-use restricted_context_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
 require_once($CFG->dirroot . '/lib/externallib.php');
+
 /**
  * Search my courses
  * @package    mod_certifygen
@@ -58,7 +51,6 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class searchmycourses_external_test extends advanced_testcase {
-
     /**
      * Test set up.
      */
@@ -77,9 +69,12 @@ class searchmycourses_external_test extends advanced_testcase {
      */
     public function test_searchmycourses_notenrolled(): void {
         // Create user.
-        $user = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_2', 'firstname' => 'test',
-                'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
+        $user = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_2',
+                'firstname' => 'test',
+                'lastname' => 'user 2',
+                'email' => 'test_user_2@fake.es',
+                ]);
 
         // Login as user.
         $this->setUser($user);
@@ -125,9 +120,12 @@ class searchmycourses_external_test extends advanced_testcase {
      */
     public function test_searchmycourses_enrolled(): void {
         // Create user and enrol as teacher.
-        $user = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_2', 'firstname' => 'test',
-                'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
+        $user = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_2',
+                'firstname' => 'test',
+                'lastname' => 'user 2',
+                'email' => 'test_user_2@fake.es',
+                ]);
 
         // Login as user.
         $this->setUser($user);

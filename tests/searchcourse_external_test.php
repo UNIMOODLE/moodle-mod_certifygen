@@ -33,15 +33,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace tests;
-
-use advanced_testcase;
-use coding_exception;
-use dml_exception;
-use invalid_parameter_exception;
 use mod_certifygen\external\searchcourse_external;
-use required_capability_exception;
-use restricted_context_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -57,7 +49,6 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class searchcourse_external_test extends advanced_testcase {
-
     /**
      * Test set up.
      */
@@ -71,9 +62,12 @@ class searchcourse_external_test extends advanced_testcase {
      */
     public function test_searchcourse_nopermission(): void {
         // Create user and enrol as teacher.
-        $user = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_2', 'firstname' => 'test',
-                'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
+        $user = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_2',
+                'firstname' => 'test',
+                'lastname' => 'user 2',
+                'email' => 'test_user_2@fake.es',
+                ]);
 
         // Login as user.
         $this->setUser($user);
@@ -104,12 +98,8 @@ class searchcourse_external_test extends advanced_testcase {
      * @throws restricted_context_exception
      */
     public function test_searchcourse(): void {
-        // Create user and enrol as teacher.
-        $user = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_2', 'firstname' => 'test',
-                'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
 
-        // Login as user.
+        // Login as manager.
         global $DB;
         $manager = $this->getDataGenerator()->create_user();
         $managerrole = $DB->get_record('role', ['shortname' => 'manager']);

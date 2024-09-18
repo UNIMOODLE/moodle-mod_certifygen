@@ -44,8 +44,8 @@ use mod_certifygen\task\checkfile;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot.'/lib/externallib.php');
+require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
+require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Download teacher certificate test
  * @package    mod_certifygen
@@ -55,7 +55,6 @@ require_once($CFG->dirroot.'/lib/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class downloadteachercertificate_external_test extends advanced_testcase {
-
     /**
      * Test set up.
      */
@@ -90,14 +89,20 @@ class downloadteachercertificate_external_test extends advanced_testcase {
         $modgenerator->assign_model_coursecontext($model->get('id'), $course->id);
 
         // Create user and enrol as teacher.
-        $teacher = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_1', 'firstname' => 'test',
-                'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+        $teacher = $this->getDataGenerator()->create_user([
+            'username' => 'test_user_1',
+            'firstname' => 'test',
+            'lastname' => 'user 1',
+            'email' => 'test_user_1@fake.es',
+        ]);
         $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'editingteacher');
 
-        $student = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_2', 'firstname' => 'test',
-                'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
+        $student = $this->getDataGenerator()->create_user([
+            'username' => 'test_user_2',
+            'firstname' => 'test',
+            'lastname' => 'user 2',
+            'email' => 'test_user_2@fake.es',
+        ]);
         $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
 
         // Login as student.
@@ -153,19 +158,28 @@ class downloadteachercertificate_external_test extends advanced_testcase {
         $modgenerator->assign_model_coursecontext($model->get('id'), $course->id);
 
         // Create user and enrol as teacher.
-        $teacher = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_1', 'firstname' => 'test',
-                'lastname' => 'user 1', 'email' => 'test_user_1@fake.es']);
+        $teacher = $this->getDataGenerator()->create_user([
+            'username' => 'test_user_1',
+            'firstname' => 'test',
+            'lastname' => 'user 1',
+            'email' => 'test_user_1@fake.es',
+        ]);
         $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'editingteacher');
 
-        $student = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_2', 'firstname' => 'test',
-                'lastname' => 'user 2', 'email' => 'test_user_2@fake.es']);
+        $student = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_2',
+                'firstname' => 'test',
+                'lastname' => 'user 2',
+                'email' => 'test_user_2@fake.es',
+                ]);
         $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
 
-        $student2 = $this->getDataGenerator()->create_user(
-            ['username' => 'test_user_3', 'firstname' => 'test',
-                'lastname' => 'user 3', 'email' => 'test_user_2@fake.es']);
+        $student2 = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_3',
+                'firstname' => 'test',
+                'lastname' => 'user 3',
+                'email' => 'test_user_2@fake.es',
+                ]);
         $this->getDataGenerator()->enrol_user($student2->id, $course->id, 'student');
 
         // Login as student.

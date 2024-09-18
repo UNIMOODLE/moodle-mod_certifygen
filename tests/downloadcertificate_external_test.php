@@ -35,7 +35,6 @@
 
 use certifygenvalidation_webservice\external\change_status_external;
 use core\invalid_persistent_exception;
-use mod_certifygen\certifygen;
 use mod_certifygen\external\downloadcertificate_external;
 use mod_certifygen\external\emitcertificate_external;
 use mod_certifygen\persistents\certifygen_model;
@@ -45,8 +44,8 @@ use mod_certifygen\task\checkfile;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot.'/lib/externallib.php');
+require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
+require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Download certifiacte test
  * @package    mod_certifygen
@@ -56,7 +55,6 @@ require_once($CFG->dirroot.'/lib/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class downloadcertificate_external_test extends advanced_testcase {
-
     /**
      * Test set up.
      */
@@ -67,10 +65,11 @@ class downloadcertificate_external_test extends advanced_testcase {
     /**
      * test
      * @return void
-     * @throws invalid_persistent_exception
      * @throws coding_exception
      * @throws dml_exception
      * @throws invalid_parameter_exception
+     * @throws invalid_persistent_exception
+     * @throws moodle_exception
      */
     public function test_downloadcertificate(): void {
 
@@ -148,11 +147,13 @@ class downloadcertificate_external_test extends advanced_testcase {
     }
 
     /**
-     * test
+     * Test
      * @return void
-     * @throws invalid_persistent_exception
      * @throws coding_exception
-     * @throws invalid_parameter_exception|dml_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws invalid_persistent_exception
+     * @throws moodle_exception
      */
     public function test_downloadcertificate2(): void {
 
@@ -236,13 +237,15 @@ class downloadcertificate_external_test extends advanced_testcase {
         self::assertFalse($result['result']);
         self::assertEquals(get_string('nopermissiontodownloadothercerts', 'mod_certifygen'), $result['message']);
     }
+
     /**
      * Test: validation ws + localrepository.
      * @return void
-     * @throws invalid_persistent_exception
      * @throws coding_exception
      * @throws dml_exception
      * @throws invalid_parameter_exception
+     * @throws invalid_persistent_exception
+     * @throws moodle_exception
      */
     public function test_downloadcertificate_3(): void {
 

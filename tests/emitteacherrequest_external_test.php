@@ -32,6 +32,8 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use core\invalid_persistent_exception;
 use mod_certifygen\external\emitteacherrequest_external;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
@@ -50,7 +52,6 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class emitteacherrequest_external_test extends advanced_testcase {
-
     /**
      * Test set up.
      */
@@ -61,6 +62,7 @@ class emitteacherrequest_external_test extends advanced_testcase {
     /**
      * test
      * @return void
+     * @throws invalid_persistent_exception
      * @throws coding_exception
      * @throws dml_exception
      * @throws invalid_parameter_exception
@@ -68,11 +70,11 @@ class emitteacherrequest_external_test extends advanced_testcase {
     public function test_emitteacherrequest(): void {
 
         // Create course.
-        $course = self::getDataGenerator()->create_course();
+        $course = $this->getDataGenerator()->create_course();
 
         // Create template.
         $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
-        $certificate1 = $templategenerator->create_template((object)['name' => 'Certificate 1']);
+        $certificate1 = $templategenerator->create_template((object) ['name' => 'Certificate 1']);
 
         // Create model.
         $modgenerator = $this->getDataGenerator()->get_plugin_generator('mod_certifygen');
@@ -89,14 +91,14 @@ class emitteacherrequest_external_test extends advanced_testcase {
                 'firstname' => 'test',
                 'lastname' => 'user 1',
                 'email' => 'test_user_1@fake.es',
-                ]);
+        ]);
         $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'editingteacher');
         $student = $this->getDataGenerator()->create_user([
                 'username' => 'test_user_2',
                 'firstname' => 'test',
                 'lastname' => 'user 2',
                 'email' => 'test_user_2@fake.es',
-                ]);
+        ]);
         $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
 
         $this->setUser($teacher);
@@ -115,18 +117,18 @@ class emitteacherrequest_external_test extends advanced_testcase {
         self::assertEquals(get_string('ok', 'mod_certifygen'), $result['message']);
         self::assertEquals(certifygen_validations::STATUS_FINISHED, $teacherrequest->get('status'));
     }
-
     /**
-     * test
+     * Test
      * @return void
      * @throws coding_exception
      * @throws dml_exception
      * @throws invalid_parameter_exception
+     * @throws invalid_persistent_exception
      */
     public function test_emitteacherrequest2(): void {
 
         // Create course.
-        $course = self::getDataGenerator()->create_course();
+        $course = $this->getDataGenerator()->create_course();
 
         // Create template.
         $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
@@ -178,12 +180,14 @@ class emitteacherrequest_external_test extends advanced_testcase {
         self::assertEquals(get_string('nopermissiontoemitothercerts', 'mod_certifygen'), $result['message']);
         self::assertFalse($result['result']);
     }
+
     /**
      * Test: validation ws + localrepository.
      * @return void
      * @throws coding_exception
      * @throws dml_exception
      * @throws invalid_parameter_exception
+     * @throws invalid_persistent_exception
      */
     public function test_emitteacherrequest_3(): void {
 
