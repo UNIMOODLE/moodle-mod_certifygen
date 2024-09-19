@@ -126,9 +126,11 @@ class profile_my_certificates_table extends table_sql {
         $statusmessages = $subplugin->get_status_messages();
         if (!empty($statusmessages) && array_key_exists($row->status, $statusmessages)) {
             $tooltip = $statusmessages[$row->status];
-            $status = '<button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="'
+            $status = get_string('status_' . $row->status, 'mod_certifygen')
+                    . '  '
+                . '<button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="'
                 . $tooltip . '"> '
-                . get_string('status_' . $row->status, 'mod_certifygen')
+                . '<i class="icon fa fa-exclamation-triangle"></i>'
                 . '</button>';
         }
         return $status;

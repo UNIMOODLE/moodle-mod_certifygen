@@ -197,9 +197,12 @@ class activityteacher_table extends table_sql {
         $status = get_string('status_' . $row->cstatus, 'mod_certifygen');
         if (!empty($this->statusmessages) && array_key_exists($row->cstatus, $this->statusmessages)) {
             $tooltip = $this->statusmessages[$row->cstatus];
-            $status = '<button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="'
-                . $tooltip . '">'
-                . get_string('status_' . $row->cstatus, 'mod_certifygen') . '</button>';
+            $status = get_string('status_' . $row->cstatus, 'mod_certifygen') . '</button>';
+            $status .= ' ';
+            $status .= '<button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="'
+                    . $tooltip . '">'
+                    . '<i class="icon fa fa-exclamation-triangle"></i>'
+                    . '</button>';
         }
         return $status;
     }
