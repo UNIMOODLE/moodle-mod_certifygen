@@ -34,6 +34,7 @@ use certifygenvalidation_csv\csv_configuration;
 use coding_exception;
 use dml_exception;
 use mod_certifygen\interfaces\ICertificateRepository;
+use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 use stored_file;
@@ -121,5 +122,31 @@ class certifygenrepository_csv implements ICertificateRepository {
      */
     public function get_consistent_validation_plugins(): array {
         return ['certifygenvalidation_csv'];
+    }
+    /**
+     * Return file content (called by ws)
+     *
+     * @param certifygen_validations $trequest
+     * @return string
+     */
+    public function get_file_content(certifygen_validations $validation): string {
+        $filecontent = '';
+        try {
+            $validationcsv = new certifygenvalidation_csv();
+            $courseid = 0;
+            if (!empty($validation->get('certifygenid'))) {
+                $certifygen = new certifygen($validation->get('certifygenid'));
+                $courseid = $certifygen->get('course');
+            }
+            $data = $validationcsv->get_file($courseid, $validation->get('id'));
+            if (empty($data['error']) && array_key_exists('file', $data)) {
+                /** @var stored_file $file */
+                $file = $data['file'];
+                $filecontent = $file->get_content();
+            }
+        } catch (moodle_exception $e) {
+            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
+        }
+        return $filecontent;
     }
 }

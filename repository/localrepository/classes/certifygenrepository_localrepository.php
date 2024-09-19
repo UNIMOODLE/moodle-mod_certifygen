@@ -49,6 +49,34 @@ use stored_file;
  */
 class certifygenrepository_localrepository implements ICertificateRepository {
     /**
+     * getFile
+     * @param certifygen_validations $validation
+     * @return string
+     * @throws coding_exception
+     * @throws dml_exception
+     */
+    protected function get_file(certifygen_validations $validation): stored_file {
+        $code = certifygen_validations::get_certificate_code($validation);
+        $code .= '.pdf';
+        $contextid = context_system::instance()->id;
+        if (!empty($validation->get('certifygenid'))) {
+            $cert = new certifygen($validation->get('certifygenid'));
+            $contextid = context_course::instance($cert->get('course'))->id;
+        }
+        $itemid = (int) $validation->get('id');
+        $fs = get_file_storage();
+        $file = $fs->get_file(
+            $contextid,
+            ICertificateReport::FILE_COMPONENT,
+            ICertificateRepository::FILE_AREA,
+            $itemid,
+            ICertificateRepository::FILE_PATH,
+            $code
+        );
+
+        return $file;
+    }
+    /**
      * getFileUrl
      * @param certifygen_validations $validation
      * @return string
@@ -146,5 +174,22 @@ class certifygenrepository_localrepository implements ICertificateRepository {
      */
     public function get_consistent_validation_plugins(): array {
         return [];
+    }
+
+    /**
+     * Return file content (called by ws)
+     *
+     * @param certifygen_validations $trequest
+     * @return string
+     */
+    public function get_file_content(certifygen_validations $validation): string {
+        $result = '';
+        try {
+            $file = $this->get_file($validation);
+            $result = $file->get_content();
+        } catch (moodle_exception $e) {
+            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
+        }
+        return $result;
     }
 }

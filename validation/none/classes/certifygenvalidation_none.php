@@ -97,9 +97,50 @@ class certifygenvalidation_none implements ICertificateValidation {
      * @param int $courseid
      * @param int $validationid
      * @return array
+     * @throws coding_exception
      */
     public function get_file(int $courseid, int $validationid): array {
-        return ['error' => [], 'message' => 'ok'];
+        $fs = get_file_storage();
+        $file = null;
+        $haserror = false;
+        $code = '';
+        $message = get_string('ok', 'mod_certifygen');
+        try {
+            $context = context_system::instance();
+            $cv = new certifygen_validations($validationid);
+            if (!empty($cv->get('certifygenid'))) {
+                $context = context_course::instance($courseid);
+            }
+            $code = certifygen_validations::get_certificate_code($cv);
+            $filerecord = [
+                    'contextid' => $context->id,
+                    'component' => self::FILE_COMPONENT,
+                    'filearea' => self::FILE_AREA_VALIDATED,
+                    'itemid' => $validationid,
+                    'filepath' => self::FILE_PATH,
+                    'filename' => $code . '.pdf',
+            ];
+            $file = $fs->get_file(
+                $filerecord['contextid'],
+                $filerecord['component'],
+                $filerecord['filearea'],
+                $filerecord['itemid'],
+                $filerecord['filepath'],
+                $filerecord['filename'],
+            );
+        } catch (moodle_exception $e) {
+            $haserror = true;
+            $message = $e->getMessage();
+            $code = $e->getCode();
+        }
+        if ($haserror) {
+            $result['error']['code'] = $code;
+            $result['error']['message'] = $message;
+        } else {
+            $result['error'] = [];
+            $result['file'] = $file;
+        }
+        return $result;
     }
 
     /**

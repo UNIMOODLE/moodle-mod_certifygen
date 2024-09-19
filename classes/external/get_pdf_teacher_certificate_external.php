@@ -39,6 +39,7 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
+use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
@@ -103,6 +104,7 @@ class get_pdf_teacher_certificate_external extends external_api {
                 'modelid' => $modelid, 'lang' => $lang]
         );
         try {
+            $filecontent = '';
             $context = context_system::instance();
             require_capability('mod/certifygen:manage', $context);
             // Choose user parameter.
@@ -163,23 +165,24 @@ class get_pdf_teacher_certificate_external extends external_api {
                 $trequest = certifygen_validations::manage_validation($id, (object) $data);
                 $id = $trequest->get('id');
                 // Emit teacher request.
-                $output = emitteacherrequest_external::emitteacherrequest($id);
+                emitteacherrequest_external::emitteacherrequest($id);
             }
             // Ask again in case status has changed.
             $trequest = new certifygen_validations($id);
             if ((int)$trequest->get('status') === certifygen_validations::STATUS_FINISHED) {
                 // Get file.
-                $validationplugin = $certifygenmodel->get('validation');
-                $validationpluginclass = $validationplugin . '\\' . $validationplugin;
-                if (get_config($validationplugin, 'enabled') === '1') {
-                    /** @var ICertificateValidation $subplugin */
-                    $subplugin = new $validationpluginclass();
-                    $fileresult = $subplugin->get_file(0, $trequest->get('id'));
-                    if (!array_key_exists('file', $fileresult)) {
-                        $result['error'] = $fileresult['error'];
+                $repositoryplugin = $certifygenmodel->get('repository');
+                $repositorypluginclass = $repositoryplugin . '\\' . $repositoryplugin;
+                if (get_config($repositoryplugin, 'enabled') === '1') {
+                    /** @var ICertificateRepository $subplugin */
+                    $subplugin = new $repositorypluginclass();
+                    $filecontent = $subplugin->get_file_content($trequest);
+                    $filecontent = base64_encode($filecontent);
+                    if (empty($filecontent)) {
+                        $result['error']['code'] = 'file_url_empty';
+                        $result['error']['message'] = 'file_url_empty';
                         return $result;
                     }
-                    $file = $fileresult['file'];
                 } else {
                     $result['error']['code'] = 'validation_plugin_not_enabled';
                     $result['error']['message'] = 'Certificate validation plugin is not enabled';
@@ -198,9 +201,10 @@ class get_pdf_teacher_certificate_external extends external_api {
         $certificate = [
             'validationid' => $id,
             'status' => $trequest->get('status'),
-            'file' => $file->get_contenthash(),
+            'statusstr' => get_string('status_' . $trequest->get('status'), 'mod_certifygen'),
+            'file' => $filecontent,
             'reporttype' => $certifygenmodel->get('type'),
-            'reporttypestr' => get_string('status_' . $certifygenmodel->get('type'), 'mod_certifygen'),
+            'reporttypestr' => get_string('type_' . $certifygenmodel->get('type'), 'mod_certifygen'),
         ];
         return ['certificate' => $certificate];
     }
@@ -215,8 +219,10 @@ class get_pdf_teacher_certificate_external extends external_api {
                 [
                     'validationid'   => new external_value(PARAM_INT, 'Valiation id'),
                     'status'   => new external_value(PARAM_INT, 'Teacher request status'),
-                    'file' => new external_value(PARAM_CLEANFILE, 'certificate'),
-                    'reporttype' => new external_value(PARAM_INT, 'model type'),
+                    'statusstr'   => new external_value(PARAM_RAW, 'Teacher request status'),
+                    'file' => new external_value(PARAM_RAW, 'certificate'),
+                    'reporttype' => new external_value(PARAM_INT, 'report type'),
+                    'reporttypestr' => new external_value(PARAM_RAW, 'report type'),
                 ],
                 'Certificate info',
                 VALUE_OPTIONAL

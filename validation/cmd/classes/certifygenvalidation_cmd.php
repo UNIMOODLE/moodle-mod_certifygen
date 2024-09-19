@@ -102,7 +102,7 @@ class certifygenvalidation_cmd implements ICertificateValidation {
         exec($command, $output, $returnvar);
 
         $haserror = false;
-        $message = 'ok';
+        $message = get_string('ok', 'mod_certifygen');
         // Muestra la salida del comando.
         if ($returnvar !== 0) {
             $haserror = true;
@@ -204,6 +204,7 @@ class certifygenvalidation_cmd implements ICertificateValidation {
             $result['error']['code'] = $exception->getCode();
             $result['error']['message'] = $exception->getMessage();
         }
+
         return $result;
     }
 

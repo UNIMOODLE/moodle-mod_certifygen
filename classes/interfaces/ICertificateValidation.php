@@ -64,6 +64,8 @@ interface ICertificateValidation {
 
     /**
      * Get file
+     * return $result = ['error' => [], 'file' => $file,];
+     *
      * @param int $courseid
      * @param int $validationid
      * @return array

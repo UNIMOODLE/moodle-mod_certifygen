@@ -312,10 +312,9 @@ xmlns:fir="http://firma.ws.producto.com/">
             ]);
             $response = curl_exec($curl);
             if (curl_errno($curl)) {
-                return [
-                    'haserror' => true,
-                    'message' => curl_error($curl),
-                ];
+                $result['error']['code'] = '';
+                $result['error']['message'] = curl_error($curl);
+                return $result;
             }
             $xml = simplexml_load_string(
                 $response,
@@ -332,33 +331,28 @@ xmlns:fir="http://firma.ws.producto.com/">
             if ($resultado === 'KO') {
                 $codeerror = (string) $obtenercontenidodocumentorc->error->children()->codError;
                 $descerror = (string) $obtenercontenidodocumentorc->error->children()->descError;
-                return [
-                    'haserror' => true,
-                    'message' => $codeerror . ' - ' . $descerror,
-                ];
+                $result['error']['code'] = $codeerror;
+                $result['error']['message'] = $descerror;
+                return $result;
             }
             $docspeticion = $obtenercontenidodocumentorc->docsPeticion;
             $docspeticiondocumentos = $docspeticion->documentos;
             $datos = (string) $docspeticiondocumentos->datos;
             $datos = base64_decode($datos);
             $file = $this->create_file_from_content($datos, $validationid, $code, $courseid);
-            return [
-                'haserror' => false,
-                'message' => 'ok',
-                'file' => $file,
-            ];
+            $result['error'] = [];
+            $result['file'] = $file;
+            return $result;
         } catch (SoapFault $e) {
             debugging(__FUNCTION__ . ' SoapFault error: ' . $e->getMessage());
             $message = $e->getMessage();
         } catch (Exception $e) {
             debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $message = $e->getMessage();
-// $connection = new SoapFault('client', 'Could not connect to the service');
         }
-        return [
-            'haserror' => $haserror,
-            'message' => $message,
-        ];
+        $result['error']['code'] = $message;
+        $result['error']['message'] = $message;
+        return $result;
     }
 
     /**

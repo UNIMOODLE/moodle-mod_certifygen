@@ -61,6 +61,13 @@ interface ICertificateRepository {
     public function get_file_url(certifygen_validations $trequest): string;
 
     /**
+     * Return file content (called by ws)
+     * @param certifygen_validations $trequest
+     * @return string
+     */
+    public function get_file_content(certifygen_validations $trequest): string;
+
+    /**
      * saveFile
      * @param stored_file $file
      * @return array

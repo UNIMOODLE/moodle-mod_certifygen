@@ -129,4 +129,15 @@ class certifygenrepository_onedrive implements ICertificateRepository {
     public function get_consistent_validation_plugins(): array {
         return [];
     }
+
+    /**
+     * Return file content (called by ws)
+     *
+     * @param certifygen_validations $trequest
+     * @return string
+     */
+    public function get_file_content(certifygen_validations $trequest): string {
+        // TODO: Implement get_file_content() method.
+        return '';
+    }
 }
