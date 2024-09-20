@@ -99,17 +99,18 @@ class certifygen {
         $comparelangplaceholder = $DB->sql_compare_text(':lang');
         $comparecomp = $DB->sql_compare_text('ci.component');
         $comparecompplaceholder = $DB->sql_compare_text(':component');
-        $sql = "SELECT ci.*";
-        $sql .= " FROM {tool_certificate_issues} ci";
-        $sql .= " INNER JOIN {certifygen_validations} cv ON (cv.issueid = ci.id AND cv.userid = ci.userid)";
-        $sql .= " WHERE {$comparecomp} = {$comparecompplaceholder}";
-        $sql .= " AND ci.courseid = :courseid";
-        $sql .= " AND ci.templateid = :templateid";
-        $sql .= " AND ci.userid = :userid";
-        $sql .= " AND ci.archived = 0";
-        $sql .= " AND cv.certifygenid = :instanceid";
-        $sql .= " AND {$comparelang} = {$comparelangplaceholder}";
-        $sql .= " ORDER BY ci.id DESC";
+        $sql = "SELECT ci.*
+                  FROM {tool_certificate_issues} ci
+                  JOIN {certifygen_validations} cv ON (cv.issueid = ci.id AND cv.userid = ci.userid)
+                 WHERE {$comparecomp} = {$comparecompplaceholder}
+                       AND ci.courseid = :courseid
+                       AND ci.templateid = :templateid
+                       AND ci.userid = :userid
+                       AND ci.archived = 0
+                       AND cv.certifygenid = :instanceid
+                       AND {$comparelang} = {$comparelangplaceholder}
+                       ORDER BY ci.id DESC";
+
         $params = [
             'component' => 'mod_certifygen',
             'instanceid' => $instaceid,
@@ -168,9 +169,13 @@ class certifygen {
      * @return array
      */
     private static function get_users_issued_select(int $courseid, int $templateid): array {
-        $sql = "SELECT DISTINCT ci.userid FROM {tool_certificate_issues} ci";
-        $sql .= " WHERE component = :component AND courseid = :courseid AND templateid = :templateid";
-        $sql .= " AND archived = 0";
+        $sql = "SELECT DISTINCT ci.userid
+                  FROM {tool_certificate_issues} ci
+                 WHERE component = :component
+                       AND courseid = :courseid
+                       AND templateid = :templateid
+                       AND archived = 0";
+
         $params = ['component' => 'mod_certifygen', 'courseid' => $courseid,
             'templateid' => $templateid, ];
         return [$sql, $params];
@@ -379,23 +384,24 @@ class certifygen {
             $where = ' AND u.id = :userid';
         }
 
-        $sql = "SELECT us.userid, ci.id as issueid, ci.code, ci.emailed, ci.timecreated as ctimecreated, ci.userid,";
-        $sql .= " ci.templateid, ci.expires, ci.courseid, ci.archived, cv.lang as clang, cv.status as cstatus,";
-        $sql .= " cv.id as validationid, us.*, us.courseid, ci.courseid, ci.archived, cv.lang as clang,";
-        $sql .= " cv.status as cstatus, cv.id as validationid, us.*, us.courseid";
-        $sql .= " FROM (SELECT u.id AS userid, u.*, c.id as courseid";
-        $sql .= "         FROM {user} u";
-        $sql .= "         INNER JOIN {user_enrolments} ue ON ue.userid = u.id";
-        $sql .= "         INNER JOIN {enrol} e ON e.id = ue.enrolid";
-        $sql .= "         INNER JOIN {course} c ON c.id = e.courseid";
-        $sql .= "         INNER JOIN {context} cont ON (cont.instanceid = c.id AND cont.contextlevel = 50)";
-        $sql .= "         INNER JOIN {role_assignments} ra ON ( ra.contextid = cont.id AND  ra.userid = u.id)";
-        $sql .= "         INNER JOIN {role} r ON r.id = ra.roleid";
-        $sql .= "         WHERE r.shortname = 'student' AND c.id = :courseid $where ) AS us";
-        $sql .= " LEFT JOIN {certifygen_validations} cv ON (cv.userid = us.userid AND cv.lang = :lang  ";
-        $sql .= "         AND cv.certifygenid = :certifygenid)";
-        $sql .= " LEFT JOIN {tool_certificate_issues} ci ON (ci.userid = us.userid AND cv.issueid = ci.id ";
-        $sql .= "         AND ci.courseid = us.courseid AND ci.templateid = :templateid AND ci.component = :component)";
+        $sql = "SELECT us.userid, ci.id as issueid, ci.code, ci.emailed, ci.timecreated as ctimecreated, ci.userid,
+                        ci.templateid, ci.expires, ci.courseid, ci.archived, cv.lang as clang, cv.status as cstatus,
+                        cv.id as validationid, us.*, us.courseid, ci.courseid, ci.archived, cv.lang as clang,
+                        cv.status as cstatus, cv.id as validationid, us.*, us.courseid
+                  FROM   (SELECT u.id AS userid, u.*, c.id as courseid
+                            FROM {user} u
+                            JOIN {user_enrolments} ue ON ue.userid = u.id
+                            JOIN {enrol} e ON e.id = ue.enrolid
+                            JOIN {course} c ON c.id = e.courseid
+                            JOIN {context} cont ON (cont.instanceid = c.id AND cont.contextlevel = 50)
+                            JOIN {role_assignments} ra ON ( ra.contextid = cont.id AND  ra.userid = u.id)
+                            JOIN {role} r ON r.id = ra.roleid
+                            WHERE r.shortname = 'student' AND c.id = :courseid $where ) AS us
+             LEFT JOIN {certifygen_validations} cv
+                        ON (cv.userid = us.userid AND cv.lang = :lang AND cv.certifygenid = :certifygenid)
+             LEFT JOIN {tool_certificate_issues} ci
+                        ON (ci.userid = us.userid AND cv.issueid = ci.id AND ci.courseid = us.courseid
+                            AND ci.templateid = :templateid AND ci.component = :component)";
 
         return $DB->get_records_sql($sql, $params, $limitfrom, $limitnum);
     }
@@ -471,16 +477,20 @@ class certifygen {
             $where = ' AND u.id = :userid';
         }
 
-        $sql = "SELECT COUNT(u.id) as count";
-        $sql .= " FROM {user} u";
-        $sql .= " INNER JOIN {user_enrolments} ue ON ue.userid = u.id";
-        $sql .= " INNER JOIN {enrol} e ON e.id = ue.enrolid";
-        $sql .= " INNER JOIN {course} c ON c.id = e.courseid";
-        $sql .= " INNER JOIN {context} cont ON (cont.instanceid = c.id AND cont.contextlevel = 50)";
-        $sql .= " INNER JOIN {role_assignments} ra ON ( ra.contextid = cont.id AND  ra.userid = u.id)";
-        $sql .= " INNER JOIN {role} r ON r.id = ra.roleid";
-        $sql .= " WHERE r.shortname = 'student'";
-        $sql .= " AND c.id = :courseid $where";
+        $sql = "SELECT COUNT(u.id) as count
+                  FROM {user} u
+                  JOIN {user_enrolments} ue ON ue.userid = u.id
+                  JOIN {enrol} e
+                        ON e.id = ue.enrolid
+                  JOIN {course} c
+                        ON c.id = e.courseid
+                  JOIN {context} cont
+                        ON (cont.instanceid = c.id AND cont.contextlevel = 50)
+                  JOIN {role_assignments} ra
+                        ON ( ra.contextid = cont.id AND  ra.userid = u.id)
+                  JOIN {role} r ON r.id = ra.roleid
+                 WHERE r.shortname = 'student'
+                       AND c.id = :courseid $where";
         return $DB->count_records_sql($sql, $params);
     }
 
@@ -597,13 +607,13 @@ class certifygen {
         if (!empty($where)) {
             $wheresql = ' WHERE ' . $where;
         }
-        $sql = "SELECT COUNT(*)";
-        $sql .= " FROM  {certifygen_error} ce";
-        $sql .= " INNER JOIN {certifygen_validations} cv ON cv.id = ce.validationid";
-        $sql .= " INNER JOIN {certifygen_model} cm ON cm.id = cv.modelid";
-        $sql .= " INNER JOIN {user} u ON u.id = cv.userid";
-        $sql .= " LEFT JOIN {certifygen} c ON c.id = cv.certifygenid";
-        $sql .= $wheresql;
+        $sql = "SELECT COUNT(*)
+                  FROM  {certifygen_error} ce
+                  JOIN {certifygen_validations} cv ON cv.id = ce.validationid
+                  JOIN {certifygen_model} cm ON cm.id = cv.modelid
+                  JOIN {user} u ON u.id = cv.userid
+             LEFT JOIN {certifygen} c ON c.id = cv.certifygenid
+             $wheresql";
 
         return $DB->count_records_sql($sql, $params);
     }
@@ -645,18 +655,18 @@ class certifygen {
             $wheresql = ' WHERE ' . $where;
         }
 
-        $sql = "SELECT ce.id, ce.`status`, ce.code AS errorcode, ce.message AS errormessage, ce.timecreated,";
-        $sql .= " ce.validationid, cv.name AS teacherreportname, c.name AS activityname,cm.validation AS modelvalidation,";
-        $sql .= " cm.report AS modelreport, cm.repository AS modelrepository,cm.type AS modeltype, cm.name as modelname,";
-        $sql .= " u.id as userid, u.picture, u.firstname, u.lastname, u.firstnamephonetic, u.lastnamephonetic,";
-        $sql .= " u.middlename, u.alternatename, u.imagealt, u.email, cv.certifygenid";
-        $sql .= " FROM  {certifygen_error} ce";
-        $sql .= " INNER JOIN {certifygen_validations} cv ON cv.id = ce.validationid";
-        $sql .= " INNER JOIN {certifygen_model} cm ON cm.id = cv.modelid";
-        $sql .= " INNER JOIN {user} u ON u.id = cv.userid";
-        $sql .= " LEFT JOIN {certifygen} c ON c.id = cv.certifygenid ";
-        $sql .= $wheresql;
-        $sql .= "ORDER BY ce.timecreated DESC";
+        $sql = "SELECT ce.id, ce.`status`, ce.code AS errorcode, ce.message AS errormessage, ce.timecreated,
+                        ce.validationid, cv.name AS teacherreportname, c.name AS activityname,cm.validation AS modelvalidation,
+                        cm.report AS modelreport, cm.repository AS modelrepository,cm.type AS modeltype, cm.name as modelname,
+                        u.id as userid, u.picture, u.firstname, u.lastname, u.firstnamephonetic, u.lastnamephonetic,
+                        u.middlename, u.alternatename, u.imagealt, u.email, cv.certifygenid
+                  FROM  {certifygen_error} ce
+                  JOIN {certifygen_validations} cv ON cv.id = ce.validationid
+                  JOIN {certifygen_model} cm ON cm.id = cv.modelid
+                  JOIN {user} u ON u.id = cv.userid
+             LEFT JOIN {certifygen} c ON c.id = cv.certifygenid
+                        $wheresql
+                        ORDER BY ce.timecreated DESC";
 
         return $DB->get_records_sql($sql, $params, $limitfrom, $limitnum);
     }

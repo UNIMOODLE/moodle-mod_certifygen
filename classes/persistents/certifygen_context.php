@@ -129,11 +129,12 @@ class certifygen_context extends persistent {
         ];
         [$sinsql, $sinparams] = $DB->get_in_or_equal($scontexts, SQL_PARAMS_NAMED);
 
-        $sql = "SELECT count(*) as total";
-        $sql .= " FROM {certifygen_model} m";
-        $sql .= " INNER JOIN {certifygen_context} c ON c.modelid = m.id";
-        $sql .= " WHERE m.type $minsql ";
-        $sql .= " AND ((c.contextids <> '' AND c.type $cinsql) OR (c.contextids = '' AND c.type $sinsql) )";
+        $sql = "SELECT count(*) as total
+                  FROM {certifygen_model} m
+                  JOIN {certifygen_context} c ON c.modelid = m.id
+                 WHERE m.type $minsql
+                       AND ((c.contextids <> '' AND c.type $cinsql) OR (c.contextids = '' AND c.type $sinsql) )";
+
         $params = array_merge($minparams, $cinparams, $sinparams);
         $result = $DB->get_records_sql($sql, $params);
         $result = reset($result);
@@ -152,15 +153,15 @@ class certifygen_context extends persistent {
         $comparenameplaceholder = $DB->sql_compare_text(':shortname');
         $select = "AND  {$comparename} = {$comparenameplaceholder}";
 
-        $sql = "SELECT COUNT(c.id) as num";
-        $sql .= " FROM {course} c ";
-        $sql .= " INNER JOIN {enrol} e ON e.courseid = c.id";
-        $sql .= " INNER JOIN {user_enrolments} ue ON ue.enrolid = e.id";
-        $sql .= " INNER JOIN {user} u ON ue.userid = u.id";
-        $sql .= " INNER JOIN {role_assignments} ra ON ra.userid = u.id ";
-        $sql .= " INNER JOIN {context} con ON ( con.id = ra.contextid AND con.contextlevel = 50 AND con.instanceid = c.id)";
-        $sql .= " INNER JOIN {role} r ON r.id = ra.roleid";
-        $sql .= " WHERE u.id = :userid $select";
+        $sql = "SELECT COUNT(c.id) as num
+                  FROM {course} c
+                  JOIN {enrol} e ON e.courseid = c.id
+                  JOIN {user_enrolments} ue ON ue.enrolid = e.id
+                  JOIN {user} u ON ue.userid = u.id
+                  JOIN {role_assignments} ra ON ra.userid = u.id
+                  JOIN {context} con ON ( con.id = ra.contextid AND con.contextlevel = 50 AND con.instanceid = c.id)
+                  JOIN {role} r ON r.id = ra.roleid
+                 WHERE u.id = :userid $select";
         $result = $DB->get_records_sql($sql, ['userid' => $userid, 'shortname' => 'editingteacher']);
         $result = reset($result);
         if ($result->num > 0) {
@@ -302,11 +303,10 @@ class certifygen_context extends persistent {
             certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
         ];
         [$insql, $inparams] = $DB->get_in_or_equal($contexts, SQL_PARAMS_NAMED);
-        $sql = "SELECT m.id as modelid, m.name, m.langs";
-        $sql .= " FROM {certifygen_model} m";
-        $sql .= " INNER JOIN {certifygen_context} c ON c.modelid = m.id";
-        $sql .= " WHERE m.type $insql ";
-
+        $sql = "SELECT m.id as modelid, m.name, m.langs
+                  FROM {certifygen_model} m
+                  JOIN {certifygen_context} c ON c.modelid = m.id
+                 WHERE m.type $insql";
         $contexts = $DB->get_records_sql($sql, $inparams);
         $langstrings = get_string_manager()->get_list_of_translations();
         foreach ($contexts as $context) {

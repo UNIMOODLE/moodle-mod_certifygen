@@ -101,13 +101,13 @@ class provider implements
         // This plugin involves two main contexts, system for teachers and module for students.
         $contextlist = new contextlist();
 
-        $sql = "SELECT ctx.id";
-        $sql .= " FROM {course_modules} cm";
-        $sql .= " JOIN {modules} m ON cm.module = m.id AND m.name = :modulename";
-        $sql .= " JOIN {certifygen} a ON cm.instance = a.id";
-        $sql .= " JOIN {certifygen_validations} cv ON cv.certifygenid = a.id";
-        $sql .= " JOIN {context} ctx ON cm.id = ctx.instanceid AND ctx.contextlevel = :contextlevel";
-        $sql .= " WHERE cv.userid = :userid";
+        $sql = "SELECT ctx.id
+                  FROM {course_modules} cm
+                  JOIN {modules} m ON cm.module = m.id AND m.name = :modulename
+                  JOIN {certifygen} a ON cm.instance = a.id
+                  JOIN {certifygen_validations} cv ON cv.certifygenid = a.id
+                  JOIN {context} ctx ON cm.id = ctx.instanceid AND ctx.contextlevel = :contextlevel
+                 WHERE cv.userid = :userid";
 
         $params = [
             'modulename' => 'certifygen',
@@ -116,9 +116,9 @@ class provider implements
         ];
         $contextlist->add_from_sql($sql, $params);
 
-        $sql = "SELECT c.id";
-        $sql .= " FROM {context} c ";
-        $sql .= " WHERE c.contextlevel = :contextsystem";
+        $sql = "SELECT c.id
+                  FROM {context} c
+                 WHERE c.contextlevel = :contextsystem";
         $contextlist->add_from_sql($sql, ['contextsystem' => CONTEXT_SYSTEM]);
         return $contextlist;
     }
@@ -230,12 +230,12 @@ class provider implements
             ];
 
             // Certificates issues.
-            $sql = "SELECT cv.userid";
-            $sql .= " FROM {course_modules} cm";
-            $sql .= " JOIN {modules} m ON m.id = cm.module AND m.name = :modulename";
-            $sql .= " JOIN {certifygen} a ON a.id = cm.instance";
-            $sql .= " JOIN {certifygen_validations} cv ON cv.certifygenid = a.id";
-            $sql .= " WHERE cm.id = :instanceid";
+            $sql = "SELECT cv.userid
+                      FROM {course_modules} cm
+                      JOIN {modules} m ON m.id = cm.module AND m.name = :modulename
+                      JOIN {certifygen} a ON a.id = cm.instance
+                      JOIN {certifygen_validations} cv ON cv.certifygenid = a.id
+                     WHERE cm.id = :instanceid";
             $userlist->add_from_sql('userid', $sql, $params);
         } else if ($context instanceof context_system) {
             // Teachers.
@@ -243,9 +243,9 @@ class provider implements
                 'certifygenid'    => 0,
             ];
 
-            $sql = "SELECT cv.userid";
-            $sql .= " FROM {certifygen_validations} cv";
-            $sql .= " WHERE cv.certifygenid = :certifygenid";
+            $sql = "SELECT cv.userid
+                      FROM {certifygen_validations} cv
+                     WHERE cv.certifygenid = :certifygenid";
             $userlist->add_from_sql('userid', $sql, $params);
         }
     }

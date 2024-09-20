@@ -203,11 +203,13 @@ class certifygen_validations extends persistent {
             'code' => $code,
             'component' => 'mod_certifygen',
         ];
-        $sql = "SELECT cv.lang";
-        $sql .= " FROM {tool_certificate_issues} ci";
-        $sql .= " JOIN {certifygen_validations} cv";
-        $sql .= " ON (cv.issueid = ci.id AND cv.userid = ci.userid)";
-        $sql .= " WHERE code =:code AND component =:component";
+        $sql = "SELECT cv.lang
+                  FROM {tool_certificate_issues} ci
+                  JOIN {certifygen_validations} cv
+                        ON (cv.issueid = ci.id AND cv.userid = ci.userid)
+                  WHERE code =:code AND component =:component
+
+        ";
         $record = $DB->get_record_sql($sql, $params);
         return $record->lang;
     }
@@ -260,13 +262,13 @@ class certifygen_validations extends persistent {
             'userid' => $userid,
             'certifygenid' => 0,
         ];
-        $sql = "SELECT tr.id, tr.name, tr.modelid, tr.status, tr.lang, tr.courses, tr.userid, tr.timecreated, m.validation,";
-        $sql .= " m.report, m.mode, m.timeondemmand, m.validation";
-        $sql .= " FROM {certifygen_model} m ";
-        $sql .= " INNER JOIN {certifygen_validations} tr ON tr.modelid = m.id";
-        $sql .= " WHERE tr.userid = :userid";
-        $sql .= " AND tr.certifygenid = :certifygenid";
-        $sql .= " ORDER BY tr.timemodified DESC";
+        $sql = "SELECT tr.id, tr.name, tr.modelid, tr.status, tr.lang, tr.courses, tr.userid,
+                       tr.timecreated, m.validation, m.report, m.mode, m.timeondemmand, m.validation
+                  FROM {certifygen_model} m
+                  JOIN {certifygen_validations} tr ON tr.modelid = m.id
+                 WHERE tr.userid = :userid
+                       AND tr.certifygenid = :certifygenid
+                       ORDER BY tr.timemodified DESC";
 
         return $DB->get_records_sql($sql, $params, $start, $pagesize);
     }
@@ -305,15 +307,14 @@ class certifygen_validations extends persistent {
             'certifygenid' => 0,
         ];
 
-        $sql = "SELECT ct.* ";
-        $sql .= " FROM {certifygen_validations} ct";
-        $sql .= " WHERE {$comparelang} = {$comparelangplaceholder} ";
-        $sql .= " AND {$comparecourses} = {$comparecoursesplaceholder}";
-        $sql .= " AND {$comparename} = {$comparenameplaceholder} ";
-        $sql .= " AND ct.userid = :userid";
-        $sql .= " AND ct.certifygenid = :certifygenid";
-        $sql .= " AND ct.modelid = :modelid ";
-
+        $sql = "SELECT ct.*
+                  FROM {certifygen_validations} ct
+                 WHERE {$comparelang} = {$comparelangplaceholder}
+                       AND {$comparecourses} = {$comparecoursesplaceholder}
+                       AND {$comparename} = {$comparenameplaceholder}
+                       AND ct.userid = :userid
+                       AND ct.certifygenid = :certifygenid
+                       AND ct.modelid = :modelid";
         return $DB->get_record_sql($sql, $params);
     }
 

@@ -85,9 +85,9 @@ class searchcategory_external extends external_api {
         require_capability('mod/certifygen:manage', $context);
 
         $likename = $DB->sql_like('name', ':name', false, true);
-        $sql = "SELECT id, name";
-        $sql .= " FROM {course_categories} c";
-        $sql .= " WHERE $likename";
+        $sql = "SELECT id, name
+                  FROM {course_categories} c
+                 WHERE $likename";
         $rs = $DB->get_recordset_sql($sql, ['name' => '%' . $query . '%']);
         $count = 0;
         $list = [];

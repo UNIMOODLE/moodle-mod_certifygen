@@ -221,12 +221,12 @@ class useofthecoursealgorithm {
     private function get_resources(): void {
         global $DB;
         try {
-            $sql = "SELECT COUNT(*)";
-            $sql .= " FROM {course_modules} cm";
-            $sql .= " LEFT JOIN {modules} m ON m.id = cm.module";
-            $sql .= " WHERE cm.course = :courseid";
-            $sql .= " AND m.name IN ('resource','url','label','page', 'book', 'folder','glossary','scorm', 'data')";
-            $sql .= " AND cm.visible=1";
+            $sql = "SELECT COUNT(*)
+                      FROM {course_modules} cm
+                 LEFT JOIN {modules} m ON m.id = cm.module
+                     WHERE cm.course = :courseid
+                           AND m.name IN ('resource','url','label','page', 'book', 'folder','glossary','scorm', 'data')
+                           AND cm.visible=1";
             $this->resources = $DB->count_records_sql($sql, ['courseid' => $this->courseid]);
             $this->resourceslevel = $this->get_item_level($this->resources);
         } catch (moodle_exception $e) {
@@ -243,15 +243,15 @@ class useofthecoursealgorithm {
     private function get_resource_views(): void {
         global $DB;
         try {
-            $sql = "SELECT logs.userid, count(logs.id) views";
-            $sql .= " FROM {logstore_standard_log} logs ";
-            $sql .= " WHERE logs.action='viewed'";
-            $sql .= " AND logs.component IN ('mod_resource','mod_url','mod_label','mod_page', 'mod_book', 'mod_folder',";
-            $sql .= " 'mod_glossary','mod_scorm','mod_data')";
-            $sql .= " AND logs.timecreated > :startdate";
-            $sql .= " AND logs.timecreated < :enddate";
-            $sql .= " AND logs.courseid = :courseid";
-            $sql .= " GROUP BY logs.userid,logs.courseid";
+            $sql = "SELECT logs.userid, count(logs.id) views
+                      FROM {logstore_standard_log} logs
+                     WHERE logs.action='viewed'
+                           AND logs.component IN ('mod_resource','mod_url','mod_label','mod_page', 'mod_book', 'mod_folder',
+                            'mod_glossary','mod_scorm','mod_data')
+                           AND logs.timecreated > :startdate
+                           AND logs.timecreated < :enddate
+                           AND logs.courseid = :courseid
+                  GROUP BY logs.userid,logs.courseid";
             $params = [
                 'courseid' => $this->courseid,
                 'startdate' => $this->course->startdate,
@@ -279,11 +279,11 @@ class useofthecoursealgorithm {
     private function get_forums(): void {
         global $DB;
         try {
-            $sql = "SELECT COUNT(*)";
-            $sql .= " FROM {course_modules} cm";
-            $sql .= " LEFT JOIN {modules} m ON m.id = cm.module";
-            $sql .= " WHERE cm.course = :courseid";
-            $sql .= " AND m.name IN ('forum') AND cm.visible=1";
+            $sql = "SELECT COUNT(*)
+                      FROM {course_modules} cm
+                 LEFT JOIN {modules} m ON m.id = cm.module
+                     WHERE cm.course = :courseid
+                           AND m.name IN ('forum') AND cm.visible=1";
             $this->forums = $DB->count_records_sql($sql, ['courseid' => $this->courseid]);
             $this->forumslevel = $this->get_item_level($this->forums);
         } catch (moodle_exception $e) {
@@ -299,13 +299,16 @@ class useofthecoursealgorithm {
     private function get_forum_views(): void {
         global $DB;
         try {
-            $sql = "SELECT COUNT(*)";
-            $sql .= " FROM {course_modules} cm";
-            $sql .= " LEFT JOIN {modules} m ON m.id = cm.module";
-            $sql .= " WHERE cm.course = :courseid";
-            $sql .= " AND m.name IN ('forum') AND cm.visible=1";
-            $sql .= " AND cm.instance IN (SELECT f.id";
-            $sql .= " FROM {forum} f WHERE f.type = 'news' AND f.course = :courseid2)";
+            $sql = "SELECT COUNT(*)
+                      FROM {course_modules} cm
+                 LEFT JOIN {modules} m ON m.id = cm.module
+                     WHERE cm.course = :courseid
+                           AND m.name IN ('forum') AND cm.visible=1
+                           AND cm.instance IN (
+                                SELECT f.id
+                                  FROM {forum} f 
+                                 WHERE f.type = 'news' 
+                                       AND f.course = :courseid2)";
             $this->forumnews = $DB->count_records_sql($sql, ['courseid' => $this->courseid,
                 'courseid2' => $this->courseid]);
             $this->forumnewslevel = $this->get_item_level($this->forumnews);
@@ -322,15 +325,15 @@ class useofthecoursealgorithm {
     private function get_forum_interactions(): void {
         global $DB;
         try {
-            $sql = "SELECT count(slogs.id) total";
-            $sql .= " FROM  {logstore_standard_log} as slogs";
-            $sql .= " WHERE slogs.component ='mod_forum' ";
-            $sql .= " AND slogs.action='viewed' ";
-            $sql .= " AND slogs.target='discussion'";
-            $sql .= " AND slogs.timecreated > :startdate";
-            $sql .= " AND slogs.timecreated < :enddate";
-            $sql .= " AND slogs.courseid = :courseid";
-            $sql .= " GROUP BY slogs.courseid";
+            $sql = "SELECT count(slogs.id) total
+                      FROM {logstore_standard_log} as slogs
+                     WHERE slogs.component ='mod_forum'
+                           AND slogs.action='viewed'
+                           AND slogs.target='discussion'
+                           AND slogs.timecreated > :startdate
+                           AND slogs.timecreated < :enddate
+                           AND slogs.courseid = :courseid
+                  GROUP BY slogs.courseid";
             $params = [
                 'courseid' => $this->courseid,
                 'startdate' => $this->course->startdate,
@@ -355,13 +358,13 @@ class useofthecoursealgorithm {
     private function get_assigns(): void {
         global $DB;
         try {
-            $sql = "SELECT count(*) media ";
-            $sql .= " FROM {course_modules} cm ";
-            $sql .= " INNER JOIN {modules} m ON m.id = cm.module";
-            $sql .= " WHERE m.name = 'assign'";
-            $sql .= " AND cm.visible=1 ";
-            $sql .= " AND cm.course = :courseid";
-            $sql .= " GROUP BY cm.course";
+            $sql = "SELECT count(*) media
+                      FROM {course_modules} cm
+                      JOIN {modules} m ON m.id = cm.module
+                     WHERE m.name = 'assign'
+                           AND cm.visible=1 
+                           AND cm.course = :courseid
+                  GROUP BY cm.course";
             $params = [
                 'courseid' => $this->courseid,
             ];
@@ -384,12 +387,12 @@ class useofthecoursealgorithm {
     private function get_assigns_submissions(): void {
         global $DB;
         try {
-            $sql = "SELECT assign_subm.userid userid, COUNT(assign_subm.id) total";
-            $sql .= " FROM {assign_submission} assign_subm";
-            $sql .= " LEFT JOIN {assign} assign  ON (assign.id = assign_subm.assignment)";
-            $sql .= " WHERE assign_subm.timecreated > :startdate";
-            $sql .= " AND assign.course = :courseid";
-            $sql .= " GROUP BY assign.course, assign_subm.userid";
+            $sql = "SELECT assign_subm.userid userid, COUNT(assign_subm.id) total
+                      FROM {assign_submission} assign_subm
+                 LEFT JOIN {assign} assign  ON (assign.id = assign_subm.assignment)
+                     WHERE assign_subm.timecreated > :startdate
+                           AND assign.course = :courseid
+                 GROUP BY assign.course, assign_subm.userid";
             $params = [
                 'courseid' => $this->courseid,
                 'startdate' => $this->course->startdate,
@@ -414,12 +417,12 @@ class useofthecoursealgorithm {
     private function get_grade_items(): void {
         global $DB;
         try {
-            $sql = "SELECT count(gradeitems.id) total";
-            $sql .= " FROM {grade_items} gradeitems";
-            $sql .= " WHERE gradeitems.hidden=0 ";
-            $sql .= " AND gradeitems.itemtype in ('manual', 'mod')";
-            $sql .= " AND gradeitems.courseid = :courseid";
-            $sql .= " GROUP BY gradeitems.courseid";
+            $sql = "SELECT count(gradeitems.id) total
+                      FROM {grade_items} gradeitems
+                     WHERE gradeitems.hidden=0
+                           AND gradeitems.itemtype in ('manual', 'mod')
+                           AND gradeitems.courseid = :courseid
+                  GROUP BY gradeitems.courseid";
             $params = [
                 'courseid' => $this->courseid,
             ];
@@ -442,14 +445,14 @@ class useofthecoursealgorithm {
     private function get_grade_feedback(): void {
         global $DB;
         try {
-            $sql = "SELECT count(distinct(items.id))";
-            $sql .= " FROM {grade_grades} grades";
-            $sql .= " RIGHT JOIN {grade_items} items on (items.id = grades.itemid)";
-            $sql .= " WHERE grades.hidden=0";
-            $sql .= " AND itemtype in ('manual', 'mod')";
-            $sql .= " AND feedback is not NULL";
-            $sql .= " AND items.courseid = :courseid";
-            $sql .= " GROUP BY courseid";
+            $sql = "SELECT count(distinct(items.id))
+                      FROM {grade_grades} grades
+                RIGHT JOIN {grade_items} items on (items.id = grades.itemid)
+                     WHERE grades.hidden=0
+                           AND itemtype in ('manual', 'mod')
+                           AND feedback is not NULL
+                           AND items.courseid = :courseid
+                  GROUP BY courseid";
             $params = [
                 'courseid' => $this->courseid,
             ];

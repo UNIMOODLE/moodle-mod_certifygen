@@ -124,13 +124,12 @@ class searchmycourses_external extends external_api {
             }
         }
         $likename = $DB->sql_like('c.fullname', ':fullname', false);
-        $sql = "SELECT c.id, c.fullname";
-        $sql .= " FROM  {user_enrolments} ue ";
-        $sql .= " INNER JOIN {enrol} e ON e.id = ue.enrolid";
-        $sql .= " INNER JOIN {course} c ON c.id = e.courseid";
-        $sql .= " WHERE ue.userid = :userid ";
-        $sql .= " AND $likename";
-        $sql .= " $wherecourse $wherecategory";
+        $sql = "SELECT c.id, c.fullname
+                  FROM  {user_enrolments} ue
+                  JOIN {enrol} e ON e.id = ue.enrolid
+                  JOIN {course} c ON c.id = e.courseid
+                 WHERE ue.userid = :userid
+                       AND $likename $wherecourse $wherecategory";
 
         $rs = $DB->get_recordset_sql($sql, $params);
         $count = 0;

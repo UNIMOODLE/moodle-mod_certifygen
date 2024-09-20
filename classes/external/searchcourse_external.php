@@ -85,9 +85,9 @@ class searchcourse_external extends external_api {
         require_capability('mod/certifygen:manage', $context);
 
         $likename = $DB->sql_like('c.fullname', ':fullname', false);
-        $sql = "SELECT id, fullname";
-        $sql .= " FROM {course} c";
-        $sql .= " WHERE $likename";
+        $sql = "SELECT id, fullname
+                  FROM {course} c
+                 WHERE $likename";
         $rs = $DB->get_recordset_sql($sql, ['fullname' => '%' . $query . '%']);
         $count = 0;
         $list = [];
