@@ -65,6 +65,7 @@ const reemitCertificate = async (event) => {
                 type: ModalFactory.types.SAVE_CANCEL
             }).then(modal => {
                 modal.getRoot().on(ModalEvents.hidden, () => {
+                    identifier.find('.overlay-icon-container').remove();
                     modal.destroy();
                 });
                 modal.getRoot().on(ModalEvents.cancel, () => {
@@ -250,6 +251,7 @@ const emitCertificate = async(event) => {
             }).fail(Notification.exception);
         });
         modal.getRoot().on(ModalEvents.hidden, () => {
+            identifier.find('.overlay-icon-container').remove();
             modal.destroy();
         });
         modal.getRoot().on(ModalEvents.cancel, () => {

@@ -109,6 +109,7 @@ const reemitCertificate = async (event) => {
                 type: ModalFactory.types.SAVE_CANCEL
             }).then(modal => {
                 modal.getRoot().on(ModalEvents.hidden, () => {
+                    identifier.find('.overlay-icon-container').remove();
                     modal.destroy();
                 });
                 modal.getRoot().on(ModalEvents.cancel, () => {
@@ -169,6 +170,7 @@ const emitCertificate = async (event) => {
                 type: ModalFactory.types.SAVE_CANCEL
             }).then(modal => {
                 modal.getRoot().on(ModalEvents.hidden, () => {
+                    identifier.find('.overlay-icon-container').remove();
                     modal.destroy();
                 });
                 modal.getRoot().on(ModalEvents.cancel, () => {
@@ -275,6 +277,7 @@ const deleteRequest = (event) => {
                             }).then(modal => {
                                 modal.show();
                                 modal.getRoot().on(ModalEvents.hidden, () => {
+                                    identifier.find('.overlay-icon-container').remove();
                                     modal.destroy();
                                 });
                                 modal.getRoot().on(ModalEvents.CANCEL, () => {
