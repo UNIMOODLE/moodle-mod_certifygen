@@ -44,11 +44,13 @@ to complete the installation from the command line.
 
 ### certifygenvalidation ###
 * certifygenvalidation_cmd 
-* certifygenvalidation_csv 
-* certifygenvalidation_webservice 
+* certifygenvalidation_csv
+* certifygenvalidation_electronic
+* certifygenvalidation_none
 ### certifygenreport ###
 * certifygenreport_basic 
 ### certifygenrepository ###
+* certifygenvalidation_csv
 * certifygenrepository_localrepository 
 * certifygenrepository_onedrive 
 
@@ -76,8 +78,18 @@ Contains information about stores each certifygen models
   
 Contains information about stores each context of a certifygen
 * __certifygen_validations__
+
+Contains information about stores each validation of a certifygen 
+
+* __certifygen_repository__
   
-Contains information about stores each validation of a certifygen
+Contains information about sotores certificate url
+
+* __certifygen__error__
+  
+Contains information about stores certificate errors
+  
+
 ## Unit Test ##
 
 ES
