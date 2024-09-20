@@ -127,7 +127,7 @@ class onedriveconnection {
         string $reportname,
         string $completefilepath,
         bool $replacefile = true
-    ): void {
+    ): string {
 
         // Get a system and a user oauth client.
         /** @var oauth2_client $systemauth */
@@ -146,7 +146,7 @@ class onedriveconnection {
         $parentid = 'root';
         // Save the file in a specific onedrive folder.
         $parent = get_config('certifygenrepository_onedrive', 'folder');
-        $onedrivepath = $parent . '/' . $onedrivepath;
+        $onedrivepath = $onedrivepath . '/' . $parent;
         $allfolders = explode('/', $onedrivepath);
         $fullpath = '';
         // Variable $allfolders now has the complete path we want to store the file in.
@@ -162,9 +162,8 @@ class onedriveconnection {
             }
             $fullpath .= '/';
         }
-        $filename = urlencode(clean_param($reportname, PARAM_PATH)) . '.csv';
+        $filename = urlencode(clean_param($reportname, PARAM_PATH));
         $path = $fullpath . $filename;
-
         // Delete if it is necesary.
         if ($replacefile) {
             $fileid = $this->get_file_id_by_path($systemservice, $path);
@@ -177,10 +176,19 @@ class onedriveconnection {
         $mimetype = $this->get_mimetype_from_filename($safefilename);
         // We cannot send authorization headers in the upload or personal microsoft accounts will fail (what a joke!).
         $curl = new curl();
-        $this->upload_file_to_onedrive($systemservice, $curl, $systemauth, $completefilepath, $mimetype, $parentid, $safefilename);
-
+        $fileid = $this->upload_file_to_onedrive(
+            $systemservice,
+            $curl,
+            $systemauth,
+            $completefilepath,
+            $mimetype,
+            $parentid,
+            $safefilename
+        );
         // Read with link.
         $this->link = $this->set_file_sharing_anyone_with_link_can_read($systemservice, $fileid);
+
+        return $fileid;
     }
 
     /**
@@ -213,6 +221,7 @@ class onedriveconnection {
             $details = 'Cannot update link sharing for the document: ' . $fileid;
             throw new moodle_exception('errorwhilecommunicatingwith', 'repository', '', $details);
         }
+        $this->url = $response->link->webUrl;
         return $response->link->webUrl;
     }
     /**
@@ -224,7 +233,7 @@ class onedriveconnection {
      * @param string $mimetype
      * @param string $parentid
      * @param string $filename
-     * @return void
+     * @return string
      * @throws coding_exception
      * @throws moodle_exception
      * @throws rest_exception
@@ -237,7 +246,8 @@ class onedriveconnection {
         string $mimetype,
         string $parentid,
         string $filename
-    ): void {
+    ): string {
+
         // Start an upload session.
         // Docs https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/item_createuploadsession link.
         $params = ['parentid' => $parentid, 'filename' => urlencode($filename)];
@@ -248,12 +258,11 @@ class onedriveconnection {
             throw new moodle_exception('errorwhilecommunicatingwith', 'repository', '', $details);
         }
         $options = ['file' => $filepath];
-
         // Try each curl class in turn until we succeed.
         // First attempt an upload with no auth headers (will work for personal onedrive accounts).
         // If that fails, try an upload with the auth headers (will work for work onedrive accounts).
         $curls = [$curl, $authcurl];
-        $response = null;
+        $id = '';
         foreach ($curls as $curlinstance) {
             $curlinstance->setHeader('Content-type: ' . $mimetype);
             $size = filesize($filepath);
@@ -266,17 +275,17 @@ class onedriveconnection {
                 $response = json_decode($response);
             }
             if (!empty($response->id)) {
+                $id = $response->id;
                 // We can stop now - there is a valid file returned.
                 break;
             }
         }
-
-        // Delete filepath.
-        unlink($filepath);
-        if (empty($response->id)) {
+        if (empty($id)) {
             $details = 'File not created';
             throw new moodle_exception('errorwhilecommunicatingwith', 'repository', '', $details);
         }
+
+        return $id;
     }
     /**
      * Given a filename, use the core_filetypes registered types to guess a mimetype.
@@ -361,5 +370,35 @@ class onedriveconnection {
             throw new moodle_exception('errorwhilecommunicatingwith', 'repository', '', $details);
         }
         return $created->id;
+    }
+
+    /**
+     * Get a file.
+     * @param $id
+     * @param $filename
+     * @return bool|string
+     * @throws moodle_exception
+     */
+    public function get_file($id, $filename = '') {
+
+        $client = api::get_system_oauth_client($this->issuer);
+        $base = 'https://graph.microsoft.com/v1.0/';
+
+        $sourceurl = new moodle_url($base . 'me/drive/items/' . $id . '/content');
+        $source = $sourceurl->out(false);
+
+        // We use download_one and not the rest API because it has special timeouts etc.
+        $path = sprintf('%s/%s', make_request_directory(), $filename);
+        $options = [
+                'filepath' => $path,
+                'timeout' => 15,
+                'followlocation' => true,
+                'maxredirs' => 5,
+        ];
+        $result = $client->get($source, null, $options);
+        if ($result) {
+            return $result;
+        }
+        return '';
     }
 }

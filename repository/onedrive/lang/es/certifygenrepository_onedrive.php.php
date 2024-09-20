@@ -37,3 +37,6 @@ $string['enable_help'] = 'Este repositorio guarda los certificados en uno de los
 $string['settings_folder'] = 'Carpeta';
 $string['settings_folder_desc'] = 'Directorio en Onedrive done se van a almacenar los certificados';
 $string['privacy:metadata'] = 'El plugin Certifygen Repositorio Onedrive no almacena datos personales.';
+$string['privacy:metadata:validationid'] = 'El id de emisión';
+$string['privacy:metadata:userid'] = 'Id del usuario al que pertenece el certificado';
+$string['privacy:metadata:url'] = 'Enlace al certificado';

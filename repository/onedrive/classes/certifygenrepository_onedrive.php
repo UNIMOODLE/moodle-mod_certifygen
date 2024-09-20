@@ -30,6 +30,7 @@ namespace certifygenrepository_onedrive;
 
 use coding_exception;
 use core\oauth2\rest_exception;
+use dml_exception;
 use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\persistents\certifygen_repository;
 use mod_certifygen\persistents\certifygen_validations;
@@ -72,7 +73,7 @@ class certifygenrepository_onedrive implements ICertificateRepository {
      * @throws rest_exception
      */
     public function save_file(stored_file $file): array {
-        global $CFG;
+        global $CFG, $USER;
         $result = [
             'result' => true,
             'haserror' => false,
@@ -84,11 +85,23 @@ class certifygenrepository_onedrive implements ICertificateRepository {
             $onedrivepath = 'root';
             $reportname = $file->get_filename();
             // It is needed to have the file in a known path to upload it to onedrive.
-            $completefilepath = $CFG->dirroot . '/mod/certifygen/repository/onedrive/tempfiles/' . $reportname . '.pdf';
+            $completefilepath = $CFG->dirroot . '/mod/certifygen/repository/onedrive/tempfiles/' . $reportname;
             $file->copy_content_to($completefilepath);
             // Upload file to onedrive.
-            $connection->upload_file($onedrivepath, $reportname, $completefilepath);
+            $id = $connection->upload_file($onedrivepath, $reportname, $completefilepath);
+            $odata = ['id' => $id];
             $this->url = $connection->get_link();
+            // Save on db.
+            $validation = new certifygen_validations($file->get_itemid());
+            $data = [
+                    'validationid' => $file->get_itemid(),
+                    'userid' => $validation->get('userid'),
+                    'usermodified' => $USER->id,
+                    'url' => $this->url,
+                    'data' => json_encode($odata),
+            ];
+            $userfile = new certifygen_repository(0, (object)$data);
+            $userfile->create();
             // Delete temp file.
             unlink($completefilepath);
             $file->delete();
@@ -103,14 +116,14 @@ class certifygenrepository_onedrive implements ICertificateRepository {
     /**
      * is_enabled
      * @return bool
-     * @throws \dml_exception
+     * @throws dml_exception
      */
     public function is_enabled(): bool {
-// $enabled = (int) get_config('certifygenrepository_onedrive', 'enabled');
-// $connection = new onedriveconnection();
-// if ($enabled && $connection->is_enabled()) {
-// return true;
-// }
+        $enabled = (int) get_config('certifygenrepository_onedrive', 'enabled');
+        $connection = new onedriveconnection();
+        if ($enabled && $connection->is_enabled()) {
+            return true;
+        }
         return false;
     }
 
@@ -132,12 +145,29 @@ class certifygenrepository_onedrive implements ICertificateRepository {
 
     /**
      * Return file content (called by ws)
-     *
      * @param certifygen_validations $trequest
      * @return string
      */
     public function get_file_content(certifygen_validations $trequest): string {
-        // TODO: Implement get_file_content() method.
-        return '';
+
+        $result = '';
+        try {
+            $connection = new onedriveconnection();
+            $code = certifygen_validations::get_certificate_code($trequest);
+            $reportname = $code . '.pdf';
+            // Upload file to onedrive.
+            $usercert = certifygen_repository::get_record([
+                    'validationid' => $trequest->get('id'),
+                    'userid' => $trequest->get('userid'),
+                    ]);
+            $odata = $usercert->get('data');
+            $odata = json_decode($odata);
+            $id = $odata->id;
+            $result = $connection->get_file($id, $reportname);
+        } catch (moodle_exception $e) {
+            debugging(__FUNCTION__ . ' ERROR: ' . $e->getMessage());
+        }
+
+        return $result;
     }
 }

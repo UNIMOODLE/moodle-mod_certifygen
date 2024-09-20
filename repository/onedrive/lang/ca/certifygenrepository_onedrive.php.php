@@ -37,3 +37,6 @@ $string['enable_help'] = 'Aquest repositori emmagatzema els certificats en un de
 $string['settings_folder'] = 'Carpeta';
 $string['settings_folder_desc'] = 'Directori a Onedrive on es desaran els certificats';
 $string['privacy:metadata'] = 'El plugin Repositori Onedrive Certifygen no emmagatzema dades personals.';
+$string['privacy:metadata:validationid'] = 'ID d’emissió';
+$string['privacy:metadata:userid'] = 'ID d’usuari';
+$string['privacy:metadata:url'] = 'Enllaç al certificat';

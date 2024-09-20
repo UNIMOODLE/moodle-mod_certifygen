@@ -81,7 +81,6 @@ class getteacherrequestviewdata_external extends external_api {
         $view = new profile_my_certificates_view($userid);
         $output = $PAGE->get_renderer('mod_certifygen');
         $data = $view->export_for_template($output);
-        error_log(var_export($data, true));
         return (array) $data;
     }
     /**

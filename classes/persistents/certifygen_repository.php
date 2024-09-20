@@ -55,6 +55,10 @@ class certifygen_repository extends persistent {
             'url' => [
                 'type' => PARAM_TEXT,
             ],
+            'data' => [
+                'type' => PARAM_TEXT,
+                'null' => NULL_ALLOWED,
+            ],
             'usermodified' => [
                 'type' => PARAM_INT,
             ],

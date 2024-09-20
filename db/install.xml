@@ -85,6 +85,7 @@
                 <FIELD NAME="validationid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
                 <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="certificate user"/>
                 <FIELD NAME="url" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="certificate url"/>
+                <FIELD NAME="data" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="extra data"/>
                 <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>

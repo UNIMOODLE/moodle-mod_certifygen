@@ -147,7 +147,13 @@ class get_pdf_teacher_certificate_external extends external_api {
                 return $result;
             }
             // Check if request exists.
-            $trequest = certifygen_validations::get_request_by_data_for_teachers($userid, $courses, $lang, $modelid, $name);
+            $trequest = certifygen_validations::get_request_by_data_for_teachers(
+                $userid,
+                $courses,
+                $lang,
+                $modelid,
+                $name
+            );
             $id = 0;
             if ($trequest) {
                 $id = $trequest->id;

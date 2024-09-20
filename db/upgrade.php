@@ -20,23 +20,42 @@
 
 /**
  *
- * @package   certifygenrepository_onedrive
+ * @package   mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// This line protects the file from being accessed by a URL directly.
-defined('MOODLE_INTERNAL') || die();
+/**
+ * Certifygen module upgrade task
+ *
+ * @param int $oldversion the version we are upgrading from
+ * @return bool always true
+ * @throws ddl_exception
+ * @throws ddl_table_missing_exception
+ * @throws downgrade_exception
+ * @throws moodle_exception
+ * @throws upgrade_exception
+ */
+function xmldb_certifygen_upgrade($oldversion) {
+    global $DB;
 
-$string['pluginname'] = 'Onedrive Biltegia';
-$string['pluginnamesettings'] = 'Onedrive Biltegiaren Konfigurazioa';
-$string['enable'] = 'Gaitu';
-$string['enable_help'] = 'Biltegi honek ziurtagiriak plataforma onartutako biltegiren batean gordetzen ditu.';
-$string['settings_folder'] = 'Karpetak';
-$string['settings_folder_desc'] = 'Onedrive-n ziurtagiriak gordeko diren direktorioa';
-$string['privacy:metadata'] = 'Onedrive Certifygen Biltegi pluginak ez du datu pertsonalik gordetzen.';
-$string['privacy:metadata:validationid'] = 'Igorpen IDa ';
-$string['privacy:metadata:userid'] = 'Ziurtagiria duen erabiltzailearen IDa';
-$string['privacy:metadata:url'] = 'Ziurtagiriaren esteka';
+    $dbman = $DB->get_manager();
+
+    if ($oldversion < 2024092002) {
+        // Define field data to be added to certifygen_repository.
+        $table = new xmldb_table('certifygen_repository');
+        $field = new xmldb_field('data', XMLDB_TYPE_TEXT, null, null, null, null, null, 'timemodified');
+
+        // Conditionally launch add field data.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Certifygen savepoint reached.
+        upgrade_mod_savepoint(true, 2024092002, 'certifygen');
+    }
+
+    return true;
+}
