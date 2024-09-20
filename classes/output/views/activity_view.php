@@ -97,6 +97,11 @@ class activity_view implements renderable, templatable {
         $this->pagesize = $pagesize;
         $certificate = new certifygen($cm->instance);
         $this->certificatemodel = new certifygen_model($certificate->get('modelid'));
+        if (empty($this->certificatemodel->get_model_languages())) {
+            $a = new stdClass();
+            $a->lang = $this->certificatemodel->get('langs');
+            throw new moodle_exception('lang_not_exists', 'mod_certifygen', '', $a);
+        }
         $this->hasvalidator = !is_null($this->certificatemodel->get('validation'));
         $this->lang = $lang;
     }

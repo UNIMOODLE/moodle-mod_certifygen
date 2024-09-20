@@ -47,6 +47,7 @@ use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
+use stdClass;
 use table_sql;
 /**
  * activityteacher_table
@@ -314,6 +315,11 @@ class activityteacher_table extends table_sql {
         }
         $this->lang = $this->filterset->get_filter('lang')->current();
         $langs = get_string_manager()->get_list_of_translations();
+        if (!mod_certifygen_lang_is_installed($this->lang)) {
+            $a = new stdClass();
+            $a->lang = $this->lang;
+            throw new moodle_exception('lang_not_exists', 'mod_certifygen', '', $a);
+        }
         $this->langstring = $langs[$this->lang];
         $params['lang'] = $this->filterset->get_filter('lang')->current();
         $total = certifygen::count_issues_for_course_by_lang($this->courseid, $tifirst, $tilast, $userid);

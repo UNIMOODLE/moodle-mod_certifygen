@@ -38,6 +38,7 @@ require_once($CFG->libdir . '/tablelib.php');
 
 use coding_exception;
 use dml_exception;
+use mod_certifygen\certifygen;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
@@ -142,7 +143,10 @@ class profile_my_certificates_table extends table_sql {
      * @return string
      */
     final public function col_lang(stdClass $row): string {
-        return $this->langstrings[$row->lang];
+        if (array_key_exists($row->lang, $this->langstrings)) {
+            return $this->langstrings[$row->lang];
+        }
+        return $row->lang;
     }
     /**
      * See courses
@@ -163,6 +167,10 @@ class profile_my_certificates_table extends table_sql {
      * @throws coding_exception
      */
     final public function col_emit(stdClass $row): string {
+        // Check if the certificate can be emitted.
+        if (!certifygen::can_be_issued($row->id)) {
+            return '';
+        }
         // Emit.
         if ($row->status == certifygen_validations::STATUS_NOT_STARTED) {
             return '<span class="likelink" data-userid="' . $row->userid . '" data-id="' . $row->id . '" data-action="emit">' .

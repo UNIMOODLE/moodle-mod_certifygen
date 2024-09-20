@@ -48,6 +48,7 @@ use mod_certifygen\persistents\certifygen_error;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
+use stdClass;
 use stored_file;
 
 defined('MOODLE_INTERNAL') || die();
@@ -97,6 +98,13 @@ class emitteacherrequest_external extends external_api {
 
         // Step 1: Change status to in progress.
         $teacherrequest = new certifygen_validations($id);
+        if (!mod_certifygen_lang_is_installed($teacherrequest->get('lang'))) {
+            $a = new stdClass();
+            $a->lang = $teacherrequest->get('lang');
+            $result['result'] = false;
+            $result['message'] = get_string('lang_not_exists', 'mod_certifygen', $a);
+            return $result;
+        }
         if ($USER->id != $teacherrequest->get('userid')) {
             $context = context_system::instance();
             if (!has_capability('mod/certifygen:viewcontextcertificates', $context)) {

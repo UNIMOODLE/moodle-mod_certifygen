@@ -310,14 +310,21 @@ class certifygen_context extends persistent {
         $contexts = $DB->get_records_sql($sql, $inparams);
         $langstrings = get_string_manager()->get_list_of_translations();
         foreach ($contexts as $context) {
-            $modelids[$context->modelid] = $context->name;
             $modellangs = explode(',', $context->langs);
             $modellangstrings = [];
             foreach ($modellangs as $modellang) {
+                // Check if lang exists.
+                if (!mod_certifygen_lang_is_installed($modellang)) {
+                    continue;
+                }
                 $modellangstrings[$modellang] = $langstrings[$modellang];
             }
-            $langs[$context->modelid] = $modellangstrings;
+            if (!empty($modellangstrings)) {
+                $modelids[$context->modelid] = $context->name;
+                $langs[$context->modelid] = $modellangstrings;
+            }
         }
+
         return [$modelids, $langs];
     }
 }

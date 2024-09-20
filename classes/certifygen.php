@@ -670,4 +670,34 @@ class certifygen {
 
         return $DB->get_records_sql($sql, $params, $limitfrom, $limitnum);
     }
+
+    /**
+     * Check if certificate can be issued.
+     *
+     * @param certifygen_validations $validation
+     * @return bool
+     * @throws coding_exception
+     */
+    public static function can_be_issued(int $validationid): bool {
+        $canbeemitted = false;
+        $validation = new certifygen_validations($validationid);
+        // Check lang exists.
+        if (!mod_certifygen_lang_is_installed($validation->get('lang'))) {
+            return $canbeemitted;
+        }
+        // Check courses exist.
+        $courses = $validation->get('courses');
+        $courses = explode(',', $courses);
+        foreach ($courses as $course) {
+            try {
+                get_course($course);
+                $canbeemitted = true;
+            } catch (moodle_exception $exception) {
+                $canbeemitted = false;
+                break;
+            }
+        }
+
+        return $canbeemitted;
+    }
 }

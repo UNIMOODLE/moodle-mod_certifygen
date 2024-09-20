@@ -146,7 +146,7 @@ class certifygen_model extends persistent {
     }
 
     /**
-     * get_model_languages
+     * Get installed model languages.
      * @return array
      * @throws coding_exception
      */
@@ -155,6 +155,14 @@ class certifygen_model extends persistent {
         if (empty($languages)) {
             return [];
         }
-        return explode(',', $languages);
+        $modellangs = explode(',', $languages);
+        $langs = [];
+        foreach ($modellangs as $modellang) {
+            if (mod_certifygen_lang_is_installed($modellang)) {
+                $langs[] = $modellang;
+            }
+        }
+
+        return $langs;
     }
 }

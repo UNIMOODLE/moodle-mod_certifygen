@@ -399,10 +399,20 @@ function mod_certifygen_pluginfile(
  */
 function mod_certifygen_get_lang_selected(certifygen_model $model): string {
     global $USER;
-    $langs = $model->get_model_languages();
-    $lang = $USER->lang;
-    if (!empty($langs)) {
-        $lang = $langs[0];
+    $modellangs = $model->get_model_languages();
+    $lang = '';
+    foreach ($modellangs as $modellang) {
+        if ($modellang == $USER->lang) {
+            $lang = $modellang;
+            break;
+        }
+        $lang = $modellang;
+    }
+
+    if (empty($lang)) {
+        $a = new stdClass();
+        $a->lang = $model->get('langs');
+        throw new moodle_exception('lang_not_exists', 'mod_certifygen', '', $a);
     }
     return optional_param('lang', $lang, PARAM_RAW);
 }
@@ -550,4 +560,17 @@ function mod_certifygen_are_there_any_certificate_emited_by_instanceid(int $cert
     $num = certifygen_validations::count_records_select($select, $params);
 
     return $num > 0;
+}
+/**
+ * Checks if a language is installed
+ * @param string $langcode
+ * @return bool
+ */
+function mod_certifygen_lang_is_installed(string $langcode): bool {
+
+    $installedlangs = get_string_manager()->get_list_of_translations(true);
+    if (!array_key_exists($langcode, $installedlangs)) {
+        return false;
+    }
+    return true;
 }

@@ -33,7 +33,13 @@ use core\invalid_persistent_exception;
 use core\persistent;
 use core_text;
 use dml_exception;
+use moodle_exception;
 use stdClass;
+
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->dirroot . '/mod/certifygen/lib.php');
 /**
  * certifygen_validations
  * @package   mod_certifygen
@@ -128,6 +134,12 @@ class certifygen_validations extends persistent {
      * @throws invalid_persistent_exception|dml_exception
      */
     public static function manage_validation(int $id, stdClass $data): self {
+        // Check if lang exists.
+        if (!mod_certifygen_lang_is_installed($data->lang)) {
+            $a = new stdClass();
+            $a->lang = $data->lang;
+            throw new moodle_exception('lang_not_exists', 'mod_certifygen', '', $a);
+        }
         if (!empty($data->courses)) {
             // Order courses by id.
             $courses = explode(',', $data->courses);

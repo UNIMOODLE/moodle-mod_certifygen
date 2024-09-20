@@ -189,3 +189,5 @@ $string['removefilters'] = 'Remove filters';
 $string['nopermissiontorevokecerts'] = 'You do not have permissions to revoke a certificate';
 $string['certifygen:canemitotherscertificates'] = 'You can issue certificates to other users';
 $string['certifygen:reemitcertificates'] = 'You can reissue certificates';
+$string['lang_not_exists'] = 'Language not installed {$a->lang}';
+$string['coursenotexists'] = 'Course not exists';

@@ -89,6 +89,12 @@ class getcoursesnames_external extends external_api {
                     'link' => $url->out(),
                 ];
             } catch (moodle_exception $e) {
+                $list[] = [
+                        'id' => $courseid,
+                        'shortname' => '-',
+                        'fullname' => get_string('coursenotexists', 'mod_certifygen'),
+                        'link' => '-',
+                ];
                 continue;
             }
         }

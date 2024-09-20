@@ -138,8 +138,9 @@ class emitcertificate_external extends external_api {
                 return $result;
             }
         }
-        $validation = certifygen_validations::manage_validation($id, (object) $data);
+        $validation = null;
         try {
+            $validation = certifygen_validations::manage_validation($id, (object) $data);
             // Step 2: Generate issue.
             $users = user_get_users_by_id([$userid]);
             $user = reset($users);
@@ -228,11 +229,17 @@ class emitcertificate_external extends external_api {
             debugging(__FUNCTION__ . ' ' . ' error: ' . $e->getMessage());
             $result['result'] = false;
             $result['message'] = $e->getMessage();
-            $validation->set('status', certifygen_validations::STATUS_ERROR);
-            $validation->save();
+            $id = 0;
+            $status = '';
+            if (!is_null($validation)) {
+                $validation->set('status', certifygen_validations::STATUS_ERROR);
+                $validation->save();
+                $id = $validation->get('id');
+                $status = $validation->get('status');
+            }
             $data = [
-                'validationid' => $validation->get('id'),
-                'status' => $validation->get('status'),
+                'validationid' => $id,
+                'status' => $status,
                 'code' => $e->getCode(),
                 'message' => $result['message'],
                 'usermodified' => $USER->id,

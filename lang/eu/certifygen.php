@@ -189,3 +189,5 @@ $string['removefilters'] = 'Ezabatu iragazkiak';
 $string['nopermissiontorevokecerts'] = 'Ez duzu ziurtagiria baliogabetzeko baimenik';
 $string['certifygen:canemitotherscertificates'] = 'Beste erabiltzaileen ziurtagiriak jaulki ditzake';
 $string['certifygen:reemitcertificates'] = 'Ziurtagiriak berriz jaulki ditzake';
+$string['lang_not_exists'] = 'Hizkuntza hau ez dago instalatuta, {$a->lang}';
+$string['coursenotexists'] = 'Ikastaroa ez da existitzen';
