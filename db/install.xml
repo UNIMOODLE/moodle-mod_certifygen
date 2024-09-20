@@ -19,6 +19,8 @@
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for certifygen"/>
                 <KEY NAME="fk_model" TYPE="foreign" FIELDS="modelid" REFTABLE="certifygen_model" REFFIELDS="id"/>
+                <KEY NAME="fk_course" TYPE="foreign" FIELDS="course" REFTABLE="course" REFFIELDS="id"/>
+                <KEY NAME="fk_usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
         <TABLE NAME="certifygen_model" COMMENT="Stores each certifygen models">
@@ -41,6 +43,7 @@
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for certifygen_template"/>
                 <KEY NAME="fk_templateid" TYPE="foreign" FIELDS="templateid" REFTABLE="tool_certificate_templates" REFFIELDS="id"/>
+                <KEY NAME="fk_usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
         <TABLE NAME="certifygen_context" COMMENT="Stores each context of a certifygen">
@@ -56,6 +59,7 @@
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for certifygen_context"/>
                 <KEY NAME="fk_model" TYPE="foreign" FIELDS="modelid" REFTABLE="certifygen_model" REFFIELDS="id"/>
+                <KEY NAME="fk_usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
         <TABLE NAME="certifygen_validations" COMMENT="Stores each student request of a certifygen certification">
@@ -77,6 +81,10 @@
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for certifygen_context"/>
                 <KEY NAME="fk_model" TYPE="foreign" FIELDS="modelid" REFTABLE="certifygen_model" REFFIELDS="id"/>
+                <KEY NAME="fk_certifygenid" TYPE="foreign" FIELDS="certifygenid" REFTABLE="certifygen" REFFIELDS="id"/>
+                <KEY NAME="fk_userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+                <KEY NAME="fk_issueid" TYPE="foreign" FIELDS="issueid" REFTABLE="tool_certificate_issues" REFFIELDS="id"/>
+                <KEY NAME="fk_usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
         <TABLE NAME="certifygen_repository" COMMENT="Stores certificate url">
@@ -92,6 +100,9 @@
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for certifygen_template"/>
+                <KEY NAME="fk_validationid" TYPE="foreign" FIELDS="validationid" REFTABLE="certifygen_validations" REFFIELDS="id"/>
+                <KEY NAME="fk_userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+                <KEY NAME="fk_usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
         <TABLE NAME="certifygen_error" COMMENT="Stores certificate errors">
@@ -107,6 +118,8 @@
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for certifygen_template"/>
+                <KEY NAME="fk_validationid" TYPE="foreign" FIELDS="validationid" REFTABLE="certifygen_validations" REFFIELDS="id"/>
+                <KEY NAME="fk_usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
     </TABLES>

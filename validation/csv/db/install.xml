@@ -15,6 +15,8 @@
         </FIELDS>
         <KEYS>
           <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+          <KEY NAME="fk_validationid" TYPE="foreign" FIELDS="validationid" REFTABLE="certifygen_validations" REFFIELDS="id"/>
+          <KEY NAME="fk_usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
         </KEYS>
       </TABLE>
     </TABLES>
