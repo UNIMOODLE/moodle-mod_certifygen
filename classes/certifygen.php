@@ -655,7 +655,7 @@ class certifygen {
             $wheresql = ' WHERE ' . $where;
         }
 
-        $sql = "SELECT ce.id, ce.`status`, ce.code AS errorcode, ce.message AS errormessage, ce.timecreated,
+        $sql = "SELECT ce.id, ce.status, ce.code AS errorcode, ce.message AS errormessage, ce.timecreated,
                         ce.validationid, cv.name AS teacherreportname, c.name AS activityname,cm.validation AS modelvalidation,
                         cm.report AS modelreport, cm.repository AS modelrepository,cm.type AS modeltype, cm.name as modelname,
                         u.id as userid, u.picture, u.firstname, u.lastname, u.firstnamephonetic, u.lastnamephonetic,
