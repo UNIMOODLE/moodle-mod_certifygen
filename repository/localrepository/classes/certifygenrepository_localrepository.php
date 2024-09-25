@@ -123,7 +123,7 @@ class certifygenrepository_localrepository implements ICertificateRepository {
     public function save_file(stored_file $file): array {
         $result = [
             'result' => true,
-            'message' => 'ok',
+            'message' => get_string('ok', 'mod_certifygen'),
             'haserror' => false,
         ];
 

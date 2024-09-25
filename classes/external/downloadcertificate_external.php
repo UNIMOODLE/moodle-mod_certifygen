@@ -96,7 +96,7 @@ class downloadcertificate_external extends external_api {
                 'modelid' => $modelid, 'code' => $code, 'courseid' => $courseid]
         );
         global $USER;
-        $result = ['result' => true, 'message' => 'OK', 'url' => ''];
+        $result = ['result' => true, 'message' => get_string('ok', 'mod_certifygen'), 'url' => ''];
 
         try {
             // Step 1: verified status finished.
@@ -112,10 +112,18 @@ class downloadcertificate_external extends external_api {
                 return $result;
             }
             if (is_null($validation)) {
-                return ['result' => false, 'message' => 'notfound', 'url' => ''];
+                return [
+                    'result' => false,
+                    'message' => get_string('validationnotfound', 'mod_certifygen'),
+                    'url' => '',
+                ];
             }
             if ($validation->get('status') != certifygen_validations::STATUS_FINISHED) {
-                return ['result' => false, 'message' => 'statusnotfinished', 'url' => ''];
+                return [
+                    'result' => false,
+                    'message' => get_string('statusnotfinished', 'mod_certifygen'),
+                    'url' => '',
+                ];
             }
             // Step 2: call to getfile from repositoryplugin.
             $certifygenmodel = new certifygen_model($validation->get('modelid'));
@@ -127,14 +135,14 @@ class downloadcertificate_external extends external_api {
                 $result['url'] = $subplugin->get_file_url($validation);
                 if (empty($result['url'])) {
                     $result['result'] = false;
-                    $result['message'] = 'empty_url';
+                    $result['message'] = get_string('empty_repository_url', 'mod_certifygen');
                 } else {
                     // Triger event.
                     certificate_downloaded::create_from_validation($validation)->trigger();
                 }
             } else {
                 $result['result'] = false;
-                $result['message'] = 'plugin_not_enabled';
+                $result['message'] = get_string('repository_plugin_not_enabled', 'mod_certifygen');
             }
         } catch (moodle_exception $e) {
             $result['result'] = false;

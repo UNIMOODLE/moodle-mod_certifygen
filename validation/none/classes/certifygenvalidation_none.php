@@ -81,7 +81,7 @@ class certifygenvalidation_none implements ICertificateValidation {
             $validation->set('status', certifygen_validations::STATUS_IN_PROGRESS);
             return [
                 'haserror' => false,
-                'message' => 'ok',
+                'message' => get_string('ok', 'mod_certifygen'),
                 'newfile' => $newfile,
             ];
         } catch (moodle_exception $e) {

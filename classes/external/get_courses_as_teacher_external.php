@@ -113,7 +113,7 @@ class get_courses_as_teacher_external extends external_api {
                 unset($results['courses']);
                 unset($results['teacher']);
                 $results['error']['code'] = 'user_not_found';
-                $results['error']['message'] = 'User not found';
+                $results['error']['message'] = get_string('user_not_found', 'mod_certifygen');
                 return $results;
             }
             $results['teacher'] = [
@@ -127,7 +127,7 @@ class get_courses_as_teacher_external extends external_api {
                 unset($results['courses']);
                 unset($results['teacher']);
                 $results['error']['code'] = 'lang_not_found';
-                $results['error']['message'] = 'Lang not found on platform';
+                $results['error']['message'] = get_string('lang_not_found', 'mod_certifygen');
                 return $results;
             }
             // Filter to return course names in $lang language.

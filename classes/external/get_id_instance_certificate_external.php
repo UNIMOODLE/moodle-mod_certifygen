@@ -110,14 +110,14 @@ class get_id_instance_certificate_external extends external_api {
             $user = user_get_users_by_id([$userid]);
             if (empty($user)) {
                 $results['error']['code'] = 'user_not_found';
-                $results['error']['message'] = 'User not found';
+                $results['error']['message'] = get_string('user_not_found', 'mod_certifygen');
                 return $results;
             }
             // Lang exists.
             $langstrings = get_string_manager()->get_list_of_translations();
             if (!empty($lang) && !in_array($lang, array_keys($langstrings))) {
                 $results['error']['code'] = 'lang_not_found';
-                $results['error']['message'] = 'Lang not found on platform';
+                $results['error']['message'] = get_string('lang_not_found', 'mod_certifygen');
                 return $results;
             }
 

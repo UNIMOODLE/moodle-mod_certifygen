@@ -101,7 +101,7 @@ class change_status_external extends external_api {
             $users = user_get_users_by_id([$userid]);
             if (empty($users)) {
                 $results['error']['code'] = 'user_not_found';
-                $results['error']['message'] = 'User not found';
+                $results['error']['message'] = get_string('user_not_found', 'mod_certifygen');
                 return $results;
             }
             // Request exists.

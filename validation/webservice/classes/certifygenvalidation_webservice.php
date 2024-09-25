@@ -67,7 +67,7 @@ class certifygenvalidation_webservice implements ICertificateValidation {
             $validation->set('status', certifygen_validations::STATUS_IN_PROGRESS);
             return [
                 'haserror' => false,
-                'message' => 'ok',
+                'message' => get_string('ok', 'mod_certifygen'),
             ];
         } catch (moodle_exception $e) {
             return [
@@ -84,7 +84,7 @@ class certifygenvalidation_webservice implements ICertificateValidation {
      * @return array
      */
     public function get_file(int $courseid, int $validationid): array {
-        $result = ['error' => [], 'message' => 'ok'];
+        $result = ['error' => [], 'message' => get_string('ok', 'mod_certifygen')];
         try {
             $validation = new certifygen_validations($validationid);
             $code = certifygen_validations::get_certificate_code($validation);

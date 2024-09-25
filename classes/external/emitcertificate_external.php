@@ -134,7 +134,7 @@ class emitcertificate_external extends external_api {
                 && $validation->get('status') != certifygen_validations::STATUS_ERROR
             ) {
                 $result['result'] = false;
-                $result['message'] = 'Certificate can not be emitted again';
+                $result['message'] = get_string('cannotreemit', 'mod_certifygen');
                 return $result;
             }
         }
@@ -184,7 +184,7 @@ class emitcertificate_external extends external_api {
             );
             if (is_null($file)) {
                 $result['result'] = false;
-                $result['message'] = 'File not found';
+                $result['message'] = get_string('file_not_found', 'mod_certifygen');
                 $validation->set('status', certifygen_validations::STATUS_STUDENT_ERROR);
                 $validation->save();
                 $data = [

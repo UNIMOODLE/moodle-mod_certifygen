@@ -123,7 +123,7 @@ class checkfile extends scheduled_task {
                                         'validationid' => $validation->get('id'),
                                         'status' => certifygen_validations::STATUS_STORAGE_ERROR,
                                         'code' => 'empty_repository_url',
-                                        'message' => 'getFileUrl returns empty url',
+                                        'message' => get_string('empty_repository_url', 'mod_certifygen'),
                                         'usermodified' => $USER->id,
                                     ];
                                     certifygen_error::manage_certifygen_error(0, (object)$data);
@@ -138,8 +138,8 @@ class checkfile extends scheduled_task {
                             $data = [
                                 'validationid' => $validation->get('id'),
                                 'status' => certifygen_validations::STATUS_STORAGE_ERROR,
-                                'code' => 'saveFile_returns_error',
-                                'message' => 'saveFile returns error',
+                                'code' => 'savefile_returns_error',
+                                'message' => get_string('savefile_returns_error', 'mod_certifygen'),
                                 'usermodified' => $USER->id,
                             ];
                             certifygen_error::manage_certifygen_error(0, (object)$data);
@@ -150,8 +150,8 @@ class checkfile extends scheduled_task {
                         $data = [
                             'validationid' => $validation->get('id'),
                             'status' => certifygen_validations::STATUS_STORAGE_ERROR,
-                            'code' => 'validation_plugin_not_enabled',
-                            'message' => 'Certificate repository plugin is not enabled',
+                            'code' => 'repository_plugin_not_enabled',
+                            'message' => get_string('repository_plugin_not_enabled', 'mod_certifygen'),
                             'usermodified' => $USER->id,
                         ];
                         certifygen_error::manage_certifygen_error(0, (object)$data);
@@ -162,8 +162,8 @@ class checkfile extends scheduled_task {
                     $data = [
                         'validationid' => $validation->get('id'),
                         'status' => certifygen_validations::STATUS_STORAGE_ERROR,
-                        'code' => 'getFile_not_file_parameter',
-                        'message' => 'getFile does not return file parameter',
+                        'code' => 'getfile_missing_file_parameter',
+                        'message' => get_string('getfile_missing_file_parameter', 'mod_certifygen'),
                         'usermodified' => $USER->id,
                     ];
                     certifygen_error::manage_certifygen_error(0, (object)$data);

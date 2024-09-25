@@ -108,7 +108,7 @@ class deleteteacherrequest_external extends external_api {
                     }
                 } else {
                     $result['result'] = false;
-                    $result['message'] = 'plugin_not_enabled';
+                    $result['message'] = get_string('validationplugin_not_enabled', 'mod_certifygen');
                 }
             }
             if ($candelete) {

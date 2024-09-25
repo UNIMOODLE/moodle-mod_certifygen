@@ -115,7 +115,7 @@ class get_pdf_certificate_external extends external_api {
             $user = user_get_users_by_id([$params['userid']]);
             if (empty($user)) {
                 $result['error']['code'] = 'user_not_found';
-                $result['error']['message'] = 'User not found';
+                $result['error']['message'] = get_string('user_not_found', 'mod_certifygen');
                 return $result;
             }
             // Activity exists?.
@@ -125,7 +125,11 @@ class get_pdf_certificate_external extends external_api {
             $context = context_course::instance($certifygen->get('course'));
             if (has_capability('moodle/course:managegroups', $context, $userid)) {
                 $result['error']['code'] = 'user_not_enrolled_on_idinstance_course_as_student';
-                $result['error']['message'] = 'User not enrolled on idinstance course as student';
+                $result['error']['message'] = get_string(
+                    'student_not_enrolled',
+                    'mod_certifygen',
+                    $certifygen->get('course')
+                );
                 return $result;
             }
 
@@ -164,18 +168,17 @@ class get_pdf_certificate_external extends external_api {
                     $filecontent = base64_encode($filecontent);
                     if (empty($filecontent)) {
                         $result['error']['code'] = 'file_url_empty';
-                        $result['error']['message'] = 'file_url_empty';
+                        $result['error']['message'] = get_string('empty_repository_url', 'mod_certifygen');
                         return $result;
                     }
                 } else {
                     $result['error']['code'] = 'validation_plugin_not_enabled';
-                    $result['error']['message'] = 'Certificate validation plugin is not enabled';
+                    $result['error']['message'] = get_string('validationplugin_not_enabled', 'mod_certifygen');
                     return $result;
                 }
             } else {
                 $result['error']['code'] = 'status_not_finished';
-                $result['error']['message'] = 'File is not ready - status: '
-                        . get_string('status_' . $validation->get('status'), 'mod_certifygen');
+                $result['error']['message'] = get_string('statusnotfinished', 'mod_certifygen');
                 return $result;
             }
         } catch (moodle_exception $e) {

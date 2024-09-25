@@ -120,7 +120,7 @@ class emitteacherrequest_external extends external_api {
             $reportplugin = $certifygenmodel->get('report');
             if (empty($reportplugin)) {
                 $result['result'] = false;
-                $result['message'] = 'report plugin must be set on the model';
+                $result['message'] = get_string('missingreportonmodel', 'mod_certifygen');
                 return $result;
             }
             // Step 2: Create certificate file.
@@ -184,6 +184,7 @@ class emitteacherrequest_external extends external_api {
     }
 
     /**
+     * Get courses information
      * @param array $ids
      * @return array
      * @throws dml_exception

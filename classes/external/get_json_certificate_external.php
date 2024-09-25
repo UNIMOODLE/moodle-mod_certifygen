@@ -127,7 +127,7 @@ class get_json_certificate_external extends external_api {
             if (empty($user)) {
                 unset($result['json']);
                 $result['error']['code'] = 'user_not_found';
-                $result['error']['message'] = 'User not found';
+                $result['error']['message'] = get_string('user_not_found', 'mod_certifygen');
                 return $result;
             }
             // Activity exists?
@@ -137,8 +137,12 @@ class get_json_certificate_external extends external_api {
             $context = context_course::instance($certifygen->get('course'));
             if (has_capability('moodle/course:managegroups', $context, $userid)) {
                 unset($result['json']);
-                $result['error']['code'] = 'user_not_enrolled_on_idinstance_course_as_student';
-                $result['error']['message'] = 'User not enrolled on idinstance course as student';
+                $result['error']['code'] = 'student_not_enrolled';
+                $result['error']['message'] = get_string(
+                    'student_not_enrolled',
+                    'mod_certifygen',
+                    $certifygen->get('course')
+                );
                 return $result;
             }
 
@@ -176,7 +180,7 @@ class get_json_certificate_external extends external_api {
             if (is_null($issue)) {
                 $haserror = true;
                 $result['error']['code'] = 'issue_not_found';
-                $result['error']['message'] = 'Issue not found';
+                $result['error']['message'] = get_string('issue_not_found', 'mod_certifygen');
             } else {
                 // Filter multilang course name.
                 // Filter to return course names in $lang language.

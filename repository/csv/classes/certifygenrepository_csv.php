@@ -90,7 +90,7 @@ class certifygenrepository_csv implements ICertificateRepository {
         return [
                 'result' => true,
                 'haserror' => false,
-                'message' => 'ok',
+                'message' => get_string('ok', 'mod_certifygen'),
         ];
     }
 

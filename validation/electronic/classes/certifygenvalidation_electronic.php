@@ -177,7 +177,7 @@ class certifygenvalidation_electronic implements ICertificateValidation {
      */
     public function send_file(certifygen_file $file): array {
         $haserror = false;
-        $message = 'ok';
+        $message = get_string('ok', 'mod_certifygen');
         try {
             $fs = get_file_storage();
             $context = context_system::instance();
@@ -227,7 +227,7 @@ class certifygenvalidation_electronic implements ICertificateValidation {
      * @return array
      */
     public function get_file(int $courseid, int $validationid): array {
-        $result = ['error' => [], 'message' => 'ok'];
+        $result = ['error' => [], 'message' => get_string('ok', 'mod_certifygen')];
         try {
             $validation = new certifygen_validations($validationid);
             $code = certifygen_validations::get_certificate_code($validation);

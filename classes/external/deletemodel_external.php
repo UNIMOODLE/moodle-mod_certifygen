@@ -81,7 +81,7 @@ class deletemodel_external extends external_api {
             ['id' => $id]
         );
         $context = context_system::instance();
-        $result = ['result' => true, 'message' => 'OK'];
+        $result = ['result' => true, 'message' => get_string('ok', 'mod_certifygen')];
         try {
             if (!has_capability('mod/certifygen:manage', $context)) {
                 return ['result' => false, 'message' => get_string('nopermissiondeletemodel', 'mod_certifygen')];

@@ -43,3 +43,6 @@ $string['originalfilespath'] = 'Ruta d\'Arxius Originals';
 $string['originalfilespath_help'] = 'Ruta al servidor per allotjar els certificats originals';
 $string['validatedfilespath'] = 'Ruta d\'Arxius Validats';
 $string['validatedfilespath_help'] = 'Ruta al servidor per allotjar els certificats validats';
+$string['temp_file_not_exists'] = 'temp_file_not_exists';
+$string['missing_directory_permissions'] = 'missing_directory_permissions';
+$string['error_cmd_code'] = 'Error ejecutando el comando. Código de salida: {$a}';

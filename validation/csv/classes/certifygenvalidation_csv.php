@@ -143,7 +143,7 @@ class certifygenvalidation_csv implements ICertificateValidation {
 
             return [
                 'haserror' => false,
-                'message' => 'ok',
+                'message' => get_string('ok', 'mod_certifygen'),
             ];
         } catch (\Exception $e) {
             return [

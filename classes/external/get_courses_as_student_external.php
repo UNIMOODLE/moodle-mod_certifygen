@@ -115,7 +115,7 @@ class get_courses_as_student_external extends external_api {
                 unset($results['courses']);
                 unset($results['student']);
                 $results['error']['code'] = 'user_not_found';
-                $results['error']['message'] = 'User not found';
+                $results['error']['message'] = get_string('user_not_found', 'mod_certifygen');
                 return $results;
             }
             $results['student'] = [
@@ -127,7 +127,7 @@ class get_courses_as_student_external extends external_api {
             $langstrings = get_string_manager()->get_list_of_translations();
             if (!empty($lang) && !in_array($lang, array_keys($langstrings))) {
                 $results['error']['code'] = 'lang_not_found';
-                $results['error']['message'] = 'Lang not found on platform';
+                $results['error']['message'] = get_string('lang_not_found', 'mod_certifygen');
                 return $results;
             }
             // Filter to return course names in $lang language.

@@ -77,7 +77,7 @@ class certifygenrepository_onedrive implements ICertificateRepository {
         $result = [
             'result' => true,
             'haserror' => false,
-            'message' => 'ok',
+            'message' => get_string('ok', 'mod_certifygen'),
         ];
 
         try {

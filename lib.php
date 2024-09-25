@@ -456,14 +456,14 @@ function mod_certifygen_validate_user_parameters_for_ws(int $userid, string $use
 
     if (empty($userid) && empty($userfield)) {
         $results['error']['code'] = 'user_not_sent';
-        $results['error']['message'] = 'userid or userfield must be filled';
+        $results['error']['message'] = get_string('user_not_sent', 'mod_certifygen');
         return $results;
     }
     if (!empty($userfield)) {
         $fieldid = get_config('mod_certifygen', 'userfield');
         if (empty($fieldid)) {
             $results['error']['code'] = 'userfield_not_selected';
-            $results['error']['message'] = 'There is no user field selected on the platform.';
+            $results['error']['message'] = get_string('userfield_not_selected', 'mod_certifygen');
             return $results;
         }
         if ($fieldid === 'username') {
@@ -483,16 +483,16 @@ function mod_certifygen_validate_user_parameters_for_ws(int $userid, string $use
             $id = $DB->get_field_select('user_info_data', 'userid', $select, $params);
         } else {
             $results['error']['code'] = 'userfield_not_valid';
-            $results['error']['message'] = 'There is not valid user field selected on the platform.';
+            $results['error']['message'] = get_string('userfield_not_valid', 'mod_certifygen');
             return $results;
         }
         if (!$id) {
             $results['error']['code'] = 'user_not_found';
-            $results['error']['message'] = 'User not found by userfield parameter';
+            $results['error']['message'] = get_string('user_not_found', 'mod_certifygen');
             return $results;
         } else if (!empty($userid) && !empty($userfield) && $id != $userid) {
             $results['error']['code'] = 'userfield_and_userid_sent';
-            $results['error']['message'] = 'It is necessary to sent only one parameter.';
+            $results['error']['message'] = get_string('userfield_and_userid_sent', 'mod_certifygen');
             return $results;
         } else {
             $results['userid'] = $id;

@@ -520,16 +520,14 @@ class certifygen {
             $subplugin = new $validationpluginclass();
             $response = $subplugin->send_file($certifygenfile);
             if ($response['haserror']) {
-                if (!array_key_exists('message', $response)) {
-                    $result['message'] = 'validation_plugin_send_file_error';
-                }
+                $result['message'] = $response['message'];
                 $validation->set('status', certifygen_validations::STATUS_VALIDATION_ERROR);
                 $validation->save();
                 $data = [
                     'validationid' => $validation->get('id'),
                     'status' => $validation->get('status'),
                     'code' => 'validation_plugin_send_file_error',
-                    'message' => 'validation_plugin_send_file_error',
+                    'message' => $response['message'],
                     'usermodified' => $USER->id,
                 ];
                 certifygen_error::manage_certifygen_error(0, (object)$data);
@@ -539,14 +537,14 @@ class certifygen {
             }
         } else {
             $result['result'] = false;
-            $result['message'] = 'validationplugin_not_enabled';
+            $result['message'] = get_string('validationplugin_not_enabled', 'mod_certifygen');
             $validation->set('status', certifygen_validations::STATUS_VALIDATION_ERROR);
             $validation->save();
             $data = [
                 'validationid' => $validation->get('id'),
                 'status' => $validation->get('status'),
                 'code' => 'validationplugin_not_enabled',
-                'message' => 'validationplugin_not_enabled',
+                'message' => $result['message'],
                 'usermodified' => $USER->id,
             ];
             certifygen_error::manage_certifygen_error(0, (object)$data);

@@ -79,14 +79,14 @@ class certifygenvalidation_cmd implements ICertificateValidation {
         if (!file_exists($tempfile)) {
             return [
                 'haserror' => true,
-                'message' => 'temp_file_not_exists',
+                'message' => get_string('temp_file_not_exists', 'certifygenvalidation_cmd'),
             ];
         }
         $copied = copy($tempfile, $originalfilename);
         if (!$copied) {
             return [
                 'haserror' => true,
-                'message' => 'missing directory permissions',
+                'message' => get_string('missing_directory_permissions', 'certifygenvalidation_cmd'),
             ];
         }
 
@@ -106,7 +106,7 @@ class certifygenvalidation_cmd implements ICertificateValidation {
         // Muestra la salida del comando.
         if ($returnvar !== 0) {
             $haserror = true;
-            $message = " Error ejecutando el comando. Código de salida: " . $returnvar;
+            $message = get_string('error_cmd_code', 'certifygenvalidation_cmd', $returnvar);
         } else {
             if (!empty($output)) {
                 try {
@@ -182,7 +182,7 @@ class certifygenvalidation_cmd implements ICertificateValidation {
      * @return array
      */
     public function get_file(int $courseid, int $validationid): array {
-        $result = ['error' => [], 'message' => 'ok'];
+        $result = ['error' => [], 'message' => get_string('ok', 'mod_certifygen')];
         try {
             $validation = new certifygen_validations($validationid);
             $code = certifygen_validations::get_certificate_code($validation);

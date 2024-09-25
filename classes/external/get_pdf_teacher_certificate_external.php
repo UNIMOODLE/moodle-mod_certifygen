@@ -118,7 +118,7 @@ class get_pdf_teacher_certificate_external extends external_api {
             $user = user_get_users_by_id([$params['userid']]);
             if (empty($user)) {
                 $result['error']['code'] = 'user_not_found';
-                $result['error']['message'] = 'User not found';
+                $result['error']['message'] = get_string('user_not_found', 'mod_certifygen');
                 return $result;
             }
 
@@ -128,7 +128,7 @@ class get_pdf_teacher_certificate_external extends external_api {
                 $context = context_course::instance($course);
                 if (!has_capability('moodle/course:managegroups', $context, $userid)) {
                     $result['error']['code'] = 'user_not_enrolled_as_teacher';
-                    $result['error']['message'] = 'User not enrolled on course id=' . $course . ', as teacher';
+                    $result['error']['message'] = get_string('teacher_not_enrolled', 'mod_certifygen', $course);
                     return $result;
                 }
             }
@@ -136,14 +136,14 @@ class get_pdf_teacher_certificate_external extends external_api {
             $certifygenmodel = new certifygen_model($modelid);
             if ($certifygenmodel->get('type') == certifygen_model::TYPE_ACTIVITY) {
                 $result['error']['code'] = 'model_type_assigned_to_activity';
-                $result['error']['message'] = 'This model is assigned for activities.';
+                $result['error']['message'] = get_string('model_type_assigned_to_activity', 'mod_certifygen');
                 return $result;
             }
             // Check certificate report.
             $reportplugin = $certifygenmodel->get('report');
             if (empty($reportplugin)) {
-                $result['error']['code'] = 'no_reportplugin_set';
-                $result['error']['message'] = 'This model has no report plugin set';
+                $result['error']['code'] = 'missingreportonmodel';
+                $result['error']['message'] = get_string('missingreportonmodel', 'mod_certifygen');
                 return $result;
             }
             // Check if request exists.
@@ -185,18 +185,18 @@ class get_pdf_teacher_certificate_external extends external_api {
                     $filecontent = $subplugin->get_file_content($trequest);
                     $filecontent = base64_encode($filecontent);
                     if (empty($filecontent)) {
-                        $result['error']['code'] = 'file_url_empty';
-                        $result['error']['message'] = 'file_url_empty';
+                        $result['error']['code'] = 'empty_repository_url';
+                        $result['error']['message'] = get_string('empty_repository_url', 'mod_certifygen');
                         return $result;
                     }
                 } else {
-                    $result['error']['code'] = 'validation_plugin_not_enabled';
-                    $result['error']['message'] = 'Certificate validation plugin is not enabled';
+                    $result['error']['code'] = 'repository_plugin_not_enabled';
+                    $result['error']['message'] = get_string('repository_plugin_not_enabled', 'mod_certifygen');
                     return $result;
                 }
             } else {
                 $result['error']['code'] = 'certificate_not_ready';
-                $result['error']['message'] = 'Certificate validation status is: ' . $trequest->get('status');
+                $result['error']['message'] = get_string('certificate_not_ready', 'mod_certifygen', $trequest->get('status'));
                 return $result;
             }
         } catch (moodle_exception $e) {
