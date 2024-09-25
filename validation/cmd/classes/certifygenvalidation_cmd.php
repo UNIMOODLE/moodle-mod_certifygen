@@ -225,7 +225,12 @@ class certifygenvalidation_cmd implements ICertificateValidation {
     public function is_enabled(): bool {
         $enabled = (int) get_config('certifygenvalidation_cmd', 'enabled');
         $pathenabled = get_config('certifygenvalidation_cmd', 'path');
-        if ($enabled && !empty($pathenabled)) {
+        $path = get_config('certifygenvalidation_cmd', 'path');
+        $pathexists = false;
+        if (!empty($path) && file_exists($path)) {
+            $pathexists = true;
+        }
+        if ($enabled && !empty($pathenabled) && $pathexists) {
             return true;
         }
         return false;

@@ -43,3 +43,4 @@ $string['originalfilespath'] = 'Ruta de Archivos Originales';
 $string['originalfilespath_help'] = 'Ruta en el servidor para almacenar los certificados originales';
 $string['validatedfilespath'] = 'Ruta de Archivos Validados';
 $string['validatedfilespath_help'] = 'Ruta en el servidor para almacenar los certificados validados';
+$string['path_not_exists'] = 'La ruta no existe';

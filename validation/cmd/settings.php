@@ -51,13 +51,21 @@ if ($ADMIN->fulltree) {
         new lang_string('enable_help', 'certifygenvalidation_cmd'),
         0
     ));
-
+    // Validate if path exists.
+    $path = get_config('certifygenvalidation_cmd', 'path');
+    $description = new lang_string('path_help', 'certifygenvalidation_cmd');
+    if (!empty($path) && !file_exists($path)) {
+        $description = '<span class="alert alert-warning">'
+                . get_string('path_not_exists', 'certifygenvalidation_cmd')
+                . '</span>';
+    }
     $settings->add(new admin_setting_configtext(
         'certifygenvalidation_cmd/path',
         new lang_string('path', 'certifygenvalidation_cmd'),
-        new lang_string('path_help', 'certifygenvalidation_cmd'),
+        $description,
         ""
     ));
+
 
     $settings->add(new admin_setting_configtext(
         'certifygenvalidation_cmd/originalfilespath',

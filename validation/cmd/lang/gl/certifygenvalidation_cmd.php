@@ -43,3 +43,4 @@ $string['originalfilespath'] = 'Camiño dos Arquivos Originais';
 $string['originalfilespath_help'] = 'Camiño no servidor para almacenar os certificados orixinais';
 $string['validatedfilespath'] = 'Camiño dos Arquivos Validados';
 $string['validatedfilespath_help'] = 'Camiño no servidor para almacenar os certificados validados';
+$string['path_not_exists'] = 'O camiño non existe';

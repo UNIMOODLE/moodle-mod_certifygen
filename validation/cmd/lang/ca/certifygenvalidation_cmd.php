@@ -46,3 +46,4 @@ $string['validatedfilespath_help'] = 'Ruta al servidor per allotjar els certific
 $string['temp_file_not_exists'] = 'temp_file_not_exists';
 $string['missing_directory_permissions'] = 'missing_directory_permissions';
 $string['error_cmd_code'] = 'Error ejecutando el comando. Código de salida: {$a}';
+$string['path_not_exists'] = 'El camí no existeix';
