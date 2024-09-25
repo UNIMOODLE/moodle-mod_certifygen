@@ -85,7 +85,7 @@ class certifygenrepository_onedrive implements ICertificateRepository {
             $onedrivepath = 'root';
             $reportname = $file->get_filename();
             // It is needed to have the file in a known path to upload it to onedrive.
-            $completefilepath = $CFG->dirroot . '/mod/certifygen/repository/onedrive/tempfiles/' . $reportname;
+            $completefilepath = $CFG->dataroot . '/temp/' . $reportname;
             $file->copy_content_to($completefilepath);
             // Upload file to onedrive.
             $id = $connection->upload_file($onedrivepath, $reportname, $completefilepath);
@@ -102,8 +102,6 @@ class certifygenrepository_onedrive implements ICertificateRepository {
             ];
             $userfile = new certifygen_repository(0, (object)$data);
             $userfile->create();
-            // Delete temp file.
-            unlink($completefilepath);
             $file->delete();
         } catch (moodle_exception $e) {
             $result['result'] = false;

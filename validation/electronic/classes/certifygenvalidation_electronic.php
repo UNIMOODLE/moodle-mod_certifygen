@@ -49,7 +49,7 @@ global $CFG;
 require_once($CFG->dirroot . '/lib/tcpdf/tcpdf.php');
 require_once($CFG->dirroot . '/mod/assign/feedback/editpdf/fpdi/autoload.php');
 /**
- * ELECTRONIC
+ * Certifygen Validation Electronic
  * @package   certifygenvalidation_electronic
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -57,9 +57,6 @@ require_once($CFG->dirroot . '/mod/assign/feedback/editpdf/fpdi/autoload.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class certifygenvalidation_electronic implements ICertificateValidation {
-    /** @var string CERTIFYGENVALIDATION_ELECTRONIC_TEMP_DIRECTORY */
-    private const CERTIFYGENVALIDATION_ELECTRONIC_TEMP_DIRECTORY = '/mod/certifygen/validation/electronic/temp/';
-
     /**
      * add_certificate_signature
      * @param certifygen_file $file
@@ -121,7 +118,7 @@ class certifygenvalidation_electronic implements ICertificateValidation {
         // Set document signature.
         $pdf->setSignature($certificate, $certificate, 'tcpdfdemo', '', 2, $info);
         $name = $file->get_file()->get_filename();
-        $completefilepath = $CFG->dirroot . self::CERTIFYGENVALIDATION_ELECTRONIC_TEMP_DIRECTORY . $name;
+        $completefilepath = $CFG->dataroot . '/temp/' . $name;
         $file->get_file()->copy_content_to($completefilepath);
         $pages = $pdf->setSourceFile($completefilepath);
         for ($i = 0; $i < $pages; $i++) {
@@ -196,7 +193,6 @@ class certifygenvalidation_electronic implements ICertificateValidation {
             ];
             $pdfstring = $this->add_certificate_signature($file);
             $newfile = $fs->create_file_from_string($filerecord, $pdfstring);
-            $this->delete_temp_file($file->get_file()->get_filename());
         } catch (moodle_exception $exception) {
             $haserror = true;
             $message = $exception->getMessage();
@@ -210,16 +206,6 @@ class certifygenvalidation_electronic implements ICertificateValidation {
         ];
     }
 
-    /**
-     * delete_temp_file
-     * @param $name
-     * @return void
-     */
-    private function delete_temp_file($name): void {
-        global $CFG;
-        $completefilepath = $CFG->dirroot . self::CERTIFYGENVALIDATION_ELECTRONIC_TEMP_DIRECTORY . $name;
-        unlink($completefilepath);
-    }
     /**
      * getFile
      * @param int $courseid
