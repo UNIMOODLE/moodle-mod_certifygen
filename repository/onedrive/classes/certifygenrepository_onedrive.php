@@ -85,10 +85,11 @@ class certifygenrepository_onedrive implements ICertificateRepository {
             $onedrivepath = 'root';
             $reportname = $file->get_filename();
             // It is needed to have the file in a known path to upload it to onedrive.
-            $completefilepath = $CFG->dataroot . '/temp/' . $reportname;
-            $file->copy_content_to($completefilepath);
+            $tempdir = make_temp_directory('certifygen');
+            $tempfile = tempnam($tempdir, 'certifygen');
+            $file->copy_content_to($tempfile);
             // Upload file to onedrive.
-            $id = $connection->upload_file($onedrivepath, $reportname, $completefilepath);
+            $id = $connection->upload_file($onedrivepath, $reportname, $tempfile);
             $odata = ['id' => $id];
             $this->url = $connection->get_link();
             // Save on db.

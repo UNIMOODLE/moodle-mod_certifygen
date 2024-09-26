@@ -117,10 +117,11 @@ class certifygenvalidation_electronic implements ICertificateValidation {
 
         // Set document signature.
         $pdf->setSignature($certificate, $certificate, 'tcpdfdemo', '', 2, $info);
-        $name = $file->get_file()->get_filename();
-        $completefilepath = $CFG->dataroot . '/temp/' . $name;
-        $file->get_file()->copy_content_to($completefilepath);
-        $pages = $pdf->setSourceFile($completefilepath);
+        // Temporary file.
+        $tempdir = make_temp_directory('certifygen');
+        $tempfile = tempnam($tempdir, 'certifygen');
+        $file->get_file()->copy_content_to($tempfile);
+        $pages = $pdf->setSourceFile($tempfile);
         for ($i = 0; $i < $pages; $i++) {
             // Set font.
             $pdf->SetFont('helvetica', '', 12);
