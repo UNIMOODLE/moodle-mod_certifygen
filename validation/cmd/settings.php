@@ -59,7 +59,7 @@ if ($ADMIN->fulltree) {
                 . get_string('path_not_exists', 'certifygenvalidation_cmd')
                 . '</span>';
     }
-    $settings->add(new admin_setting_configtext(
+    $settings->add(new admin_setting_configexecutable(
         'certifygenvalidation_cmd/path',
         new lang_string('path', 'certifygenvalidation_cmd'),
         $description,
