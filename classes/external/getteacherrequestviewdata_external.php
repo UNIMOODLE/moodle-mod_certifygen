@@ -95,6 +95,7 @@ class getteacherrequestviewdata_external extends external_api {
                 'table' => new external_value(PARAM_RAW, 'table data'),
                 'title' => new external_value(PARAM_RAW, 'title', VALUE_OPTIONAL),
                 'mycertificates' => new external_value(PARAM_BOOL, 'table data', VALUE_OPTIONAL),
+                'cancreaterequest' => new external_value(PARAM_BOOL, 'cancreaterequest', VALUE_OPTIONAL),
             ]
         );
     }

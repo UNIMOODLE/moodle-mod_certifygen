@@ -93,7 +93,12 @@ class deleteteacherrequest_external extends external_api {
             }
             $model = new certifygen_model($request->get('modelid'));
             $validationplugin = $model->get('validation');
-            if (!empty($validationplugin) && $request->get('status') != certifygen_validations::STATUS_NOT_STARTED) {
+            if (
+                    $request->get('status') != certifygen_validations::STATUS_NOT_STARTED
+                    && $request->get('status') == certifygen_validations::STATUS_IN_PROGRESS
+                    && $request->get('status') == certifygen_validations::STATUS_VALIDATION_ERROR
+                    && $request->get('status') == certifygen_validations::STATUS_TEACHER_ERROR
+            ) {
                 $validationpluginclass = $validationplugin . '\\' . $validationplugin;
                 if (get_config($validationplugin, 'enabled') === '1') {
                     /** @var ICertificateValidation $subplugin */

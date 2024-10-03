@@ -114,11 +114,6 @@ class useofthecoursealgorithm {
         $this->courseid = $courseid;
         $this->numstudents = $numstudents;
         $this->course = get_course($courseid);
-        if ($this->numstudents == 0) {
-            debugging(__CLASS__ . '  courseid '  . $courseid);
-            debugging(__CLASS__ . '  numstudents '  . $numstudents);
-            throw new moodle_exception('cannotusealgorith_nostudents', 'certifygenreport_basic');
-        }
     }
     /**
      * get_course_info
@@ -243,6 +238,11 @@ class useofthecoursealgorithm {
     private function get_resource_views(): void {
         global $DB;
         try {
+            if (!$this->numstudents) {
+                $this->resourceviews = [];
+                $this->resourceviewslevel = self::LOW;
+                return;
+            }
             $sql = "SELECT logs.userid, count(logs.id) views
                       FROM {logstore_standard_log} logs
                      WHERE logs.action='viewed'
@@ -387,6 +387,11 @@ class useofthecoursealgorithm {
     private function get_assigns_submissions(): void {
         global $DB;
         try {
+            if (!$this->numstudents) {
+                $this->assignsubmissions = [];
+                $this->assignsubmissionslevel = self::LOW;
+                return;
+            }
             $sql = "SELECT assign_subm.userid userid, COUNT(assign_subm.id) total
                       FROM {assign_submission} assign_subm
                  LEFT JOIN {assign} assign  ON (assign.id = assign_subm.assignment)
