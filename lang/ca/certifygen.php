@@ -213,3 +213,6 @@ $string['userfield_not_valid'] = 'Camp d’usuari no vàlid';
 $string['issue_not_found'] = 'Codi d’emissió no trobat';
 $string['userfield_not_selected'] = 'No s’ha seleccionat cap camp d’usuari a la plataforma';
 $string['user_not_sent'] = 'No s’ha indicat l’usuari';
+$string['model_not_found'] = 'No existeix el model';
+$string['model_not_valid'] = 'Model no vàlid';
+$string['course_not_valid_with_model'] = 'El curs {a} no és compatible amb el model';

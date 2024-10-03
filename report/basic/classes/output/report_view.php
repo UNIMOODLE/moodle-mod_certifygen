@@ -119,7 +119,7 @@ class report_view implements renderable, templatable {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    private function get_courses_list(): array {
+    public function get_courses_list(): array {
         $courses = [];
         foreach ($this->courses as $course) {
             $courses[] = $this->get_user_evaluation_in_course((int)$course['courseid']);

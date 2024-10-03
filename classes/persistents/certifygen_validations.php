@@ -300,11 +300,11 @@ class certifygen_validations extends persistent {
         string $courses,
         string $lang,
         int $modelid,
-        string $name
+        string $name = ''
     ) {
         global $DB;
-        $comparename = $DB->sql_compare_text('ct.name');
-        $comparenameplaceholder = $DB->sql_compare_text(':name');
+
+
         $comparelang = $DB->sql_compare_text('ct.lang');
         $comparelangplaceholder = $DB->sql_compare_text(':lang');
         $comparecourses = $DB->sql_compare_text('ct.courses');
@@ -315,15 +315,20 @@ class certifygen_validations extends persistent {
             'courses' => $courses,
             'lang' => $lang,
             'modelid' => $modelid,
-            'name' => $name,
             'certifygenid' => 0,
         ];
-
+        $comparenamecondition = "";
+        if (!empty($name)) {
+            $comparename = $DB->sql_compare_text('ct.name');
+            $comparenameplaceholder = $DB->sql_compare_text(':name');
+            $comparenamecondition = "AND {$comparename} = {$comparenameplaceholder}";
+            $params['name'] = $name;
+        }
         $sql = "SELECT ct.*
                   FROM {certifygen_validations} ct
                  WHERE {$comparelang} = {$comparelangplaceholder}
                        AND {$comparecourses} = {$comparecoursesplaceholder}
-                       AND {$comparename} = {$comparenameplaceholder}
+                       $comparenamecondition
                        AND ct.userid = :userid
                        AND ct.certifygenid = :certifygenid
                        AND ct.modelid = :modelid";

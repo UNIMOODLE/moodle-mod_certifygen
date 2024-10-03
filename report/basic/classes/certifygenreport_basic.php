@@ -135,4 +135,29 @@ class certifygenreport_basic implements ICertificateReport {
 
         return $result;
     }
+
+    /**
+     * Get the certificate content.
+     *
+     * @param certifygen_validations $trequest
+     * @return array
+     */
+    public function get_certificate_elements(certifygen_validations $trequest): array {
+        $output = [];
+        try {
+            $courselist = [];
+            $courses = $trequest->get('courses');
+            $courses = explode(',', $courses);
+            foreach ($courses as $courseid) {
+                $courselist[] = ['courseid' => $courseid];
+            }
+            $view = new report_view($trequest->get('userid'), $courselist);
+            $output['list'] = $view->get_courses_list();
+        } catch (moodle_exception $exception) {
+            $output['error']['code'] = 'general_error';
+            $output['error']['message'] = $exception->getMessage();
+        }
+
+        return $output;
+    }
 }

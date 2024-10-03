@@ -213,3 +213,6 @@ $string['userfield_not_valid'] = 'Invalid user field';
 $string['issue_not_found'] = 'Issue code not found';
 $string['userfield_not_selected'] = 'No user field has been selected on the platform';
 $string['user_not_sent'] = 'User not specified';
+$string['model_not_found'] = 'Model not found';
+$string['model_not_valid'] = 'Invalid model';
+$string['course_not_valid_with_model'] = 'The course, {a}, is not compatible with the model';

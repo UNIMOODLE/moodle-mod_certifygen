@@ -213,3 +213,6 @@ $string['userfield_not_valid'] = 'Campo de usuario no válido';
 $string['issue_not_found'] = 'Código de emisión no encontrado';
 $string['userfield_not_selected'] = 'No se ha seleccionado ningun campo de usuario en la plataforma';
 $string['user_not_sent'] = 'Falta indicar el usuario';
+$string['model_not_found'] = 'No existe el modelo';
+$string['model_not_valid'] = 'Modelo no válido';
+$string['course_not_valid_with_model'] = 'El curso, {a}, no es compatible con el modelo';

@@ -213,3 +213,6 @@ $string['userfield_not_valid'] = 'Erabiltzaile eremua baliogabea da';
 $string['issue_not_found'] = 'Emisio kodea ez da aurkitu';
 $string['userfield_not_selected'] = 'Ez da hautatu erabiltzaile eremurik plataforman';
 $string['user_not_sent'] = 'Ez da erabiltzailea adierazi';
+$string['model_not_found'] = 'Eredua ez da existitzen';
+$string['model_not_valid'] = 'Eredu baliogabea';
+$string['course_not_valid_with_model'] = 'Ikastaroa, {a}, ez da ereduarekin bateragarria';

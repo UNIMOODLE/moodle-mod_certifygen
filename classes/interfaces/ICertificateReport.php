@@ -58,4 +58,11 @@ interface ICertificateReport {
      * @return array
      */
     public function create_file(certifygen_validations $trequest): array;
+
+    /**
+     * Get the certificate content.
+     * @param certifygen_validations $trequest
+     * @return array
+     */
+    public function get_certificate_elements(certifygen_validations $trequest): array;
 }
