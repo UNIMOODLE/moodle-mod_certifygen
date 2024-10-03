@@ -76,4 +76,11 @@ if ($ADMIN->fulltree) {
         new lang_string('appID_help', 'certifygenvalidation_csv'),
         ""
     ));
+    // WS output.
+    $settings->add(new admin_setting_configcheckbox(
+        'certifygenvalidation_csv/wsoutput',
+        new lang_string('wsoutput', 'certifygenvalidation_csv'),
+        new lang_string('wsoutput_help', 'certifygenvalidation_csv'),
+        0
+    ));
 }

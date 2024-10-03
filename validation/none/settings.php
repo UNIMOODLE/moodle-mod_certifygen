@@ -52,4 +52,10 @@ if ($ADMIN->fulltree) {
         new lang_string('enable_help', 'certifygenvalidation_none'),
         0
     ));
+    $settings->add(new admin_setting_configcheckbox(
+        'certifygenvalidation_none/wsoutput',
+        new lang_string('wsoutput', 'certifygenvalidation_none'),
+        new lang_string('wsoutput_help', 'certifygenvalidation_none'),
+        0
+    ));
 }

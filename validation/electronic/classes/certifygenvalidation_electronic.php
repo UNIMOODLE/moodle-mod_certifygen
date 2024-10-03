@@ -308,4 +308,17 @@ class certifygenvalidation_electronic implements ICertificateValidation {
     public function get_status_messages(): array {
         return [];
     }
+
+    /**
+     * If true, the certifygen activities related with this type of validation will be part
+     * of the output of get_id_instance_certificate_external ws.
+     * If true, the teacher requests with models with this type of validation will be part
+     *  of the output of get_courses_as_teacher ws.
+     *
+     * @return bool
+     * @throws dml_exception
+     */
+    public function is_visible_in_ws(): bool {
+        return (int)get_config('certifygenvalidation_electronic', 'wsoutput');
+    }
 }

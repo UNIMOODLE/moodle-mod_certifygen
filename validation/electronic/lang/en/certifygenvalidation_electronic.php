@@ -46,3 +46,7 @@ $string['reasondesc'] = 'Field required to sign the certificate';
 $string['contactinfo'] = 'Certificate contact infornation';
 $string['contactinfodesc'] = 'Field required to sign the certificate';
 $string['privacy:metadata'] = 'The ELECTRONIC Validation plugin does not store any personal data.';
+$string['wsoutput'] = 'Web Serviece Output';
+$string['wsoutput_help'] = 'If true, the certifygen activities related with this type of validation will be part of the output of
+get_id_instance_certificate_external ws. If true, the teacher requests with models with this type of validation will be part of the
+output of get_courses_as_teacher ws.';

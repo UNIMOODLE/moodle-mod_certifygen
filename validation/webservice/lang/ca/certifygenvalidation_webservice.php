@@ -37,3 +37,7 @@ $string['webservicenotconfigured'] = 'Certifygen WEBSERVICE no configurat';
 $string['pluginnamesettings'] = 'Configuració de Validació WEBSERVICE';
 $string['privacy:metadata'] = 'El complement de Validació WEBSERVICE no emmagatzema cap dada personal.';
 $string['inprogress_msg'] = 'Accedeix a l’administració de la teva universitat per continuar amb el procés de validació del certificat.';
+$string['wsoutput'] = 'Sortida del servei web';
+$string['wsoutput_help'] = 'Si és cert, les activitats de certificació relacionades amb aquest tipus de validació formaran part de la sortida de
+get_id_instance_certificate_external ws. Si és cert, les sol·licituds del professor amb models amb aquest tipus de validació formaran part de la
+sortida de get_courses_as_teacher ws.';

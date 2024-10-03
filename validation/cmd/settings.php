@@ -66,7 +66,6 @@ if ($ADMIN->fulltree) {
         ""
     ));
 
-
     $settings->add(new admin_setting_configtext(
         'certifygenvalidation_cmd/originalfilespath',
         new lang_string('originalfilespath', 'certifygenvalidation_cmd'),
@@ -79,5 +78,12 @@ if ($ADMIN->fulltree) {
         new lang_string('validatedfilespath', 'certifygenvalidation_cmd'),
         new lang_string('validatedfilespath_help', 'certifygenvalidation_cmd'),
         ""
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'certifygenvalidation_cmd/wsoutput',
+        new lang_string('wsoutput', 'certifygenvalidation_cmd'),
+        new lang_string('wsoutput_help', 'certifygenvalidation_cmd'),
+        0
     ));
 }

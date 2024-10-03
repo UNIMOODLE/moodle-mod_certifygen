@@ -44,3 +44,7 @@ $string['csvnotconfigured'] = 'CSV ez dago konfiguraturik';
 $string['pluginnamesettings'] = 'CSV Balioztapenaren Konfigurazioa';
 $string['csv_result_not_expected'] = 'Endpointaren emaitza ez da espero zen';
 $string['privacy:metadata'] = 'CSV Balioztapen pluginak ez du datu pertsonalik gordetzen.';
+$string['wsoutput'] = 'Web Zerbitzuaren irteera';
+$string['wsoutput_help'] = 'Egia bada, baliozkotze-mota honekin lotutako certifygen jarduerak irteeraren parte izango dira
+get_id_instance_certificate_external ws. Egia bada, irakasleak baliozkotze mota hau duten ereduekin egindako eskaerak parte izango dira
+get_courses_as_teacher ws-en irteera.';

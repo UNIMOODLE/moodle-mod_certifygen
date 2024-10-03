@@ -88,4 +88,10 @@ if ($ADMIN->fulltree) {
         new lang_string('contactinfodesc', 'certifygenvalidation_electronic'),
         ''
     ));
+    $settings->add(new admin_setting_configcheckbox(
+        'certifygenvalidation_electronic/wsoutput',
+        new lang_string('wsoutput', 'certifygenvalidation_electronic'),
+        new lang_string('wsoutput_help', 'certifygenvalidation_electronic'),
+        0
+    ));
 }

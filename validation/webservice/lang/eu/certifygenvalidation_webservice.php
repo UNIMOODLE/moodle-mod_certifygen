@@ -37,3 +37,7 @@ $string['webservicenotconfigured'] = 'Certifygen WEBSERVICE ez dago konfiguratur
 $string['pluginnamesettings'] = 'WEBSERVICE Balioztapenaren Konfigurazioa';
 $string['privacy:metadata'] = 'WEBSERVICE Balioztapen pluginak ez du datu pertsonalik gordetzen.';
 $string['inprogress_msg'] = 'Jarraitzea ahalbidetzeko, zure unibertsitateko administrazio bulegora joan.';
+$string['wsoutput'] = 'Web Zerbitzuaren irteera';
+$string['wsoutput_help'] = 'Egia bada, baliozkotze-mota honekin lotutako certifygen jarduerak irteeraren parte izango dira
+get_id_instance_certificate_external ws. Egia bada, irakasleak baliozkotze mota hau duten ereduekin egindako eskaerak parte izango dira
+get_courses_as_teacher ws-en irteera.';

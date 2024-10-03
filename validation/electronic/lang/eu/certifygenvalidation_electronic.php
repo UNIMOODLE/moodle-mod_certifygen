@@ -46,3 +46,7 @@ $string['reasondesc'] = 'Ziurtagiria sinatzeko beharrezko eremua';
 $string['contactinfo'] = 'Ziurtagiriaren Kontaktuen Informazioa';
 $string['contactinfodesc'] = 'Ziurtagiria sinatzeko beharrezko eremua';
 $string['privacy:metadata'] = 'BALIOZTAZIO ELEKTRONIKOA pluginak ez du datu pertsonalik gordetzen.';
+$string['wsoutput'] = 'Web Zerbitzuaren irteera';
+$string['wsoutput_help'] = 'Egia bada, baliozkotze-mota honekin lotutako certifygen jarduerak irteeraren parte izango dira
+get_id_instance_certificate_external ws. Egia bada, irakasleak baliozkotze mota hau duten ereduekin egindako eskaerak parte izango dira
+get_courses_as_teacher ws-en irteera.';

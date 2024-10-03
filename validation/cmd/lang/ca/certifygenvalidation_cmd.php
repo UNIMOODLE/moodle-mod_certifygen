@@ -47,3 +47,7 @@ $string['temp_file_not_exists'] = 'temp_file_not_exists';
 $string['missing_directory_permissions'] = 'missing_directory_permissions';
 $string['error_cmd_code'] = 'Error ejecutando el comando. Código de salida: {$a}';
 $string['path_not_exists'] = 'El camí no existeix';
+$string['wsoutput'] = 'Sortida del servei web';
+$string['wsoutput_help'] = 'Si és cert, les activitats de certificació relacionades amb aquest tipus de validació formaran part de la sortida de
+get_id_instance_certificate_external ws. Si és cert, les sol·licituds del professor amb models amb aquest tipus de validació formaran part de la
+sortida de get_courses_as_teacher ws.';

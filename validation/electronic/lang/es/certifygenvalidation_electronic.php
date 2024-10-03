@@ -46,3 +46,7 @@ $string['reasondesc'] = 'Campo requerido para firmar el certificado';
 $string['contactinfo'] = 'Información de contacto del Certificado';
 $string['contactinfodesc'] = 'Campo requerido para firmar el certificado';
 $string['privacy:metadata'] = 'El plugin de Validación ELECTRÓNICA no almacena ningún dato personal.';
+$string['wsoutput'] = 'Salida del Servicio Web';
+$string['wsoutput_help'] = 'Si es verdadero, las actividades de certifygen relacionadas con este tipo de validación serán parte de la salida del ws
+get_id_instance_certificate_external. Si es verdadero, las solicitudes de los profesores con modelos con este tipo de validación serán parte de la
+salida del ws get_courses_as_teacher.';

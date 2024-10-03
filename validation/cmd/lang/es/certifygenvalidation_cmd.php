@@ -44,3 +44,7 @@ $string['originalfilespath_help'] = 'Ruta en el servidor para almacenar los cert
 $string['validatedfilespath'] = 'Ruta de Archivos Validados';
 $string['validatedfilespath_help'] = 'Ruta en el servidor para almacenar los certificados validados';
 $string['path_not_exists'] = 'La ruta no existe';
+$string['wsoutput'] = 'Salida del Servicio Web';
+$string['wsoutput_help'] = 'Si es verdadero, las actividades de certifygen relacionadas con este tipo de validación serán parte de la salida del ws
+get_id_instance_certificate_external. Si es verdadero, las solicitudes de los profesores con modelos con este tipo de validación serán parte de la
+salida del ws get_courses_as_teacher.';

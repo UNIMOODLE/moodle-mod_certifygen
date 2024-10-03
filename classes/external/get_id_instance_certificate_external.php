@@ -40,6 +40,7 @@ use external_multiple_structure;
 use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
+use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
 use certifygenfilter;
@@ -168,6 +169,16 @@ class get_id_instance_certificate_external extends external_api {
                             continue;
                         }
                         $model = certifygen_model::get_record(['id' => $activity->get('modelid')]);
+                        $validationplugin = $model->get('validation');
+                        $validationpluginclass = $validationplugin . '\\' . $validationplugin;
+                        if (get_config($validationplugin, 'enabled') === '0') {
+                            continue;
+                        }
+                        /** @var ICertificateValidation $subplugin */
+                        $subplugin = new $validationpluginclass();
+                        if (!$subplugin->is_visible_in_ws()) {
+                            continue;
+                        }
                         $actvname = $filter->filter($activity->get('name'));
                         $actvname = strip_tags($actvname);
                         $instance['instance'] = [

@@ -35,3 +35,11 @@ $string['enable_help'] = 'Plugin hau gaituta dagoenean, Unimoodle ziurtagiriak w
 $string['certifygenvalidation_none_settings'] = 'Certifygen Balioztapenik Gabe Konfigurazioa';
 $string['pluginnamesettings'] = 'Certifygen Balioztapenik Gabe Konfigurazioa';
 $string['privacy:metadata'] = 'Certifygen Balioztapenik Gabe pluginak ez du datu pertsonalik gordetzen.';
+$string['wsoutput'] = 'Web Zerbitzuaren irteera';
+$string['wsoutput_help'] = 'Egia bada, baliozkotze-mota honekin lotutako certifygen jarduerak irteeraren parte izango dira
+get_id_instance_certificate_external ws. Egia bada, irakasleak baliozkotze mota hau duten ereduekin egindako eskaerak parte izango dira
+get_courses_as_teacher ws-en irteera.';
+$string['wsoutput'] = 'Web Zerbitzuaren irteera';
+$string['wsoutput_help'] = 'Egia bada, baliozkotze-mota honekin lotutako certifygen jarduerak irteeraren parte izango dira
+get_id_instance_certificate_external ws. Egia bada, irakasleak baliozkotze mota hau duten ereduekin egindako eskaerak parte izango dira
+get_courses_as_teacher ws-en irteera.';

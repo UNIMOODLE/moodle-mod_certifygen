@@ -46,7 +46,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
 /**
- * certifygenvalidation_cmd
+ * CMD
  * @package   certifygenvalidation_cmd
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -267,5 +267,18 @@ class certifygenvalidation_cmd implements ICertificateValidation {
      */
     public function get_status_messages(): array {
         return [];
+    }
+
+    /**
+     * If true, the certifygen activities related with this type of validation will be part
+     * of the output of get_id_instance_certificate_external ws.
+     * If true, the teacher requests with models with this type of validation will be part
+     *  of the output of get_courses_as_teacher ws.
+     *
+     * @return bool
+     * @throws dml_exception
+     */
+    public function is_visible_in_ws(): bool {
+        return (int)get_config('certifygenvalidation_cmd', 'wsoutput');
     }
 }

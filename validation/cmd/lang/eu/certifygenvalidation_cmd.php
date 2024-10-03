@@ -44,3 +44,7 @@ $string['originalfilespath_help'] = 'Ziurtagiri jatorrizkoak gordetzeko zerbitzu
 $string['validatedfilespath'] = 'Balioztatutako Fitxategien Bidea';
 $string['validatedfilespath_help'] = 'Balioztatutako ziurtagiriak gordetzeko zerbitzuko bidea';
 $string['path_not_exists'] = 'Bidea ez da existitzen';
+$string['wsoutput'] = 'Web Zerbitzuaren irteera';
+$string['wsoutput_help'] = 'Egia bada, baliozkotze-mota honekin lotutako certifygen jarduerak irteeraren parte izango dira
+get_id_instance_certificate_external ws. Egia bada, irakasleak baliozkotze mota hau duten ereduekin egindako eskaerak parte izango dira
+get_courses_as_teacher ws-en irteera.';

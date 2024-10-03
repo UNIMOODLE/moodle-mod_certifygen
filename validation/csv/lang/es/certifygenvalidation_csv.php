@@ -44,3 +44,7 @@ $string['csvnotconfigured'] = 'CSV no configurado';
 $string['pluginnamesettings'] = 'Configuración de la Validación CSV';
 $string['csv_result_not_expected'] = 'Resultado del endpoint no esperado';
 $string['privacy:metadata'] = 'El plugin de Validación CSV no almacena ningún dato personal.';
+$string['wsoutput'] = 'Salida del Servicio Web';
+$string['wsoutput_help'] = 'Si es verdadero, las actividades de certifygen relacionadas con este tipo de validación serán parte de la salida del ws
+get_id_instance_certificate_external. Si es verdadero, las solicitudes de los profesores con modelos con este tipo de validación serán parte de la
+salida del ws get_courses_as_teacher.';

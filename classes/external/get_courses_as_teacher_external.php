@@ -39,8 +39,10 @@ use external_single_structure;
 use external_multiple_structure;
 use external_value;
 use invalid_parameter_exception;
+use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_context;
 use mod_certifygen\persistents\certifygen_model;
+use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
@@ -150,15 +152,27 @@ class get_courses_as_teacher_external extends external_api {
                     if ($model->get('type') == certifygen_model::TYPE_ACTIVITY) {
                         continue;
                     }
+                    $validationplugin = $model->get('validation');
+                    $validationpluginclass = $validationplugin . '\\' . $validationplugin;
+                    if (get_config($validationplugin, 'enabled') === '0') {
+                        continue;
+                    }
+                    /** @var ICertificateValidation $subplugin */
+                    $subplugin = new $validationpluginclass();
+                    if (!$subplugin->is_visible_in_ws()) {
+                        continue;
+                    }
                     $coursemodels[] = (array)$model->to_record();
                 }
-                $courses[] = [
-                    'id' => $enrolment->ctxinstance,
-                    'shortname' => $courseshortname,
-                    'fullname' => $coursefullname,
-                    'categoryid' => $enrolment->category,
-                    'models' => $coursemodels,
-                ];
+                if (!empty($coursemodels)) {
+                    $courses[] = [
+                            'id' => $enrolment->ctxinstance,
+                            'shortname' => $courseshortname,
+                            'fullname' => $coursefullname,
+                            'categoryid' => $enrolment->category,
+                            'models' => $coursemodels,
+                    ];
+                }
             }
             $results['courses'] = $courses;
         } catch (moodle_exception $e) {

@@ -79,6 +79,7 @@ class mod_certifygen_generator extends testing_module_generator {
         // Configure the platform.
         set_config('enabled', 1, 'certifygenrepository_localrepository');
         set_config('enabled', 1, 'certifygenvalidation_none');
+        set_config('wsoutput', 1, 'certifygenvalidation_none');
         $data = [
             'name' => $name,
             'idnumber' => '',

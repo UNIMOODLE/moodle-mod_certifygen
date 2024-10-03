@@ -46,3 +46,7 @@ $string['reasondesc'] = 'Camp requerit per signar el certificat';
 $string['contactinfo'] = 'Informació de contacte del Certificat';
 $string['contactinfodesc'] = 'Camp requerit per signar el certificat';
 $string['privacy:metadata'] = 'El complement de Validació ELECTRÒNICA no emmagatzema cap dada personal.';
+$string['wsoutput'] = 'Sortida del servei web';
+$string['wsoutput_help'] = 'Si és cert, les activitats de certificació relacionades amb aquest tipus de validació formaran part de la sortida de
+get_id_instance_certificate_external ws. Si és cert, les sol·licituds del professor amb models amb aquest tipus de validació formaran part de la
+sortida de get_courses_as_teacher ws.';

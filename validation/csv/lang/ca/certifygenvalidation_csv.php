@@ -44,3 +44,7 @@ $string['csvnotconfigured'] = 'CSV no configurat';
 $string['pluginnamesettings'] = 'Configuració de la Validació CSV';
 $string['csv_result_not_expected'] = 'Resultat de l\'endpoint no esperat';
 $string['privacy:metadata'] = 'El plugin de Validació CSV no emmagatzema cap dada personal.';
+$string['wsoutput'] = 'Sortida del servei web';
+$string['wsoutput_help'] = 'Si és cert, les activitats de certificació relacionades amb aquest tipus de validació formaran part de la sortida de
+get_id_instance_certificate_external ws. Si és cert, les sol·licituds del professor amb models amb aquest tipus de validació formaran part de la
+sortida de get_courses_as_teacher ws.';

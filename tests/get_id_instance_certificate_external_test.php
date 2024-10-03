@@ -463,4 +463,73 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
         $this->assertArrayHasKey('code', $result['error']);
         $this->assertEquals('userfield_and_userid_sent', $result['error']['code']);
     }
+    /**
+     * Test: settings wsoutput not checked.
+     * @return void
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws required_capability_exception
+     */
+    public function test_get_id_instance_certificate_validation_not_checked(): void {
+        global $DB;
+
+        // Create user.
+        $user1 = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_1',
+                'firstname' => 'test',
+                'lastname' => 'user 1',
+                'email' => 'test_user_1@fake.es',
+        ]);
+        $manager = $this->getDataGenerator()->create_user();
+        $managerrole = $DB->get_record('role', ['shortname' => 'manager']);
+        $this->getDataGenerator()->role_assign($managerrole->id, $manager->id);
+        $this->setUser($manager);
+
+        // Create courses.
+        $course1 = self::getDataGenerator()->create_course();
+        $course2 = self::getDataGenerator()->create_course();
+
+        // Enrol user in course1 as editingteacher.
+        self::getDataGenerator()->enrol_user($user1->id, $course1->id, 'student');
+
+        // Enrol user in course2 as student.
+        self::getDataGenerator()->enrol_user($user1->id, $course2->id, 'editingteacher');
+
+        // Tests: Course with no mod_certifygen included.
+        $result = get_id_instance_certificate_external::get_id_instance_certificate($user1->id, '', '');
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('instances', $result);
+        $this->assertIsArray($result['instances']);
+        $this->assertEmpty($result['instances']);
+
+        // Create mod_certifygen.
+        $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
+        $certificate1 = $templategenerator->create_template((object)['name' => 'Certificate 1']);
+        $modgenerator = $this->getDataGenerator()->get_plugin_generator('mod_certifygen');
+        $model = $modgenerator->create_model_by_name(
+                certifygen_model::TYPE_ACTIVITY,
+                $certificate1->get_id(),
+                certifygen_model::TYPE_ACTIVITY
+        );
+        set_config('wsoutput', 0, 'certifygenvalidation_none');
+        $langs = $model->get('langs');
+        $langs = explode(',', $langs);
+        $lang = $langs[0];
+        $datamodule = [
+                'name' => 'Test 1,',
+                'course' => $course1->id,
+                'modelid' => $model->get('id'),
+                'instance' => 0,
+        ];
+        $modcertifygen = self::getDataGenerator()->create_module('certifygen', $datamodule);
+        $cm = get_coursemodule_from_instance('certifygen', $modcertifygen->id, $course1->id, false, MUST_EXIST);
+
+        // Tests: Course with no mod_certifygen included.
+        $result = get_id_instance_certificate_external::get_id_instance_certificate($user1->id, '', '');
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('instances', $result);
+        $this->assertIsArray($result['instances']);
+        $this->assertCount(0, $result['instances']);
+    }
 }

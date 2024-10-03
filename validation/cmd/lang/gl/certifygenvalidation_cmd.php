@@ -44,3 +44,7 @@ $string['originalfilespath_help'] = 'Camiño no servidor para almacenar os certi
 $string['validatedfilespath'] = 'Camiño dos Arquivos Validados';
 $string['validatedfilespath_help'] = 'Camiño no servidor para almacenar os certificados validados';
 $string['path_not_exists'] = 'O camiño non existe';
+$string['wsoutput'] = 'Saída do servizo web';
+$string['wsoutput_help'] = 'Se é verdade, as actividades de certificación relacionadas con este tipo de validación formarán parte da saída de
+get_id_instance_certificate_external ws. De ser certo, as solicitudes do profesor con modelos con este tipo de validación formarán parte do
+saída de get_courses_as_teacher ws.';

@@ -44,3 +44,7 @@ $string['originalfilespath_help'] = 'Server path to allocate original certificat
 $string['validatedfilespath'] = 'Validated Files Path';
 $string['validatedfilespath_help'] = 'Server path to allocate validated certificates';
 $string['path_not_exists'] = 'Path not exists';
+$string['wsoutput'] = 'Web Serviece Output';
+$string['wsoutput_help'] = 'If true, the certifygen activities related with this type of validation will be part of the output of
+get_id_instance_certificate_external ws. If true, the teacher requests with models with this type of validation will be part of the
+output of get_courses_as_teacher ws.';

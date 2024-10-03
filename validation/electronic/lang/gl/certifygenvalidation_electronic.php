@@ -46,3 +46,7 @@ $string['reasondesc'] = 'Campo requirido para firmar o certificado';
 $string['contactinfo'] = 'Información de contacto do Certificado';
 $string['contactinfodesc'] = 'Campo requirido para firmar o certificado';
 $string['privacy:metadata'] = 'O plugin de Validación ELECTRÓNICA non almacena ningún dato persoal.';
+$string['wsoutput'] = 'Saída do servizo web';
+$string['wsoutput_help'] = 'Se é verdade, as actividades de certificación relacionadas con este tipo de validación formarán parte da saída de
+get_id_instance_certificate_external ws. De ser certo, as solicitudes do profesor con modelos con este tipo de validación formarán parte do
+saída de get_courses_as_teacher ws.';

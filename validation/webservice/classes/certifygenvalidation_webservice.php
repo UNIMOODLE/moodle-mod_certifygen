@@ -220,4 +220,17 @@ class certifygenvalidation_webservice implements ICertificateValidation {
             certifygen_validations::STATUS_IN_PROGRESS => get_string('inprogress_msg', 'certifygenvalidation_webservice'),
         ];
     }
+
+    /**
+     * If true, the certifygen activities related with this type of validation will be part
+     * of the output of get_id_instance_certificate_external ws.
+     * If true, the teacher requests with models with this type of validation will be part
+     *  of the output of get_courses_as_teacher ws.
+     *
+     * @return bool
+     * @throws dml_exception
+     */
+    public function is_visible_in_ws(): bool {
+        return (int)get_config('certifygenvalidation_webservice', 'wsoutput');
+    }
 }

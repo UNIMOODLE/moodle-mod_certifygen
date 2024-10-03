@@ -35,3 +35,7 @@ $string['enable_help'] = 'Si aquest complement està habilitat, pots utilitzar-l
 $string['certifygenvalidation_none_settings'] = 'Configuració de Certifygen Sense Validació';
 $string['pluginnamesettings'] = 'Configuració de Certifygen Sense Validació';
 $string['privacy:metadata'] = 'El complement Certifygen Sense Validació no emmagatzema cap dada personal.';
+$string['wsoutput'] = 'Sortida del servei web';
+$string['wsoutput_help'] = 'Si és cert, les activitats de certificació relacionades amb aquest tipus de validació formaran part de la sortida de
+get_id_instance_certificate_external ws. Si és cert, les sol·licituds del professor amb models amb aquest tipus de validació formaran part de la
+sortida de get_courses_as_teacher ws.';

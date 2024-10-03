@@ -35,3 +35,7 @@ $string['enable_help'] = 'If this plugin is enabled, you can use it to validate 
 $string['certifygenvalidation_none_settings'] = 'Certifygen No Validation settings';
 $string['pluginnamesettings'] = 'Certifygen No Validation Configuration';
 $string['privacy:metadata'] = 'The Certifygen No Validation Validation plugin does not store any personal data.';
+$string['wsoutput'] = 'Web Serviece Output';
+$string['wsoutput_help'] = 'If true, the certifygen activities related with this type of validation will be part of the output of
+get_id_instance_certificate_external ws. If true, the teacher requests with models with this type of validation will be part of the
+output of get_courses_as_teacher ws.';
