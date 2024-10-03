@@ -72,15 +72,11 @@ class emitteacherrequest_external_test extends advanced_testcase {
         // Create course.
         $course = $this->getDataGenerator()->create_course();
 
-        // Create template.
-        $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
-        $certificate1 = $templategenerator->create_template((object) ['name' => 'Certificate 1']);
-
         // Create model.
         $modgenerator = $this->getDataGenerator()->get_plugin_generator('mod_certifygen');
         $model = $modgenerator->create_model_by_name(
             certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
-            $certificate1->get_id(),
+            0,
             certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
         );
         $modgenerator->assign_model_coursecontext($model->get('id'), $course->id);
@@ -130,15 +126,11 @@ class emitteacherrequest_external_test extends advanced_testcase {
         // Create course.
         $course = $this->getDataGenerator()->create_course();
 
-        // Create template.
-        $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
-        $certificate1 = $templategenerator->create_template((object)['name' => 'Certificate 1']);
-
         // Create model.
         $modgenerator = $this->getDataGenerator()->get_plugin_generator('mod_certifygen');
         $model = $modgenerator->create_model_by_name(
             certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
-            $certificate1->get_id(),
+            0,
             certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
         );
         $modgenerator->assign_model_coursecontext($model->get('id'), $course->id);

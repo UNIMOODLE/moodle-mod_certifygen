@@ -115,7 +115,7 @@ class get_pdf_teacher_certificate_external extends external_api {
             $userid = $uparam['userid'];
 
             // User exists.
-            $user = user_get_users_by_id([$params['userid']]);
+            $user = user_get_users_by_id([$userid]);
             if (empty($user)) {
                 $result['error']['code'] = 'user_not_found';
                 $result['error']['message'] = get_string('user_not_found', 'mod_certifygen');
