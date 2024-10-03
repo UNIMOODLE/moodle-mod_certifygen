@@ -67,7 +67,7 @@ class emitcertificate_external extends external_api {
     public static function emitcertificate_parameters(): external_function_parameters {
         return new external_function_parameters(
             [
-                'id' => new external_value(PARAM_INT, 'id'),
+                'id' => new external_value(PARAM_INT, 'Validation id'),
                 'instanceid' => new external_value(PARAM_INT, 'instance id'),
                 'modelid' => new external_value(PARAM_INT, 'model id'),
                 'lang' => new external_value(PARAM_RAW, 'model lang'),

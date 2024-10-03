@@ -104,7 +104,6 @@ class get_json_certificate_external extends external_api {
         );
 
         if ($USER->id != $userid) {
-            debugging("enttra en el if y no deberia");
             $context = context_system::instance();
             if (!has_capability('mod/certifygen:manage', $context)) {
                 $result['result'] = false;
