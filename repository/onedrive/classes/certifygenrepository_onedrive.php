@@ -35,6 +35,7 @@ use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\persistents\certifygen_repository;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
+use moodle_url;
 use stored_file;
 /**
  * certifygenrepository_onedrive
@@ -168,5 +169,98 @@ class certifygenrepository_onedrive implements ICertificateRepository {
         }
 
         return $result;
+    }
+
+    /**
+     * Get file by code
+     * Search for files named by $code
+     *
+     * @param string $code
+     * @return string
+     */
+    public function get_file_by_code(string $code): string {
+        $result = '';
+        try {
+            // First search on db.
+            $result = $this->get_file_by_code_on_moodle_db($code);
+            if (empty($result)) {
+                // If there is no result, find on onedrive repository.
+                $result = $this->get_file_by_code_on_onedrive($code);
+            }
+        } catch (moodle_exception $e) {
+            debugging(__FUNCTION__ . ' ERROR: ' . $e->getMessage());
+        }
+
+        return $result;
+    }
+    /**
+     * Get file by code on onedrive repository
+     * Search for files named by $code
+     *
+     * @param string $code
+     * @return string
+     */
+    protected function get_file_by_code_on_onedrive(string $code): string {
+
+        $output = '';
+        $connection = new onedriveconnection();
+        $result = $connection->search($code);
+        if (!array_key_exists('list', $result)) {
+            return $output;
+        } else if (empty($result['list'])) {
+            return $output;
+        } else if (array_key_exists('source', $result['list'][0])) {
+            $fdata = $result['list'][0]['source'];
+            $fdata = json_decode($fdata);
+            if (isset($fdata->link)) {
+                $output = $fdata->link;
+            }
+        }
+
+        return $output;
+    }
+
+    /**
+     * Get file by code on moodle database
+     * Search for files named by $code
+     *
+     * @param string $code
+     * @return string
+     * @throws dml_exception
+     */
+    protected function get_file_by_code_on_moodle_db(string $code): string {
+        global $DB;
+
+        $url = '';
+        $comparecomp = $DB->sql_compare_text('component');
+        $comparecompplaceholder = $DB->sql_compare_text(':component');
+        $comparefarea = $DB->sql_compare_text('filearea');
+        $comparefareaplaceholder = $DB->sql_compare_text(':filearea');
+        $comparefname = $DB->sql_compare_text('filename');
+        $comparefnameplaceholder = $DB->sql_compare_text(':filename');
+        $params = [
+                'component' => self::FILE_COMPONENT,
+                'filearea' => self::FILE_AREA,
+                'filename' => $code . '.pdf',
+        ];
+        $sql = "SELECT *
+                  FROM {files}
+                 WHERE {$comparecomp} = {$comparecompplaceholder}
+                        AND {$comparefarea} = {$comparefareaplaceholder}
+                        AND {$comparefname} = {$comparefnameplaceholder}";
+        $result = $DB->get_record_sql($sql, $params);
+        if ($result) {
+            $url = moodle_url::make_pluginfile_url(
+                $result->contextid,
+                $result->component,
+                $result->filearea,
+                $result->itemid,
+                $result->filepath,
+                $result->filename
+            )->out();
+            print_object($result);
+        }
+
+        return $url;
     }
 }

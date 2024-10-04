@@ -33,6 +33,7 @@ use core\oauth2\api;
 use core\oauth2\client;
 use core\oauth2\issuer;
 use core\oauth2\rest_exception;
+use core_collator;
 use core_filetypes;
 use curl;
 use dml_exception;
@@ -400,5 +401,215 @@ class onedriveconnection {
             return $result;
         }
         return '';
+    }
+
+
+    /**
+     * Query OneDrive for files and folders using a search query.
+     *
+     * Documentation about the query format can be found here:
+     *   https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/resources/driveitem
+     *   https://developer.microsoft.com/en-us/graph/docs/overview/query_parameters
+     *
+     * This returns a list of files and folders with their details as they should be
+     * formatted and returned by functions such as get_listing() or search().
+     *
+     * @param string $q search query as expected by the Graph API.
+     * @param string $path parent path of the current files, will not be used for the query.
+     * @param string $parent Parent id.
+     * @param int $page page.
+     * @return array of files and folders.
+     * @throws Exception
+     * @throws repository_exception
+     */
+    protected function query($q, $path = null, $parent = null, $page = 0) {
+        global $OUTPUT;
+
+        $files = [];
+        $folders = [];
+        //$fields = "folder,id,lastModifiedDateTime,name,size,webUrl,thumbnails";
+        $fields = "folder,id,lastModifiedDateTime,name,size,webUrl";
+        $params = ['$select' => $fields, 'parent' => $parent];
+
+        try {
+            // Retrieving files and folders.
+            $systemauth = api::get_system_oauth_client($this->issuer);
+            $service = new rest($systemauth);
+
+            if (!empty($q)) {
+                $params['search'] = urlencode($q);
+
+                // MS does not return thumbnails on a search.
+                unset($params['$expand']);
+                $response = $service->call('search', $params);
+            } else {
+                $response = $service->call('list', $params);
+            }
+        } catch (\Exception $e) {
+            if ($e->getCode() == 403 && strpos($e->getMessage(), 'Access Not Configured') !== false) {
+                throw new repository_exception('servicenotenabled', 'repository_onedrive');
+            } else if (strpos($e->getMessage(), 'mysite not found') !== false) {
+                throw new repository_exception('mysitenotfound', 'repository_onedrive');
+            }
+        }
+
+        $remotefiles = isset($response->value) ? $response->value : [];
+        foreach ($remotefiles as $remotefile) {
+            if (!empty($remotefile->folder)) {
+                // This is a folder.
+                $folders[$remotefile->id] = [
+                        'title' => $remotefile->name,
+                        'path' => $this->build_node_path($remotefile->id, $remotefile->name, $path),
+                        'date' => strtotime($remotefile->lastModifiedDateTime),
+                        //'thumbnail' => $OUTPUT->image_url(file_folder_icon(64))->out(false),
+                        //'thumbnail_height' => 64,
+                        //'thumbnail_width' => 64,
+                        'children' => []
+                ];
+            } else {
+                // We can download all other file types.
+                $title = $remotefile->name;
+                $source = json_encode([
+                        'id' => $remotefile->id,
+                        'name' => $remotefile->name,
+                        'link' => $remotefile->webUrl
+                ]);
+
+                $thumb = '';
+                $thumbwidth = 0;
+                $thumbheight = 0;
+                $extendedinfoerr = false;
+
+                //if (empty($remotefile->thumbnails)) {
+                //    // Try and get it directly from the item.
+                //    $params = ['fileid' => $remotefile->id, '$select' => $fields, '$expand' => 'thumbnails'];
+                //    try {
+                //        $response = $service->call('get', $params);
+                //        $remotefile = $response;
+                //    } catch (Exception $e) {
+                //        // This is not a failure condition - we just could not get extended info about the file.
+                //        $extendedinfoerr = true;
+                //    }
+                //}
+
+                //if (!empty($remotefile->thumbnails)) {
+                //    $thumbs = $remotefile->thumbnails;
+                //    if (count($thumbs)) {
+                //        $first = reset($thumbs);
+                //        if (!empty($first->medium) && !empty($first->medium->url)) {
+                //            $thumb = $first->medium->url;
+                //            $thumbwidth = min($first->medium->width, 64);
+                //            $thumbheight = min($first->medium->height, 64);
+                //        }
+                //    }
+                //}
+
+                $files[$remotefile->id] = [
+                        'title' => $title,
+                        'source' => $source,
+                        'date' => strtotime($remotefile->lastModifiedDateTime),
+                        'size' => isset($remotefile->size) ? $remotefile->size : null,
+                        //'thumbnail' => $thumb,
+                        //'thumbnail_height' => $thumbwidth,
+                        //'thumbnail_width' => $thumbheight,
+                ];
+            }
+        }
+
+        // Filter and order the results.
+        //$files = array_filter($files, [$this, 'filter']);
+        $files = array_filter($files);
+        core_collator::ksort($files, core_collator::SORT_NATURAL);
+        core_collator::ksort($folders, core_collator::SORT_NATURAL);
+        return array_merge(array_values($folders), array_values($files));
+    }
+    /**
+     * Search throughout the OneDrive
+     *
+     * @param string $searchtext text to search for.
+     * @param int $page search page.
+     * @return array of results.
+     */
+    public function search($searchtext, $page = 0) {
+        $path = $this->build_node_path('root', get_string('pluginname', 'repository_onedrive'));
+        $str = get_string('searchfor', 'repository_onedrive', $searchtext);
+        $path = $this->build_node_path('search', $str, $path);
+
+        // Query the Drive.
+        $parent = 'root';
+        $results = $this->query($searchtext, $path, 'root');
+
+        $ret = [];
+        $ret['dynload'] = true;
+        $ret['path'] = $this->build_breadcrumb($path);
+        $ret['list'] = $results;
+        $ret['manage'] = 'https://www.office.com/';
+        return $ret;
+    }
+
+
+    /**
+     * Build the breadcrumb from a path.
+     *
+     * @param string $path to create a breadcrumb from.
+     * @return array containing name and path of each crumb.
+     */
+    protected function build_breadcrumb($path) {
+        $bread = explode('/', $path);
+        $crumbtrail = '';
+        foreach ($bread as $crumb) {
+            list($id, $name) = $this->explode_node_path($crumb);
+            $name = empty($name) ? $id : $name;
+            $breadcrumb[] = [
+                'name' => $name,
+                'path' => $this->build_node_path($id, $name, $crumbtrail),
+            ];
+            $tmp = end($breadcrumb);
+            $crumbtrail = $tmp['path'];
+        }
+        return $breadcrumb;
+    }
+    /**
+     * Returns information about a node in a path.
+     *
+     * @see self::build_node_path()
+     * @param string $node to extrat information from.
+     * @return array about the node.
+     */
+    protected function explode_node_path($node) {
+        if (strpos($node, '|') !== false) {
+            list($id, $name) = explode('|', $node, 2);
+            $name = urldecode($name);
+        } else {
+            $id = $node;
+            $name = '';
+        }
+        $id = urldecode($id);
+        return array(
+                0 => $id,
+                1 => $name,
+                'id' => $id,
+                'name' => $name
+        );
+    }
+    /**
+     * Generates a safe path to a node.
+     *
+     * Typically, a node will be id|Name of the node.
+     *
+     * @param string $id of the node.
+     * @param string $name of the node, will be URL encoded.
+     * @param string $root to append the node on, must be a result of this function.
+     * @return string path to the node.
+     */
+    protected function build_node_path($id, $name = '', $root = '') {
+        $path = $id;
+        if (!empty($name)) {
+            $path .= '|' . urlencode($name);
+        }
+        if (!empty($root)) {
+            $path = trim($root, '/') . '/' . $path;
+        }
+        return $path;
     }
 }

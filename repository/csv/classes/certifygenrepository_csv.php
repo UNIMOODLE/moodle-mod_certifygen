@@ -31,6 +31,7 @@ namespace certifygenrepository_csv;
 
 use certifygenvalidation_csv\certifygenvalidation_csv;
 use certifygenvalidation_csv\csv_configuration;
+use certifygenvalidation_csv\persistents\certifygenvalidationcsv;
 use coding_exception;
 use dml_exception;
 use mod_certifygen\interfaces\ICertificateRepository;
@@ -72,8 +73,13 @@ class certifygenrepository_csv implements ICertificateRepository {
      * @throws coding_exception
      */
     private function call_file_url_from_external_service(certifygen_validations $validation, string $code): string {
+        $params = ['validationid' => $validation->get('id')];
+        $teacherrequest = certifygenvalidationcsv::get_record($params);
+        if (!$teacherrequest) {
+            throw new moodle_exception('certifygenvalidationcsvnotfound', 'certifygen');
+        }
         $validationcsv = new certifygenvalidation_csv();
-        $data = $validationcsv->get_file_url_from_external_service($validation->get('id'), $code);
+        $data = $validationcsv->get_file_url_from_external_service($code);
         if (array_key_exists('url', $data)) {
             return $data['url'];
         }
@@ -148,5 +154,21 @@ class certifygenrepository_csv implements ICertificateRepository {
             debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
         }
         return $filecontent;
+    }
+
+    /**
+     * Get file by code
+     * Search for files named by $code
+     *
+     * @param string $code
+     * @return string
+     */
+    public function get_file_by_code(string $code): string {
+        $validationcsv = new certifygenvalidation_csv();
+        $data = $validationcsv->get_file_url_from_external_service($code);
+        if (array_key_exists('url', $data)) {
+            return $data['url'];
+        }
+        return '';
     }
 }

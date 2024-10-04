@@ -86,4 +86,13 @@ interface ICertificateRepository {
      * @return array
      */
     public function get_consistent_validation_plugins(): array;
+
+    /**
+     * Get file by code
+     * Search for files named by $code
+     *
+     * @param string $code
+     * @return string
+     */
+    public function get_file_by_code(string $code): string;
 }

@@ -361,13 +361,8 @@ xmlns:fir="http://firma.ws.producto.com/">
      * @param string $code
      * @return array
      */
-    public function get_file_url_from_external_service(int $validationid, string $code): array {
+    public function get_file_url_from_external_service(string $code): array {
         try {
-            $params = ['validationid' => $validationid];
-            $teacherrequest = certifygenvalidationcsv::get_record($params);
-            if (!$teacherrequest) {
-                throw new moodle_exception('certifygenvalidationcsvnotfound', 'certifygen');
-            }
             $params = $this->create_params_get_file_url($code);
             $curl = curl_init();
 

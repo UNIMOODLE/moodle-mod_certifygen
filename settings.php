@@ -97,6 +97,15 @@ $teacherrequestreportsettings = new admin_externalpage(
     $module->is_enabled() === false
 );
 $ADMIN->add('certifygencat', $teacherrequestreportsettings);
+// Search for ccertificates by code.
+$searchforcerts = new admin_externalpage(
+    'certifygensearchfor',
+    get_string('certifygensearchfor', 'mod_certifygen'),
+    '/mod/certifygen/code.php',
+    'mod/certifygen:manage',
+    $module->is_enabled() === false
+);
+$ADMIN->add('certifygencat', $searchforcerts);
 
 $errorspage = new admin_externalpage(
     'certifygenerrors',

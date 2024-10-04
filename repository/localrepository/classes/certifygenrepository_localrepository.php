@@ -192,4 +192,50 @@ class certifygenrepository_localrepository implements ICertificateRepository {
         }
         return $result;
     }
+
+    /**
+     * Get file by code
+     * Search for files named by $code
+     *
+     * @param string $code
+     * @return string
+     */
+    public function get_file_by_code(string $code): string {
+        global $DB;
+
+        $url = '';
+        try {
+            $comparecomp = $DB->sql_compare_text('component');
+            $comparecompplaceholder = $DB->sql_compare_text(':component');
+            $comparefarea = $DB->sql_compare_text('filearea');
+            $comparefareaplaceholder = $DB->sql_compare_text(':filearea');
+            $comparefname = $DB->sql_compare_text('filename');
+            $comparefnameplaceholder = $DB->sql_compare_text(':filename');
+            $params = [
+                    'component' => self::FILE_COMPONENT,
+                    'filearea' => self::FILE_AREA,
+                    'filename' => $code . '.pdf',
+            ];
+            $sql = "SELECT *
+                  FROM {files}
+                 WHERE {$comparecomp} = {$comparecompplaceholder}
+                        AND {$comparefarea} = {$comparefareaplaceholder}
+                        AND {$comparefname} = {$comparefnameplaceholder}";
+            $result = $DB->get_record_sql($sql, $params);
+            if ($result) {
+                $url = moodle_url::make_pluginfile_url(
+                    $result->contextid,
+                    $result->component,
+                    $result->filearea,
+                    $result->itemid,
+                    $result->filepath,
+                    $result->filename
+                )->out();
+            }
+        } catch (moodle_exception $e) {
+            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
+        }
+
+        return $url;
+    }
 }
