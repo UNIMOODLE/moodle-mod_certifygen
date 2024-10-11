@@ -2,22 +2,26 @@
 
 #  Certifygen Custom Course Certificate Mod #
 
+Generation of PDF certificates with connection to digital signature systems and modular storage
+
 ## Compatibility ##
 
 The plugin has been tested on the following versions:
 
 * Moodle 4.1.1 (Build: 20230116) - 2022112801.00
-* Moodle 3.11.17+ (Build: 20231124) - 2021051717.06
 
 ## Requirements ##
 
 * User configuration and REST Web Services
-* User for web service must have 'report/completion:view' capability.
+* Admin tool certificate v2024042300 or higher.
 
 ## Languages ##
 
 * English
 * Spanish
+* Catalan
+* Euskera
+* Galego
 
 ## Installation via uploaded ZIP file ##
 
@@ -35,22 +39,25 @@ Then, log in to your Moodle site as an administrator and go to Site Administrati
 
 Alternatively, you can run
 ```
-$ php admin/cli/upgrade.php
+php admin/cli/upgrade.php
 ```
 to complete the installation from the command line.
 ## Global Configuration ##
+```
+{your/moodle/dirroot}/admin/settings.php?section=modsettingcertifygen
+```
 ## CLI Executions ##
 ## Subplugins ##
 
-### certifygenvalidation ###
+### Certifygen validation ###
 * certifygenvalidation_cmd 
 * certifygenvalidation_csv
 * certifygenvalidation_electronic
 * certifygenvalidation_none
-### certifygenreport ###
+### Certifygen report ###
 * certifygenreport_basic 
-### certifygenrepository ###
-* certifygenvalidation_csv
+### Certifygen repository ###
+* certifygenrepository_csv
 * certifygenrepository_localrepository 
 * certifygenrepository_onedrive 
 
@@ -61,11 +68,20 @@ to complete the installation from the command line.
 There is a task, checkstatus, that is recomended to enable it when the validation subplugin used does not validate inmediately the certificate.
 This task verify the status of the certificate on the external aplication used by the validation subplugin.
 
+```
+php {your/moodle/dirroot}/admin/cli/scheduled_task.php --execute=\mod_certifygen\task\checkstatus
+```
 ## Check file ##
 There is a task, checkfile, that is recomended to enable it when the validation subplugin used does not receive inmediately the certificate.
 This task get the certificate from the external aplication used by the validation subplugin.
-
-   
+```
+php {your/moodle/dirroot}/admin/cli/scheduled_task.php --execute=\mod_certifygen\task\checkfile
+```
+## Check error ##
+There is a task, checkerror. It is responsible for searching for error states in the validation processes and returning them to the not started state, so that the user can start the process again. 
+```
+php {your/moodle/dirroot}/admin/cli/scheduled_task.php --execute=\mod_certifygen\task\checkerror
+```
 ## Database Tables ##
 
 * __certifygen__
@@ -92,13 +108,8 @@ Contains information about stores certificate errors
 
 ## Unit Test ##
 
-ES
-
-<img src="https://github.com/UNIMOODLE/p31_mod/blob/develop/pix/icon.png" width="160" >
-
-#  P31 Certifygen custom Course Certificate mod #
-
-## Compatibilidad ##
-
-
+You can run unit tests manually with the following command
+```
+php {your/moodle/dirroot}/vendor/bin/phpunit --testsuite mod_certifygen_testsuite
+```
 
