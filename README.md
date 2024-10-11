@@ -1,4 +1,4 @@
-<img src="https://github.com/UNIMOODLE/p31_mod/blob/develop/pix/icon.png" width="160" >
+<img src="pix/icon.png" width="160">
 
 #  Certifygen Custom Course Certificate Mod #
 
@@ -112,4 +112,3 @@ You can run unit tests manually with the following command
 ```
 php {your/moodle/dirroot}/vendor/bin/phpunit --testsuite mod_certifygen_testsuite
 ```
-
