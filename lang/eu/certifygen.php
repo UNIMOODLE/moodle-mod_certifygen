@@ -220,3 +220,5 @@ $string['codeview'] = 'Bilatu ziurtagiriak kodearen arabera';
 $string['codefound'] = 'Emaitza aurkitu dugu. Deskargatu fitxategia hurrengo estekan klik eginez {$a}';
 $string['codenotfound'] = 'Kode honekin ez dugu emaitzarik aurkitu';
 $string['certifygensearchfor'] = 'Bilatu ziurtagiriak kodearen arabera';
+$string['model_must_exists'] = 'Eredua existitu behar da';
+$string['course_not_valid_for_modelid'] = 'Ikastaroak ez du balio modelid honetarako';

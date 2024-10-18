@@ -57,5 +57,34 @@ function xmldb_certifygen_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2024092002, 'certifygen');
     }
 
+    if ($oldversion < 2024101100) {
+
+        // Define field modelid to be dropped from certifygen.
+        $table = new xmldb_table('certifygen');
+        $key = new xmldb_key('fk_model', XMLDB_KEY_FOREIGN, ['modelid'], 'certifygen_model', ['id']);
+        $dbman->drop_key($table, $key);
+        $field = new xmldb_field('modelid');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+
+        // Define table certifygen_cmodels to be created.
+        $table = new xmldb_table('certifygen_cmodels');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('modelid', XMLDB_TYPE_INTEGER, '20', null, null, null, null);
+        $table->add_field('certifygenid', XMLDB_TYPE_INTEGER, '20', null, null, null, null);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('fkmodelid', XMLDB_KEY_FOREIGN, ['modelid'], 'certifygen_model', ['id']);
+        $table->add_key('fkcertifygenid', XMLDB_KEY_FOREIGN, ['certifygenid'], 'certifygen', ['id']);
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Certifygen savepoint reached.
+        upgrade_mod_savepoint(true, 2024101100, 'certifygen');
+    }
+
+
     return true;
 }

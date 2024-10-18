@@ -64,12 +64,12 @@ class mod_certifygen_mod_form extends moodleform_mod {
             !is_null($this->get_instance()) && !empty($this->get_instance())
             && mod_certifygen_are_there_any_certificate_emited_by_instanceid($this->get_instance())
         ) {
-            $certifygen = new certifygen($this->get_instance());
-            $model = new certifygen_model($certifygen->get('modelid'));
+            $modelid = certifygen::get_modelid_from_certifygenid($this->get_instance());
+            $model = new certifygen_model($modelid);
             $htmlstring = get_string('model', 'mod_certifygen');
             $htmlstring .= ': ' . $model->get('name');
             $mform->addElement('html', '<div class="row p-4">' . $htmlstring . '</div>');
-            $mform->addElement('hidden', 'modelid', $certifygen->get('modelid'));
+            $mform->addElement('hidden', 'modelid', $modelid);
             $mform->setType('modelid', PARAM_INT);
         } else {
             $canmanagemodels = has_capability('mod/certifygen:manage', context_system::instance());
@@ -100,8 +100,7 @@ class mod_certifygen_mod_form extends moodleform_mod {
             $mform->addGroupRule('models_group', $rules);
 
             if (!is_null($this->get_instance())) {
-                $certifygen = new certifygen($this->get_instance());
-                $modelid = $certifygen->get('modelid');
+                $modelid = certifygen::get_modelid_from_certifygenid((int)$this->get_instance());
                 $mform->setDefault('modelid', $modelid);
             }
         }

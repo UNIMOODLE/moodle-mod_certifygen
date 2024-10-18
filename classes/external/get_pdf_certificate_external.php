@@ -134,7 +134,7 @@ class get_pdf_certificate_external extends external_api {
             }
 
             // Model info.
-            $model = new certifygen_model($certifygen->get('modelid'));
+            $model = new certifygen_model(certifygen::get_modelid_from_certifygenid($params['idinstance']));
 
             // Already emtited?
             $validation = certifygen_validations::get_validation_by_lang_and_instance($lang, $idinstance, $userid);

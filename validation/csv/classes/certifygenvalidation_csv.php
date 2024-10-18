@@ -664,8 +664,6 @@ xmlns:fir="http://firma.ws.producto.com/">
             throw new moodle_exception('validationidnotfound', 'certifygenvalidation_csv');
         }
         try {
-            $message = '';
-            $haserror = false;
             $params = $this->create_params_status($code);
             $curl = curl_init();
 
@@ -686,10 +684,7 @@ xmlns:fir="http://firma.ws.producto.com/">
 
             $response = curl_exec($curl);
             if (curl_errno($curl)) {
-                return [
-                    'haserror' => true,
-                    'message' => curl_error($curl),
-                ];
+                return certifygen_validations::STATUS_VALIDATION_ERROR;
             }
             curl_close($curl);
 
@@ -720,16 +715,11 @@ xmlns:fir="http://firma.ws.producto.com/">
             }
             return certifygen_validations::STATUS_IN_PROGRESS;
         } catch (SoapFault $e) {
-            $haserror = true;
             debugging(__FUNCTION__ . '  SoapFault error: ' . $e->getMessage());
         } catch (Exception $e) {
-            $haserror = true;
             debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
         }
-        return [
-            'haserror' => $haserror,
-            'message' => $message,
-        ];
+        return certifygen_validations::STATUS_VALIDATION_ERROR;
     }
 
     /**

@@ -96,10 +96,10 @@ class getmycertificatedata_external extends external_api {
                 false,
                 MUST_EXIST
             );
-            $certifygen = $DB->get_record('certifygen', ['id' => $cm->instance], '*', MUST_EXIST);
+            $cmodel = $DB->get_record('certifygen_cmodels', ['certifygenid' => $cm->instance], '*', MUST_EXIST);
             $certifygenmodel = $DB->get_record(
                 'certifygen_model',
-                ['id' => $certifygen->modelid],
+                ['id' => $cmodel->modelid],
                 '*',
                 MUST_EXIST
             );

@@ -220,3 +220,5 @@ $string['codeview'] = 'Búsqueda de certificados por código';
 $string['codefound'] = 'Hemos encontrado un resultado. Descargate el fichero pinchando en el siguiente link {$a}';
 $string['codenotfound'] = 'No hemos encontrado ningun resultado con este código';
 $string['certifygensearchfor'] = 'Búsqueda de certificados por código';
+$string['model_must_exists'] = 'El modelo debe de existir';
+$string['course_not_valid_for_modelid'] = 'Curso no válido para este modelo';

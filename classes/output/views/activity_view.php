@@ -88,6 +88,7 @@ class activity_view implements renderable, templatable {
      * @throws coding_exception
      */
     public function __construct(int $courseid, int $templateid, stdClass $cm, string $lang = "", int $pagesize = 10) {
+        global $DB;
 
         $ccontext = context_course::instance($courseid);
         $this->isteacher = has_capability('moodle/course:managegroups', $ccontext);
@@ -95,8 +96,8 @@ class activity_view implements renderable, templatable {
         $this->templateid = $templateid;
         $this->cm = $cm;
         $this->pagesize = $pagesize;
-        $certificate = new certifygen($cm->instance);
-        $this->certificatemodel = new certifygen_model($certificate->get('modelid'));
+        $cmodel = $DB->get_record('certifygen_cmodels', ['certifygenid' => $cm->instance], '*', MUST_EXIST);
+        $this->certificatemodel = new certifygen_model($cmodel->modelid);
         if (empty($this->certificatemodel->get_model_languages())) {
             $a = new stdClass();
             $a->lang = $this->certificatemodel->get('langs');

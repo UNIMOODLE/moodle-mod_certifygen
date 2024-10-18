@@ -48,9 +48,6 @@ class certifygen extends persistent {
             'course' => [
                 'type' => PARAM_INT,
             ],
-            'modelid' => [
-                'type' => PARAM_INT,
-            ],
             'name' => [
                 'type' => PARAM_RAW,
             ],
@@ -64,5 +61,16 @@ class certifygen extends persistent {
                 'type' => PARAM_INT,
             ],
         ];
+    }
+
+    /**
+     * Get modelid from certifygenid
+     * @param int $certifygenid
+     * @return int
+     * @throws \dml_exception
+     */
+    public static function get_modelid_from_certifygenid(int $certifygenid): int {
+        global $DB;
+        return $DB->get_field('certifygen_cmodels', 'modelid', ['certifygenid' => $certifygenid]);
     }
 }
