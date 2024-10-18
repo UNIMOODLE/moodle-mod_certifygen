@@ -220,3 +220,5 @@ $string['codeview'] = 'Cerca de certificats per codi';
 $string['codefound'] = 'Hem trobat un resultat. Descarrega\'t el fitxer clicant al següent link {$a}';
 $string['codenotfound'] = 'No hem trobat resultats amb aquest codi.';
 $string['certifygensearchfor'] = 'Cercar certificats per codi';
+$string['model_must_exists'] = 'El model ha d\'existir';
+$string['course_not_valid_for_modelid'] = 'Curs no vàlid per a aquest modelid';

@@ -43,7 +43,8 @@ $id = required_param('id', PARAM_INT);    // Course Module ID.
 $cm = get_coursemodule_from_id('certifygen', $id, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
 $certifygen = $DB->get_record('certifygen', ['id' => $cm->instance], '*', MUST_EXIST);
-$certifygenmodel = $DB->get_record('certifygen_model', ['id' => $certifygen->modelid], '*', MUST_EXIST);
+$cmodel = $DB->get_record('certifygen_cmodels', ['certifygenid' => $cm->instance], '*', MUST_EXIST);
+$certifygenmodel = $DB->get_record('certifygen_model', ['id' => $cmodel->modelid], '*', MUST_EXIST);
 
 $PAGE->set_url('/mod/certifygen/view.php', ['id' => $id]);
 require_login($course, false, $cm);

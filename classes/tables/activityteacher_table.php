@@ -94,8 +94,8 @@ class activityteacher_table extends table_sql {
         /** @var cm_info $cm**/
         [$course, $cm] = get_course_and_cm_from_instance($instance, 'certifygen', $courseid);
         $this->cmid = $cm->id;
-        $this->modelid = $certifygen->get('modelid');
-        $this->model = new certifygen_model($certifygen->get('modelid'));
+        $this->modelid = \mod_certifygen\persistents\certifygen::get_modelid_from_certifygenid($instance);
+        $this->model = new certifygen_model($this->modelid);
         $uniqueid = 'certifygen-activity-teacher-view';
         parent::__construct($uniqueid);
         // Define the list of columns to show.

@@ -49,6 +49,7 @@ use tool_certificate\permission;
  */
 function certifygen_supports(string $feature): ?bool {
     switch ($feature) {
+        case FEATURE_BACKUP_MOODLE2:
         case FEATURE_MOD_INTRO:
         case FEATURE_SHOW_DESCRIPTION:
         case FEATURE_COMPLETION_TRACKS_VIEWS:
@@ -67,14 +68,13 @@ function certifygen_supports(string $feature): ?bool {
  * @throws invalid_persistent_exception
  */
 function certifygen_add_instance(stdClass $data, $mform = null): int {
-    global $USER;
+    global $USER, $DB;
 
     $data->modelname = $data->name;
 
     // Create a certifygen.
     $certifygendata = [
         'course' => $data->course,
-        'modelid' => $data->modelid,
         'name' => $data->name,
         'intro' => $data->intro,
         'introformat' => $data->introformat,
@@ -85,6 +85,8 @@ function certifygen_add_instance(stdClass $data, $mform = null): int {
 
     $certifygen = new certifygen(0, (object)$certifygendata);
     $certifygen->create();
+
+    $DB->insert_record('certifygen_cmodels', (object)['modelid' => $data->modelid, 'certifygenid' => $certifygen->get('id')]);
 
     return $certifygen->get('id');
 }
@@ -99,16 +101,20 @@ function certifygen_add_instance(stdClass $data, $mform = null): int {
  * @throws coding_exception
  */
 function certifygen_update_instance($data, $mform): bool {
-    global $USER;
+    global $USER, $DB;
 
     // Update a certifygen.
     $certifygen = new certifygen($data->instance);
     $certifygen->set('name', $data->name);
-    $certifygen->set('modelid', $data->modelid);
     $certifygen->set('intro', $data->intro);
     $certifygen->set('introformat', $data->introformat);
     $certifygen->set('usermodified', $USER->id);
     $certifygen->set('timemodified', time());
+
+    if ($cmodel = $DB->get_record('certifygen_cmodels', ['certifygenid' => $certifygen->get('id')])) {
+        $cmodel->modelid = $data->modelid;
+        $DB->update_record('certifygen_cmodels', $cmodel);
+    }
     return $certifygen->update();
 }
 
@@ -119,8 +125,12 @@ function certifygen_update_instance($data, $mform): bool {
  * @throws coding_exception
  */
 function certifygen_delete_instance($id): bool {
+    global $DB;
     // Delete a certifygen.
     $certifygen = new certifygen($id);
+
+    // Table certifygen_cmodels.
+    $DB->delete_records('certifygen_cmodels', ['certifygenid' => $id]);
 
     // Delete a certifygen_validations and certifygen_repository.
     $validations = certifygen_validations::get_records(['certifygenid' => $id]);
