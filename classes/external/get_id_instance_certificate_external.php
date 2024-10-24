@@ -82,7 +82,7 @@ class get_id_instance_certificate_external extends external_api {
      * @throws dml_exception
      */
     public static function get_id_instance_certificate(int $userid, string $userfield, string $lang): array {
-
+        global $DB;
         $params = self::validate_parameters(
             self::get_id_instance_certificate_parameters(),
             ['userid' => $userid, 'userfield' => $userfield,
@@ -159,6 +159,7 @@ class get_id_instance_certificate_external extends external_api {
                         if ($activity->get('course') != $enrolment->ctxinstance) {
                             continue;
                         }
+                        $modelid = $DB->get_field('certifygen_cmodels', 'modelid', ['certifygenid' => $activity->get('id')]);
                         $data = get_course_and_cm_from_instance($activity->get('id'), 'certifygen', $activity->get('course'));
                         /** @var cm_info $cm */
                         $cm = $data[1];
@@ -168,7 +169,7 @@ class get_id_instance_certificate_external extends external_api {
                         if (!$cm->available) {
                             continue;
                         }
-                        $model = certifygen_model::get_record(['id' => $activity->get('modelid')]);
+                        $model = certifygen_model::get_record(['id' => $modelid]);
                         $validationplugin = $model->get('validation');
                         $validationpluginclass = $validationplugin . '\\' . $validationplugin;
                         if (get_config($validationplugin, 'enabled') === '0') {

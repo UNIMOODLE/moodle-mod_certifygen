@@ -182,6 +182,8 @@ class get_json_teacher_certificate_external_test extends advanced_testcase {
 
         // Create courses.
         $course1 = self::getDataGenerator()->create_course();
+        $course2 = self::getDataGenerator()->create_course();
+        $course3 = self::getDataGenerator()->create_course();
 
         // Enrol user in course1 as editingteacher.
         $teacher = $this->getDataGenerator()->create_user();
@@ -199,7 +201,7 @@ class get_json_teacher_certificate_external_test extends advanced_testcase {
         $result = get_json_teacher_certificate_external::get_json_teacher_certificate(
             $teacher->id,
             '',
-            '456,6789',
+            $course2->id . ',' . $course3->id,
             'en',
             $model->get('id')
         );
@@ -208,7 +210,7 @@ class get_json_teacher_certificate_external_test extends advanced_testcase {
         $this->assertArrayHasKey('code', $result['error']);
         $this->assertArrayHasKey('message', $result['error']);
         $this->assertEquals('course_not_valid_with_model', $result['error']['code']);
-        $this->assertEquals(get_string('course_not_valid_with_model', 'mod_certifygen'), $result['error']['message']);
+        $this->assertEquals(get_string('course_not_valid_with_model', 'mod_certifygen', $course2->id), $result['error']['message']);
     }
 
     /**
