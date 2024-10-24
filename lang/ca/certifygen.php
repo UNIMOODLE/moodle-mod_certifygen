@@ -221,4 +221,4 @@ $string['codefound'] = 'Hem trobat un resultat. Descarrega\'t el fitxer clicant 
 $string['codenotfound'] = 'No hem trobat resultats amb aquest codi.';
 $string['certifygensearchfor'] = 'Cercar certificats per codi';
 $string['model_must_exists'] = 'El model ha d\'existir';
-$string['course_not_valid_for_modelid'] = 'Curs no vàlid per a aquest modelid';
+$string['course_not_valid_for_modelid'] = 'No es pot restaurar l\'activitat {$a->activityname}. El curs ({$a->courseid}) no és vàlid per a aquest model (nom: {$a->name}, idnumber: {$a->idnumber})';

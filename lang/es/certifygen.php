@@ -221,4 +221,4 @@ $string['codefound'] = 'Hemos encontrado un resultado. Descargate el fichero pin
 $string['codenotfound'] = 'No hemos encontrado ningun resultado con este código';
 $string['certifygensearchfor'] = 'Búsqueda de certificados por código';
 $string['model_must_exists'] = 'El modelo debe de existir';
-$string['course_not_valid_for_modelid'] = 'Curso no válido para este modelo';
+$string['course_not_valid_for_modelid'] = 'No se puede restaurar la actividad {$a->activityname}. El curso ({$a->courseid}) no es válido para este modelo(nombre: {$a->name}, idnumber: {$a->idnumber})';

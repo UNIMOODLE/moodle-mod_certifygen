@@ -94,7 +94,7 @@ class restore_certifygen_activity_structure_step extends restore_activity_struct
         $data = (object) $data;
         $this->oldcourseid = $data->course;
         $data->course = $this->get_courseid();
-
+        $this->activityname = $data->name;
         // Insert the record.
         $newitemid = $DB->insert_record('certifygen', $data);
         $this->newcertifygenid = $newitemid;
@@ -130,12 +130,12 @@ class restore_certifygen_activity_structure_step extends restore_activity_struct
 
         $updatemodelid = false;
         // Validate if the restore can be done.
-        // Model name must exists.
+        // Model idnumber must exists.
         $params = [
-                'name' => $data['name'],
+            'idnumber' => $data['idnumber'],
         ];
-        $comparename = $DB->sql_compare_text('cm.name');
-        $comparenameplaceholder = $DB->sql_compare_text(':name');
+        $comparename = $DB->sql_compare_text('cm.idnumber');
+        $comparenameplaceholder = $DB->sql_compare_text(':idnumber');
         $comparenamecondition = "{$comparename} = {$comparenameplaceholder}";
 
         $sql = "SELECT *
@@ -155,7 +155,14 @@ class restore_certifygen_activity_structure_step extends restore_activity_struct
         // New course id must be on model context.
         $modelids = \mod_certifygen\persistents\certifygen_context::get_course_valid_modelids($this->get_courseid());
         if (!in_array($newmodelid, $modelids)) {
-            throw new moodle_exception('course_not_valid_for_modelid', 'mod_certifygen');
+            $params = ['courseid' => $this->get_courseid(), 'activityname' => $this->activityname,
+                    'name' => $data['name'], 'idnumber' => $data['idnumber']];
+            throw new moodle_exception(
+                'course_not_valid_for_modelid',
+                'mod_certifygen',
+                '',
+                (object) $params
+            );
         }
         if ($updatemodelid) {
             $certifygen = $DB->get_record('certifygen', ['id' => $this->newcertifygenid]);

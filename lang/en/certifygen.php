@@ -221,4 +221,4 @@ $string['codefound'] = 'We have found a result. Download the file by clicking on
 $string['codenotfound'] = 'We have not found any results with this code';
 $string['certifygensearchfor'] = 'Search for certificates by code';
 $string['model_must_exists'] = 'Model must exist';
-$string['course_not_valid_for_modelid'] = 'Course not valid for modelid';
+$string['course_not_valid_for_modelid'] = 'Cannot restore activity {$a->activityname}. The course ({$a->courseid}) is not valid for this model(name: {$a->name}, idnumber: {$a->idnumber})';

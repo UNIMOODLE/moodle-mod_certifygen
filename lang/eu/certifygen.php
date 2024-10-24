@@ -221,4 +221,4 @@ $string['codefound'] = 'Emaitza aurkitu dugu. Deskargatu fitxategia hurrengo est
 $string['codenotfound'] = 'Kode honekin ez dugu emaitzarik aurkitu';
 $string['certifygensearchfor'] = 'Bilatu ziurtagiriak kodearen arabera';
 $string['model_must_exists'] = 'Eredua existitu behar da';
-$string['course_not_valid_for_modelid'] = 'Ikastaroak ez du balio modelid honetarako';
+$string['course_not_valid_for_modelid'] = 'Ezin da jarduera berrezarri {$a->activityname}. Ikastaroak ({$a->courseid}) ez du balio eredu honetarako (izena: {$a->name}, idzenbakia: {$a->idnumber})';
