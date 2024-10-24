@@ -220,5 +220,5 @@ $string['codeview'] = 'Busca certificados por código';
 $string['codefound'] = 'Atopamos un resultado. Descarga o ficheiro facendo clic na seguinte ligazón {$a}';
 $string['codenotfound'] = 'Non atopamos ningún resultado con este código';
 $string['certifygensearchfor'] = 'Buscar certificados por código';
-$string['model_must_exists'] = 'O modelo debe existir';
-$string['course_not_valid_for_modelid'] = 'Curso non válido para este modelo';
+$string['model_must_exists'] = 'Non se pode restaurar a actividade {$a->activityname}. Debe haber un modelo cun idnumber igual a {$a->idnumber}';
+$string['course_not_valid_for_modelid'] = 'Non se pode restaurar a actividade {$a->activityname}. O curso ({$a->courseid}) non é válido para este modelo (nome: {$a->name}, número de identificación: {$a->idnumber})';

@@ -128,6 +128,7 @@ class modelform extends dynamic_form {
             $html = get_string('type', 'mod_certifygen') . ' : ' . $typestring;
             $html = html_writer::div($html, 'w-100');
             $mform->addElement('html', $html);
+            $mform->addElement('hidden', 'type', $model->get('type'));
         }
         // End Model Form Part.
 
@@ -172,6 +173,7 @@ class modelform extends dynamic_form {
                 . $templates[(int)$model->get('templateid')];
             $html = html_writer::div($html, 'w-100');
             $mform->addElement('html', $html);
+            $mform->addElement('hidden', 'templateid', $model->get('templateid'));
         }
 
         // Langs.
@@ -190,6 +192,7 @@ class modelform extends dynamic_form {
             $html = get_string('validation', 'mod_certifygen') . ' : ' . $typestring;
             $html = html_writer::div($html, 'w-100');
             $mform->addElement('html', $html);
+            $mform->addElement('hidden', 'langs', $model->get('langs'));
         }
 
         // Validation.
@@ -208,6 +211,7 @@ class modelform extends dynamic_form {
             $html = get_string('validation', 'mod_certifygen') . ' : ' . $typestring;
             $html = html_writer::div($html, 'w-100');
             $mform->addElement('html', $html);
+            $mform->addElement('hidden', 'validation', $model->get('validation'));
         }
         // Report (only for teacher model type).
         $types = mod_certifygen_get_report();
@@ -225,6 +229,7 @@ class modelform extends dynamic_form {
             $html = get_string('report', 'mod_certifygen') . ' : ' . $typestring;
             $html = html_writer::div($html, 'w-100');
             $mform->addElement('html', $html);
+            $mform->addElement('hidden', 'report', $model->get('report'));
         }
 
         // Repository.
@@ -244,6 +249,7 @@ class modelform extends dynamic_form {
             $html = get_string('repository', 'mod_certifygen') . ' : ' . $typestring;
             $html = html_writer::div($html, 'w-100');
             $mform->addElement('html', $html);
+            $mform->addElement('hidden', 'repository', $model->get('repository'));
         }
 
         // Hidden elements.

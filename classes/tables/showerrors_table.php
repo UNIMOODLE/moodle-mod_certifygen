@@ -115,20 +115,24 @@ class showerrors_table extends table_sql {
      */
     final public function col_user($row): string {
         global $OUTPUT;
-        $data = [
-            'id' => $row->userid,
-            'picture' => $row->picture,
-            'firstname' => $row->firstname,
-            'lastname' => $row->lastname,
-            'firstnamephonetic' => $row->firstnamephonetic,
-            'lastnamephonetic' => $row->lastnamephonetic,
-            'middlename' => $row->middlename,
-            'alternatename' => $row->alternatename,
-            'imagealt' => $row->imagealt,
-            'email' => $row->email,
-        ];
-
-        return $OUTPUT->user_picture((object) $data, ['size' => 35, 'includefullname' => true]);
+        try {
+            $data = [
+                    'id' => $row->userid,
+                    'picture' => $row->picture,
+                    'firstname' => $row->firstname,
+                    'lastname' => $row->lastname,
+                    'firstnamephonetic' => $row->firstnamephonetic,
+                    'lastnamephonetic' => $row->lastnamephonetic,
+                    'middlename' => $row->middlename,
+                    'alternatename' => $row->alternatename,
+                    'imagealt' => $row->imagealt,
+                    'email' => $row->email,
+            ];
+            return $OUTPUT->user_picture((object) $data, ['size' => 35, 'includefullname' => true]);
+        } catch (\moodle_exception $e) {
+            debugging('Error: ' . $e->getMessage());
+        }
+        return '';
     }
     /**
      * Download certificate
@@ -138,32 +142,36 @@ class showerrors_table extends table_sql {
      * @throws dml_exception
      */
     final public function col_download($row): string {
-
-        // Validation plugin.
-        $validationplugin = $row->modelvalidation;
-        $validationpluginclass = $validationplugin . '\\' . $validationplugin;
-        if (get_config($validationplugin, 'enabled') === '1') {
-            /** @var ICertificateValidation $subplugin */
-            $subplugin = new $validationpluginclass();
-            $courseid = 0;
-            if ($row->modeltype == certifygen_model::TYPE_ACTIVITY) {
-                $certifygen = new \mod_certifygen\persistents\certifygen($row->certifygenid);
-                $courseid = $certifygen->get('course');
+        try {
+            // Validation plugin.
+            $validationplugin = $row->modelvalidation;
+            $validationpluginclass = $validationplugin . '\\' . $validationplugin;
+            if (get_config($validationplugin, 'enabled') === '1') {
+                /** @var ICertificateValidation $subplugin */
+                $subplugin = new $validationpluginclass();
+                $courseid = 0;
+                if ($row->modeltype == certifygen_model::TYPE_ACTIVITY) {
+                    $certifygen = new \mod_certifygen\persistents\certifygen($row->certifygenid);
+                    $courseid = $certifygen->get('course');
+                }
+                $response = $subplugin->get_file($courseid, $row->validationid);
+                if (array_key_exists('file', $response)) {
+                    $file = $response['file'];
+                    $url = moodle_url::make_pluginfile_url(
+                        $file->get_contextid(),
+                        $file->get_component(),
+                        $file->get_filearea(),
+                        $file->get_itemid(),
+                        $file->get_filepath(),
+                        $file->get_filename()
+                    )->out();
+                    return html_writer::link($url, get_string('download'));
+                }
             }
-            $response = $subplugin->get_file($courseid, $row->validationid);
-            if (array_key_exists('file', $response)) {
-                $file = $response['file'];
-                $url = moodle_url::make_pluginfile_url(
-                    $file->get_contextid(),
-                    $file->get_component(),
-                    $file->get_filearea(),
-                    $file->get_itemid(),
-                    $file->get_filepath(),
-                    $file->get_filename()
-                )->out();
-                return html_writer::link($url, get_string('download'));
-            }
+        } catch (\moodle_exception $e) {
+            debugging(' Error: ' . $e->getMessage());
         }
+
         return '';
     }
     /**

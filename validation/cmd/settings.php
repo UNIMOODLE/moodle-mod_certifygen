@@ -66,14 +66,14 @@ if ($ADMIN->fulltree) {
         ""
     ));
 
-    $settings->add(new admin_setting_configtext(
+    $settings->add(new admin_setting_configdirectory(
         'certifygenvalidation_cmd/originalfilespath',
         new lang_string('originalfilespath', 'certifygenvalidation_cmd'),
         new lang_string('originalfilespath_help', 'certifygenvalidation_cmd'),
         ""
     ));
 
-    $settings->add(new admin_setting_configtext(
+    $settings->add(new admin_setting_configdirectory(
         'certifygenvalidation_cmd/validatedfilespath',
         new lang_string('validatedfilespath', 'certifygenvalidation_cmd'),
         new lang_string('validatedfilespath_help', 'certifygenvalidation_cmd'),
