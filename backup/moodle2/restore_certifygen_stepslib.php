@@ -144,6 +144,8 @@ class restore_certifygen_activity_structure_step extends restore_activity_struct
         $existingmodel = $DB->get_record_sql($sql, $params);
         $newmodelid = $data['id'];
         if (!$existingmodel) {
+            $DB->delete_records('certifygen_cmodels', ['certifygenid' => $this->get_new_parentid('certifygen')]);
+            $DB->delete_records('certifygen', ['id' => $this->get_new_parentid('certifygen')]);
             throw new moodle_exception('model_must_exists', 'mod_certifygen');
         } else if ($existingmodel && $existingmodel->id != $data['id']) {
             // Hay que modificar el modelid en certifygen y certifygen_cmodels.
@@ -155,6 +157,9 @@ class restore_certifygen_activity_structure_step extends restore_activity_struct
         // New course id must be on model context.
         $modelids = \mod_certifygen\persistents\certifygen_context::get_course_valid_modelids($this->get_courseid());
         if (!in_array($newmodelid, $modelids)) {
+            // Remove db inserts.
+            $DB->delete_records('certifygen_cmodels', ['certifygenid' => $this->get_new_parentid('certifygen')]);
+            $DB->delete_records('certifygen', ['id' => $this->get_new_parentid('certifygen')]);
             $params = ['courseid' => $this->get_courseid(), 'activityname' => $this->activityname,
                     'name' => $data['name'], 'idnumber' => $data['idnumber']];
             throw new moodle_exception(
