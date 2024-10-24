@@ -146,7 +146,13 @@ class restore_certifygen_activity_structure_step extends restore_activity_struct
         if (!$existingmodel) {
             $DB->delete_records('certifygen_cmodels', ['certifygenid' => $this->get_new_parentid('certifygen')]);
             $DB->delete_records('certifygen', ['id' => $this->get_new_parentid('certifygen')]);
-            throw new moodle_exception('model_must_exists', 'mod_certifygen');
+            $params = ['activityname' => $this->activityname, 'idnumber' => $data['idnumber']];
+            throw new moodle_exception(
+                'model_must_exists',
+                'mod_certifygen',
+                (new moodle_url('/'))->out(),
+                (object) $params
+            );
         } else if ($existingmodel && $existingmodel->id != $data['id']) {
             // Hay que modificar el modelid en certifygen y certifygen_cmodels.
             $updatemodelid = true;
@@ -165,7 +171,7 @@ class restore_certifygen_activity_structure_step extends restore_activity_struct
             throw new moodle_exception(
                 'course_not_valid_for_modelid',
                 'mod_certifygen',
-                '',
+                (new moodle_url('/'))->out(),
                 (object) $params
             );
         }

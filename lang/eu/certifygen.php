@@ -220,5 +220,5 @@ $string['codeview'] = 'Bilatu ziurtagiriak kodearen arabera';
 $string['codefound'] = 'Emaitza aurkitu dugu. Deskargatu fitxategia hurrengo estekan klik eginez {$a}';
 $string['codenotfound'] = 'Kode honekin ez dugu emaitzarik aurkitu';
 $string['certifygensearchfor'] = 'Bilatu ziurtagiriak kodearen arabera';
-$string['model_must_exists'] = 'Eredua existitu behar da';
+$string['model_must_exists'] = 'Ezin da {$a->activityname} jarduera leheneratu. {$a->idnumber}-ren ID zenbakia duen eredu bat egon behar da';
 $string['course_not_valid_for_modelid'] = 'Ezin da jarduera berrezarri {$a->activityname}. Ikastaroak ({$a->courseid}) ez du balio eredu honetarako (izena: {$a->name}, idzenbakia: {$a->idnumber})';
