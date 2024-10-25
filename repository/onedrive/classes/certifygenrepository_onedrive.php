@@ -258,7 +258,6 @@ class certifygenrepository_onedrive implements ICertificateRepository {
                 $result->filepath,
                 $result->filename
             )->out();
-            print_object($result);
         }
 
         return $url;

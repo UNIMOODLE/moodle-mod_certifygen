@@ -108,4 +108,11 @@ $capabilities = [
             'manager' => CAP_ALLOW,
         ],
     ],
+    'mod/certifygen:emitmyactivitycertificate' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => [
+            'student' => CAP_ALLOW,
+        ],
+    ],
 ];

@@ -123,7 +123,7 @@ class get_pdf_certificate_external extends external_api {
 
             // Is user enrolled on this course as student?
             $context = context_course::instance($certifygen->get('course'));
-            if (has_capability('moodle/course:managegroups', $context, $userid)) {
+            if (!has_capability('mod/certifygen:emitmyactivitycertificate', $context, $userid)) {
                 $result['error']['code'] = 'user_not_enrolled_on_idinstance_course_as_student';
                 $result['error']['message'] = get_string(
                     'student_not_enrolled',

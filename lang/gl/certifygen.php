@@ -42,6 +42,7 @@ $string['certifygen:manage'] = 'Xestionar certificados Unimoodle Certifygen';
 $string['certifygen:canmanagecertificates'] = 'Pode xestionar certificados Unimoodle Certifygen';
 $string['certifygen:viewmycontextcertificates'] = 'Ver os meus certificados Unimoodle Certifygen';
 $string['certifygen:viewcontextcertificates'] = 'Ver certificados Unimoodle Certifygen doutros profesores';
+$string['certifygen:emitmyactivitycertificate'] = 'Expedir certificados nunha actividade';
 $string['type'] = 'Tipo';
 $string['type_help'] = 'Escolle o tipo de certificado que desexas emitir. Alumnado ou profesorado.';
 $string['type_1'] = 'Curso completo (para alumnado)';

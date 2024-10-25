@@ -134,7 +134,7 @@ class get_json_certificate_external extends external_api {
 
             // Is user enrolled on this course as student?
             $context = context_course::instance($certifygen->get('course'));
-            if (has_capability('moodle/course:managegroups', $context, $userid)) {
+            if (!has_capability('mod/certifygen:emitmyactivitycertificate', $context, $userid)) {
                 unset($result['json']);
                 $result['error']['code'] = 'student_not_enrolled';
                 $result['error']['message'] = get_string(

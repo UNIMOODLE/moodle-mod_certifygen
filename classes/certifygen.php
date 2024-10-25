@@ -369,6 +369,8 @@ class certifygen {
             'component' => $component,
             'lang' => $lang,
             'certifygenid' => $certifygenid,
+            'permission' => 1,
+            'capability' => 'mod/certifygen:emitmyactivitycertificate',
             ];
         $where = "";
         if (!empty($tifirst)) {
@@ -379,12 +381,16 @@ class certifygen {
             $params['tilast'] = $tilast . '%';
             $where .= ' AND ' . $DB->sql_like('u.lastname', ':tilast');
         }
+        $comparecap = $DB->sql_compare_text('rc.capability');
+        $comparecapplaceholder = $DB->sql_compare_text(':capability');
+        $where .= "AND  {$comparecap} = {$comparecapplaceholder}";
+
         if ($userid) {
             $params['userid'] = $userid;
             $where = ' AND u.id = :userid';
         }
 
-        $sql = "SELECT us.userid, ci.id as issueid, ci.code, ci.emailed, ci.timecreated as ctimecreated, ci.userid,
+        $sql = "SELECT DISTINCT us.userid, ci.id as issueid, ci.code, ci.emailed, ci.timecreated as ctimecreated, ci.userid,
                         ci.templateid, ci.expires, ci.courseid, ci.archived, cv.lang as clang, cv.status as cstatus,
                         cv.id as validationid, us.*, us.courseid, ci.courseid, ci.archived, cv.lang as clang,
                         cv.status as cstatus, cv.id as validationid, us.*, us.courseid
@@ -396,7 +402,8 @@ class certifygen {
                             JOIN {context} cont ON (cont.instanceid = c.id AND cont.contextlevel = 50)
                             JOIN {role_assignments} ra ON ( ra.contextid = cont.id AND  ra.userid = u.id)
                             JOIN {role} r ON r.id = ra.roleid
-                            WHERE r.shortname = 'student' AND c.id = :courseid $where ) AS us
+                            JOIN {role_capabilities} rc ON rc.roleid = r.id
+                            WHERE rc.permission = :permission AND c.id = :courseid $where ) AS us
              LEFT JOIN {certifygen_validations} cv
                         ON (cv.userid = us.userid AND cv.lang = :lang AND cv.certifygenid = :certifygenid)
              LEFT JOIN {tool_certificate_issues} ci
@@ -464,6 +471,8 @@ class certifygen {
         $where = '';
         $params = [
             'courseid' => $courseid,
+            'permission' => 1,
+            'capability' => 'mod/certifygen:emitmyactivitycertificate',
         ];
         if (!empty($tifirst)) {
             $where .= " AND u.firstname LIKE '$tifirst%'";
@@ -471,6 +480,9 @@ class certifygen {
         if (!empty($tilast)) {
             $where .= " AND u.firstname LIKE '%$tilast'";
         }
+        $comparecap = $DB->sql_compare_text('rc.capability');
+        $comparecapplaceholder = $DB->sql_compare_text(':capability');
+        $where .= "AND  {$comparecap} = {$comparecapplaceholder}";
 
         if ($userid) {
             $params['userid'] = $userid;
@@ -489,8 +501,8 @@ class certifygen {
                   JOIN {role_assignments} ra
                         ON ( ra.contextid = cont.id AND  ra.userid = u.id)
                   JOIN {role} r ON r.id = ra.roleid
-                 WHERE r.shortname = 'student'
-                       AND c.id = :courseid $where";
+                  JOIN {role_capabilities} rc ON rc.roleid = r.id
+                 WHERE rc.permission = :permission AND c.id = :courseid $where";
         return $DB->count_records_sql($sql, $params);
     }
 

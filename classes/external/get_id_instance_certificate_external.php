@@ -138,51 +138,54 @@ class get_id_instance_certificate_external extends external_api {
                     continue;
                 }
                 $coursecontext = context_course::instance($enrolment->ctxinstance);
-                $roles = get_users_roles($coursecontext, [$userid]);
-                $roles = reset($roles);
-                foreach ($roles as $role) {
-                    if ($role->shortname != 'student') {
-                        continue;
-                    }
-                    $coursefullname = $filter->filter($enrolment->fullname);
-                    $coursefullname = strip_tags($coursefullname);
-                    $courseshortname = $filter->filter($enrolment->shortname);
-                    $courseshortname = strip_tags($courseshortname);
-                    $course = [
+                if (
+                    !has_capability(
+                        'mod/certifygen:emitmyactivitycertificate',
+                        $coursecontext,
+                        $userid
+                    )
+                ) {
+                    continue;
+                }
+                $coursefullname = $filter->filter($enrolment->fullname);
+                $coursefullname = strip_tags($coursefullname);
+                $courseshortname = $filter->filter($enrolment->shortname);
+                $courseshortname = strip_tags($courseshortname);
+                $course = [
                         'id' => $enrolment->ctxinstance,
                         'shortname' => $courseshortname,
                         'fullname' => $coursefullname,
                         'categoryid' => $enrolment->category,
-                    ];
-                    $instance['course'] = $course;
-                    foreach ($allactivities as $activity) {
-                        if ($activity->get('course') != $enrolment->ctxinstance) {
-                            continue;
-                        }
-                        $modelid = $DB->get_field('certifygen_cmodels', 'modelid', ['certifygenid' => $activity->get('id')]);
-                        $data = get_course_and_cm_from_instance($activity->get('id'), 'certifygen', $activity->get('course'));
-                        /** @var cm_info $cm */
-                        $cm = $data[1];
-                        if (!$cm->visible) {
-                            continue;
-                        }
-                        if (!$cm->available) {
-                            continue;
-                        }
-                        $model = certifygen_model::get_record(['id' => $modelid]);
-                        $validationplugin = $model->get('validation');
-                        $validationpluginclass = $validationplugin . '\\' . $validationplugin;
-                        if (get_config($validationplugin, 'enabled') === '0') {
-                            continue;
-                        }
-                        /** @var ICertificateValidation $subplugin */
-                        $subplugin = new $validationpluginclass();
-                        if (!$subplugin->is_visible_in_ws()) {
-                            continue;
-                        }
-                        $actvname = $filter->filter($activity->get('name'));
-                        $actvname = strip_tags($actvname);
-                        $instance['instance'] = [
+                ];
+                $instance['course'] = $course;
+                foreach ($allactivities as $activity) {
+                    if ($activity->get('course') != $enrolment->ctxinstance) {
+                        continue;
+                    }
+                    $modelid = $DB->get_field('certifygen_cmodels', 'modelid', ['certifygenid' => $activity->get('id')]);
+                    $data = get_course_and_cm_from_instance($activity->get('id'), 'certifygen', $activity->get('course'));
+                    /** @var cm_info $cm */
+                    $cm = $data[1];
+                    if (!$cm->visible) {
+                        continue;
+                    }
+                    if (!$cm->available) {
+                        continue;
+                    }
+                    $model = certifygen_model::get_record(['id' => $modelid]);
+                    $validationplugin = $model->get('validation');
+                    $validationpluginclass = $validationplugin . '\\' . $validationplugin;
+                    if (get_config($validationplugin, 'enabled') === '0') {
+                        continue;
+                    }
+                    /** @var ICertificateValidation $subplugin */
+                    $subplugin = new $validationpluginclass();
+                    if (!$subplugin->is_visible_in_ws()) {
+                        continue;
+                    }
+                    $actvname = $filter->filter($activity->get('name'));
+                    $actvname = strip_tags($actvname);
+                    $instance['instance'] = [
                             'id' => $activity->get('id'),
                             'name' => $actvname,
                             'modelname' => $model->get('name'),
@@ -194,9 +197,8 @@ class get_id_instance_certificate_external extends external_api {
                             'modellangs' => $model->get('langs'),
                             'modelvalidation' => $model->get('validation'),
                             'modelrepository' => $model->get('repository'),
-                        ];
-                        $instances[] = $instance;
-                    }
+                    ];
+                    $instances[] = $instance;
                 }
             }
             $results['instances'] = $instances;
