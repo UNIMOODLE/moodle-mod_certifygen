@@ -267,7 +267,7 @@ class activityteacher_table extends table_sql {
 
         if ($status == certifygen_validations::STATUS_NOT_STARTED) {
             return '<span data-courseid="' . $row->courseid . '" data-modelid="' . $this->modelid . '" data-id="' . $id .
-                '" data-action="emit-certificate" data-userid="' . $row->userid . '" data-lang="' . $this->lang . '" 
+                '" data-action="emit-certificate" data-userid="' . $row->userid . '" data-lang="' . $this->lang . '"
                 data-langstring="' . $this->langstring . '"  data-cmid="' . $this->cmid . '" data-instanceid="'
                 . $this->instanceid . '" class="btn btn-primary">'
                 . get_string('emit', 'mod_certifygen') . '</span>';
@@ -298,6 +298,7 @@ class activityteacher_table extends table_sql {
      * @param int $pagesize size of page for paginated displayed table.
      * @param bool $useinitialsbar do you want to use the initials bar?
      * @throws dml_exception
+     * @throws coding_exception
      */
     public function query_db($pagesize, $useinitialsbar = true): void {
 
@@ -322,8 +323,24 @@ class activityteacher_table extends table_sql {
         }
         $this->langstring = $langs[$this->lang];
         $params['lang'] = $this->filterset->get_filter('lang')->current();
-        $total = certifygen::count_issues_for_course_by_lang($this->courseid, $tifirst, $tilast, $userid);
+        $students = certifygen::get_students($this->cmid, $this->courseid);
 
+        if ($userid && !in_array($userid, $students)) {
+            throw new moodle_exception('notastudent');
+        } else if ($userid && in_array($userid, $students)) {
+            $students = [$userid];
+        }
+
+        $total = certifygen::count_issues_for_course_by_lang(
+            $params['lang'],
+            $this->instanceid,
+            $this->templateid,
+            $this->courseid,
+            'mod_certifygen',
+            $students,
+            $tifirst,
+            $tilast,
+        );
         $this->pagesize($pagesize, $total);
 
         $this->rawdata = certifygen::get_issues_for_course_by_lang(
@@ -332,14 +349,12 @@ class activityteacher_table extends table_sql {
             $this->templateid,
             $this->courseid,
             'mod_certifygen',
-            $userid,
+            $students,
             $tifirst,
             $tilast,
             $this->get_page_start(),
             $this->get_page_size(),
-            $this->get_sql_sort()
         );
-
         // Set initial bars.
         $this->initialbars($total > $pagesize);
     }

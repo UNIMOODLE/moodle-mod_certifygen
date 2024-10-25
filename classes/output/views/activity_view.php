@@ -79,18 +79,21 @@ class activity_view implements renderable, templatable {
 
     /**
      * __construct
+     *
      * @param int $courseid
      * @param int $templateid
      * @param stdClass $cm
      * @param string $lang
      * @param int $pagesize
      * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public function __construct(int $courseid, int $templateid, stdClass $cm, string $lang = "", int $pagesize = 10) {
-        global $DB;
+        global $DB, $USER;
 
         $ccontext = context_module::instance($cm->id);
-        $this->isteacher = !has_capability('mod/certifygen:emitmyactivitycertificate', $ccontext);
+        $this->isteacher = is_primary_admin($USER->id) || !has_capability('mod/certifygen:emitmyactivitycertificate', $ccontext);
         $this->courseid = $courseid;
         $this->templateid = $templateid;
         $this->cm = $cm;
