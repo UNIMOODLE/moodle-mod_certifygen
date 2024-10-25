@@ -38,6 +38,7 @@ namespace mod_certifygen;
 use coding_exception;
 use context;
 use context_course;
+use context_module;
 use core\invalid_persistent_exception;
 use core_course\customfield\course_handler;
 use core_user\fields;
@@ -329,6 +330,7 @@ class certifygen {
 
     /**
      * get_issues_for_course_by_lang
+     *
      * @param string $lang
      * @param int $certifygenid
      * @param int $templateid
@@ -341,7 +343,7 @@ class certifygen {
      * @param int $limitnum
      * @param string $sort
      * @return array
-     * @throws dml_exception
+     * @throws dml_exception|coding_exception
      */
     public static function get_issues_for_course_by_lang(
         string $lang,
@@ -349,28 +351,71 @@ class certifygen {
         int $templateid,
         int $courseid,
         string $component,
-        int $userid,
+        array $students,
         string $tifirst,
         string $tilast,
-        int $limitfrom,
-        int $limitnum,
-        string $sort = ''
+        int $limitfrom = 0,
+        int $limitnum = 0
     ): array {
         global $DB;
 
-        if (empty($sort)) {
-            $sort = 'ci.timecreated DESC';
-        }
+        $selectsql = "SELECT DISTINCT us.id, ci.id as issueid, ci.code, ci.emailed, ci.timecreated as ctimecreated, ci.userid,
+                        ci.templateid, ci.expires, ci.courseid, ci.archived, cv.lang as clang, cv.status as cstatus,
+                        cv.id as validationid, us.*, ci.courseid as courseid, ci.archived, cv.lang as clang,
+                        cv.status as cstatus, cv.id as validationid, us.*";
+
+        [$sql, $params] = self::get_query_issues_for_course_by_lang(
+            $lang,
+            $certifygenid,
+            $templateid,
+            $courseid,
+            $component,
+            $students,
+            $tifirst,
+            $tilast
+        );
+
+        $reuslt = $DB->get_records_sql($selectsql . $sql, $params, $limitfrom, $limitnum);
+        return $reuslt;
+    }
+
+    /**
+     * get_query_issues_for_course_by_lang
+     *
+     * @param string $lang
+     * @param int $certifygenid
+     * @param int $templateid
+     * @param int $courseid
+     * @param string $component
+     * @param array $students
+     * @param string $tifirst
+     * @param string $tilast
+     * @return array
+     * @throws coding_exception
+     * @throws dml_exception
+     */
+    public static function get_query_issues_for_course_by_lang(
+        string $lang,
+        int $certifygenid,
+        int $templateid,
+        int $courseid,
+        string $component,
+        array $students,
+        string $tifirst,
+        string $tilast
+    ): array {
+        global $DB;
 
         $params = [
-            'now' => time(),
             'templateid' => $templateid,
             'courseid' => $courseid,
             'component' => $component,
             'lang' => $lang,
             'certifygenid' => $certifygenid,
             ];
-        $where = "";
+        [$insql, $inparams] = $DB->get_in_or_equal($students, SQL_PARAMS_NAMED);
+        $where = ' WHERE us.id ' . $insql;
+        $params = array_merge($inparams, $params);
         if (!empty($tifirst)) {
             $params['tifirst'] = $tifirst . '%';
             $where .= ' AND ' . $DB->sql_like('u.firstname', ':tifirst');
@@ -379,31 +424,15 @@ class certifygen {
             $params['tilast'] = $tilast . '%';
             $where .= ' AND ' . $DB->sql_like('u.lastname', ':tilast');
         }
-        if ($userid) {
-            $params['userid'] = $userid;
-            $where = ' AND u.id = :userid';
-        }
-
-        $sql = "SELECT us.userid, ci.id as issueid, ci.code, ci.emailed, ci.timecreated as ctimecreated, ci.userid,
-                        ci.templateid, ci.expires, ci.courseid, ci.archived, cv.lang as clang, cv.status as cstatus,
-                        cv.id as validationid, us.*, us.courseid, ci.courseid, ci.archived, cv.lang as clang,
-                        cv.status as cstatus, cv.id as validationid, us.*, us.courseid
-                  FROM   (SELECT u.id AS userid, u.*, c.id as courseid
-                            FROM {user} u
-                            JOIN {user_enrolments} ue ON ue.userid = u.id
-                            JOIN {enrol} e ON e.id = ue.enrolid
-                            JOIN {course} c ON c.id = e.courseid
-                            JOIN {context} cont ON (cont.instanceid = c.id AND cont.contextlevel = 50)
-                            JOIN {role_assignments} ra ON ( ra.contextid = cont.id AND  ra.userid = u.id)
-                            JOIN {role} r ON r.id = ra.roleid
-                            WHERE r.shortname = 'student' AND c.id = :courseid $where ) AS us
+        $sql = " FROM {user} us
              LEFT JOIN {certifygen_validations} cv
-                        ON (cv.userid = us.userid AND cv.lang = :lang AND cv.certifygenid = :certifygenid)
+                        ON (cv.userid = us.id AND cv.lang = :lang AND cv.certifygenid = :certifygenid)
              LEFT JOIN {tool_certificate_issues} ci
-                        ON (ci.userid = us.userid AND cv.issueid = ci.id AND ci.courseid = us.courseid
-                            AND ci.templateid = :templateid AND ci.component = :component)";
+                        ON (ci.userid = us.id AND cv.issueid = ci.id
+                            AND ci.templateid = :templateid AND ci.component = :component AND ci.courseid = :courseid)
+            $where";
 
-        return $DB->get_records_sql($sql, $params, $limitfrom, $limitnum);
+        return [$sql, $params];
     }
 
     /**
@@ -451,47 +480,44 @@ class certifygen {
 
     /**
      * count_issues_for_course_by_lang
+     *
+     * @param string $lang
+     * @param int $certifygenid
+     * @param int $templateid
      * @param int $courseid
+     * @param string $component
+     * @param array $students
      * @param string $tifirst
      * @param string $tilast
-     * @param int $userid
      * @return int
+     * @throws coding_exception
      * @throws dml_exception
      */
-    public static function count_issues_for_course_by_lang(int $courseid, string $tifirst, string $tilast, int $userid = 0) {
+    public static function count_issues_for_course_by_lang(
+        string $lang,
+        int $certifygenid,
+        int $templateid,
+        int $courseid,
+        string $component,
+        array $students,
+        string $tifirst,
+        string $tilast
+    ) {
         global $DB;
 
-        $where = '';
-        $params = [
-            'courseid' => $courseid,
-        ];
-        if (!empty($tifirst)) {
-            $where .= " AND u.firstname LIKE '$tifirst%'";
-        }
-        if (!empty($tilast)) {
-            $where .= " AND u.firstname LIKE '%$tilast'";
-        }
-
-        if ($userid) {
-            $params['userid'] = $userid;
-            $where = ' AND u.id = :userid';
-        }
-
-        $sql = "SELECT COUNT(u.id) as count
-                  FROM {user} u
-                  JOIN {user_enrolments} ue ON ue.userid = u.id
-                  JOIN {enrol} e
-                        ON e.id = ue.enrolid
-                  JOIN {course} c
-                        ON c.id = e.courseid
-                  JOIN {context} cont
-                        ON (cont.instanceid = c.id AND cont.contextlevel = 50)
-                  JOIN {role_assignments} ra
-                        ON ( ra.contextid = cont.id AND  ra.userid = u.id)
-                  JOIN {role} r ON r.id = ra.roleid
-                 WHERE r.shortname = 'student'
-                       AND c.id = :courseid $where";
-        return $DB->count_records_sql($sql, $params);
+        $selectsql = "SELECT COUNT(*) as count ";
+        [$sql, $params] = self::get_query_issues_for_course_by_lang(
+            $lang,
+            $certifygenid,
+            $templateid,
+            $courseid,
+            $component,
+            $students,
+            $tifirst,
+            $tilast
+        );
+        $result = $DB->count_records_sql($selectsql . $sql, $params);
+        return $result;
     }
 
     /**
@@ -697,5 +723,36 @@ class certifygen {
         }
 
         return $canbeemitted;
+    }
+
+    /**
+     * get_students
+     * @param int $cmid
+     * @param int $courseid
+     * @return array
+     * @throws coding_exception
+     * @throws dml_exception
+     */
+    public static function get_students(int $cmid, int $courseid): array {
+        global $DB;
+        $selectedusers = [];
+        $cmcontext = context_module::instance($cmid);
+        $sql = "SELECT u.id
+                  FROM {user} u
+                  JOIN {user_enrolments} ue ON ue.userid = u.id
+                  JOIN {enrol} e ON e.id = ue.enrolid
+                  JOIN {course} c ON c.id = e.courseid
+                  WHERE c.id = :courseid";
+        $results = $DB->get_records_sql($sql, ['courseid' => $courseid]);
+        foreach ($results as $result) {
+            if (
+                is_primary_admin($result->id)
+                || !has_capability('mod/certifygen:emitmyactivitycertificate', $cmcontext, $result->id)
+            ) {
+                continue;
+            }
+            $selectedusers[] = $result->id;
+        }
+        return $selectedusers;
     }
 }

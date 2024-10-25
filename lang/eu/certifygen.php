@@ -42,6 +42,7 @@ $string['certifygen:manage'] = 'Kudeatu Unimoodle Certifygen ziurtagiriak';
 $string['certifygen:canmanagecertificates'] = 'Kudeatu ditzake Unimoodle Certifygen ziurtagiriak';
 $string['certifygen:viewmycontextcertificates'] = 'Ikusi nire Unimoodle Certifygen ziurtagiriak';
 $string['certifygen:viewcontextcertificates'] = 'Ikusi beste irakasleen Unimoodle Certifygen ziurtagiriak';
+$string['certifygen:emitmyactivitycertificate'] = 'Jarduera batean ziurtagiriak ematea';
 $string['type'] = 'Mota';
 $string['type_help'] = 'Aukeratu eman nahi duzun ziurtagiri mota. Ikasle edo irakasle.';
 $string['type_1'] = 'Ikastaro osoa (ikasleentzat)';

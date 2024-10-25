@@ -194,7 +194,7 @@ class report_view implements renderable, templatable {
         $context = context_course::instance($courseid);
         $participants = get_enrolled_users($context);
         foreach ($participants as $participant) {
-            if (has_capability('moodle/course:managegroups', $context, $participant)) {
+            if (!has_capability('mod/certifygen:emitmyactivitycertificate', $context, $participant)) {
                 continue;
             }
             $students++;

@@ -136,7 +136,7 @@ class get_courses_as_student_external extends external_api {
             $enrolments = enrol_get_all_users_courses($userid, true);
             foreach ($enrolments as $enrolment) {
                 $coursecontext = context_course::instance($enrolment->ctxinstance);
-                if (has_capability('moodle/course:managegroups', $coursecontext, $userid)) {
+                if (!has_capability('mod/certifygen:emitmyactivitycertificate', $coursecontext, $userid)) {
                     continue;
                 }
                 if (!certifygen::get_record(['course' => $enrolment->ctxinstance])) {
