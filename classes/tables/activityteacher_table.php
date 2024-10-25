@@ -178,7 +178,7 @@ class activityteacher_table extends table_sql {
         if ($status == certifygen_validations::STATUS_FINISHED) {
             return '<span class="likelink" data-action="revoke-certificate" data-username="' . $row->firstname . ' '
                 . $row->lastname . '" data-issueid="' . $row->issueid . '" data-modelid="' . $this->modelid
-                . '" data-courseid="' . $this->courseid . '" data-userid="' . $row->id . '" data-cmid="' . $this->cmid . '"
+                . '" data-courseid="' . $this->courseid . '" data-userid="' . $row->userid . '" data-cmid="' . $this->cmid . '"
                 data-lang="' . $this->lang . '" data-langstring="' . $this->langstring . '"  >' .
                 get_string('revoke', 'tool_certificate') . '</span>';
         }
@@ -232,9 +232,9 @@ class activityteacher_table extends table_sql {
             $status = certifygen_validations::STATUS_NOT_STARTED;
         }
         if ($status == certifygen_validations::STATUS_FINISHED) {
-            return '<span data-courseid="' . $row->courseid . '" data-instanceid="' . $this->instanceid
+            return '<span data-courseid="' . $this->courseid . '" data-instanceid="' . $this->instanceid
                 . '" data-modelid="' . $this->modelid . '" data-id="' . $row->validationid
-                . '" data-action="download-certificate" data-userid="' . $row->id . '" data-code="'
+                . '" data-action="download-certificate" data-userid="' . $row->userid . '" data-code="'
                 . $row->code . '" data-lang="' . $this->lang . '" data-langstring="' . $this->langstring
                 . '"  data-cmid="' . $this->cmid . '" class="btn btn-primary">'
                 . get_string('download') . '</span>';
@@ -266,7 +266,7 @@ class activityteacher_table extends table_sql {
         }
 
         if ($status == certifygen_validations::STATUS_NOT_STARTED) {
-            return '<span data-courseid="' . $row->courseid . '" data-modelid="' . $this->modelid . '" data-id="' . $id .
+            return '<span data-courseid="' . $this->courseid . '" data-modelid="' . $this->modelid . '" data-id="' . $id .
                 '" data-action="emit-certificate" data-userid="' . $row->userid . '" data-lang="' . $this->lang . '"
                 data-langstring="' . $this->langstring . '"  data-cmid="' . $this->cmid . '" data-instanceid="'
                 . $this->instanceid . '" class="btn btn-primary">'
@@ -330,31 +330,37 @@ class activityteacher_table extends table_sql {
         } else if ($userid && in_array($userid, $students)) {
             $students = [$userid];
         }
+        if (count($students) > 0) {
+            $total = certifygen::count_issues_for_course_by_lang(
+                $params['lang'],
+                $this->instanceid,
+                $this->templateid,
+                $this->courseid,
+                'mod_certifygen',
+                $students,
+                $tifirst,
+                $tilast,
+            );
+            $this->pagesize($pagesize, $total);
 
-        $total = certifygen::count_issues_for_course_by_lang(
-            $params['lang'],
-            $this->instanceid,
-            $this->templateid,
-            $this->courseid,
-            'mod_certifygen',
-            $students,
-            $tifirst,
-            $tilast,
-        );
-        $this->pagesize($pagesize, $total);
+            $this->rawdata = certifygen::get_issues_for_course_by_lang(
+                $params['lang'],
+                $this->instanceid,
+                $this->templateid,
+                $this->courseid,
+                'mod_certifygen',
+                $students,
+                $tifirst,
+                $tilast,
+                $this->get_page_start(),
+                $this->get_page_size(),
+            );
+        } else {
+            $this->pagesize($pagesize, 0);
+            $this->rawdata = [];
+        }
 
-        $this->rawdata = certifygen::get_issues_for_course_by_lang(
-            $params['lang'],
-            $this->instanceid,
-            $this->templateid,
-            $this->courseid,
-            'mod_certifygen',
-            $students,
-            $tifirst,
-            $tilast,
-            $this->get_page_start(),
-            $this->get_page_size(),
-        );
+
         // Set initial bars.
         $this->initialbars($total > $pagesize);
     }
