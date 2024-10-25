@@ -96,7 +96,7 @@ class get_json_certificate_external extends external_api {
         string $customfields,
         string $lang
     ): array {
-        global $USER;
+        global $USER, $DB;
         $params = self::validate_parameters(
             self::get_json_certificate_parameters(),
             ['userid' => $userid, 'userfield' => $userfield, 'idinstance' => $idinstance,
@@ -111,7 +111,7 @@ class get_json_certificate_external extends external_api {
                 return $result;
             }
         }
-        $result = ['json' => '', 'error' => []];
+        $result = ['json' => [], 'error' => []];
         $haserror = false;
         try {
             // Choose user parameter.
@@ -184,10 +184,27 @@ class get_json_certificate_external extends external_api {
                 // Filter multilang course name.
                 // Filter to return course names in $lang language.
                 $filter = new certifygenfilter(context_system::instance(), [], $lang);
+                // Static data.
                 $json = json_decode($issue->data);
                 $json->courseshortname = $filter->filter($json->courseshortname);
                 $json->coursefullname = $filter->filter($json->coursefullname);
-                $result['json'] = json_encode($json);
+                //$result['json']['data'] = $json;
+                //$data = $json;
+                // Dynamic data.
+                $pages = $DB->get_records('tool_certificate_pages', ['templateid' => $model->get('templateid')]);
+                $elements = [];
+                $result['json']['elements'] = [];
+                foreach ($pages as $page) {
+                    $elements = $DB->get_records('tool_certificate_elements', ['pageid' => $page->id]);
+                    $elements[] = $elements;
+                    $result['json']['elements'][] = [
+                            'pageid' => $page->id,
+                            'elements' => $elements,
+                    ];
+                }
+                $output['data'] = $json;
+                $output['elements'] = $elements;
+                $result['json'] = json_encode($output);
             }
         } catch (moodle_exception $e) {
             debugging(__FUNCTION__ . " error: " . $e->getMessage());
