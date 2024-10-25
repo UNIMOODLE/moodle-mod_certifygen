@@ -258,5 +258,7 @@ class get_json_teacher_certificate_external_test extends advanced_testcase {
         // Tests.
         $this->assertIsArray($result);
         $this->assertArrayHasKey('json', $result);
+        $courses = json_decode($result['json']);
+        $this->assertEquals(count($courses), 2);
     }
 }

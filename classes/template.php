@@ -96,7 +96,9 @@ class template extends \tool_certificate\template {
     public function generate_pdf($preview = false, $issue = null, $return = false) {
         global $CFG, $USER;
 
-        if (is_null($issue)) {
+        if ($preview) {
+            $user = core_user::get_user($issue->userid);
+        } else if (is_null($issue)) {
             $user = $USER;
         } else {
             $user = core_user::get_user($issue->userid);
