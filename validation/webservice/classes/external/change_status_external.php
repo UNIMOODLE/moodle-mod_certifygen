@@ -97,6 +97,7 @@ class change_status_external extends external_api {
             if (array_key_exists('error', $uparam)) {
                 return $uparam;
             }
+            $userid = $uparam['userid'];
             // User exists.
             $users = user_get_users_by_id([$userid]);
             if (empty($users)) {
@@ -119,7 +120,7 @@ class change_status_external extends external_api {
                 return $results;
             }
             // Request user.
-            if ($params['userid'] != $request->get('userid')) {
+            if ($userid != $request->get('userid')) {
                 $results['error']['code'] = 'request_user_not_matched';
                 $results['error']['message'] = 'This is not the user\'s request';
                 return $results;

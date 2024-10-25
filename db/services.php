@@ -46,6 +46,7 @@ use mod_certifygen\external\revokecertificate_external;
 use mod_certifygen\external\get_id_instance_certificate_external;
 use mod_certifygen\external\get_json_certificate_external;
 use mod_certifygen\external\get_pdf_certificate_external;
+use mod_certifygen\external\get_draft_certificate_external;
 use mod_certifygen\external\getteacherrequestviewdata_external;
 use mod_certifygen\external\deleteteacherrequest_external;
 use mod_certifygen\external\getcoursesnames_external;
@@ -250,6 +251,13 @@ $functions = [
         'type' => 'read',
         'capabilities' => 'mod/certifygen:manage',
     ],
+    'mod_certifygen_get_draft_certificate' => [
+        'classname' => get_draft_certificate_external::class,
+        'methodname' => 'get_draft_certificate',
+        'description' => 'get_draft_certificate',
+        'type' => 'read',
+        'capabilities' => 'mod/certifygen:manage',
+    ],
 ];
 $services = [
     'Unimoodle Certifygen' => [
@@ -257,6 +265,7 @@ $services = [
             'mod_certifygen_deletemodel',
             'mod_certifygen_getmodellisttable',
             'mod_certifygen_get_pdf_certificate',
+            'mod_certifygen_get_draft_certificate',
             'mod_certifygen_get_json_certificate',
             'mod_certifygen_get_id_instance_certificate',
             'mod_certifygen_get_courses_as_teacher',

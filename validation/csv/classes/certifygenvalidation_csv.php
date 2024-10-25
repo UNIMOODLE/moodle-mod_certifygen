@@ -104,7 +104,7 @@ class certifygenvalidation_csv implements ICertificateValidation {
             $xml = simplexml_load_string(
                 $response,
                 null,
-                null,
+                0,
                 'http://schemas.xmlsoap.org/soap/envelope/'
             );
             $ns = $xml->getNamespaces(true);
@@ -319,7 +319,7 @@ xmlns:fir="http://firma.ws.producto.com/">
             $xml = simplexml_load_string(
                 $response,
                 null,
-                null,
+                0,
                 'http://schemas.xmlsoap.org/soap/envelope/'
             );
             $ns = $xml->getNamespaces(true);
@@ -390,7 +390,7 @@ xmlns:fir="http://firma.ws.producto.com/">
             $xml = simplexml_load_string(
                 $response,
                 null,
-                null,
+                0,
                 'http://schemas.xmlsoap.org/soap/envelope/'
             );
             $ns = $xml->getNamespaces(true);
@@ -600,7 +600,7 @@ xmlns:fir="http://firma.ws.producto.com/">
             $xml = simplexml_load_string(
                 $response,
                 null,
-                null,
+                0,
                 'http://schemas.xmlsoap.org/soap/envelope/'
             );
             $ns = $xml->getNamespaces(true);
@@ -688,7 +688,7 @@ xmlns:fir="http://firma.ws.producto.com/">
             }
             curl_close($curl);
 
-            $xml = simplexml_load_string($response, null, null, 'http://schemas.xmlsoap.org/soap/envelope/');
+            $xml = simplexml_load_string($response, null, 0, 'http://schemas.xmlsoap.org/soap/envelope/');
             $ns = $xml->getNamespaces(true);
             $soap = $xml->children($ns['soap']);
             $res = $soap->Body->children($ns['ns2']);

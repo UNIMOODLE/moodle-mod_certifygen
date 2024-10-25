@@ -107,7 +107,6 @@ class mod_certifygen_generator extends testing_module_generator {
      */
     public function create_teacher_request(int $modelid, string $courses, int $userid) {
 
-        $this->install_language_package('es');
         $data = [
             'name' => 'test1',
             'modelid' => $modelid,

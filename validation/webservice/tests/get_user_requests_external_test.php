@@ -227,19 +227,19 @@ class get_user_requests_external_test extends advanced_testcase {
         // Create model.
         $modgenerator = $this->getDataGenerator()->get_plugin_generator('mod_certifygen');
         $data = [
-            'name' => 'model1',
-            'idnumber' => '',
             'type' => certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
             'mode' => certifygen_model::MODE_UNIQUE,
             'templateid' => $certificate1->get_id(),
-            'timeondemmand' => 0,
-            'langs' => 'en',
             'validation' => 'certifygenvalidation_webservice',
             'report' => 'certifygenreport_basic',
-            'repository' => 'certifygenrepository_localrepository',
         ];
-        $model = new certifygen_model(0, (object)$data);
-        $model = $model->create();
+        $model = $modgenerator->create_model(
+            $data['type'],
+            $data['mode'],
+            $data['templateid'],
+            $data['validation'],
+            $data['report'],
+        );
         $modgenerator->assign_model_coursecontext($model->get('id'), $course->id);
 
         // Create user and enrol as teacher.
@@ -400,5 +400,227 @@ class get_user_requests_external_test extends advanced_testcase {
         self::assertArrayHasKey('validation', $result['requests'][0]['model']);
         self::assertArrayHasKey('report', $result['requests'][0]['model']);
         self::assertArrayHasKey('repository', $result['requests'][0]['model']);
+    }
+    /**
+     * Test 5: userfield ok
+     *
+     * @return void
+     * @throws coding_exception
+     * @throws invalid_persistent_exception
+     * @throws invalid_parameter_exception
+     * @throws moodle_exception
+     */
+    public function test_5(): void {
+
+        // Configure the platform.
+        set_config('enabled', 1, 'certifygenvalidation_webservice');
+        set_config('enabled', 1, 'certifygenrepository_localrepository');
+
+        // Create template.
+        $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
+        $certificate1 = $templategenerator->create_template((object)['name' => 'Certificate 1']);
+
+        // Create course.
+        $course = self::getDataGenerator()->create_course();
+
+        // Create model.
+        $modgenerator = $this->getDataGenerator()->get_plugin_generator('mod_certifygen');
+        $data = [
+            'name' => 'model1',
+            'idnumber' => '',
+            'type' => certifygen_model::TYPE_ACTIVITY,
+            'mode' => certifygen_model::MODE_UNIQUE,
+            'templateid' => $certificate1->get_id(),
+            'timeondemmand' => 0,
+            'langs' => 'en',
+            'validation' => 'certifygenvalidation_webservice',
+            'report' => '',
+            'repository' => 'certifygenrepository_localrepository',
+        ];
+        $model = new certifygen_model(0, (object)$data);
+        $model = $model->create();
+        $modgenerator->assign_model_coursecontext($model->get('id'), $course->id);
+
+        $langs = $model->get('langs');
+        $langs = explode(',', $langs);
+        $lang = $langs[0];
+
+        // Create mod_certifygen module.
+        $datamodule = [
+            'name' => 'Test 1,',
+            'course' => $course->id,
+            'modelid' => $model->get('id'),
+        ];
+        $modcertifygen = self::getDataGenerator()->create_module('certifygen', $datamodule);
+        $cm = get_coursemodule_from_instance('certifygen', $modcertifygen->id, $course->id, false, MUST_EXIST);
+
+        // Create user profile fields.
+        $category = self::getDataGenerator()->create_custom_profile_field_category(['name' => 'Category 1']);
+        $field = self::getDataGenerator()->create_custom_profile_field([
+                'shortname' => 'DNI',
+                'name' => 'DNI',
+                'categoryid' => $category->id,
+                'required' => 1,
+                'visible' => 1,
+                'locked' => 0,
+                'datatype' => 'text',
+                'defaultdata' => null,
+        ]);
+
+        // Configure the platform.
+        set_config('userfield', 'profile_' . $field->id, 'mod_certifygen');
+        $dni = '123456789P';
+
+        // Create users.
+        $student = $this->getDataGenerator()->create_user(
+            ['username' => 'test_user_1', 'firstname' => 'test',
+            'lastname' => 'user 1', 'email' => 'test_user_1@fake.es',
+            'profile_field_DNI' => $dni,
+            ]
+        );
+
+        // Enrol into the course as student.
+        self::getDataGenerator()->enrol_user($student->id, $course->id, 'student');
+
+        // Login as student.
+        $this->setUser($student);
+
+        $data = [
+            'userid' => $student->id,
+            'certifygenid' => $modcertifygen->id,
+        ];
+        $validation = certifygen_validations::get_record($data);
+        self::assertFalse($validation);
+        emitcertificate_external::emitcertificate(0, $cm->instance, $model->get('id'), $lang, $student->id, $course->id);
+
+        // Validate.
+        $this->setAdminUser();
+        $result = get_user_requests_external::get_user_requests(0, $dni, 'en');
+        self::assertIsArray($result);
+        self::assertArrayHasKey('requests', $result);
+        self::assertIsArray($result['requests']);
+        self::assertArrayHasKey('id', $result['requests'][0]);
+        self::assertArrayNotHasKey('name', $result['requests'][0]);
+        self::assertArrayHasKey('code', $result['requests'][0]);
+        self::assertArrayHasKey('lang', $result['requests'][0]);
+        self::assertArrayHasKey('status', $result['requests'][0]);
+        self::assertArrayHasKey('statusdesc', $result['requests'][0]);
+        self::assertArrayNotHasKey('courses', $result['requests'][0]);
+        self::assertArrayHasKey('model', $result['requests'][0]);
+        self::assertIsArray($result['requests'][0]['model']);
+        self::assertArrayHasKey('id', $result['requests'][0]['model']);
+        self::assertArrayHasKey('name', $result['requests'][0]['model']);
+        self::assertArrayHasKey('idnumber', $result['requests'][0]['model']);
+        self::assertArrayHasKey('type', $result['requests'][0]['model']);
+        self::assertArrayHasKey('typedesc', $result['requests'][0]['model']);
+        self::assertArrayHasKey('mode', $result['requests'][0]['model']);
+        self::assertArrayHasKey('templateid', $result['requests'][0]['model']);
+        self::assertArrayHasKey('timeondemmand', $result['requests'][0]['model']);
+        self::assertArrayHasKey('langs', $result['requests'][0]['model']);
+        self::assertArrayHasKey('validation', $result['requests'][0]['model']);
+        self::assertArrayHasKey('report', $result['requests'][0]['model']);
+        self::assertArrayHasKey('repository', $result['requests'][0]['model']);
+    }
+    /**
+     * Test 6: userfield KO
+     *
+     * @return void
+     * @throws coding_exception
+     * @throws invalid_persistent_exception
+     * @throws invalid_parameter_exception
+     * @throws moodle_exception
+     */
+    public function test_6(): void {
+
+        // Configure the platform.
+        set_config('enabled', 1, 'certifygenvalidation_webservice');
+        set_config('enabled', 1, 'certifygenrepository_localrepository');
+
+        // Create template.
+        $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
+        $certificate1 = $templategenerator->create_template((object)['name' => 'Certificate 1']);
+
+        // Create course.
+        $course = self::getDataGenerator()->create_course();
+
+        // Create model.
+        $modgenerator = $this->getDataGenerator()->get_plugin_generator('mod_certifygen');
+        $data = [
+                'name' => 'model1',
+                'idnumber' => '',
+                'type' => certifygen_model::TYPE_ACTIVITY,
+                'mode' => certifygen_model::MODE_UNIQUE,
+                'templateid' => $certificate1->get_id(),
+                'timeondemmand' => 0,
+                'langs' => 'en',
+                'validation' => 'certifygenvalidation_webservice',
+                'report' => '',
+                'repository' => 'certifygenrepository_localrepository',
+        ];
+        $model = new certifygen_model(0, (object)$data);
+        $model = $model->create();
+        $modgenerator->assign_model_coursecontext($model->get('id'), $course->id);
+
+        $langs = $model->get('langs');
+        $langs = explode(',', $langs);
+        $lang = $langs[0];
+
+        // Create mod_certifygen module.
+        $datamodule = [
+                'name' => 'Test 1,',
+                'course' => $course->id,
+                'modelid' => $model->get('id'),
+        ];
+        $modcertifygen = self::getDataGenerator()->create_module('certifygen', $datamodule);
+        $cm = get_coursemodule_from_instance('certifygen', $modcertifygen->id, $course->id, false, MUST_EXIST);
+
+        // Create user profile fields.
+        $category = self::getDataGenerator()->create_custom_profile_field_category(['name' => 'Category 1']);
+        $field = self::getDataGenerator()->create_custom_profile_field([
+                'shortname' => 'DNI',
+                'name' => 'DNI',
+                'categoryid' => $category->id,
+                'required' => 1,
+                'visible' => 1,
+                'locked' => 0,
+                'datatype' => 'text',
+                'defaultdata' => null,
+        ]);
+
+        // Configure the platform.
+        set_config('userfield', 'profile_' . $field->id, 'mod_certifygen');
+        $dni = '123456789P';
+
+        // Create users.
+        $student = $this->getDataGenerator()->create_user(
+            [
+            'username' => 'test_user_1', 'firstname' => 'test',
+            'lastname' => 'user 1', 'email' => 'test_user_1@fake.es',
+            'profile_field_DNI' => $dni,
+            ]
+        );
+
+        // Enrol into the course as student.
+        self::getDataGenerator()->enrol_user($student->id, $course->id, 'student');
+
+        // Login as student.
+        $this->setUser($student);
+
+        $data = [
+                'userid' => $student->id,
+                'certifygenid' => $modcertifygen->id,
+        ];
+        $validation = certifygen_validations::get_record($data);
+        self::assertFalse($validation);
+        emitcertificate_external::emitcertificate(0, $cm->instance, $model->get('id'), $lang, $student->id, $course->id);
+
+        // Validate.
+        $this->setAdminUser();
+        $result = get_user_requests_external::get_user_requests($student->id-1, $dni, 'en');
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('error', $result);
+        $this->assertIsArray($result['error']);
+        $this->assertArrayHasKey('code', $result['error']);
+        $this->assertEquals('userfield_and_userid_sent', $result['error']['code']);
     }
 }

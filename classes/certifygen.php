@@ -297,7 +297,6 @@ class certifygen {
         if ($existingcertificate = self::get_user_certificate($instanceid, $userid, $course->id, $templateid, $lang)) {
             $issue = template::get_issue_from_code($existingcertificate->code);
             $context = context_course::instance($issue->courseid, IGNORE_MISSING) ?: null;
-
             $template = $issue ? template::instance($issue->templateid, (object) ['lang' => $lang]) : null;
             if (
                 $template && (permission::can_verify() ||
@@ -375,8 +374,7 @@ class certifygen {
             $tilast
         );
 
-        $reuslt = $DB->get_records_sql($selectsql . $sql, $params, $limitfrom, $limitnum);
-        return $reuslt;
+        return $DB->get_records_sql($selectsql . $sql, $params, $limitfrom, $limitnum);
     }
 
     /**
