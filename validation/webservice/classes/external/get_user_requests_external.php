@@ -104,12 +104,20 @@ class get_user_requests_external extends external_api {
             }
             // Choose user parameter.
             $uparam = mod_certifygen_validate_user_parameters_for_ws($params['userid'], $params['userfield']);
+
+            // Choose user parameter.
+            if (array_key_exists('error', $uparam)) {
+                return $uparam;
+            }
+            $userid = $uparam['userid'];
+
+
             if (array_key_exists('error', $uparam)) {
                 return $uparam;
             }
             // Filter to return course names in $lang language.
             $filter = new certifygenfilter(context_system::instance(), [], $lang);
-            $requests = certifygen_validations::get_records(['userid' => $params['userid']]);
+            $requests = certifygen_validations::get_records(['userid' => $userid]);
             $userrequest = [];
             foreach ($requests as $request) {
                 $urequest = [];
