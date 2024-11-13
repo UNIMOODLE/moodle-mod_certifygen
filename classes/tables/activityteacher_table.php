@@ -279,7 +279,7 @@ class activityteacher_table extends table_sql {
             && has_capability('mod/certifygen:reemitcertificates', $this->context)
         ) {
             $today = time();
-            $dif = $today - $row->timecreated;
+            $dif = $today - $row->ctimecreated;
             $difindays = abs($dif / (60 * 60 * 24));
             if ($difindays > (int)$this->model->get('timeondemmand')) {
                 return '<span class="likelink" data-userid="' . $row->userid . '" data-id="' . $id

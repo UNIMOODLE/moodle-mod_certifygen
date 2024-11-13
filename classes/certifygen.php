@@ -358,10 +358,8 @@ class certifygen {
     ): array {
         global $DB;
 
-        $selectsql = "SELECT DISTINCT us.id as userid, ci.id as issueid, ci.code, ci.emailed, ci.timecreated as ctimecreated,
-                        ci.templateid, ci.expires, ci.courseid, ci.archived, cv.lang as clang, cv.status as cstatus,
-                        cv.id as validationid, us.*, ci.courseid as courseid, ci.archived, cv.lang as clang,
-                        cv.status as cstatus, cv.id as validationid, us.*";
+        $selectsql = "SELECT DISTINCT us.id as userid, ci.id as issueid, ci.code, ci.timecreated as ctimecreated,
+                        cv.status as cstatus, cv.id as validationid, cv.status as cstatus, us.*";
 
         [$sql, $params] = self::get_query_issues_for_course_by_lang(
             $lang,
