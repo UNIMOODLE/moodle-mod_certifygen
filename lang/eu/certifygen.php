@@ -97,7 +97,6 @@ $string['subplugintype_certifygenvalidation'] = 'Unimoodle Certifygen Ziurtagiri
 $string['subplugintype_certifygenvalidation_plural'] = 'Unimoodle Certifygen Ziurtagiriaren baliozkotze metodoak';
 $string['managecertifygenvalidationplugins'] = 'Kudeatu Unimoodle Certifygen ziurtagiriaren baliozkotze pluginak';
 $string['validationplugins'] = 'Baliozkotze pluginak';
-$string['certifygenvalidationpluginname'] = $string['validationplugins'];
 $string['hideshow'] = 'Ezkutatu/Erakutsi';
 $string['settings'] = 'Ezarpenak';
 $string['assigncontextto'] = 'Testuinguruak esleitu "{$a}" eredura';

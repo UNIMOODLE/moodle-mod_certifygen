@@ -97,7 +97,6 @@ $string['subplugintype_certifygenvalidation'] = 'Unimoodle certifygen validation
 $string['subplugintype_certifygenvalidation_plural'] = 'Unimoodle certifygen validations methods';
 $string['managecertifygenvalidationplugins'] = 'Manage unimoodle certifygen validation plugins';
 $string['validationplugins'] = 'Validation plugins';
-$string['certifygenvalidationpluginname'] = $string['validationplugins'];
 $string['hideshow'] = 'Hide/Show';
 $string['settings'] = 'Settings';
 $string['assigncontextto'] = 'Assigning context to model "{$a}"';
