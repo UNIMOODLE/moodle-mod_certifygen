@@ -93,7 +93,7 @@ class activity_view implements renderable, templatable {
         global $DB, $USER;
 
         $ccontext = context_module::instance($cm->id);
-        $this->isteacher = is_primary_admin($USER->id) || !has_capability('mod/certifygen:emitmyactivitycertificate', $ccontext);
+        $this->isteacher = is_siteadmin($USER->id) || !has_capability('mod/certifygen:emitmyactivitycertificate', $ccontext);
         $this->courseid = $courseid;
         $this->templateid = $templateid;
         $this->cm = $cm;

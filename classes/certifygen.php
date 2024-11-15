@@ -742,7 +742,7 @@ class certifygen {
         $results = $DB->get_records_sql($sql, ['courseid' => $courseid]);
         foreach ($results as $result) {
             if (
-                is_primary_admin($result->id)
+                is_siteadmin($result->id)
                 || !has_capability('mod/certifygen:emitmyactivitycertificate', $cmcontext, $result->id)
             ) {
                 continue;
