@@ -741,6 +741,7 @@ class certifygen {
                   WHERE c.id = :courseid";
         $results = $DB->get_records_sql($sql, ['courseid' => $courseid]);
         foreach ($results as $result) {
+            // Only students must be shown on the list.
             if (
                 is_siteadmin($result->id)
                 || !has_capability('mod/certifygen:emitmyactivitycertificate', $cmcontext, $result->id)
