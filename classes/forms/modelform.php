@@ -145,7 +145,7 @@ class modelform extends dynamic_form {
                 $templateoptions
             )];
             $mform->setType('templateid', PARAM_INT);
-
+            $mform->addRule('templateid', get_string('required'), 'required');
             // Adding "Manage templates" link if user has capabilities to manage templates.
             if ($canmanagetemplates && !empty($templates)) {
                 $elements[] = $mform->createElement(
@@ -168,6 +168,8 @@ class modelform extends dynamic_form {
                 'noteq',
                 certifygen_model::TYPE_ACTIVITY
             );
+            $rules['templateid'][] = [null, 'required', null, 'client'];
+            $mform->addGroupRule('template_group', $rules);
         } else if ($model->get('templateid')) {
             $html = get_string('template', 'mod_certifygen') . ' : '
                 . $templates[(int)$model->get('templateid')];

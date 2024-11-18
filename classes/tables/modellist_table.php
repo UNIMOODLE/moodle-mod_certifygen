@@ -123,7 +123,11 @@ class modellist_table extends table_sql {
         if (empty($values->get('templateid'))) {
             return get_string('pluginname', $values->get('report'));
         }
-        return template::instance($values->get('templateid'))->get_name();
+        try {
+            return template::instance($values->get('templateid'))->get_name();
+        } catch (\moodle_exception $e) {
+            return '-';
+        }
     }
 
     /**
