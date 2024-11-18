@@ -116,16 +116,25 @@ class activity_view implements renderable, templatable {
      * @throws dml_exception
      */
     public function export_for_template(renderer_base $output): stdClass {
-        $url = new moodle_url('/mod/certifygen/view.php', ['id' => $this->cm->id]);
-        $data = new stdClass();
-        $data->table = $this->get_certificates_table();
-        $modellangs = $this->certificatemodel->get_model_languages();
-        if (count($modellangs) > 1) {
-            $data->form = mod_certifygen_get_certificates_table_form($this->certificatemodel, $url, $this->lang, 'teacher');
+        try {
+            // Check if template exists.
+            \mod_certifygen\template::instance($this->certificatemodel->get('templateid'));
+            $url = new moodle_url('/mod/certifygen/view.php', ['id' => $this->cm->id]);
+            $data = new stdClass();
+            $data->table = $this->get_certificates_table();
+            $modellangs = $this->certificatemodel->get_model_languages();
+            if (count($modellangs) > 1) {
+                $data->form = mod_certifygen_get_certificates_table_form($this->certificatemodel, $url, $this->lang, 'teacher');
+            }
+            if (!$this->isteacher) {
+                $data->isstudent = true;
+            }
+        } catch (moodle_exception $exception) {
+            $data = new stdClass();
+            $data->haserror = true;
+            $data->error = $exception->getMessage();
         }
-        if (!$this->isteacher) {
-            $data->isstudent = true;
-        }
+
         return $data;
     }
 

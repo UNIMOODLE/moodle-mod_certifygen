@@ -222,3 +222,4 @@ $string['codenotfound'] = 'No hemos encontrado ningun resultado con este código
 $string['certifygensearchfor'] = 'Búsqueda de certificados por código';
 $string['model_must_exists'] = 'No se puede restaurar la actividad {$a->activityname}. Debe existir un modelo con idnumber igual a {$a->idnumber}';
 $string['course_not_valid_for_modelid'] = 'No se puede restaurar la actividad {$a->activityname}. El curso ({$a->courseid}) no es válido para este modelo(nombre: {$a->name}, idnumber: {$a->idnumber})';
+$string['templatenotfound'] = 'Hay un problema con la configuración de la plantilla del certificado. De momento no se puede hacer uso de la actividad.';

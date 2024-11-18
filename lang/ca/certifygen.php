@@ -222,3 +222,4 @@ $string['codenotfound'] = 'No hem trobat resultats amb aquest codi.';
 $string['certifygensearchfor'] = 'Cercar certificats per codi';
 $string['model_must_exists'] = 'No es pot restaurar l\'activitat {$a->activityname}. Hi ha d\'haver un model amb idnumber igual a {$a->idnumber}';
 $string['course_not_valid_for_modelid'] = 'No es pot restaurar l\'activitat {$a->activityname}. El curs ({$a->courseid}) no és vàlid per a aquest model (nom: {$a->name}, idnumber: {$a->idnumber})';
+$string['templatenotfound'] = 'Hi ha un problema amb la configuració de l\'activitat. De moment no es pot fer ús d\'aquesta.';

@@ -40,6 +40,15 @@
     }
 }}
 <div data-region="activity-view" {{#isstudent}} class="student"{{/isstudent}}>
+    {{#haserror}}
+        <div class="alert alert-warning">
+            {{#str}} templatenotfound, mod_certifygen {{/str}}
+        </div>
+        <div class="hidden">
+            {{error}}
+        </div>
+    {{/haserror}}
+    {{^haserror}}
     <h3 class="mt-5 mb-5">
         {{#isstudent}}
             {{#str}} mycertificate, mod_certifygen {{/str}}
@@ -56,7 +65,7 @@
     <div>
         {{{ table }}}
     </div>
-
+    {{/haserror}}
 </div>
 
 {{#js}}

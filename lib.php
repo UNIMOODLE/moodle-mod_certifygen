@@ -195,6 +195,13 @@ function mod_certifygen_get_activity_models(int $courseid): array {
     $validmodels = certifygen_context::get_course_valid_modelids($courseid);
     $list = [];
     foreach ($models as $model) {
+        try {
+            // Check if template exists.
+            \mod_certifygen\template::instance($model->get('templateid'));
+        } catch (moodle_exception $exception) {
+            continue;
+        }
+
         if (in_array($model->get('id'), $validmodels)) {
             $list[$model->get('id')] = $model->get('name');
         }
