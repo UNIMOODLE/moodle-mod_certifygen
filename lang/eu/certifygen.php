@@ -225,3 +225,4 @@ $string['model_must_exists'] = 'Ezin da {$a->activityname} jarduera leheneratu. 
 $string['course_not_valid_for_modelid'] = 'Ezin da jarduera berrezarri {$a->activityname}. Ikastaroak ({$a->courseid}) ez du balio eredu honetarako (izena: {$a->name}, idzenbakia: {$a->idnumber})';
 $string['templatenotfound'] = 'Jardueraren konfigurazioan arazo bat dago. Une honetan ezin da hori erabili.';
 $string['messageprovider:certifygen_notification'] = 'Certifygen abisua';
+$string['nocontextassociated'] = 'Eredu honek ez du inolako testuingururik lotuta.';

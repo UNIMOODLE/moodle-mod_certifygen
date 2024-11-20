@@ -225,3 +225,4 @@ $string['model_must_exists'] = 'Non se pode restaurar a actividade {$a->activity
 $string['course_not_valid_for_modelid'] = 'Non se pode restaurar a actividade {$a->activityname}. O curso ({$a->courseid}) non é válido para este modelo (nome: {$a->name}, número de identificación: {$a->idnumber})';
 $string['templatenotfound'] = 'Hai un problema coa configuración da actividade. Polo de agora non se pode facer uso dela.';
 $string['messageprovider:certifygen_notification'] = 'Notificación Certifygen';
+$string['nocontextassociated'] = 'Este modelo non ten ningún contexto asociado.';

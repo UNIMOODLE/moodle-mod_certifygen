@@ -79,8 +79,7 @@ class modellist_table extends table_sql {
         $total = certifygen_model::count_records();
 
         $this->pagesize($pagesize, $total);
-        $this->rawdata = certifygen_model::get_records(
-            [],
+        $this->rawdata = certifygen_model::get_models_and_context(
             $this->get_sql_sort(),
             'ASC',
             $this->get_page_start(),
@@ -100,16 +99,24 @@ class modellist_table extends table_sql {
      * @throws coding_exception
      */
     final public function col_type($values): string {
-        return get_string('type_' . $values->get('type'), 'mod_certifygen');
+        return get_string('type_' . $values->type, 'mod_certifygen');
     }
 
     /**
      * Model name
+     *
      * @param $values
      * @return string
+     * @throws coding_exception
      */
     final public function col_modelname($values): string {
-        return $values->get('name');
+        $title = get_string('nocontextassociated', 'mod_certifygen');
+        $spanclass = is_null($values->modelcontextid) ? '' : 'hidden';
+        $message = '<span id="modelwarningicon_' . $values->id . '" class="' . $spanclass . '" title="' . $title . '" >';
+        $message .= '<i class="icon fa fa-exclamation-circle text-danger fa-fw" ></i>';
+        $message .= '</span>';
+
+        return $message . $values->name;
     }
 
 
@@ -120,11 +127,11 @@ class modellist_table extends table_sql {
      * @throws coding_exception
      */
     final public function col_template($values): string {
-        if (!empty($values->get('report'))) {
-            return get_string('pluginname', $values->get('report'));
+        if (!empty($values->report)) {
+            return get_string('pluginname', $values->report);
         }
         try {
-            return template::instance($values->get('templateid'))->get_name();
+            return template::instance($values->templateid)->get_name();
         } catch (\moodle_exception $e) {
             return '-';
         }
@@ -136,7 +143,7 @@ class modellist_table extends table_sql {
      * @return string
      */
     final public function col_lastupdate($values): string {
-        return date('d-m-Y', $values->get('timemodified'));
+        return date('d-m-Y', $values->timemodified);
     }
 
     /**
@@ -146,7 +153,7 @@ class modellist_table extends table_sql {
      * @throws coding_exception
      */
     final public function col_deletemodel($values): string {
-        return '<span class="likelink" data-id="' . $values->get('id') . '" data-name="' . $values->get('name')
+        return '<span class="likelink" data-id="' . $values->id . '" data-name="' . $values->name
             . '" data-action="delete-model">'
             . get_string('delete', 'mod_certifygen') . '</span>';
     }
@@ -158,7 +165,7 @@ class modellist_table extends table_sql {
      * @throws coding_exception
      */
     final public function col_editmodel($values): string {
-        return '<span class="likelink" data-action="edit-model" data-id="' . $values->get('id') . '">'
+        return '<span class="likelink" data-action="edit-model" data-id="' . $values->id . '">'
             . get_string('edit', 'mod_certifygen') . '</span>';
     }
 
@@ -172,13 +179,13 @@ class modellist_table extends table_sql {
     final public function col_associatecontexts($values): string {
         global $DB;
 
-        $contextid = $DB->get_field('certifygen_context', 'id', ['modelid' => $values->get('id')]);
+        $contextid = $DB->get_field('certifygen_context', 'id', ['modelid' => $values->id]);
 
         if (empty($contextid)) {
             $contextid = 0;
         }
         return '<span class="likelink" data-action="assign-context" data-id="' . $contextid . '" data-modelid="'
-            . $values->get('id') . '" data-name="' . $values->get('name') . '">'
+            . $values->id . '" data-name="' . $values->name . '">'
             . get_string('assigncontext', 'mod_certifygen') . '</span>';
     }
 }
