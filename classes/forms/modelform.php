@@ -171,6 +171,9 @@ class modelform extends dynamic_form {
             $rules = [];
             $rules[]['templateid'] = [null, 'required', null, 'server'];
             $mform->addGroupRule('template_group', $rules);
+            if ($model && !$model->get('templateid')) {
+                $mform->addElement('hidden', 'templateid', 0);
+            }
         } else if ($model->get('templateid')) {
             $html = get_string('template', 'mod_certifygen') . ' : '
                 . $templates[(int)$model->get('templateid')];
@@ -286,6 +289,7 @@ class modelform extends dynamic_form {
      * @throws invalid_persistent_exception
      */
     public function process_dynamic_submission() {
+        error_log(__FUNCTION__);
         $formdata = $this->get_data();
         certifygen_model::save_model_object($formdata);
     }

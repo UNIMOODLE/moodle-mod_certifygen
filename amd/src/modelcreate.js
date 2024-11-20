@@ -32,8 +32,47 @@ let TEMPLATES = {
 };
 const InitModelCreate = () => {
     jQuery(ACTION.CREATE_MODEL).on('click', CreateModel);
+    jQuery('body').on('change', '.custom-select', function (event) {
+        if (event.target && event.target.name === 'type' && event.target.value == '2') {
+            addTemplateidValue();
+        } else if (event.target && event.target.name === 'type' && event.target.value == '1'
+        && jQuery('form [name="templateid"]').length > 1) {
+            removeTemplateidVlaue();
+        } else {
+            checkTemplateidValue();
+        }
+    });
+    jQuery('body').on('focusout', 'input[type="text"]', function () {
+        checkTemplateidValue();
+    });
 };
-
+const checkTemplateidValue = () => {
+    let typeElement = document.querySelector('form [name="type"]');
+    if (typeElement &&  typeElement.value == 2) {
+        addTemplateidValue();
+    }
+};
+const removeTemplateidVlaue = () => {
+    jQuery('form [name="templateid"]').each(function () {
+        if (this.type == 'hidden') {
+            jQuery(this).remove();
+        }
+    });
+};
+const addTemplateidValue = () => {
+    const element = document.querySelector('form [name="templateid"]');
+    if (element) {
+        element.setAttribute('data-initial-value', '0');
+    }
+    addHiddenTemplateidInput();
+};
+const addHiddenTemplateidInput = () => {
+    jQuery("<input>").attr({
+        name: "templateid",
+        type: "hidden",
+        value: 0
+    }).appendTo("form");
+};
 const CreateModel = (e) => {
     e.preventDefault();
     const element = e.target;
@@ -51,6 +90,7 @@ const CreateModel = (e) => {
         // DOM element that should get the focus after the modal dialogue is closed:
         returnFocus: element,
     });
+
     // Listen to events if you want to execute something on form submit. Event detail will contain everything the process()
     // function returned:
     modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, () => {
@@ -62,14 +102,14 @@ const CreateModel = (e) => {
     modalForm.show();
 };
 const reloadModelListTable = () => {
-    Templates.render(TEMPLATES.LOADING, {visible: true}).done(function(html) {
+    Templates.render(TEMPLATES.LOADING, {visible: true}).done(function (html) {
         let identifier = jQuery(REGION.LIST_TABLE);
         identifier.append(html);
         let request = {
             methodname: SERVICES.GET_LIST_TABLE,
             args: {}
         };
-        Ajax.call([request])[0].done(function(data) {
+        Ajax.call([request])[0].done(function (data) {
             Templates.render(TEMPLATES.MODELLISTTABLE, data).then((html, js) => {
                 identifier.html(html);
                 Templates.runTemplateJS(js);
