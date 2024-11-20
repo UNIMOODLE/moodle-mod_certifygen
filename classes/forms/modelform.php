@@ -289,7 +289,6 @@ class modelform extends dynamic_form {
      * @throws invalid_persistent_exception
      */
     public function process_dynamic_submission() {
-        error_log(__FUNCTION__);
         $formdata = $this->get_data();
         certifygen_model::save_model_object($formdata);
     }

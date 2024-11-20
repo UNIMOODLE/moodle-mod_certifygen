@@ -227,3 +227,4 @@ $string['model_must_exists'] = 'Cannot restore activity {$a->activityname}. A mo
 $string['course_not_valid_for_modelid'] = 'Cannot restore activity {$a->activityname}. The course ({$a->courseid}) is not valid for this model(name: {$a->name}, idnumber: {$a->idnumber})';
 $string['templatenotfound'] = 'There is a problem with the activity configuration. The activity cannot be used at the moment.';
 $string['messageprovider:certifygen_notification'] = 'Certifygen notifications';
+$string['nocontextassociated'] = 'This model has no associated context.';
