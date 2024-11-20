@@ -98,7 +98,7 @@ class emitcertificate_external extends external_api {
         int $userid,
         int $courseid
     ): array {
-        global $USER;
+        global $USER, $PAGE;
 
         self::validate_parameters(
             self::emitcertificate_parameters(),
@@ -108,9 +108,9 @@ class emitcertificate_external extends external_api {
 
         $result = ['result' => true, 'message' => get_string('ok', 'mod_certifygen')];
         [$course, $cm] = get_course_and_cm_from_instance($instanceid, 'certifygen');
-
+        $context = context_module::instance($cm->id);
+        $PAGE->set_context($context);
         if ($USER->id != $userid) {
-            $context = context_module::instance($cm->id);
             if (!has_capability('mod/certifygen:canemitotherscertificates', $context)) {
                 $result['result'] = false;
                 $result['message'] = get_string('nopermissiontoemitothercerts', 'mod_certifygen');

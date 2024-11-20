@@ -132,6 +132,10 @@ class checkfile extends scheduled_task {
                             // Save status.
                             $validation->set('status', $status);
                             $validation->save();
+                            if ($status == certifygen_validations::STATUS_FINISHED) {
+                                // Send notification.
+                                self::send_notification($validation);
+                            }
                         } else {
                             $validation->set('status', certifygen_validations::STATUS_STORAGE_ERROR);
                             $validation->save();
