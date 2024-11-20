@@ -43,7 +43,10 @@ use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 
 /**
- * checkstatus
+ * There is a task, checkstatus, that is recomended to enable it when the validation subplugin used does not validate inmediately
+ * the certificate.
+ * This task verify the status of the certificate on the external aplication used by the validation subplugin.
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>

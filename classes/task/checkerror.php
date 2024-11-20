@@ -46,7 +46,8 @@ use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 
 /**
- * checkerror
+ * There is a task, checkerror. It is responsible for searching for error states in the validation processes and returning them
+ * to the not started state, so that the user can start the process again.
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
