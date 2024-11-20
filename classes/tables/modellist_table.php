@@ -120,7 +120,7 @@ class modellist_table extends table_sql {
      * @throws coding_exception
      */
     final public function col_template($values): string {
-        if (empty($values->get('templateid'))) {
+        if (!empty($values->get('report'))) {
             return get_string('pluginname', $values->get('report'));
         }
         try {

@@ -65,7 +65,9 @@ class modelform extends dynamic_form {
     protected function definition() {
         global $OUTPUT;
         $mform =& $this->_form;
-        $modelid = is_null($this->_ajaxformdata) ? 0 : (int)$this->_ajaxformdata['id'];
+        $modelid = (is_null($this->_ajaxformdata) || !array_key_exists('id', $this->_ajaxformdata))
+                ? 0
+                : (int)$this->_ajaxformdata['id'];
         if ($modelid) {
             $model = new certifygen_model($modelid);
         }
@@ -144,8 +146,6 @@ class modelform extends dynamic_form {
                 get_string('template', 'mod_certifygen'),
                 $templateoptions
             )];
-            $mform->setType('templateid', PARAM_INT);
-            $mform->addRule('templateid', get_string('required'), 'required');
             // Adding "Manage templates" link if user has capabilities to manage templates.
             if ($canmanagetemplates && !empty($templates)) {
                 $elements[] = $mform->createElement(
@@ -168,7 +168,8 @@ class modelform extends dynamic_form {
                 'noteq',
                 certifygen_model::TYPE_ACTIVITY
             );
-            $rules['templateid'][] = [null, 'required', null, 'client'];
+            $rules = [];
+            $rules[]['templateid'] = [null, 'required', null, 'server'];
             $mform->addGroupRule('template_group', $rules);
         } else if ($model->get('templateid')) {
             $html = get_string('template', 'mod_certifygen') . ' : '
