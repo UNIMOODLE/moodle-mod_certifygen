@@ -25,6 +25,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ * Checkerror task
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -108,6 +109,8 @@ class checkerror extends scheduled_task {
                             if (!$response['haserror']) {
                                 $validation->set('status', certifygen_validations::STATUS_FINISHED);
                                 $validation->save();
+                                // Send notification.
+                                \mod_certifygen\certifygen::send_notification($validation);
                             } else {
                                 $validation->set('status', certifygen_validations::STATUS_NOT_STARTED);
                                 $validation->save();

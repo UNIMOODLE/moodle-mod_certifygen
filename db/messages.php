@@ -13,17 +13,19 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 // Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU".
 //
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
-// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos..
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
- * Version File
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -33,12 +35,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2024112000;
-$plugin->requires = 2022112802;
-$plugin->component = 'mod_certifygen';
-$plugin->cron = 0;
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = 'v0.0.1';
-$plugin->dependencies = [
-    'tool_certificate' => 2024042300,
+$messageproviders = [
+        // Notify certificate is ready to download.
+        'certifygen_notification' => [],
 ];

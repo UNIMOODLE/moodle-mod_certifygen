@@ -192,7 +192,7 @@ class modelform extends dynamic_form {
             foreach ($langstrings as $langstring) {
                 $typestring .= $langs[$langstring];
             }
-            $html = get_string('validation', 'mod_certifygen') . ' : ' . $typestring;
+            $html = get_string('lang', 'mod_certifygen') . ' : ' . $typestring;
             $html = html_writer::div($html, 'w-100');
             $mform->addElement('html', $html);
             $mform->addElement('hidden', 'langs', $model->get('langs'));
