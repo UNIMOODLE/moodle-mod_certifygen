@@ -32,6 +32,7 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace mod_certifygen;
 use mod_certifygen\external\get_id_instance_certificate_external;
 use mod_certifygen\persistents\certifygen_model;
 
@@ -48,7 +49,7 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_id_instance_certificate_external_test extends advanced_testcase {
+class get_id_instance_certificate_external_test extends \advanced_testcase {
     /**
      * Test set up.
      */
@@ -58,10 +59,12 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
 
     /**
      * Test
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @covers \mod_certifygen\external\get_draft_certificate_external::get_draft_certificate
      */
     public function test_get_id_instance_certificate_nopermission(): void {
 
@@ -97,11 +100,12 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
 
     /**
      * Test
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @covers \mod_certifygen\external\get_draft_certificate_external::get_draft_certificate
      */
     public function test_get_id_instance_certificate(): void {
         global $DB;
@@ -172,7 +176,7 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
         $this->assertEquals($course1->id, $result['instances'][0]['course']['id']);
 
         // Filter to return course names in $lang language.
-        $filter = new certifygenfilter(context_system::instance(), [], $lang);
+        $filter = new \certifygenfilter(\context_system::instance(), [], $lang);
         $coursefullname = $filter->filter($course1->fullname);
         $coursefullname = strip_tags($coursefullname);
         $courseshortname = $filter->filter($course1->shortname);
@@ -204,11 +208,12 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
 
     /**
      * Test
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @covers \mod_certifygen\external\get_draft_certificate_external::get_draft_certificate
      */
     public function test_get_id_instance_certificate_by_userfield(): void {
         global $DB;
@@ -292,7 +297,7 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
         $this->assertArrayHasKey('categoryid', $result['instances'][0]['course']);
         $this->assertEquals($course1->id, $result['instances'][0]['course']['id']);
         // Filter to return course names in $lang language.
-        $filter = new certifygenfilter(context_system::instance(), [], $lang);
+        $filter = new \certifygenfilter(\context_system::instance(), [], $lang);
         $coursefullname = $filter->filter($course1->fullname);
         $coursefullname = strip_tags($coursefullname);
         $courseshortname = $filter->filter($course1->shortname);
@@ -332,11 +337,12 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
 
     /**
      * Test
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @covers \mod_certifygen\external\get_draft_certificate_external::get_draft_certificate
      */
     public function test_get_id_instance_certificate_by_lang(): void {
         global $CFG, $DB;
@@ -428,7 +434,7 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
         $this->assertArrayHasKey('categoryid', $result['instances'][0]['course']);
         $this->assertEquals($course1->id, $result['instances'][0]['course']['id']);
         // Filter to return course names in $lang language.
-        $filter = new certifygenfilter(context_system::instance(), [], $lang);
+        $filter = new \certifygenfilter(\context_system::instance(), [], $lang);
         $courseshortname = $filter->filter($course1->shortname);
         $courseshortname = strip_tags($courseshortname);
         $this->assertEquals($courseshortname, $result['instances'][0]['course']['shortname']);
@@ -463,13 +469,15 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
         $this->assertArrayHasKey('code', $result['error']);
         $this->assertEquals('userfield_and_userid_sent', $result['error']['code']);
     }
+
     /**
      * Test: settings wsoutput not checked.
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @covers \mod_certifygen\external\get_draft_certificate_external::get_draft_certificate
      */
     public function test_get_id_instance_certificate_validation_not_checked(): void {
         global $DB;
@@ -508,9 +516,9 @@ class get_id_instance_certificate_external_test extends advanced_testcase {
         $certificate1 = $templategenerator->create_template((object)['name' => 'Certificate 1']);
         $modgenerator = $this->getDataGenerator()->get_plugin_generator('mod_certifygen');
         $model = $modgenerator->create_model_by_name(
-                certifygen_model::TYPE_ACTIVITY,
-                $certificate1->get_id(),
-                certifygen_model::TYPE_ACTIVITY
+            certifygen_model::TYPE_ACTIVITY,
+            $certificate1->get_id(),
+            certifygen_model::TYPE_ACTIVITY
         );
         set_config('wsoutput', 0, 'certifygenvalidation_none');
         $langs = $model->get('langs');

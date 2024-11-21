@@ -32,7 +32,7 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+namespace mod_certifygen;
 use certifygenvalidation_webservice\external\change_status_external;
 use core\invalid_persistent_exception;
 use mod_certifygen\external\downloadcertificate_external;
@@ -54,7 +54,7 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class downloadcertificate_external_test extends advanced_testcase {
+class downloadcertificate_external_test extends \advanced_testcase {
     /**
      * Test set up.
      */
@@ -64,12 +64,14 @@ class downloadcertificate_external_test extends advanced_testcase {
 
     /**
      * test
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \moodle_exception
      * @throws invalid_persistent_exception
-     * @throws moodle_exception
+     * @covers \mod_certifygen\external\downloadcertificate_external::downloadcertificate
      */
     public function test_downloadcertificate(): void {
 
@@ -125,7 +127,7 @@ class downloadcertificate_external_test extends advanced_testcase {
         // Now validation record exists.
         $validation = certifygen_validations::get_record($data);
         $code = certifygen_validations::get_certificate_code($validation);
-        $localrepository = new certifygenrepository_localrepository\certifygenrepository_localrepository();
+        $localrepository = new \certifygenrepository_localrepository\certifygenrepository_localrepository();
         $fileurl = $localrepository->get_file_url($validation);
         $result = downloadcertificate_external::downloadcertificate(
             $validation->get('id'),
@@ -148,12 +150,14 @@ class downloadcertificate_external_test extends advanced_testcase {
 
     /**
      * Test
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \moodle_exception
      * @throws invalid_persistent_exception
-     * @throws moodle_exception
+     * @covers \mod_certifygen\external\downloadcertificate_external::downloadcertificate
      */
     public function test_downloadcertificate2(): void {
 
@@ -240,12 +244,14 @@ class downloadcertificate_external_test extends advanced_testcase {
 
     /**
      * Test: validation ws + localrepository.
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \moodle_exception
      * @throws invalid_persistent_exception
-     * @throws moodle_exception
+     * @covers \mod_certifygen\external\downloadcertificate_external::downloadcertificate
      */
     public function test_downloadcertificate_3(): void {
 
@@ -325,7 +331,7 @@ class downloadcertificate_external_test extends advanced_testcase {
 
         // Now validation record exists.
         $code = certifygen_validations::get_certificate_code($validation);
-        $localrepository = new certifygenrepository_localrepository\certifygenrepository_localrepository();
+        $localrepository = new \certifygenrepository_localrepository\certifygenrepository_localrepository();
         $fileurl = $localrepository->get_file_url($validation);
         $result = downloadcertificate_external::downloadcertificate(
             $validation->get('id'),

@@ -32,7 +32,7 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+namespace mod_certifygen;
 use mod_certifygen\external\emitteacherrequest_external;
 use mod_certifygen\external\get_pdf_teacher_certificate_external;
 use mod_certifygen\persistents\certifygen_model;
@@ -53,7 +53,7 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_pdf_teacher_certificate_external_test extends advanced_testcase {
+class get_pdf_teacher_certificate_external_test extends \advanced_testcase {
     /**
      * Test set up.
      */
@@ -62,13 +62,15 @@ class get_pdf_teacher_certificate_external_test extends advanced_testcase {
         $controller = new \tool_langimport\controller();
         $controller->install_languagepacks('es');
     }
+
     /**
      * Test 1:calls get_pdf_teacher_certificate without emiting.
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @covers \mod_certifygen\external\get_pdf_teacher_certificate_external::get_pdf_teacher_certificate
      */
     public function test_1(): void {
         global $DB;
@@ -140,10 +142,11 @@ class get_pdf_teacher_certificate_external_test extends advanced_testcase {
      * Test 2: before calling get_pdf_teacher_certificate ws, called eitteacherrequest ws..
      *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception|invalid_persistent_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws invalid_persistent_exception
+     * @covers \mod_certifygen\external\get_pdf_teacher_certificate_external::get_pdf_teacher_certificate
      */
     public function test_2(): void {
         global $DB;
@@ -229,10 +232,11 @@ class get_pdf_teacher_certificate_external_test extends advanced_testcase {
      * Test 3: userfields
      *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception|invalid_persistent_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws invalid_persistent_exception
+     * @covers \mod_certifygen\external\get_pdf_teacher_certificate_external::get_pdf_teacher_certificate
      */
     public function test_3(): void {
         global $DB;
@@ -337,10 +341,11 @@ class get_pdf_teacher_certificate_external_test extends advanced_testcase {
      * Test 4: find user by usrename
      *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception|invalid_persistent_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws invalid_persistent_exception
+     * @covers \mod_certifygen\external\get_pdf_teacher_certificate_external::get_pdf_teacher_certificate
      */
     public function test_4(): void {
         global $DB;
@@ -430,10 +435,11 @@ class get_pdf_teacher_certificate_external_test extends advanced_testcase {
      * Test 5: find user by idnumber
      *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception|invalid_persistent_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws invalid_persistent_exception
+     * @covers \mod_certifygen\external\get_pdf_teacher_certificate_external::get_pdf_teacher_certificate
      */
     public function test_5(): void {
         global $DB;
@@ -524,10 +530,11 @@ class get_pdf_teacher_certificate_external_test extends advanced_testcase {
      * Test 6: validation ws: error
      *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception|invalid_persistent_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws invalid_persistent_exception
+     * @covers \mod_certifygen\external\get_pdf_teacher_certificate_external::get_pdf_teacher_certificate
      */
     public function test_6(): void {
         global $DB;
@@ -615,11 +622,11 @@ class get_pdf_teacher_certificate_external_test extends advanced_testcase {
     /**
      * Test 7: validation ws: ok
      *
-     * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception|invalid_persistent_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws invalid_persistent_exception
+     * @covers \mod_certifygen\external\get_pdf_teacher_certificate_external::get_pdf_teacher_certificate
      */
     public function test_7(): void {
         global $DB;

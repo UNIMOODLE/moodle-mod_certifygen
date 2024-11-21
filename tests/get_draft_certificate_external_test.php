@@ -32,7 +32,7 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+namespace mod_certifygen;
 use certifygenvalidation_webservice\external\change_status_external;
 use core\invalid_persistent_exception;
 use mod_certifygen\external\emitcertificate_external;
@@ -55,7 +55,7 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_draft_certificate_external_test extends advanced_testcase {
+class get_draft_certificate_external_test extends \advanced_testcase {
     /**
      * Test set up.
      */
@@ -65,11 +65,13 @@ class get_draft_certificate_external_test extends advanced_testcase {
 
     /**
      * Test 1
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \required_capability_exception
+     * @covers \mod_certifygen\external\get_draft_certificate_external::get_draft_certificate
      */
     public function test_1(): void {
         global $DB;
@@ -129,13 +131,16 @@ class get_draft_certificate_external_test extends advanced_testcase {
         $this->assertArrayHasKey('certificate', $result);
         $this->assertArrayHasKey('file', $result['certificate']);
     }
+
     /**
      * Test 2
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \required_capability_exception
+     * @covers \mod_certifygen\external\get_draft_certificate_external::get_draft_certificate
      */
     public function test_2(): void {
         global $DB;
@@ -199,11 +204,13 @@ class get_draft_certificate_external_test extends advanced_testcase {
 
     /**
      * Test 3
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \required_capability_exception
+     * @covers \mod_certifygen\external\get_draft_certificate_external::get_draft_certificate
      */
     public function test_3(): void {
         global $DB;
@@ -281,13 +288,16 @@ class get_draft_certificate_external_test extends advanced_testcase {
         $this->assertArrayHasKey('certificate', $result);
         $this->assertArrayHasKey('file', $result['certificate']);
     }
+
     /**
      * Test 4
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \required_capability_exception
+     * @covers \mod_certifygen\external\get_draft_certificate_external::get_draft_certificate
      */
     public function test_4(): void {
         global $DB;
@@ -351,13 +361,16 @@ class get_draft_certificate_external_test extends advanced_testcase {
         $this->assertArrayHasKey('certificate', $result);
         $this->assertArrayHasKey('file', $result['certificate']);
     }
+
     /**
      * Test 5
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \required_capability_exception
+     * @covers \mod_certifygen\external\get_draft_certificate_external::get_draft_certificate
      */
     public function test_5(): void {
         global $DB;
@@ -422,13 +435,16 @@ class get_draft_certificate_external_test extends advanced_testcase {
         $this->assertArrayHasKey('certificate', $result);
         $this->assertArrayHasKey('file', $result['certificate']);
     }
+
     /**
      * Test 6
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \required_capability_exception
+     * @covers \mod_certifygen\external\get_draft_certificate_external::get_draft_certificate
      */
     public function test_6(): void {
         global $DB;

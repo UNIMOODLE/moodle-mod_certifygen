@@ -32,7 +32,7 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+namespace mod_certifygen;
 use mod_certifygen\external\searchmycourses_external;
 use mod_certifygen\persistents\certifygen_model;
 
@@ -50,7 +50,7 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class searchmycourses_external_test extends advanced_testcase {
+class searchmycourses_external_test extends \advanced_testcase {
     /**
      * Test set up.
      */
@@ -60,12 +60,14 @@ class searchmycourses_external_test extends advanced_testcase {
 
     /**
      * Test
+     *
      * @return void
      * @throws coding_exception
      * @throws dml_exception
      * @throws invalid_parameter_exception
      * @throws moodle_exception
      * @throws restricted_context_exception
+     * @covers \mod_certifygen\external\searchmycourses_external::searchmycourses
      */
     public function test_searchmycourses_notenrolled(): void {
         // Create user.
@@ -111,12 +113,14 @@ class searchmycourses_external_test extends advanced_testcase {
 
     /**
      * Test
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws moodle_exception
-     * @throws restricted_context_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \moodle_exception
+     * @throws \restricted_context_exception
+     * @covers \mod_certifygen\external\searchmycourses_external::searchmycourses
      */
     public function test_searchmycourses_enrolled(): void {
         // Create user and enrol as teacher.

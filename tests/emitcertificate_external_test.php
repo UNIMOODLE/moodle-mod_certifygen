@@ -32,7 +32,7 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+namespace mod_certifygen;
 use core\invalid_persistent_exception;
 use mod_certifygen\external\emitcertificate_external;
 use mod_certifygen\persistents\certifygen_model;
@@ -51,7 +51,7 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class emitcertificate_external_test extends advanced_testcase {
+class emitcertificate_external_test extends \advanced_testcase {
     /**
      * Test set up.
      */
@@ -61,11 +61,13 @@ class emitcertificate_external_test extends advanced_testcase {
 
     /**
      * test
+     *
      * @return void
-     * @throws coding_exception
-     * @throws invalid_parameter_exception
+     * @throws \coding_exception
+     * @throws \invalid_parameter_exception
+     * @throws \moodle_exception
      * @throws invalid_persistent_exception
-     * @throws moodle_exception
+     * @covers \mod_certifygen\external\emitcertificate_external::emitcertificate
      */
     public function test_emitcertificate(): void {
 
@@ -130,11 +132,13 @@ class emitcertificate_external_test extends advanced_testcase {
 
     /**
      * test
+     *
      * @return void
-     * @throws coding_exception
-     * @throws invalid_parameter_exception
+     * @throws \coding_exception
+     * @throws \invalid_parameter_exception
+     * @throws \moodle_exception
      * @throws invalid_persistent_exception
-     * @throws moodle_exception
+     * @covers \mod_certifygen\external\emitcertificate_external::emitcertificate
      */
     public function test_emitcertificate_2(): void {
 
@@ -200,11 +204,13 @@ class emitcertificate_external_test extends advanced_testcase {
 
     /**
      * Test: validation ws + localrepository.
+     *
      * @return void
-     * @throws coding_exception
-     * @throws invalid_parameter_exception
+     * @throws \coding_exception
+     * @throws \invalid_parameter_exception
+     * @throws \moodle_exception
      * @throws invalid_persistent_exception
-     * @throws moodle_exception
+     * @covers \mod_certifygen\external\emitcertificate_external::emitcertificate
      */
     public function test_emitcertificate_3(): void {
 

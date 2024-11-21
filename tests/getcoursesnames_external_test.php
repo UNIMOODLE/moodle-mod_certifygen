@@ -32,6 +32,7 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace mod_certifygen;
 use mod_certifygen\external\getcoursesnames_external;
 
 defined('MOODLE_INTERNAL') || die();
@@ -47,7 +48,7 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class getcoursesnames_external_test extends advanced_testcase {
+class getcoursesnames_external_test extends \advanced_testcase {
     /**
      * Test set up.
      */
@@ -57,8 +58,10 @@ class getcoursesnames_external_test extends advanced_testcase {
 
     /**
      * Test
+     *
      * @return void
-     * @throws invalid_parameter_exception
+     * @throws \invalid_parameter_exception
+     * @covers \mod_certifygen\external\getcoursesnames_external::getcoursesnames
      */
     public function test_getcoursesnames(): void {
         $course1 = self::getDataGenerator()->create_course();

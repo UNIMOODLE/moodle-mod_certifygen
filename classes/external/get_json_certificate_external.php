@@ -22,6 +22,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos..
 
 /**
+ * WS Get kson certificate
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -188,8 +189,6 @@ class get_json_certificate_external extends external_api {
                 $json = json_decode($issue->data);
                 $json->courseshortname = $filter->filter($json->courseshortname);
                 $json->coursefullname = $filter->filter($json->coursefullname);
-                //$result['json']['data'] = $json;
-                //$data = $json;
                 // Dynamic data.
                 $pages = $DB->get_records('tool_certificate_pages', ['templateid' => $model->get('templateid')]);
                 $elements = [];

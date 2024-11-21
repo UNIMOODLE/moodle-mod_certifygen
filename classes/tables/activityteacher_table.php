@@ -360,7 +360,6 @@ class activityteacher_table extends table_sql {
             $this->rawdata = [];
         }
 
-
         // Set initial bars.
         $this->initialbars($total > $pagesize);
     }
