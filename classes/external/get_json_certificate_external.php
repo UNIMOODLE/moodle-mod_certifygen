@@ -33,10 +33,6 @@ use coding_exception;
 use context_course;
 use context_system;
 use dml_exception;
-use external_api;
-use external_function_parameters;
-use external_single_structure;
-use external_value;
 use invalid_parameter_exception;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
@@ -50,6 +46,7 @@ global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
 require_once($CFG->dirroot . '/mod/certifygen/lib.php');
 require_once($CFG->dirroot . '/mod/certifygen/classes/filters/certifygenfilter.php');
+require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Get certificate elements
  * @package    mod_certifygen
@@ -58,20 +55,20 @@ require_once($CFG->dirroot . '/mod/certifygen/classes/filters/certifygenfilter.p
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_json_certificate_external extends external_api {
+class get_json_certificate_external extends \external_api {
     /**
      * Describes the external function parameters.
      *
-     * @return external_function_parameters
+     * @return \external_function_parameters
      */
-    public static function get_json_certificate_parameters(): external_function_parameters {
-        return new external_function_parameters(
+    public static function get_json_certificate_parameters(): \external_function_parameters {
+        return new \external_function_parameters(
             [
-                'userid' => new external_value(PARAM_INT, 'user id'),
-                'userfield' => new external_value(PARAM_RAW, 'user field'),
-                'idinstance' => new external_value(PARAM_INT, 'instance id'),
-                'customfields' => new external_value(PARAM_RAW, 'customfields'),
-                'lang' => new external_value(PARAM_LANG, 'lang'),
+                'userid' => new \external_value(PARAM_INT, 'user id'),
+                'userfield' => new \external_value(PARAM_RAW, 'user field'),
+                'idinstance' => new \external_value(PARAM_INT, 'instance id'),
+                'customfields' => new \external_value(PARAM_RAW, 'customfields'),
+                'lang' => new \external_value(PARAM_LANG, 'lang'),
             ]
         );
     }
@@ -223,14 +220,14 @@ class get_json_certificate_external extends external_api {
     /**
      * Describes the data returned from the external function.
      *
-     * @return external_single_structure
+     * @return \external_single_structure
      */
-    public static function get_json_certificate_returns(): external_single_structure {
-        return new external_single_structure([
-                'json' => new external_value(PARAM_RAW, 'Certificate elements in a json', VALUE_OPTIONAL),
-                'error' => new external_single_structure([
-                    'message' => new external_value(PARAM_CLEANFILE, 'Error message'),
-                    'code' => new external_value(PARAM_RAW, 'Error code'),
+    public static function get_json_certificate_returns(): \external_single_structure {
+        return new \external_single_structure([
+                'json' => new \external_value(PARAM_RAW, 'Certificate elements in a json', VALUE_OPTIONAL),
+                'error' => new \external_single_structure([
+                    'message' => new \external_value(PARAM_CLEANFILE, 'Error message'),
+                    'code' => new \external_value(PARAM_RAW, 'Error code'),
                 ], 'Errors information', VALUE_OPTIONAL),
             ]);
     }

@@ -34,14 +34,11 @@ namespace mod_certifygen\external;
 use coding_exception;
 use context_system;
 use dml_exception;
-use external_api;
 use invalid_parameter_exception;
 use mod_certifygen\output\views\profile_my_certificates_view;
-use external_function_parameters;
-use external_single_structure;
-use external_value;
 use moodle_exception;
-
+global $CFG;
+require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Get teacher request view data
  * @package    mod_certifygen
@@ -50,15 +47,15 @@ use moodle_exception;
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class getteacherrequestviewdata_external extends external_api {
+class getteacherrequestviewdata_external extends \external_api {
     /**
      * Describes the external function parameters.
      *
-     * @return external_function_parameters
+     * @return \external_function_parameters
      */
-    public static function getteacherrequestviewdata_parameters(): external_function_parameters {
-        return new external_function_parameters([
-            'userid' => new external_value(PARAM_INT, 'user id'),
+    public static function getteacherrequestviewdata_parameters(): \external_function_parameters {
+        return new \external_function_parameters([
+            'userid' => new \external_value(PARAM_INT, 'user id'),
         ]);
     }
 
@@ -86,16 +83,16 @@ class getteacherrequestviewdata_external extends external_api {
     /**
      * Describes the data returned from the external function.
      *
-     * @return external_single_structure
+     * @return \external_single_structure
      */
-    public static function getteacherrequestviewdata_returns(): external_single_structure {
-        return new external_single_structure(
+    public static function getteacherrequestviewdata_returns(): \external_single_structure {
+        return new \external_single_structure(
             [
-                'userid' => new external_value(PARAM_INT, 'model deleted'),
-                'table' => new external_value(PARAM_RAW, 'table data'),
-                'title' => new external_value(PARAM_RAW, 'title', VALUE_OPTIONAL),
-                'mycertificates' => new external_value(PARAM_BOOL, 'table data', VALUE_OPTIONAL),
-                'cancreaterequest' => new external_value(PARAM_BOOL, 'cancreaterequest', VALUE_OPTIONAL),
+                'userid' => new \external_value(PARAM_INT, 'model deleted'),
+                'table' => new \external_value(PARAM_RAW, 'table data'),
+                'title' => new \external_value(PARAM_RAW, 'title', VALUE_OPTIONAL),
+                'mycertificates' => new \external_value(PARAM_BOOL, 'table data', VALUE_OPTIONAL),
+                'cancreaterequest' => new \external_value(PARAM_BOOL, 'cancreaterequest', VALUE_OPTIONAL),
             ]
         );
     }

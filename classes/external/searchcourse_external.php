@@ -32,16 +32,11 @@ namespace mod_certifygen\external;
 use coding_exception;
 use context_system;
 use dml_exception;
-use external_api;
-use external_description;
-use external_function_parameters;
-use external_multiple_structure;
-use external_single_structure;
-use external_value;
 use invalid_parameter_exception;
 use required_capability_exception;
 use restricted_context_exception;
-
+global $CFG;
+require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Search course
  * @package    mod_certifygen
@@ -50,15 +45,15 @@ use restricted_context_exception;
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class searchcourse_external extends external_api {
+class searchcourse_external extends \external_api {
     /**
      * Describes the external function parameters.
      *
-     * @return external_function_parameters
+     * @return \external_function_parameters
      */
-    public static function searchcourse_parameters(): external_function_parameters {
-        return new external_function_parameters([
-            'query' => new external_value(PARAM_RAW, 'The search query', VALUE_REQUIRED),
+    public static function searchcourse_parameters(): \external_function_parameters {
+        return new \external_function_parameters([
+            'query' => new \external_value(PARAM_RAW, 'The search query', VALUE_REQUIRED),
         ]);
     }
 
@@ -75,7 +70,7 @@ class searchcourse_external extends external_api {
     public static function searchcourse(string $query): array {
         global $DB, $CFG;
 
-        $params = external_api::validate_parameters(self::searchcourse_parameters(), [
+        $params = \external_api::validate_parameters(self::searchcourse_parameters(), [
             'query' => $query,
         ]);
         $query = clean_param($params['query'], PARAM_TEXT);
@@ -116,19 +111,19 @@ class searchcourse_external extends external_api {
     /**
      * Describes the external function result value.
      *
-     * @return external_description
+     * @return \external_description
      */
-    public static function searchcourse_returns(): external_description {
+    public static function searchcourse_returns(): \external_description {
 
-        return new external_single_structure([
-            'list' => new external_multiple_structure(
-                new external_single_structure([
-                    'id' => new external_value(PARAM_INT, 'Course ID'),
-                    'name' => new external_value(PARAM_RAW, 'Course name'),
+        return new \external_single_structure([
+            'list' => new \external_multiple_structure(
+                new \external_single_structure([
+                    'id' => new \external_value(PARAM_INT, 'Course ID'),
+                    'name' => new \external_value(PARAM_RAW, 'Course name'),
                 ])
             ),
-            'maxusersperpage' => new external_value(PARAM_INT, 'Configured maximum categories per page.'),
-            'overflow' => new external_value(PARAM_BOOL, 'Were there more records than maxusersperpage found?'),
+            'maxusersperpage' => new \external_value(PARAM_INT, 'Configured maximum categories per page.'),
+            'overflow' => new \external_value(PARAM_BOOL, 'Were there more records than maxusersperpage found?'),
         ]);
     }
 }

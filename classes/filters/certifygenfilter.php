@@ -38,8 +38,7 @@ defined('MOODLE_INTERNAL') || die();
 //
 // Following new syntax is not compatible with old one:
 // <span lang="XX" class="multilang">one lang</span><span lang="YY" class="multilang">another language</span>.
-global $CFG;
-require_once($CFG->dirroot . '/filter/multilang/filter.php');
+
 /**
  * Certifygen filter
  * @package    mod_certifygen
@@ -48,7 +47,7 @@ require_once($CFG->dirroot . '/filter/multilang/filter.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class certifygenfilter extends filter_multilang {
+class certifygenfilter extends \filter_multilang\text_filter {
     /** @var string $lang */
     private string $lang;
 

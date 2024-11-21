@@ -36,12 +36,9 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
+require_once($CFG->dirroot . '/lib/externallib.php');
 use coding_exception;
 use context_course;
-use external_api;
-use external_function_parameters;
-use external_single_structure;
-use external_value;
 use invalid_parameter_exception;
 use mod_certifygen\event\certificate_revoked;
 use mod_certifygen\persistents\certifygen_model;
@@ -49,7 +46,6 @@ use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 use required_capability_exception;
 use tool_certificate\template;
-
 /**
  * Revoke certificate
  * @package    mod_certifygen
@@ -58,18 +54,18 @@ use tool_certificate\template;
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class revokecertificate_external extends external_api {
+class revokecertificate_external extends \external_api {
     /**
      * Describes the external function parameters.
      *
-     * @return external_function_parameters
+     * @return \external_function_parameters
      */
-    public static function revokecertificate_parameters(): external_function_parameters {
-        return new external_function_parameters(
+    public static function revokecertificate_parameters(): \external_function_parameters {
+        return new \external_function_parameters(
             [
-                'issueid' => new external_value(PARAM_INT, 'tool_certificate_issues id'),
-                'userid' => new external_value(PARAM_INT, 'user id'),
-                'modelid' => new external_value(PARAM_INT, 'model id'),
+                'issueid' => new \external_value(PARAM_INT, 'tool_certificate_issues id'),
+                'userid' => new \external_value(PARAM_INT, 'user id'),
+                'modelid' => new \external_value(PARAM_INT, 'model id'),
             ]
         );
     }
@@ -153,13 +149,13 @@ class revokecertificate_external extends external_api {
     /**
      * Describes the data returned from the external function.
      *
-     * @return external_single_structure
+     * @return \external_single_structure
      */
-    public static function revokecertificate_returns(): external_single_structure {
-        return new external_single_structure(
+    public static function revokecertificate_returns(): \external_single_structure {
+        return new \external_single_structure(
             [
-                'result' => new external_value(PARAM_BOOL, 'model deleted'),
-                'message' => new external_value(PARAM_RAW, 'meesage'),
+                'result' => new \external_value(PARAM_BOOL, 'model deleted'),
+                'message' => new \external_value(PARAM_RAW, 'meesage'),
             ]
         );
     }

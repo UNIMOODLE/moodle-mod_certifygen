@@ -34,10 +34,6 @@ namespace mod_certifygen\external;
 
 use coding_exception;
 use context_module;
-use external_api;
-use external_function_parameters;
-use external_single_structure;
-use external_value;
 use invalid_parameter_exception;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
@@ -47,6 +43,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->libdir . '/modinfolib.php');
+require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Reemit certificate
  * @package    mod_certifygen
@@ -55,16 +52,16 @@ require_once($CFG->libdir . '/modinfolib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class reemitcertificate_external extends external_api {
+class reemitcertificate_external extends \external_api {
     /**
      * Describes the external function parameters.
      *
-     * @return external_function_parameters
+     * @return \external_function_parameters
      */
-    public static function reemitcertificate_parameters(): external_function_parameters {
-        return new external_function_parameters(
+    public static function reemitcertificate_parameters(): \external_function_parameters {
+        return new \external_function_parameters(
             [
-                'id' => new external_value(PARAM_INT, 'id'),
+                'id' => new \external_value(PARAM_INT, 'id'),
             ]
         );
     }
@@ -138,13 +135,13 @@ class reemitcertificate_external extends external_api {
     /**
      * Describes the data returned from the external function.
      *
-     * @return external_single_structure
+     * @return \external_single_structure
      */
-    public static function reemitcertificate_returns(): external_single_structure {
-        return new external_single_structure(
+    public static function reemitcertificate_returns(): \external_single_structure {
+        return new \external_single_structure(
             [
-                'result' => new external_value(PARAM_BOOL, 'model deleted'),
-                'message' => new external_value(PARAM_RAW, 'meesage', VALUE_OPTIONAL),
+                'result' => new \external_value(PARAM_BOOL, 'model deleted'),
+                'message' => new \external_value(PARAM_RAW, 'meesage', VALUE_OPTIONAL),
             ]
         );
     }

@@ -34,11 +34,6 @@ use cm_info;
 use context_course;
 use context_system;
 use dml_exception;
-use external_api;
-use external_function_parameters;
-use external_multiple_structure;
-use external_single_structure;
-use external_value;
 use invalid_parameter_exception;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen;
@@ -52,6 +47,7 @@ global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
 require_once($CFG->dirroot . '/mod/certifygen/lib.php');
 require_once($CFG->dirroot . '/mod/certifygen/classes/filters/certifygenfilter.php');
+require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Get instances where there is a mod_certifygen
  * @package    mod_certifygen
@@ -60,18 +56,18 @@ require_once($CFG->dirroot . '/mod/certifygen/classes/filters/certifygenfilter.p
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_id_instance_certificate_external extends external_api {
+class get_id_instance_certificate_external extends \external_api {
     /**
      * Describes the external function parameters.
      *
-     * @return external_function_parameters
+     * @return \external_function_parameters
      */
-    public static function get_id_instance_certificate_parameters(): external_function_parameters {
-        return new external_function_parameters(
+    public static function get_id_instance_certificate_parameters(): \external_function_parameters {
+        return new \external_function_parameters(
             [
-                'userid' => new external_value(PARAM_INT, 'user id'),
-                'userfield' => new external_value(PARAM_RAW, 'user field'),
-                'lang' => new external_value(PARAM_LANG, 'user id'),
+                'userid' => new \external_value(PARAM_INT, 'user id'),
+                'userfield' => new \external_value(PARAM_RAW, 'user field'),
+                'lang' => new \external_value(PARAM_LANG, 'user id'),
             ]
         );
     }
@@ -217,83 +213,83 @@ class get_id_instance_certificate_external extends external_api {
     /**
      * Describes the data returned from the external function.
      *
-     * @return external_single_structure
+     * @return \external_single_structure
      */
-    public static function get_id_instance_certificate_returns(): external_single_structure {
-        return new external_single_structure([
-                'instances' => new external_multiple_structure(
-                    new external_single_structure(
+    public static function get_id_instance_certificate_returns(): \external_single_structure {
+        return new \external_single_structure([
+                'instances' => new \external_multiple_structure(
+                    new \external_single_structure(
                         [
-                            'course'   => new external_single_structure([
-                                'id' => new external_value(PARAM_INT, 'Course id', VALUE_OPTIONAL),
-                                'shortname' => new external_value(
+                            'course'   => new \external_single_structure([
+                                'id' => new \external_value(PARAM_INT, 'Course id', VALUE_OPTIONAL),
+                                'shortname' => new \external_value(
                                     PARAM_RAW,
                                     'Course shortname',
                                     VALUE_OPTIONAL
                                 ),
-                                'fullname' => new external_value(
+                                'fullname' => new \external_value(
                                     PARAM_RAW,
                                     'Course fullname',
                                     VALUE_OPTIONAL
                                 ),
-                                'categoryid' => new external_value(
+                                'categoryid' => new \external_value(
                                     PARAM_INT,
                                     'Category id',
                                     VALUE_OPTIONAL
                                 ),
                             ], 'Course information', VALUE_OPTIONAL),
-                            'instance'   => new external_single_structure([
-                                'id' => new external_value(
+                            'instance'   => new \external_single_structure([
+                                'id' => new \external_value(
                                     PARAM_INT,
                                     'Instance id',
                                     VALUE_OPTIONAL
                                 ),
-                                'name' => new external_value(
+                                'name' => new \external_value(
                                     PARAM_RAW,
                                     'Instance name',
                                     VALUE_OPTIONAL
                                 ),
-                                'modelname' => new external_value(
+                                'modelname' => new \external_value(
                                     PARAM_RAW,
                                     'Model name',
                                     VALUE_OPTIONAL
                                 ),
-                                'modelidnumber' => new external_value(
+                                'modelidnumber' => new \external_value(
                                     PARAM_RAW,
                                     'Model name',
                                     VALUE_OPTIONAL
                                 ),
-                                'modelmode' => new external_value(
+                                'modelmode' => new \external_value(
                                     PARAM_INT,
                                     'Model mode',
                                     VALUE_OPTIONAL
                                 ),
-                                'modeltimeondemmand' => new external_value(
+                                'modeltimeondemmand' => new \external_value(
                                     PARAM_INT,
                                     'Model timeondemmand',
                                     VALUE_OPTIONAL
                                 ),
-                                'modeltype' => new external_value(
+                                'modeltype' => new \external_value(
                                     PARAM_INT,
                                     'Model type',
                                     VALUE_OPTIONAL
                                 ),
-                                'modeltemplateid' => new external_value(
+                                'modeltemplateid' => new \external_value(
                                     PARAM_INT,
                                     'Model template id',
                                     VALUE_OPTIONAL
                                 ),
-                                'modellangs' => new external_value(
+                                'modellangs' => new \external_value(
                                     PARAM_RAW,
                                     'Model langs',
                                     VALUE_OPTIONAL
                                 ),
-                                'modelvalidation' => new external_value(
+                                'modelvalidation' => new \external_value(
                                     PARAM_RAW,
                                     'Model validation',
                                     VALUE_OPTIONAL
                                 ),
-                                'modelrepository' => new external_value(
+                                'modelrepository' => new \external_value(
                                     PARAM_RAW,
                                     'Model repository',
                                     VALUE_OPTIONAL
@@ -306,9 +302,9 @@ class get_id_instance_certificate_external extends external_api {
                     '',
                     VALUE_OPTIONAL
                 ),
-                'error' => new external_single_structure([
-                    'message' => new external_value(PARAM_RAW, 'Error message'),
-                    'code' => new external_value(PARAM_RAW, 'Error code'),
+                'error' => new \external_single_structure([
+                    'message' => new \external_value(PARAM_RAW, 'Error message'),
+                    'code' => new \external_value(PARAM_RAW, 'Error code'),
                 ], 'Errors information', VALUE_OPTIONAL),
             ]);
     }

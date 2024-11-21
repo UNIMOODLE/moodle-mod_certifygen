@@ -32,14 +32,17 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-use mod_certifygen\external\deletemodel_external;
-use mod_certifygen\persistents\certifygen_model;
+
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot . '/lib/externallib.php');
+require_once($CFG->dirroot . '/mod/certifygen/classes/external/deletemodel_external.php');
+
+use mod_certifygen\external\deletemodel_external;
+use mod_certifygen\persistents\certifygen_model;
+//require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Delete model test
  * @package    mod_certifygen
@@ -48,8 +51,7 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class deletemodel_external_test extends advanced_testcase {
-
+class deletemodel_external_test extends \advanced_testcase {
     /**
      * Test set up.
      */
@@ -59,16 +61,15 @@ class deletemodel_external_test extends advanced_testcase {
 
     /**
      * test
-     * @throws coding_exception
-     * @throws invalid_parameter_exception
-     * @throws dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \dml_exception
      */
     public function test_deletemodel(): void {
         global $DB;
 
         $user = $this->getDataGenerator()->create_user([
                 'username' => 'test_manager_1',
-                 'firstname' => 'test',
+                'firstname' => 'test',
                 'lastname' => 'manager 1',
                 'email' => 'test_manager_1@fake.es',
                 ]);
@@ -110,8 +111,8 @@ class deletemodel_external_test extends advanced_testcase {
      * test
      *
      * @return void
-     * @throws coding_exception
-     * @throws invalid_parameter_exception|dml_exception
+     * @throws \coding_exception
+     * @throws \invalid_parameter_exception|\dml_exception
      */
     public function test_deletemodel2(): void {
 

@@ -34,13 +34,8 @@ namespace mod_certifygen\external;
 use coding_exception;
 use context_course;
 use context_system;
-use external_api;
-use external_function_parameters;
-use external_single_structure;
-use external_value;
 use invalid_parameter_exception;
 use mod_certifygen\interfaces\ICertificateRepository;
-use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
@@ -51,6 +46,7 @@ global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
 require_once($CFG->dirroot . '/mod/certifygen/lib.php');
 require_once($CFG->dirroot . '/mod/certifygen/classes/filters/certifygenfilter.php');
+require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Get teacher certificate (issue it if it is not already created)
  * @package    mod_certifygen
@@ -59,21 +55,21 @@ require_once($CFG->dirroot . '/mod/certifygen/classes/filters/certifygenfilter.p
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_pdf_teacher_certificate_external extends external_api {
+class get_pdf_teacher_certificate_external extends \external_api {
     /**
      * Describes the external function parameters.
      *
-     * @return external_function_parameters
+     * @return \external_function_parameters
      */
-    public static function get_pdf_teacher_certificate_parameters(): external_function_parameters {
-        return new external_function_parameters(
+    public static function get_pdf_teacher_certificate_parameters(): \external_function_parameters {
+        return new \external_function_parameters(
             [
-                'userid' => new external_value(PARAM_INT, 'user id'),
-                'userfield' => new external_value(PARAM_RAW, 'user field'),
-                'name' => new external_value(PARAM_RAW, 'request name'),
-                'courses' => new external_value(PARAM_RAW, 'course list separated by commas.'),
-                'modelid' => new external_value(PARAM_INT, 'Model id'),
-                'lang' => new external_value(PARAM_RAW, 'certificate model type'),
+                'userid' => new \external_value(PARAM_INT, 'user id'),
+                'userfield' => new \external_value(PARAM_RAW, 'user field'),
+                'name' => new \external_value(PARAM_RAW, 'request name'),
+                'courses' => new \external_value(PARAM_RAW, 'course list separated by commas.'),
+                'modelid' => new \external_value(PARAM_INT, 'Model id'),
+                'lang' => new \external_value(PARAM_RAW, 'certificate model type'),
             ]
         );
     }
@@ -217,25 +213,25 @@ class get_pdf_teacher_certificate_external extends external_api {
     /**
      * Describes the data returned from the external function.
      *
-     * @return external_single_structure
+     * @return \external_single_structure
      */
-    public static function get_pdf_teacher_certificate_returns(): external_single_structure {
-        return new external_single_structure([
-            'certificate' => new external_single_structure(
+    public static function get_pdf_teacher_certificate_returns(): \external_single_structure {
+        return new \external_single_structure([
+            'certificate' => new \external_single_structure(
                 [
-                    'validationid'   => new external_value(PARAM_INT, 'Valiation id'),
-                    'status'   => new external_value(PARAM_INT, 'Teacher request status'),
-                    'statusstr'   => new external_value(PARAM_RAW, 'Teacher request status'),
-                    'file' => new external_value(PARAM_RAW, 'certificate'),
-                    'reporttype' => new external_value(PARAM_INT, 'report type'),
-                    'reporttypestr' => new external_value(PARAM_RAW, 'report type'),
+                    'validationid'   => new \external_value(PARAM_INT, 'Valiation id'),
+                    'status'   => new \external_value(PARAM_INT, 'Teacher request status'),
+                    'statusstr'   => new \external_value(PARAM_RAW, 'Teacher request status'),
+                    'file' => new \external_value(PARAM_RAW, 'certificate'),
+                    'reporttype' => new \external_value(PARAM_INT, 'report type'),
+                    'reporttypestr' => new \external_value(PARAM_RAW, 'report type'),
                 ],
                 'Certificate info',
                 VALUE_OPTIONAL
             ),
-            'error' => new external_single_structure([
-                'message' => new external_value(PARAM_RAW, 'Error message'),
-                'code' => new external_value(PARAM_RAW, 'Error code'),
+            'error' => new \external_single_structure([
+                'message' => new \external_value(PARAM_RAW, 'Error message'),
+                'code' => new \external_value(PARAM_RAW, 'Error code'),
             ], 'Errors information', VALUE_OPTIONAL),
         ]);
     }

@@ -30,19 +30,15 @@
  */
 
 namespace mod_certifygen\external;
-use external_api;
-use external_function_parameters;
-use external_multiple_structure;
-use external_single_structure;
-use external_value;
+
 use invalid_parameter_exception;
 use moodle_exception;
-use moodle_url;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
+require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Get courses names
  * @package    mod_certifygen
@@ -51,16 +47,16 @@ require_once($CFG->dirroot . '/user/lib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class getcoursesnames_external extends external_api {
+class getcoursesnames_external extends \external_api {
     /**
      * Describes the external function parameters.
      *
-     * @return external_function_parameters
+     * @return \external_function_parameters
      */
-    public static function getcoursesnames_parameters(): external_function_parameters {
-        return new external_function_parameters(
+    public static function getcoursesnames_parameters(): \external_function_parameters {
+        return new \external_function_parameters(
             [
-                'coursesids' => new external_value(PARAM_RAW, 'courses ids list'),
+                'coursesids' => new \external_value(PARAM_RAW, 'courses ids list'),
             ]
         );
     }
@@ -81,7 +77,7 @@ class getcoursesnames_external extends external_api {
         foreach ($coursesarray as $courseid) {
             try {
                 $course = get_course($courseid);
-                $url = new moodle_url('/course/view.php', ['id' => $courseid]);
+                $url = new \moodle_url('/course/view.php', ['id' => $courseid]);
                 $list[] = [
                     'id' => $courseid,
                     'shortname' => $course->shortname,
@@ -104,16 +100,16 @@ class getcoursesnames_external extends external_api {
     /**
      * Describes the data returned from the external function.
      *
-     * @return external_single_structure
+     * @return \external_single_structure
      */
-    public static function getcoursesnames_returns(): external_single_structure {
-        return new external_single_structure([
-                'list' => new external_multiple_structure(new external_single_structure(
+    public static function getcoursesnames_returns(): \external_single_structure {
+        return new \external_single_structure([
+                'list' => new \external_multiple_structure(new \external_single_structure(
                     [
-                            'id' => new external_value(PARAM_INT, 'Course id'),
-                            'shortname' => new external_value(PARAM_RAW, 'Course shortname'),
-                            'fullname' => new external_value(PARAM_RAW, 'Course fullname'),
-                            'link' => new external_value(PARAM_RAW, 'Course link url'),
+                            'id' => new \external_value(PARAM_INT, 'Course id'),
+                            'shortname' => new \external_value(PARAM_RAW, 'Course shortname'),
+                            'fullname' => new \external_value(PARAM_RAW, 'Course fullname'),
+                            'link' => new \external_value(PARAM_RAW, 'Course link url'),
                     ],
                     'Course list'
                 )),

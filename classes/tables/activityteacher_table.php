@@ -78,6 +78,8 @@ class activityteacher_table extends table_sql {
     private bool $canrevoke;
     /** @var array $statusmessages */
     private array $statusmessages;
+    /** @var certifygen_model $model */
+    private certifygen_model $model;
 
     /**
      * Constructor

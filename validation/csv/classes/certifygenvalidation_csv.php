@@ -29,10 +29,6 @@
 namespace certifygenvalidation_csv;
 
 defined('MOODLE_INTERNAL') || die();
-global $CFG;
-
-require_once($CFG->libdir . '/soaplib.php');
-require_once($CFG->libdir . '/pdflib.php');
 
 use certifygenvalidation_csv\persistents\certifygenvalidationcsv;
 use coding_exception;
@@ -683,7 +679,9 @@ xmlns:fir="http://firma.ws.producto.com/">
             ]);
 
             $response = curl_exec($curl);
+
             if (curl_errno($curl)) {
+                error_log(__FUNCTION__ . ' response: '.var_export($response, true));
                 return certifygen_validations::STATUS_VALIDATION_ERROR;
             }
             curl_close($curl);
@@ -695,6 +693,7 @@ xmlns:fir="http://firma.ws.producto.com/">
             $iniciarprocesofirmaresponse = $res->consultaEstadoPeticionResponse->children();
             $iniciarprocesofirmaresponsechildren = $iniciarprocesofirmaresponse->children();
             $resultado = (string) $iniciarprocesofirmaresponsechildren->resultado;
+            error_log(__FUNCTION__ . ' resultaod: '.var_export($resultado, true));
             if ($resultado === 'KO') {
                 $codeerror = (string) $iniciarprocesofirmaresponsechildren->error->children()->codError;
                 $descerror = (string) $iniciarprocesofirmaresponsechildren->error->children()->descError;
@@ -703,6 +702,8 @@ xmlns:fir="http://firma.ws.producto.com/">
             }
             // Se obtiene idExpediente.
             $peticiones = $iniciarprocesofirmaresponsechildren->peticiones;
+            error_log(__FUNCTION__ . ' peticiones: '.var_export($peticiones, true));
+
             $estado = '';
             foreach ($peticiones as $peticion) {
                 $estado = (string) $peticion->estadoCircuito;
@@ -719,6 +720,7 @@ xmlns:fir="http://firma.ws.producto.com/">
         } catch (Exception $e) {
             debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
         }
+        error_log(__FUNCTION__ . ' el final: ');
         return certifygen_validations::STATUS_VALIDATION_ERROR;
     }
 

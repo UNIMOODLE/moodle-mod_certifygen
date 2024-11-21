@@ -31,14 +31,11 @@
 namespace mod_certifygen\external;
 use context_system;
 use dml_exception;
-use external_api;
 use invalid_parameter_exception;
 use mod_certifygen\tables\modellist_table;
-use moodle_url;
-use external_function_parameters;
-use external_single_structure;
-use external_value;
 use required_capability_exception;
+global $CFG;
+require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Get model list table
  * @package    mod_certifygen
@@ -47,14 +44,14 @@ use required_capability_exception;
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class getmodellisttable_external extends external_api {
+class getmodellisttable_external extends \external_api {
     /**
      * Describes the external function parameters.
      *
-     * @return external_function_parameters
+     * @return \external_function_parameters
      */
-    public static function getmodellisttable_parameters(): external_function_parameters {
-        return new external_function_parameters([]);
+    public static function getmodellisttable_parameters(): \external_function_parameters {
+        return new \external_function_parameters([]);
     }
 
     /**
@@ -73,7 +70,7 @@ class getmodellisttable_external extends external_api {
         $PAGE->set_context($context);
         require_capability('mod/certifygen:manage', $context);
         $tablelist = new modellist_table();
-        $tablelist->baseurl = new moodle_url('/mod/certifygen/modelmanager.php');
+        $tablelist->baseurl = new \moodle_url('/mod/certifygen/modelmanager.php');
         ob_start();
         // Optional_params 10 and true.
         $tablelist->out(10, true);
@@ -86,12 +83,12 @@ class getmodellisttable_external extends external_api {
     /**
      * Describes the data returned from the external function.
      *
-     * @return external_single_structure
+     * @return \external_single_structure
      */
-    public static function getmodellisttable_returns(): external_single_structure {
-        return new external_single_structure(
+    public static function getmodellisttable_returns(): \external_single_structure {
+        return new \external_single_structure(
             [
-                'table' => new external_value(PARAM_RAW, 'model list table'),
+                'table' => new \external_value(PARAM_RAW, 'model list table'),
             ]
         );
     }
