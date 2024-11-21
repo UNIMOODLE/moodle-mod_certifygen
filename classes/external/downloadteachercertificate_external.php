@@ -30,8 +30,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_certifygen\external;
-global $CFG;
-require_once($CFG->dirroot . '/lib/externallib.php');
 use context_system;
 use invalid_parameter_exception;
 use mod_certifygen\event\certificate_downloaded;
@@ -47,16 +45,16 @@ use moodle_exception;
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class downloadteachercertificate_external extends \external_api {
+class downloadteachercertificate_external extends \core_external\external_api {
     /**
      * Describes the external function parameters.
      *
-     * @return \external_function_parameters
+     * @return \core_external\external_function_parameters
      */
-    public static function downloadteachercertificate_parameters(): \external_function_parameters {
-        return new \external_function_parameters(
+    public static function downloadteachercertificate_parameters(): \core_external\external_function_parameters {
+        return new \core_external\external_function_parameters(
             [
-                'id' => new \external_value(PARAM_INT, 'id'),
+                'id' => new \core_external\external_value(PARAM_INT, 'id'),
             ]
         );
     }
@@ -131,14 +129,14 @@ class downloadteachercertificate_external extends \external_api {
     /**
      * Describes the data returned from the external function.
      *
-     * @return \external_single_structure
+     * @return \core_external\external_single_structure
      */
-    public static function downloadteachercertificate_returns(): \external_single_structure {
-        return new \external_single_structure(
+    public static function downloadteachercertificate_returns(): \core_external\external_single_structure {
+        return new \core_external\external_single_structure(
             [
-                'result' => new \external_value(PARAM_BOOL, 'model deleted'),
-                'message' => new \external_value(PARAM_RAW, 'meesage'),
-                'url' => new \external_value(PARAM_RAW, 'certificate url'),
+                'result' => new \core_external\external_value(PARAM_BOOL, 'model deleted'),
+                'message' => new \core_external\external_value(PARAM_RAW, 'meesage'),
+                'url' => new \core_external\external_value(PARAM_RAW, 'certificate url'),
             ]
         );
     }

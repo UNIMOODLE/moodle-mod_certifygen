@@ -34,7 +34,6 @@ namespace mod_certifygen\external;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
-require_once($CFG->dirroot . '/lib/externallib.php');
 require_once($CFG->dirroot . '/mod/certifygen/lib.php');
 use context_system;
 use dml_exception;
@@ -49,16 +48,16 @@ use moodle_exception;
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class deletemodel_external extends \external_api {
+class deletemodel_external extends \core_external\external_api {
     /**
      * Describes the external function parameters.
      *
-     * @return \external_function_parameters
+     * @return \core_external\external_function_parameters
      */
-    public static function deletemodel_parameters(): \external_function_parameters {
-        return new \external_function_parameters(
+    public static function deletemodel_parameters(): \core_external\external_function_parameters {
+        return new \core_external\external_function_parameters(
             [
-                'id' => new \external_value(PARAM_INT, 'model id'),
+                'id' => new \core_external\external_value(PARAM_INT, 'model id'),
             ]
         );
     }
@@ -98,13 +97,13 @@ class deletemodel_external extends \external_api {
     /**
      * Describes the data returned from the external function.
      *
-     * @return \external_single_structure
+     * @return \core_external\external_single_structure
      */
-    public static function deletemodel_returns(): \external_single_structure {
-        return new \external_single_structure(
+    public static function deletemodel_returns(): \core_external\external_single_structure {
+        return new \core_external\external_single_structure(
             [
-                'result' => new \external_value(PARAM_BOOL, 'model deleted'),
-                'message' => new \external_value(PARAM_RAW, 'meesage'),
+                'result' => new \core_external\external_value(PARAM_BOOL, 'model deleted'),
+                'message' => new \core_external\external_value(PARAM_RAW, 'meesage'),
             ]
         );
     }

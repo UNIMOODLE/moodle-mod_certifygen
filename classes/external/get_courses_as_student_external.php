@@ -22,6 +22,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos..
 
 /**
+ * WS Get courses as student
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -45,7 +46,6 @@ global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
 require_once($CFG->dirroot . '/mod/certifygen/classes/filters/certifygenfilter.php');
 require_once($CFG->dirroot . '/mod/certifygen/lib.php');
-require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Get courses as student
  * @package    mod_certifygen
@@ -54,18 +54,18 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_courses_as_student_external extends \external_api {
+class get_courses_as_student_external extends \core_external\external_api {
     /**
      * Describes the external function parameters.
      *
-     * @return \external_function_parameters
+     * @return \core_external\external_function_parameters
      */
-    public static function get_courses_as_student_parameters(): \external_function_parameters {
-        return new \external_function_parameters(
+    public static function get_courses_as_student_parameters(): \core_external\external_function_parameters {
+        return new \core_external\external_function_parameters(
             [
-                'userid' => new \external_value(PARAM_INT, 'user id'),
-                'userfield' => new \external_value(PARAM_RAW, 'user field'),
-                'lang' => new \external_value(PARAM_LANG, 'user lang'),
+                'userid' => new \core_external\external_value(PARAM_INT, 'user id'),
+                'userfield' => new \core_external\external_value(PARAM_RAW, 'user field'),
+                'lang' => new \core_external\external_value(PARAM_LANG, 'user lang'),
             ]
         );
     }
@@ -175,37 +175,37 @@ class get_courses_as_student_external extends \external_api {
     /**
      * Describes the data returned from the external function.
      *
-     * @return \external_single_structure
+     * @return \core_external\external_single_structure
      */
-    public static function get_courses_as_student_returns(): \external_single_structure {
-        return new \external_single_structure([
-                'courses' => new \external_multiple_structure(
-                    new \external_single_structure(
+    public static function get_courses_as_student_returns(): \core_external\external_single_structure {
+        return new \core_external\external_single_structure([
+                'courses' => new \core_external\external_multiple_structure(
+                    new \core_external\external_single_structure(
                         [
-                            'id'   => new \external_value(PARAM_RAW, 'Course id'),
-                            'shortname'   => new \external_value(PARAM_RAW, 'Course shortname'),
-                            'fullname' => new \external_value(PARAM_RAW, 'Course fullname'),
-                            'categoryid' => new \external_value(PARAM_INT, 'Course category id'),
-                            'completed' => new \external_value(PARAM_BOOL, 'student has course completed '),
-                            'modellist' => new \external_value(PARAM_RAW, 'model id list separated by commas.'),
+                            'id'   => new \core_external\external_value(PARAM_RAW, 'Course id'),
+                            'shortname'   => new \core_external\external_value(PARAM_RAW, 'Course shortname'),
+                            'fullname' => new \core_external\external_value(PARAM_RAW, 'Course fullname'),
+                            'categoryid' => new \core_external\external_value(PARAM_INT, 'Course category id'),
+                            'completed' => new \core_external\external_value(PARAM_BOOL, 'student has course completed '),
+                            'modellist' => new \core_external\external_value(PARAM_RAW, 'model id list separated by commas.'),
                         ],
                         'course info'
                     ),
                     'courses list',
                     VALUE_OPTIONAL
                 ),
-                'student' => new \external_single_structure(
+                'student' => new \core_external\external_single_structure(
                     [
-                        'fullname' => new \external_value(PARAM_RAW, 'User fullname'),
-                        'id' => new \external_value(PARAM_INT, 'User id'),
-                        'userfield' => new \external_value(PARAM_RAW, 'User id', VALUE_OPTIONAL),
+                        'fullname' => new \core_external\external_value(PARAM_RAW, 'User fullname'),
+                        'id' => new \core_external\external_value(PARAM_INT, 'User id'),
+                        'userfield' => new \core_external\external_value(PARAM_RAW, 'User id', VALUE_OPTIONAL),
                     ],
                     'Student info',
                     VALUE_OPTIONAL
                 ),
-                'error' => new \external_single_structure([
-                    'message' => new \external_value(PARAM_RAW, 'Error message', VALUE_OPTIONAL),
-                    'code' => new \external_value(PARAM_RAW, 'Error code', VALUE_OPTIONAL),
+                'error' => new \core_external\external_single_structure([
+                    'message' => new \core_external\external_value(PARAM_RAW, 'Error message', VALUE_OPTIONAL),
+                    'code' => new \core_external\external_value(PARAM_RAW, 'Error code', VALUE_OPTIONAL),
                 ], 'Errors information', VALUE_OPTIONAL),
             ]);
     }

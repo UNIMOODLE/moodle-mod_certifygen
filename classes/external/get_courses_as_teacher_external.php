@@ -22,6 +22,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos..
 
 /**
+ * Ws Get courses as teacher
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -45,7 +46,6 @@ global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
 require_once($CFG->dirroot . '/mod/certifygen/classes/filters/certifygenfilter.php');
 require_once($CFG->dirroot . '/mod/certifygen/lib.php');
-require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Get courses as teacher
  * @package    mod_certifygen
@@ -54,18 +54,18 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_courses_as_teacher_external extends \external_api {
+class get_courses_as_teacher_external extends \core_external\external_api {
     /**
      * Describes the external function parameters.
      *
-     * @return \external_function_parameters
+     * @return \core_external\external_function_parameters
      */
-    public static function get_courses_as_teacher_parameters(): \external_function_parameters {
-        return new \external_function_parameters(
+    public static function get_courses_as_teacher_parameters(): \core_external\external_function_parameters {
+        return new \core_external\external_function_parameters(
             [
-                'userid' => new \external_value(PARAM_INT, 'user id'),
-                'userfield' => new \external_value(PARAM_RAW, 'user field'),
-                'lang' => new \external_value(PARAM_LANG, 'user lang'),
+                'userid' => new \core_external\external_value(PARAM_INT, 'user id'),
+                'userfield' => new \core_external\external_value(PARAM_RAW, 'user field'),
+                'lang' => new \core_external\external_value(PARAM_LANG, 'user lang'),
             ]
         );
     }
@@ -185,78 +185,78 @@ class get_courses_as_teacher_external extends \external_api {
     /**
      * Describes the data returned from the external function.
      *
-     * @return \external_single_structure
+     * @return \core_external\external_single_structure
      */
-    public static function get_courses_as_teacher_returns(): \external_single_structure {
-        return new \external_single_structure([
-                'courses' => new \external_multiple_structure(
-                    new \external_single_structure(
+    public static function get_courses_as_teacher_returns(): \core_external\external_single_structure {
+        return new \core_external\external_single_structure([
+                'courses' => new \core_external\external_multiple_structure(
+                    new \core_external\external_single_structure(
                         [
-                            'id'   => new \external_value(PARAM_RAW, 'Course id', VALUE_OPTIONAL),
-                            'shortname'   => new \external_value(
+                            'id'   => new \core_external\external_value(PARAM_RAW, 'Course id', VALUE_OPTIONAL),
+                            'shortname'   => new \core_external\external_value(
                                 PARAM_RAW,
                                 'Course shortname',
                                 VALUE_OPTIONAL
                             ),
-                            'fullname' => new \external_value(
+                            'fullname' => new \core_external\external_value(
                                 PARAM_RAW,
                                 'Course fullname',
                                 VALUE_OPTIONAL
                             ),
-                            'categoryid' => new \external_value(
+                            'categoryid' => new \core_external\external_value(
                                 PARAM_INT,
                                 'Course category id',
                                 VALUE_OPTIONAL
                             ),
-                            'models' => new \external_multiple_structure(
-                                new \external_single_structure(
+                            'models' => new \core_external\external_multiple_structure(
+                                new \core_external\external_single_structure(
                                     [
-                                                    'id' => new \external_value(
+                                                    'id' => new \core_external\external_value(
                                                         PARAM_INT,
                                                         'Instance id',
                                                         VALUE_OPTIONAL
                                                     ),
-                                                    'idnumber' => new \external_value(
+                                                    'idnumber' => new \core_external\external_value(
                                                         PARAM_RAW,
                                                         'Model name',
                                                         VALUE_OPTIONAL
                                                     ),
-                                                    'name' => new \external_value(
+                                                    'name' => new \core_external\external_value(
                                                         PARAM_RAW,
                                                         'Model name',
                                                         VALUE_OPTIONAL
                                                     ),
-                                                    'mode' => new \external_value(
+                                                    'mode' => new \core_external\external_value(
                                                         PARAM_INT,
                                                         'Model mode',
                                                         VALUE_OPTIONAL
                                                     ),
-                                                    'timeondemmand' => new \external_value(
+                                                    'timeondemmand' => new \core_external\external_value(
                                                         PARAM_INT,
                                                         'Model timeondemmand',
                                                         VALUE_OPTIONAL
                                                     ),
-                                                    'type' => new \external_value(
+                                                    'type' => new \core_external\external_value(
                                                         PARAM_INT,
                                                         'Model type',
                                                         VALUE_OPTIONAL
                                                     ),
-                                                    'templateid' => new \external_value(
+                                                    'templateid' => new \core_external\external_value(
                                                         PARAM_INT,
                                                         'Model template id',
                                                         VALUE_OPTIONAL
                                                     ),
-                                                    'langs' => new \external_value(
+                                                    'langs' => new \core_external\external_value(
                                                         PARAM_RAW,
                                                         'Model langs',
                                                         VALUE_OPTIONAL
                                                     ),
-                                                    'validation' => new \external_value(
+                                                    'validation' => new \core_external\external_value(
                                                         PARAM_RAW,
                                                         'Model validation',
                                                         VALUE_OPTIONAL
                                                     ),
-                                                    'repository' => new \external_value(
+                                                    'repository' => new \core_external\external_value(
                                                         PARAM_RAW,
                                                         'Model validation',
                                                         VALUE_OPTIONAL
@@ -275,17 +275,17 @@ class get_courses_as_teacher_external extends \external_api {
                     '',
                     VALUE_OPTIONAL
                 ),
-                'teacher' => new \external_single_structure(
+                'teacher' => new \core_external\external_single_structure(
                     [
-                        'fullname' => new \external_value(PARAM_RAW, 'User fullname', VALUE_OPTIONAL),
-                        'id' => new \external_value(PARAM_INT, 'User id', VALUE_OPTIONAL),
+                        'fullname' => new \core_external\external_value(PARAM_RAW, 'User fullname', VALUE_OPTIONAL),
+                        'id' => new \core_external\external_value(PARAM_INT, 'User id', VALUE_OPTIONAL),
                     ],
                     'Student info',
                     VALUE_OPTIONAL
                 ),
-                'error' => new \external_single_structure([
-                    'message' => new \external_value(PARAM_RAW, 'Error message', VALUE_OPTIONAL),
-                    'code' => new \external_value(PARAM_RAW, 'Error code', VALUE_OPTIONAL),
+                'error' => new \core_external\external_single_structure([
+                    'message' => new \core_external\external_value(PARAM_RAW, 'Error message', VALUE_OPTIONAL),
+                    'code' => new \core_external\external_value(PARAM_RAW, 'Error code', VALUE_OPTIONAL),
                 ], 'Errors information', VALUE_OPTIONAL),
             ]);
     }

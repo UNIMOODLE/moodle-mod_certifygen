@@ -22,6 +22,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos..
 
 /**
+ * WS Get courses names
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -38,7 +39,6 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
-require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Get courses names
  * @package    mod_certifygen
@@ -47,16 +47,16 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class getcoursesnames_external extends \external_api {
+class getcoursesnames_external extends \core_external\external_api {
     /**
      * Describes the external function parameters.
      *
-     * @return \external_function_parameters
+     * @return \core_external\external_function_parameters
      */
-    public static function getcoursesnames_parameters(): \external_function_parameters {
-        return new \external_function_parameters(
+    public static function getcoursesnames_parameters(): \core_external\external_function_parameters {
+        return new \core_external\external_function_parameters(
             [
-                'coursesids' => new \external_value(PARAM_RAW, 'courses ids list'),
+                'coursesids' => new \core_external\external_value(PARAM_RAW, 'courses ids list'),
             ]
         );
     }
@@ -100,16 +100,16 @@ class getcoursesnames_external extends \external_api {
     /**
      * Describes the data returned from the external function.
      *
-     * @return \external_single_structure
+     * @return \core_external\external_single_structure
      */
-    public static function getcoursesnames_returns(): \external_single_structure {
-        return new \external_single_structure([
-                'list' => new \external_multiple_structure(new \external_single_structure(
+    public static function getcoursesnames_returns(): \core_external\external_single_structure {
+        return new \core_external\external_single_structure([
+                'list' => new \core_external\external_multiple_structure(new \core_external\external_single_structure(
                     [
-                            'id' => new \external_value(PARAM_INT, 'Course id'),
-                            'shortname' => new \external_value(PARAM_RAW, 'Course shortname'),
-                            'fullname' => new \external_value(PARAM_RAW, 'Course fullname'),
-                            'link' => new \external_value(PARAM_RAW, 'Course link url'),
+                            'id' => new \core_external\external_value(PARAM_INT, 'Course id'),
+                            'shortname' => new \core_external\external_value(PARAM_RAW, 'Course shortname'),
+                            'fullname' => new \core_external\external_value(PARAM_RAW, 'Course fullname'),
+                            'link' => new \core_external\external_value(PARAM_RAW, 'Course link url'),
                     ],
                     'Course list'
                 )),

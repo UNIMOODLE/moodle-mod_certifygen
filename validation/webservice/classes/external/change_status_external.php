@@ -58,18 +58,18 @@ use moodle_exception;
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class change_status_external extends external_api {
+class change_status_external extends \core_external\external_api {
     /**
      * Describes the external function parameters.
      *
-     * @return external_function_parameters
+     * @return \core_external\external_function_parameters
      */
-    public static function change_status_parameters(): external_function_parameters {
-        return new external_function_parameters(
+    public static function change_status_parameters(): \core_external\external_function_parameters {
+        return new \core_external\external_function_parameters(
             [
-                'userid' => new external_value(PARAM_INT, 'user id'),
-                'userfield' => new external_value(PARAM_RAW, 'user field'),
-                'requestid' => new external_value(PARAM_INT, 'instance id'),
+                'userid' => new \core_external\external_value(PARAM_INT, 'user id'),
+                'userfield' => new \core_external\external_value(PARAM_RAW, 'user field'),
+                'requestid' => new \core_external\external_value(PARAM_INT, 'instance id'),
             ]
         );
     }
@@ -154,14 +154,14 @@ class change_status_external extends external_api {
      *
      * @return external_single_structure
      */
-    public static function change_status_returns(): external_single_structure {
-        return new external_single_structure([
-            'requestid' => new external_value(PARAM_INT, 'request id', VALUE_OPTIONAL),
-            'newstatus' => new external_value(PARAM_INT, 'status', VALUE_OPTIONAL),
-            'newstatusdesc' => new external_value(PARAM_RAW, 'status description', VALUE_OPTIONAL),
-            'error' => new external_single_structure([
-                'message' => new external_value(PARAM_RAW, 'Error message', VALUE_OPTIONAL),
-                'code' => new external_value(PARAM_RAW, 'Error code', VALUE_OPTIONAL),
+    public static function change_status_returns(): \core_external\external_single_structure {
+        return new \core_external\external_single_structure([
+            'requestid' => new \core_external\external_value(PARAM_INT, 'request id', VALUE_OPTIONAL),
+            'newstatus' => new \core_external\external_value(PARAM_INT, 'status', VALUE_OPTIONAL),
+            'newstatusdesc' => new \core_external\external_value(PARAM_RAW, 'status description', VALUE_OPTIONAL),
+            'error' => new \core_external\external_single_structure([
+                'message' => new \core_external\external_value(PARAM_RAW, 'Error message', VALUE_OPTIONAL),
+                'code' => new \core_external\external_value(PARAM_RAW, 'Error code', VALUE_OPTIONAL),
             ], 'Errors information', VALUE_OPTIONAL),
             ]);
     }

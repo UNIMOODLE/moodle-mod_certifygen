@@ -22,6 +22,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos..
 
 /**
+ * WS Get pdf certificate
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -45,7 +46,6 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
 require_once($CFG->dirroot . '/mod/certifygen/lib.php');
-require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Get studetns certificate (issue it if it is not already created)
  * @package    mod_certifygen
@@ -54,20 +54,20 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_pdf_certificate_external extends \external_api {
+class get_pdf_certificate_external extends \core_external\external_api {
     /**
      * Describes the external function parameters.
      *
-     * @return \external_function_parameters
+     * @return \core_external\external_function_parameters
      */
-    public static function get_pdf_certificate_parameters(): \external_function_parameters {
-        return new \external_function_parameters(
+    public static function get_pdf_certificate_parameters(): \core_external\external_function_parameters {
+        return new \core_external\external_function_parameters(
             [
-                'userid' => new \external_value(PARAM_INT, 'user id'),
-                'userfield' => new \external_value(PARAM_RAW, 'user field'),
-                'idinstance' => new \external_value(PARAM_INT, 'instance id'),
-                'lang' => new \external_value(PARAM_LANG, 'lang'),
-                'customfields' => new \external_value(PARAM_RAW, 'customfields'),
+                'userid' => new \core_external\external_value(PARAM_INT, 'user id'),
+                'userfield' => new \core_external\external_value(PARAM_RAW, 'user field'),
+                'idinstance' => new \core_external\external_value(PARAM_INT, 'instance id'),
+                'lang' => new \core_external\external_value(PARAM_LANG, 'lang'),
+                'customfields' => new \core_external\external_value(PARAM_RAW, 'customfields'),
             ]
         );
     }
@@ -197,26 +197,26 @@ class get_pdf_certificate_external extends \external_api {
     /**
      * Describes the data returned from the external function.
      *
-     * @return \external_single_structure
+     * @return \core_external\external_single_structure
      */
-    public static function get_pdf_certificate_returns(): \external_single_structure {
-        return new \external_single_structure([
-                'certificate' => new \external_single_structure(
+    public static function get_pdf_certificate_returns(): \core_external\external_single_structure {
+        return new \core_external\external_single_structure([
+                'certificate' => new \core_external\external_single_structure(
                     [
-                                'validationid'   => new \external_value(PARAM_INT, 'Valiation id'),
-                                'status'   => new \external_value(PARAM_INT, 'Teacher request status'),
-                                'statusstr'   => new \external_value(PARAM_RAW, 'Teacher request status'),
-                                'file' => new \external_value(PARAM_RAW, 'certificate'),
-                                'reporttype' => new \external_value(PARAM_INT, 'report type'),
-                                'reporttypestr' => new \external_value(PARAM_RAW, 'report type'),
+                                'validationid'   => new \core_external\external_value(PARAM_INT, 'Valiation id'),
+                                'status'   => new \core_external\external_value(PARAM_INT, 'Teacher request status'),
+                                'statusstr'   => new \core_external\external_value(PARAM_RAW, 'Teacher request status'),
+                                'file' => new \core_external\external_value(PARAM_RAW, 'certificate'),
+                                'reporttype' => new \core_external\external_value(PARAM_INT, 'report type'),
+                                'reporttypestr' => new \core_external\external_value(PARAM_RAW, 'report type'),
                         ],
                     'Certificate info',
                     VALUE_OPTIONAL
                 ),
-                'error' => new \external_single_structure(
+                'error' => new \core_external\external_single_structure(
                     [
-                        'message' => new \external_value(PARAM_CLEANFILE, 'Error message'),
-                        'code' => new \external_value(PARAM_RAW, 'Error code'),
+                        'message' => new \core_external\external_value(PARAM_CLEANFILE, 'Error message'),
+                        'code' => new \core_external\external_value(PARAM_RAW, 'Error code'),
                     ],
                     'Errors information',
                     VALUE_OPTIONAL

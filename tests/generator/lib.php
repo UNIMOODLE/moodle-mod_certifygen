@@ -40,8 +40,8 @@ class mod_certifygen_generator extends testing_module_generator {
      * @param string $validation
      * @param string $report
      * @return certifygen_model
-     * @throws invalid_persistent_exception
-     * @throws coding_exception|moodle_exception
+     * @throws \invalid_persistent_exception
+     * @throws \coding_exception|moodle_exception
      */
     public function create_model(int $type, int $mode, int $templateid, string $validation, string $report) {
 
@@ -68,9 +68,9 @@ class mod_certifygen_generator extends testing_module_generator {
      * @param int $templateid
      * @param int $type
      * @return certifygen_model
-     * @throws invalid_persistent_exception
-     * @throws coding_exception
-     * @throws moodle_exception
+     * @throws \invalid_persistent_exception
+     * @throws \coding_exception
+     * @throws \moodle_exception
      */
     public function create_model_by_name(string $name, int $templateid, int $type) {
 
@@ -102,8 +102,8 @@ class mod_certifygen_generator extends testing_module_generator {
      * @param string $courses
      * @param int $userid
      * @return certifygen_validations
-     * @throws invalid_persistent_exception
-     * @throws coding_exception
+     * @throws \invalid_persistent_exception
+     * @throws \coding_exception
      */
     public function create_teacher_request(int $modelid, string $courses, int $userid) {
 
@@ -125,7 +125,7 @@ class mod_certifygen_generator extends testing_module_generator {
      * install_language_package
      * @param string $langcode
      * @return void
-     * @throws moodle_exception
+     * @throws \moodle_exception
      */
     public function install_language_package(string $langcode) {
         $controller = new \tool_langimport\controller();
@@ -137,8 +137,8 @@ class mod_certifygen_generator extends testing_module_generator {
      * @param int $modelid
      * @param string $contextids
      * @return certifygen_context
-     * @throws invalid_persistent_exception
-     * @throws coding_exception
+     * @throws \invalid_persistent_exception
+     * @throws \coding_exception
      */
     public function assign_model_coursecontext(int $modelid, string $contextids) {
         $data = [

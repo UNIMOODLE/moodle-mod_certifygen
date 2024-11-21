@@ -27,6 +27,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace certifygenvalidation_webservice;
+
 use certifygenvalidation_webservice\external\get_user_requests_external;
 use core\invalid_persistent_exception;
 use mod_certifygen\external\emitcertificate_external;
@@ -39,7 +41,6 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
 require_once($CFG->dirroot . '/mod/certifygen/tests/generator/lib.php');
-require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * get_user_requests_external_test
  * @package   certifygenvalidation_webservice
@@ -48,7 +49,7 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_user_requests_external_test extends advanced_testcase {
+class get_user_requests_external_test extends \advanced_testcase {
     /**
      * Test set up.
      */
@@ -58,14 +59,13 @@ class get_user_requests_external_test extends advanced_testcase {
 
     /**
      * Test 1
-     *
+     * @covers \certifygenvalidation_webservice\external\get_user_requests_external::get_user_requests
      * @return void
-     * @throws coding_exception
-     * @throws invalid_persistent_exception
-     * @throws invalid_parameter_exception
+     * @throws \coding_exception
+     * @throws \invalid_parameter_exception
+     * @throws \invalid_persistent_exception
      */
     public function test_1(): void {
-
         // Create course.
         $course = self::getDataGenerator()->create_course();
 
@@ -131,10 +131,11 @@ class get_user_requests_external_test extends advanced_testcase {
     /**
      * Test 2
      *
+     * @covers \certifygenvalidation_webservice\external\get_user_requests_external::get_user_requests
      * @return void
-     * @throws coding_exception
-     * @throws invalid_persistent_exception
-     * @throws invalid_parameter_exception
+     * @throws \coding_exception
+     * @throws \invalid_parameter_exception
+     * @throws \invalid_persistent_exception
      */
     public function test_2(): void {
         // Create course.
@@ -205,11 +206,12 @@ class get_user_requests_external_test extends advanced_testcase {
     /**
      * Test 3
      *
+     * @covers \certifygenvalidation_webservice\external\get_user_requests_external::get_user_requests
      * @return void
-     * @throws coding_exception
-     * @throws invalid_persistent_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \invalid_persistent_exception
      */
     public function test_3(): void {
         // Create course.
@@ -303,11 +305,12 @@ class get_user_requests_external_test extends advanced_testcase {
     /**
      * Test 4
      *
+     * @covers \certifygenvalidation_webservice\external\get_user_requests_external::get_user_requests
      * @return void
-     * @throws coding_exception
-     * @throws invalid_persistent_exception
-     * @throws invalid_parameter_exception
-     * @throws moodle_exception
+     * @throws \coding_exception
+     * @throws \invalid_parameter_exception
+     * @throws \moodle_exception
+     * @throws \invalid_persistent_exception
      */
     public function test_4(): void {
 
@@ -401,14 +404,16 @@ class get_user_requests_external_test extends advanced_testcase {
         self::assertArrayHasKey('report', $result['requests'][0]['model']);
         self::assertArrayHasKey('repository', $result['requests'][0]['model']);
     }
+
     /**
      * Test 5: userfield ok
      *
+     * @covers \certifygenvalidation_webservice\external\get_user_requests_external::get_user_requests
      * @return void
-     * @throws coding_exception
-     * @throws invalid_persistent_exception
-     * @throws invalid_parameter_exception
-     * @throws moodle_exception
+     * @throws \coding_exception
+     * @throws \invalid_parameter_exception
+     * @throws \moodle_exception
+     * @throws \invalid_persistent_exception
      */
     public function test_5(): void {
 
@@ -521,14 +526,16 @@ class get_user_requests_external_test extends advanced_testcase {
         self::assertArrayHasKey('report', $result['requests'][0]['model']);
         self::assertArrayHasKey('repository', $result['requests'][0]['model']);
     }
+
     /**
      * Test 6: userfield KO
      *
+     * @covers \certifygenvalidation_webservice\external\get_user_requests_external::get_user_requests
      * @return void
-     * @throws coding_exception
-     * @throws invalid_persistent_exception
-     * @throws invalid_parameter_exception
-     * @throws moodle_exception
+     * @throws \coding_exception
+     * @throws \invalid_parameter_exception
+     * @throws \moodle_exception
+     * @throws \invalid_persistent_exception
      */
     public function test_6(): void {
 
@@ -616,7 +623,7 @@ class get_user_requests_external_test extends advanced_testcase {
 
         // Validate.
         $this->setAdminUser();
-        $result = get_user_requests_external::get_user_requests($student->id-1, $dni, 'en');
+        $result = get_user_requests_external::get_user_requests($student->id - 1, $dni, 'en');
         $this->assertIsArray($result);
         $this->assertArrayHasKey('error', $result);
         $this->assertIsArray($result['error']);

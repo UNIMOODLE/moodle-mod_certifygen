@@ -32,8 +32,8 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace mod_certifygen;
 
-use core\invalid_persistent_exception;
 use mod_certifygen\external\emitteacherrequest_external;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
@@ -42,7 +42,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot . '/lib/externallib.php');
+
 /**
  * Issue certificate test
  * @package    mod_certifygen
@@ -51,7 +51,7 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class emitteacherrequest_external_test extends advanced_testcase {
+class emitteacherrequest_external_test extends \advanced_testcase {
     /**
      * Test set up.
      */
@@ -61,11 +61,13 @@ class emitteacherrequest_external_test extends advanced_testcase {
 
     /**
      * test
+     *
      * @return void
-     * @throws invalid_persistent_exception
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \invalid_persistent_exception
+     * @covers \mod_certifygen\external\emitteacherrequest_external::emitteacherrequest
      */
     public function test_emitteacherrequest(): void {
 
@@ -113,13 +115,16 @@ class emitteacherrequest_external_test extends advanced_testcase {
         self::assertEquals(get_string('ok', 'mod_certifygen'), $result['message']);
         self::assertEquals(certifygen_validations::STATUS_FINISHED, $teacherrequest->get('status'));
     }
+
     /**
      * Test
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws invalid_persistent_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \invalid_persistent_exception
+     * @covers \mod_certifygen\external\emitteacherrequest_external::emitteacherrequest
      */
     public function test_emitteacherrequest2(): void {
 
@@ -175,11 +180,13 @@ class emitteacherrequest_external_test extends advanced_testcase {
 
     /**
      * Test: validation ws + localrepository.
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws invalid_persistent_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \invalid_persistent_exception
+     * @covers \mod_certifygen\external\emitteacherrequest_external::emitteacherrequest
      */
     public function test_emitteacherrequest_3(): void {
 

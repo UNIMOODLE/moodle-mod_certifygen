@@ -68,7 +68,6 @@ function xmldb_certifygen_upgrade($oldversion) {
             $dbman->drop_field($table, $field);
         }
 
-
         // Define table certifygen_cmodels to be created.
         $table = new xmldb_table('certifygen_cmodels');
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
@@ -84,7 +83,6 @@ function xmldb_certifygen_upgrade($oldversion) {
         // Certifygen savepoint reached.
         upgrade_mod_savepoint(true, 2024101100, 'certifygen');
     }
-
 
     return true;
 }

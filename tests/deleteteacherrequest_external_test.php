@@ -32,16 +32,17 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace mod_certifygen;
 
-use mod_certifygen\external\deleteteacherrequest_external;
-use mod_certifygen\persistents\certifygen_model;
-use mod_certifygen\persistents\certifygen_validations;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot . '/lib/externallib.php');
+require_once($CFG->dirroot . '/webservice/tests/helpers.php');
+use mod_certifygen\external\deleteteacherrequest_external;
+use mod_certifygen\persistents\certifygen_model;
+use mod_certifygen\persistents\certifygen_validations;
 /**
  * Delete teacher request test
  * @package    mod_certifygen
@@ -50,7 +51,7 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class deleteteacherrequest_external_test extends advanced_testcase {
+class deleteteacherrequest_external_test extends \advanced_testcase {
     /**
      * Test set up.
      */
@@ -60,9 +61,12 @@ class deleteteacherrequest_external_test extends advanced_testcase {
 
     /**
      * test
+     *
      * @return void
-     * @throws coding_exception
-     * @throws invalid_parameter_exception
+     * @throws \coding_exception
+     * @throws \invalid_parameter_exception
+     * @covers \mod_certifygen\external\deleteteacherrequest_external::deleteteacherrequest
+     * @runInSeparateProcess
      */
     public function test_deleteteacherrequest(): void {
         // Create template.
@@ -117,9 +121,12 @@ class deleteteacherrequest_external_test extends advanced_testcase {
 
     /**
      * test
+     *
      * @return void
-     * @throws coding_exception
-     * @throws invalid_parameter_exception
+     * @throws \coding_exception
+     * @throws \invalid_parameter_exception
+     * @covers \mod_certifygen\external\deleteteacherrequest_external::deleteteacherrequest
+     * @runInSeparateProcess
      */
     public function test_deleteteacherrequest2(): void {
         // Create template.
@@ -154,7 +161,7 @@ class deleteteacherrequest_external_test extends advanced_testcase {
 
         $this->setUser($user2);
 
-        // Delete teacher request.
+        // Delete teacher request.)
         $result = deleteteacherrequest_external::deleteteacherrequest($trequest->get('id'));
         $this->assertIsArray($result);
         $this->assertArrayHasKey('result', $result);

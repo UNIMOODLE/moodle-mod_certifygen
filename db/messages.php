@@ -13,6 +13,9 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 // Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU".
 //
@@ -22,7 +25,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
- * Errors Filterset
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -30,35 +33,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_certifygen\tables;
+defined('MOODLE_INTERNAL') || die();
 
-use core_table\local\filter\filterset;
-use core_table\local\filter\string_filter;
-/**
- * Errors filterset
- * @package    mod_certifygen
- * @copyright  2024 Proyecto UNIMOODLE
- * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
- * @author     3IPUNT <contacte@tresipunt.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class errors_filterset extends filterset {
-    /**
-     * get_required_filters
-     * @return class-string[]
-     */
-    public function get_required_filters(): array {
-        return [];
-    }
-
-    /**
-     * get_optional_filters
-     * @return array
-     */
-    public function get_optional_filters(): array {
-        return [
-            'modelname' => string_filter::class,
-            'userfullname' => string_filter::class,
-        ];
-    }
-}
+$messageproviders = [
+        // Notify certificate is ready to download.
+        'certifygen_notification' => [],
+];

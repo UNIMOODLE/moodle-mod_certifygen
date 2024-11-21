@@ -22,6 +22,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos..
 
 /**
+ * WS Get kson certificate
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -46,7 +47,6 @@ global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
 require_once($CFG->dirroot . '/mod/certifygen/lib.php');
 require_once($CFG->dirroot . '/mod/certifygen/classes/filters/certifygenfilter.php');
-require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Get certificate elements
  * @package    mod_certifygen
@@ -55,20 +55,20 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_json_certificate_external extends \external_api {
+class get_json_certificate_external extends \core_external\external_api {
     /**
      * Describes the external function parameters.
      *
-     * @return \external_function_parameters
+     * @return \core_external\external_function_parameters
      */
-    public static function get_json_certificate_parameters(): \external_function_parameters {
-        return new \external_function_parameters(
+    public static function get_json_certificate_parameters(): \core_external\external_function_parameters {
+        return new \core_external\external_function_parameters(
             [
-                'userid' => new \external_value(PARAM_INT, 'user id'),
-                'userfield' => new \external_value(PARAM_RAW, 'user field'),
-                'idinstance' => new \external_value(PARAM_INT, 'instance id'),
-                'customfields' => new \external_value(PARAM_RAW, 'customfields'),
-                'lang' => new \external_value(PARAM_LANG, 'lang'),
+                'userid' => new \core_external\external_value(PARAM_INT, 'user id'),
+                'userfield' => new \core_external\external_value(PARAM_RAW, 'user field'),
+                'idinstance' => new \core_external\external_value(PARAM_INT, 'instance id'),
+                'customfields' => new \core_external\external_value(PARAM_RAW, 'customfields'),
+                'lang' => new \core_external\external_value(PARAM_LANG, 'lang'),
             ]
         );
     }
@@ -185,8 +185,6 @@ class get_json_certificate_external extends \external_api {
                 $json = json_decode($issue->data);
                 $json->courseshortname = $filter->filter($json->courseshortname);
                 $json->coursefullname = $filter->filter($json->coursefullname);
-                //$result['json']['data'] = $json;
-                //$data = $json;
                 // Dynamic data.
                 $pages = $DB->get_records('tool_certificate_pages', ['templateid' => $model->get('templateid')]);
                 $elements = [];
@@ -220,14 +218,14 @@ class get_json_certificate_external extends \external_api {
     /**
      * Describes the data returned from the external function.
      *
-     * @return \external_single_structure
+     * @return \core_external\external_single_structure
      */
-    public static function get_json_certificate_returns(): \external_single_structure {
-        return new \external_single_structure([
-                'json' => new \external_value(PARAM_RAW, 'Certificate elements in a json', VALUE_OPTIONAL),
-                'error' => new \external_single_structure([
-                    'message' => new \external_value(PARAM_CLEANFILE, 'Error message'),
-                    'code' => new \external_value(PARAM_RAW, 'Error code'),
+    public static function get_json_certificate_returns(): \core_external\external_single_structure {
+        return new \core_external\external_single_structure([
+                'json' => new \core_external\external_value(PARAM_RAW, 'Certificate elements in a json', VALUE_OPTIONAL),
+                'error' => new \core_external\external_single_structure([
+                    'message' => new \core_external\external_value(PARAM_CLEANFILE, 'Error message'),
+                    'code' => new \core_external\external_value(PARAM_RAW, 'Error code'),
                 ], 'Errors information', VALUE_OPTIONAL),
             ]);
     }

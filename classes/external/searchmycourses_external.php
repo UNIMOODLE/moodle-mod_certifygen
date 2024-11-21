@@ -37,8 +37,7 @@ use invalid_parameter_exception;
 use mod_certifygen\persistents\certifygen_context;
 use moodle_exception;
 use restricted_context_exception;
-global $CFG;
-require_once($CFG->dirroot . '/lib/externallib.php');
+
 /**
  * Search my courses ws class
  * @package    mod_certifygen
@@ -47,17 +46,17 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class searchmycourses_external extends \external_api {
+class searchmycourses_external extends \core_external\external_api {
     /**
      * Describes the external function parameters.
      *
-     * @return \external_function_parameters
+     * @return \core_external\external_function_parameters
      */
-    public static function searchmycourses_parameters(): \external_function_parameters {
-        return new \external_function_parameters([
-            'query' => new \external_value(PARAM_RAW, 'The search query', VALUE_REQUIRED),
-            'userid' => new \external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
-            'modelid' => new \external_value(PARAM_INT, 'modelid', VALUE_REQUIRED),
+    public static function searchmycourses_parameters(): \core_external\external_function_parameters {
+        return new \core_external\external_function_parameters([
+            'query' => new \core_external\external_value(PARAM_RAW, 'The search query', VALUE_REQUIRED),
+            'userid' => new \core_external\external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
+            'modelid' => new \core_external\external_value(PARAM_INT, 'modelid', VALUE_REQUIRED),
         ]);
     }
 
@@ -76,7 +75,7 @@ class searchmycourses_external extends \external_api {
     public static function searchmycourses(string $query, int $userid, int $modelid): array {
         global $DB, $CFG;
 
-        $params = \external_api::validate_parameters(self::searchmycourses_parameters(), [
+        $params = \core_external\external_api::validate_parameters(self::searchmycourses_parameters(), [
             'query' => $query,
             'userid' => $userid,
             'modelid' => $modelid,
@@ -153,19 +152,19 @@ class searchmycourses_external extends \external_api {
     /**
      * Describes the external function result value.
      *
-     * @return \external_description
+     * @return  \core_external\external_description
      */
-    public static function searchmycourses_returns(): \external_description {
+    public static function searchmycourses_returns():  \core_external\external_description {
 
-        return new \external_single_structure([
-            'list' => new \external_multiple_structure(
-                new \external_single_structure([
-                    'id' => new \external_value(PARAM_INT, 'Course ID'),
-                    'name' => new \external_value(PARAM_RAW, 'Course name'),
+        return new \core_external\external_single_structure([
+            'list' => new \core_external\external_multiple_structure(
+                new \core_external\external_single_structure([
+                    'id' => new \core_external\external_value(PARAM_INT, 'Course ID'),
+                    'name' => new \core_external\external_value(PARAM_RAW, 'Course name'),
                 ])
             ),
-            'maxusersperpage' => new \external_value(PARAM_INT, 'Configured maximum categories per page.'),
-            'overflow' => new \external_value(PARAM_BOOL, 'Were there more records than maxusersperpage found?'),
+            'maxusersperpage' => new \core_external\external_value(PARAM_INT, 'Configured maximum categories per page.'),
+            'overflow' => new \core_external\external_value(PARAM_BOOL, 'Were there more records than maxusersperpage found?'),
         ]);
     }
 }

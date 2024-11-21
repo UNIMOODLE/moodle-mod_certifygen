@@ -165,4 +165,27 @@ class certifygen_model extends persistent {
 
         return $langs;
     }
+
+    /**
+     * Get models info and context info
+     *
+     * @param string $sort
+     * @param string $order
+     * @param int $skip
+     * @param int $limit
+     * @return array
+     * @throws \dml_exception
+     */
+    public static function get_models_and_context($sort = '', $order = 'ASC', $skip = 0, $limit = 0): array {
+        global $DB;
+        $orderby = '';
+        if (!empty($sort)) {
+            $orderby = $sort . ' ' . $order;
+        }
+        $sql = "SELECT cm.id, cm.name, cm.type, cm.report, cm.templateid, cm.timemodified, cc.id AS modelcontextid
+                  FROM {certifygen_model} cm
+             LEFT JOIN {certifygen_context} cc ON cc.modelid = cm.id
+             $orderby";
+        return $DB->get_records_sql($sql, [], $skip, $limit);
+    }
 }

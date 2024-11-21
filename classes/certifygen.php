@@ -40,6 +40,7 @@ use context;
 use context_course;
 use context_module;
 use core\invalid_persistent_exception;
+use core\message\message;
 use core_course\customfield\course_handler;
 use core_user\fields;
 use dml_exception;
@@ -582,6 +583,8 @@ class certifygen {
             if (!$response['haserror']) {
                 $validation->set('status', certifygen_validations::STATUS_FINISHED);
                 $validation->save();
+                // Send notification.
+                self::send_notification($validation);
             } else {
                 $validation->set('status', certifygen_validations::STATUS_STORAGE_ERROR);
                 $validation->save();
@@ -741,8 +744,9 @@ class certifygen {
                   WHERE c.id = :courseid";
         $results = $DB->get_records_sql($sql, ['courseid' => $courseid]);
         foreach ($results as $result) {
+            // Only students must be shown on the list.
             if (
-                is_primary_admin($result->id)
+                is_siteadmin($result->id)
                 || !has_capability('mod/certifygen:emitmyactivitycertificate', $cmcontext, $result->id)
             ) {
                 continue;
@@ -750,5 +754,54 @@ class certifygen {
             $selectedusers[] = $result->id;
         }
         return $selectedusers;
+    }
+    /**
+     * Sends a moodle notification of the certificate issued.
+     *
+     * @param \stdClass $issue
+     * @param \stored_file $file
+     */
+    public static function send_notification(certifygen_validations $validation): void {
+
+        $linkname = get_string('mycertificates', 'mod_certifygen');
+        $url = new \moodle_url('/mod/certifygen/mycertificates.php');
+        $contexturlname = get_string('mycertificates', 'mod_certifygen');
+        $courseid = SITEID;
+        if ($validation->get('certifygenid') > 0) {
+            [$course, $cm] = get_course_and_cm_from_instance((int)$validation->get('certifygenid'), 'certifygen');
+            $modcontext = \context_module::instance($cm->id);
+            $url = new \moodle_url('/mod/certifygen/view.php', ['id' => $cm->id]);
+            $contexturlname = format_string($cm->name, $modcontext->id);
+            $courseid = $course->id;
+        }
+        $userid = $validation->get('userid');
+        $user = \core_user::get_user($userid);
+        $userfullname = fullname($user, true);
+        $subject = get_string('notificationsubjectcertificateissued', 'mod_certifygen');
+        $fullmessage = get_string(
+            'notificationmsgcertificateissued',
+            'mod_certifygen',
+            [
+                'fullname' => $userfullname,
+                'url' => $url->out(),
+                'linkname' => $contexturlname,
+            ]
+        );
+        $message = new message();
+        $message->courseid = $courseid;
+        $message->component = 'mod_certifygen';
+        $message->name = 'certifygen_notification';
+        $message->notification = 1;
+        $message->userfrom = \core_user::get_noreply_user();
+        $message->userto = $user;
+        $message->subject = $subject;
+        $message->contexturl = $url;
+        $message->contexturlname = $contexturlname;
+        $message->fullmessage = html_to_text($fullmessage);
+        $message->fullmessagehtml = $fullmessage;
+        $message->fullmessageformat = FORMAT_HTML;
+        $message->smallmessage = '';
+
+        message_send($message);
     }
 }

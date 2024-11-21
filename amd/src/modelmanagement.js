@@ -61,6 +61,11 @@ const AssignContext = (e) => {
     // Event detail will contain everything the process().
     modalCForm.addEventListener(modalCForm.events.FORM_SUBMITTED, (result) => {
         mainElement.setAttribute('data-id', result.detail);
+        if (result.detail > 0) {
+            jQuery('#modelwarningicon_' + modelid).addClass('hidden');
+        } else {
+            jQuery('#modelwarningicon_' + modelid).removeClass('hidden');
+        }
     });
     // Show the form.
     modalCForm.show().then(() => {

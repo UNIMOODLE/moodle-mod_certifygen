@@ -36,7 +36,6 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
 require_once($CFG->dirroot . '/mod/certifygen/lib.php');
-require_once($CFG->dirroot . '/lib/externallib.php');
 use coding_exception;
 use context_module;
 use core\invalid_persistent_exception;
@@ -56,21 +55,21 @@ use moodle_exception;
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class emitcertificate_external extends \external_api {
+class emitcertificate_external extends \core_external\external_api {
     /**
      * Describes the external function parameters.
      *
-     * @return \external_function_parameters
+     * @return \core_external\external_function_parameters
      */
-    public static function emitcertificate_parameters(): \external_function_parameters {
-        return new \external_function_parameters(
+    public static function emitcertificate_parameters(): \core_external\external_function_parameters {
+        return new \core_external\external_function_parameters(
             [
-                'id' => new \external_value(PARAM_INT, 'Validation id'),
-                'instanceid' => new \external_value(PARAM_INT, 'instance id'),
-                'modelid' => new \external_value(PARAM_INT, 'model id'),
-                'lang' => new \external_value(PARAM_RAW, 'model lang'),
-                'userid' => new \external_value(PARAM_RAW, 'user id'),
-                'courseid' => new \external_value(PARAM_RAW, 'course id'),
+                'id' => new \core_external\external_value(PARAM_INT, 'Validation id'),
+                'instanceid' => new \core_external\external_value(PARAM_INT, 'instance id'),
+                'modelid' => new \core_external\external_value(PARAM_INT, 'model id'),
+                'lang' => new \core_external\external_value(PARAM_RAW, 'model lang'),
+                'userid' => new \core_external\external_value(PARAM_RAW, 'user id'),
+                'courseid' => new \core_external\external_value(PARAM_RAW, 'course id'),
             ]
         );
     }
@@ -96,7 +95,7 @@ class emitcertificate_external extends \external_api {
         int $userid,
         int $courseid
     ): array {
-        global $USER;
+        global $USER, $PAGE;
 
         self::validate_parameters(
             self::emitcertificate_parameters(),
@@ -106,9 +105,9 @@ class emitcertificate_external extends \external_api {
 
         $result = ['result' => true, 'message' => get_string('ok', 'mod_certifygen')];
         [$course, $cm] = get_course_and_cm_from_instance($instanceid, 'certifygen');
-
+        $context = context_module::instance($cm->id);
+        $PAGE->set_context($context);
         if ($USER->id != $userid) {
-            $context = context_module::instance($cm->id);
             if (!has_capability('mod/certifygen:canemitotherscertificates', $context)) {
                 $result['result'] = false;
                 $result['message'] = get_string('nopermissiontoemitothercerts', 'mod_certifygen');
@@ -249,13 +248,13 @@ class emitcertificate_external extends \external_api {
     /**
      * Describes the data returned from the external function.
      *
-     * @return \external_single_structure
+     * @return \core_external\external_single_structure
      */
-    public static function emitcertificate_returns(): \external_single_structure {
-        return new \external_single_structure(
+    public static function emitcertificate_returns(): \core_external\external_single_structure {
+        return new \core_external\external_single_structure(
             [
-                'result' => new \external_value(PARAM_BOOL, 'certificate emited.'),
-                'message' => new \external_value(PARAM_RAW, 'meesage'),
+                'result' => new \core_external\external_value(PARAM_BOOL, 'certificate emited.'),
+                'message' => new \core_external\external_value(PARAM_RAW, 'meesage'),
             ]
         );
     }

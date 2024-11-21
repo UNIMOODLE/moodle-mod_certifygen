@@ -306,8 +306,8 @@ class useofthecoursealgorithm {
                            AND m.name IN ('forum') AND cm.visible=1
                            AND cm.instance IN (
                                 SELECT f.id
-                                  FROM {forum} f 
-                                 WHERE f.type = 'news' 
+                                  FROM {forum} f
+                                 WHERE f.type = 'news'
                                        AND f.course = :courseid2)";
             $this->forumnews = $DB->count_records_sql($sql, ['courseid' => $this->courseid,
                 'courseid2' => $this->courseid]);
@@ -362,7 +362,7 @@ class useofthecoursealgorithm {
                       FROM {course_modules} cm
                       JOIN {modules} m ON m.id = cm.module
                      WHERE m.name = 'assign'
-                           AND cm.visible=1 
+                           AND cm.visible=1
                            AND cm.course = :courseid
                   GROUP BY cm.course";
             $params = [

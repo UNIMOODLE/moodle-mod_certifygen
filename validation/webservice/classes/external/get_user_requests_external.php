@@ -61,18 +61,18 @@ require_once($CFG->dirroot . '/mod/certifygen/classes/filters/certifygenfilter.p
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_user_requests_external extends external_api {
+class get_user_requests_external extends \core_external\external_api {
     /**
      * Describes the external function parameters.
      *
-     * @return external_function_parameters
+     * @return \core_external\external_function_parameters
      */
-    public static function get_user_requests_parameters(): external_function_parameters {
-        return new external_function_parameters(
+    public static function get_user_requests_parameters(): \core_external\external_function_parameters {
+        return new \core_external\external_function_parameters(
             [
-                'userid' => new external_value(PARAM_INT, 'user id'),
-                'userfield' => new external_value(PARAM_RAW, 'user field'),
-                'lang' => new external_value(PARAM_RAW, 'language'),
+                'userid' => new \core_external\external_value(PARAM_INT, 'user id'),
+                'userfield' => new \core_external\external_value(PARAM_RAW, 'user field'),
+                'lang' => new \core_external\external_value(PARAM_RAW, 'language'),
             ]
         );
     }
@@ -185,43 +185,43 @@ class get_user_requests_external extends external_api {
      *
      * @return external_single_structure
      */
-    public static function get_user_requests_returns(): external_single_structure {
-        return new external_single_structure([
-            'requests' => new external_multiple_structure(
-                new external_single_structure(
+    public static function get_user_requests_returns(): \core_external\external_single_structure {
+        return new \core_external\external_single_structure([
+            'requests' => new \core_external\external_multiple_structure(
+                new \core_external\external_single_structure(
                     [
-                        'id' => new external_value(PARAM_RAW, 'Request id'),
-                        'name' => new external_value(PARAM_RAW, 'Request name - (only on teacher requests)', VALUE_OPTIONAL),
-                        'code' => new external_value(PARAM_RAW, 'Certificate code'),
-                        'lang' => new external_value(PARAM_RAW, 'Certificate lang'),
-                        'status' => new external_value(PARAM_RAW, 'Certificate status'),
-                        'statusdesc' => new external_value(PARAM_RAW, 'Certificate status'),
-                        'courses'   => new external_multiple_structure(
-                            new external_single_structure([
-                            'id' => new external_value(PARAM_INT, 'Course id', VALUE_OPTIONAL),
-                            'shortname' => new external_value(PARAM_RAW, 'Course shortname', VALUE_OPTIONAL),
-                            'fullname' => new external_value(PARAM_RAW, 'Course fullname', VALUE_OPTIONAL),
+                        'id' => new \core_external\external_value(PARAM_RAW, 'Request id'),
+                        'name' => new \core_external\external_value(PARAM_RAW, 'Request name - (only on teacher requests)', VALUE_OPTIONAL),
+                        'code' => new \core_external\external_value(PARAM_RAW, 'Certificate code'),
+                        'lang' => new \core_external\external_value(PARAM_RAW, 'Certificate lang'),
+                        'status' => new \core_external\external_value(PARAM_RAW, 'Certificate status'),
+                        'statusdesc' => new \core_external\external_value(PARAM_RAW, 'Certificate status'),
+                        'courses'   => new \core_external\external_multiple_structure(
+                            new \core_external\external_single_structure([
+                            'id' => new \core_external\external_value(PARAM_INT, 'Course id', VALUE_OPTIONAL),
+                            'shortname' => new \core_external\external_value(PARAM_RAW, 'Course shortname', VALUE_OPTIONAL),
+                            'fullname' => new \core_external\external_value(PARAM_RAW, 'Course fullname', VALUE_OPTIONAL),
                             ], 'Course information', VALUE_OPTIONAL),
                             'only for teachers requests',
                             VALUE_OPTIONAL
                         ),
-                        'instance'   => new external_single_structure([
-                            'id' => new external_value(PARAM_INT, 'Instance id', VALUE_OPTIONAL),
-                            'name' => new external_value(PARAM_RAW, 'Instance name', VALUE_OPTIONAL),
+                        'instance'   => new \core_external\external_single_structure([
+                            'id' => new \core_external\external_value(PARAM_INT, 'Instance id', VALUE_OPTIONAL),
+                            'name' => new \core_external\external_value(PARAM_RAW, 'Instance name', VALUE_OPTIONAL),
                         ], 'Module Instance information', VALUE_OPTIONAL),
-                        'model'   => new external_single_structure([
-                            'id' => new external_value(PARAM_INT, 'Instance id', VALUE_OPTIONAL),
-                            'name' => new external_value(PARAM_RAW, 'Instance name', VALUE_OPTIONAL),
-                            'idnumber' => new external_value(PARAM_RAW, 'Instance name', VALUE_OPTIONAL),
-                            'type' => new external_value(PARAM_INT, 'Instance name', VALUE_OPTIONAL),
-                            'typedesc' => new external_value(PARAM_RAW, 'Instance name', VALUE_OPTIONAL),
-                            'mode' => new external_value(PARAM_INT, 'Instance name', VALUE_OPTIONAL),
-                            'templateid' => new external_value(PARAM_INT, 'Instance name', VALUE_OPTIONAL),
-                            'timeondemmand' => new external_value(PARAM_INT, 'Instance name', VALUE_OPTIONAL),
-                            'langs' => new external_value(PARAM_RAW, 'Instance name', VALUE_OPTIONAL),
-                            'validation' => new external_value(PARAM_RAW, 'Instance name', VALUE_OPTIONAL),
-                            'report' => new external_value(PARAM_RAW, 'Instance name', VALUE_OPTIONAL),
-                            'repository' => new external_value(PARAM_RAW, 'Instance name', VALUE_OPTIONAL),
+                        'model'   => new \core_external\external_single_structure([
+                            'id' => new \core_external\external_value(PARAM_INT, 'Instance id', VALUE_OPTIONAL),
+                            'name' => new \core_external\external_value(PARAM_RAW, 'Instance name', VALUE_OPTIONAL),
+                            'idnumber' => new \core_external\external_value(PARAM_RAW, 'Instance name', VALUE_OPTIONAL),
+                            'type' => new \core_external\external_value(PARAM_INT, 'Instance name', VALUE_OPTIONAL),
+                            'typedesc' => new \core_external\external_value(PARAM_RAW, 'Instance name', VALUE_OPTIONAL),
+                            'mode' => new \core_external\external_value(PARAM_INT, 'Instance name', VALUE_OPTIONAL),
+                            'templateid' => new \core_external\external_value(PARAM_INT, 'Instance name', VALUE_OPTIONAL),
+                            'timeondemmand' => new \core_external\external_value(PARAM_INT, 'Instance name', VALUE_OPTIONAL),
+                            'langs' => new \core_external\external_value(PARAM_RAW, 'Instance name', VALUE_OPTIONAL),
+                            'validation' => new \core_external\external_value(PARAM_RAW, 'Instance name', VALUE_OPTIONAL),
+                            'report' => new \core_external\external_value(PARAM_RAW, 'Instance name', VALUE_OPTIONAL),
+                            'repository' => new \core_external\external_value(PARAM_RAW, 'Instance name', VALUE_OPTIONAL),
                         ], 'Model information'),
                     ],
                     'User requests list',
@@ -230,9 +230,9 @@ class get_user_requests_external extends external_api {
                 '',
                 VALUE_OPTIONAL
             ),
-            'error' => new external_single_structure([
-                'message' => new external_value(PARAM_RAW, 'Error message'),
-                'code' => new external_value(PARAM_RAW, 'Error code'),
+            'error' => new \core_external\external_single_structure([
+                'message' => new \core_external\external_value(PARAM_RAW, 'Error message'),
+                'code' => new \core_external\external_value(PARAM_RAW, 'Error code'),
             ], 'Errors information', VALUE_OPTIONAL),
             ]);
     }

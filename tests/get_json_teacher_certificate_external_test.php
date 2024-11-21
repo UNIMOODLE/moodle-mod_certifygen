@@ -32,15 +32,15 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace mod_certifygen;
 
-use mod_certifygen\external\get_json_certificate_external;
 use mod_certifygen\external\get_json_teacher_certificate_external;
 use mod_certifygen\persistents\certifygen_model;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/lib/externallib.php');
+
 /**
  * Get json teacher certificate test
  * @package    mod_certifygen
@@ -49,7 +49,7 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_json_teacher_certificate_external_test extends advanced_testcase {
+class get_json_teacher_certificate_external_test extends \advanced_testcase {
     /**
      * Test set up.
      */
@@ -58,13 +58,14 @@ class get_json_teacher_certificate_external_test extends advanced_testcase {
         $controller = new \tool_langimport\controller();
         $controller->install_languagepacks('es');
     }
+
     /**
      * Test 1: User not found
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @covers \mod_certifygen\external\get_json_teacher_certificate_external::get_json_teacher_certificate
      */
     public function test_1(): void {
         global $DB;
@@ -91,11 +92,13 @@ class get_json_teacher_certificate_external_test extends advanced_testcase {
 
     /**
      * Test 2: Language not found
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception
+     * @throws \coding_exception
+     * x
+     * @throws \invalid_parameter_exception
+     * @throws \required_capability_exception
+     * @covers \mod_certifygen\external\get_json_teacher_certificate_external::get_json_teacher_certificate
      */
     public function test_2(): void {
         global $DB;
@@ -130,11 +133,11 @@ class get_json_teacher_certificate_external_test extends advanced_testcase {
 
     /**
      * Test 3: Model not found
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @covers \mod_certifygen\external\get_json_teacher_certificate_external::get_json_teacher_certificate
      */
     public function test_3(): void {
         global $DB;
@@ -165,11 +168,11 @@ class get_json_teacher_certificate_external_test extends advanced_testcase {
 
     /**
      * Test 4: course_not_valid_with_model
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @covers \mod_certifygen\external\get_json_teacher_certificate_external::get_json_teacher_certificate
      */
     public function test_4(): void {
         global $DB;
@@ -215,11 +218,11 @@ class get_json_teacher_certificate_external_test extends advanced_testcase {
 
     /**
      * Test 5: course_not_valid_with_model
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @covers \mod_certifygen\external\get_json_teacher_certificate_external::get_json_teacher_certificate
      */
     public function test_5(): void {
         global $DB;

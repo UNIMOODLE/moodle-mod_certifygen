@@ -32,8 +32,8 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace mod_certifygen;
 
-use core\invalid_persistent_exception;
 use mod_certifygen\external\emitcertificate_external;
 use mod_certifygen\external\revokecertificate_external;
 use mod_certifygen\persistents\certifygen_model;
@@ -43,7 +43,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot . '/lib/externallib.php');
+
 /**
  * Revoke certificate
  * @package    mod_certifygen
@@ -52,7 +52,7 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class revokecertificate_external_test extends advanced_testcase {
+class revokecertificate_external_test extends \advanced_testcase {
     /** @var string|mixed $lang */
     private string $lang;
     /** @var int $userid */
@@ -70,11 +70,13 @@ class revokecertificate_external_test extends advanced_testcase {
 
     /**
      * Test: student can not revoke
+     *
      * @return void
-     * @throws invalid_persistent_exception
-     * @throws coding_exception
-     * @throws invalid_parameter_exception
-     * @throws moodle_exception
+     * @throws \coding_exception
+     * @throws \invalid_parameter_exception
+     * @throws \moodle_exception
+     * @throws \invalid_persistent_exception
+     * @covers \mod_certifygen\external\revokecertificate_external::revokecertificate
      */
     public function test_revokecertificate(): void {
         // Emit a certificate.
@@ -149,12 +151,14 @@ class revokecertificate_external_test extends advanced_testcase {
 
     /**
      * Test: manager can revoke
+     *
      * @return void
-     * @throws invalid_persistent_exception
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws moodle_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \moodle_exception
+     * @throws \invalid_persistent_exception
+     * @covers \mod_certifygen\external\revokecertificate_external::revokecertificate
      */
     public function test_revokecertificate_2(): void {
         global $DB;

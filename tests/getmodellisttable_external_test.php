@@ -32,7 +32,7 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+namespace mod_certifygen;
 use mod_certifygen\external\getmodellisttable_external;
 use mod_certifygen\persistents\certifygen_model;
 
@@ -40,7 +40,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot . '/lib/externallib.php');
+
 /**
  * Get model list table test
  * @package    mod_certifygen
@@ -49,7 +49,7 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class getmodellisttable_external_test extends advanced_testcase {
+class getmodellisttable_external_test extends \advanced_testcase {
     /**
      * Test set up.
      */
@@ -59,7 +59,12 @@ class getmodellisttable_external_test extends advanced_testcase {
 
     /**
      * Test
+     *
      * @return void
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \required_capability_exception
+     * @covers \mod_certifygen\external\getmodellisttable_external::getmodellisttable
      */
     public function test_getmodellisttable_nopermision(): void {
 
@@ -68,7 +73,7 @@ class getmodellisttable_external_test extends advanced_testcase {
         $haserror = false;
         try {
             getmodellisttable_external::getmodellisttable();
-        } catch (moodle_exception $e) {
+        } catch (\required_capability_exception $e) {
             $haserror = true;
         }
         $this->assertTrue($haserror);
@@ -76,12 +81,13 @@ class getmodellisttable_external_test extends advanced_testcase {
 
     /**
      * Test
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception
-     * @throws restricted_context_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \required_capability_exception
+     * @covers \mod_certifygen\external\getmodellisttable_external::getmodellisttable
      */
     public function test_getmodellisttable(): void {
         global $DB;
@@ -94,8 +100,7 @@ class getmodellisttable_external_test extends advanced_testcase {
         // Tests.
         self::assertIsArray($result);
         self::assertArrayHasKey('table', $result);
-        self::assertEquals('-->' . get_string('nothingtodisplay'), trim($result['table']));
-
+        self::assertStringContainsString(get_string('nothingtodisplay'), trim($result['table']));
         // Create model.
         $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
         $certificate1 = $templategenerator->create_template((object)['name' => 'Certificate 1']);

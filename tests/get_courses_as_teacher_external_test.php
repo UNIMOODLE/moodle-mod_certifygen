@@ -32,7 +32,7 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+namespace mod_certifygen;
 use mod_certifygen\external\get_courses_as_teacher_external;
 use mod_certifygen\persistents\certifygen_model;
 
@@ -40,7 +40,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot . '/lib/externallib.php');
+
 /**
  * Get courses as teacher  test
  * @package    mod_certifygen
@@ -49,7 +49,7 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_courses_as_teacher_external_test extends advanced_testcase {
+class get_courses_as_teacher_external_test extends \advanced_testcase {
     /**
      * Test set up.
      */
@@ -59,12 +59,13 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
 
     /**
      * Test
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws moodle_exception
-     * @throws required_capability_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \moodle_exception
+     * @covers \mod_certifygen\external\get_courses_as_teacher_external::get_courses_as_teacher
      */
     public function test_get_courses_as_teacher_nopermission(): void {
 
@@ -117,11 +118,11 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
     /**
      * Test
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws moodle_exception
-     * @throws required_capability_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \moodle_exception
+     * @throws \required_capability_exception
      */
     public function test_get_courses_as_teacher(): void {
         global $DB;
@@ -198,10 +199,12 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
 
     /**
      * Test
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @covers \mod_certifygen\external\get_courses_as_teacher_external::get_courses_as_teacher
      */
     public function test_get_courses_as_teacher_by_userfield_nomodel(): void {
         global $DB;
@@ -256,10 +259,12 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
 
     /**
      * Test
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @covers \mod_certifygen\external\get_courses_as_teacher_external::get_courses_as_teacher
      */
     public function test_get_courses_as_teacher_by_userfield(): void {
         global $DB;
@@ -337,10 +342,12 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
 
     /**
      * Test
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @covers \mod_certifygen\external\get_courses_as_teacher_external::get_courses_as_teacher
      */
     public function test_get_courses_as_teacher_by_userfield_idnumber(): void {
         global $DB;
@@ -426,12 +433,15 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
         $this->assertArrayHasKey('message', $result['error']);
         $this->assertEquals('user_not_found', $result['error']['code']);
     }
+
     /**
      * Test
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @covers \mod_certifygen\external\get_courses_as_teacher_external::get_courses_as_teacher
      */
     public function test_get_courses_as_teacher_by_lang(): void {
         global $CFG, $DB;
@@ -501,12 +511,13 @@ class get_courses_as_teacher_external_test extends advanced_testcase {
 
     /**
      * Test: settings wsoutput not checked.
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws moodle_exception
-     * @throws required_capability_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \moodle_exception
+     * @covers \mod_certifygen\external\get_courses_as_teacher_external::get_courses_as_teacher
      */
     public function test_get_courses_as_teacher_not_checked(): void {
         global $DB;

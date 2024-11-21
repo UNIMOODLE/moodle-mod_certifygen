@@ -32,14 +32,14 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+namespace mod_certifygen;
 use mod_certifygen\external\searchcourse_external;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot . '/lib/externallib.php');
+
 /**
  * Search course test
  * @package    mod_certifygen
@@ -48,7 +48,7 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class searchcourse_external_test extends advanced_testcase {
+class searchcourse_external_test extends \advanced_testcase {
     /**
      * Test set up.
      */
@@ -58,7 +58,9 @@ class searchcourse_external_test extends advanced_testcase {
 
     /**
      * Test
+     *
      * @return void
+     * @covers \mod_certifygen\external\searchcourse_external::searchcourse
      */
     public function test_searchcourse_nopermission(): void {
         // Create user and enrol as teacher.
@@ -90,12 +92,14 @@ class searchcourse_external_test extends advanced_testcase {
 
     /**
      * Test
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception
-     * @throws restricted_context_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \required_capability_exception
+     * @throws \restricted_context_exception
+     * @covers \mod_certifygen\external\searchcourse_external::searchcourse
      */
     public function test_searchcourse(): void {
 

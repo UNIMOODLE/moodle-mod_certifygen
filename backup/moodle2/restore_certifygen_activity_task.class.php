@@ -32,7 +32,7 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-
+global $CFG;
 require_once($CFG->dirroot . '/mod/certifygen/backup/moodle2/restore_certifygen_stepslib.php');
 
 /**

@@ -22,6 +22,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ * File lib.php
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -195,6 +196,13 @@ function mod_certifygen_get_activity_models(int $courseid): array {
     $validmodels = certifygen_context::get_course_valid_modelids($courseid);
     $list = [];
     foreach ($models as $model) {
+        try {
+            // Check if template exists.
+            \mod_certifygen\template::instance($model->get('templateid'));
+        } catch (moodle_exception $exception) {
+            continue;
+        }
+
         if (in_array($model->get('id'), $validmodels)) {
             $list[$model->get('id')] = $model->get('name');
         }

@@ -65,7 +65,9 @@ class modelform extends dynamic_form {
     protected function definition() {
         global $OUTPUT;
         $mform =& $this->_form;
-        $modelid = is_null($this->_ajaxformdata) ? 0 : (int)$this->_ajaxformdata['id'];
+        $modelid = (is_null($this->_ajaxformdata) || !array_key_exists('id', $this->_ajaxformdata))
+                ? 0
+                : (int)$this->_ajaxformdata['id'];
         if ($modelid) {
             $model = new certifygen_model($modelid);
         }
@@ -144,8 +146,6 @@ class modelform extends dynamic_form {
                 get_string('template', 'mod_certifygen'),
                 $templateoptions
             )];
-            $mform->setType('templateid', PARAM_INT);
-
             // Adding "Manage templates" link if user has capabilities to manage templates.
             if ($canmanagetemplates && !empty($templates)) {
                 $elements[] = $mform->createElement(
@@ -168,6 +168,12 @@ class modelform extends dynamic_form {
                 'noteq',
                 certifygen_model::TYPE_ACTIVITY
             );
+            $rules = [];
+            $rules[]['templateid'] = [null, 'required', null, 'server'];
+            $mform->addGroupRule('template_group', $rules);
+            if ($model && !$model->get('templateid')) {
+                $mform->addElement('hidden', 'templateid', 0);
+            }
         } else if ($model->get('templateid')) {
             $html = get_string('template', 'mod_certifygen') . ' : '
                 . $templates[(int)$model->get('templateid')];
@@ -189,7 +195,7 @@ class modelform extends dynamic_form {
             foreach ($langstrings as $langstring) {
                 $typestring .= $langs[$langstring];
             }
-            $html = get_string('validation', 'mod_certifygen') . ' : ' . $typestring;
+            $html = get_string('lang', 'mod_certifygen') . ' : ' . $typestring;
             $html = html_writer::div($html, 'w-100');
             $mform->addElement('html', $html);
             $mform->addElement('hidden', 'langs', $model->get('langs'));

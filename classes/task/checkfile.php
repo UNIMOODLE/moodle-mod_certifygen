@@ -48,7 +48,10 @@ use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 
 /**
- * checkfile
+ * There is a task, checkfile, that is recomended to enable it when the validation subplugin used does not receive inmediately
+ * the certificate.
+ * This task get the certificate from the external aplication used by the validation subplugin.
+ *
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -132,6 +135,10 @@ class checkfile extends scheduled_task {
                             // Save status.
                             $validation->set('status', $status);
                             $validation->save();
+                            if ($status == certifygen_validations::STATUS_FINISHED) {
+                                // Send notification.
+                                \mod_certifygen\certifygen::send_notification($validation);
+                            }
                         } else {
                             $validation->set('status', certifygen_validations::STATUS_STORAGE_ERROR);
                             $validation->save();

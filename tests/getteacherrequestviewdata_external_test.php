@@ -25,13 +25,14 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ * Test
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+namespace mod_certifygen;
 use mod_certifygen\external\getteacherrequestviewdata_external;
 use mod_certifygen\persistents\certifygen_model;
 
@@ -39,7 +40,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot . '/lib/externallib.php');
+
 /**
  * Get teacher request view data test
  * @package    mod_certifygen
@@ -48,7 +49,7 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class getteacherrequestviewdata_external_test extends advanced_testcase {
+class getteacherrequestviewdata_external_test extends \advanced_testcase {
     /**
      * Test set up.
      */
@@ -58,11 +59,13 @@ class getteacherrequestviewdata_external_test extends advanced_testcase {
 
     /**
      * Test
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws moodle_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \moodle_exception
+     * @covers \mod_certifygen\external\getmodellisttable_external::getmodellisttable
      */
     public function test_getteacherrequestviewdata(): void {
 
@@ -95,7 +98,7 @@ class getteacherrequestviewdata_external_test extends advanced_testcase {
                 'lastname' => 'user 2',
                 'email' => 'test_user_2@fake.es',
                 ]);
-        $context = context_system::instance();
+        $context = \context_system::instance();
         $this->getDataGenerator()->role_assign('manager', $manager->id, $context->id);
 
         // Login as teacher.
@@ -132,11 +135,13 @@ class getteacherrequestviewdata_external_test extends advanced_testcase {
 
     /**
      * Test
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws moodle_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \moodle_exception
+     * @covers \mod_certifygen\external\getmodellisttable_external::getmodellisttable
      */
     public function test_getteacherrequestviewdata_with_data(): void {
         // Create course.
@@ -174,7 +179,7 @@ class getteacherrequestviewdata_external_test extends advanced_testcase {
                 'lastname' => 'user 2',
                 'email' => 'test_user_2@fake.es',
                 ]);
-        $context = context_system::instance();
+        $context = \context_system::instance();
         $this->getDataGenerator()->role_assign('manager', $manager->id, $context->id);
 
         // Login as teacher.

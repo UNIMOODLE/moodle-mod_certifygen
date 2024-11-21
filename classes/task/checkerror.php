@@ -25,6 +25,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ * Checkerror task
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -45,7 +46,8 @@ use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 
 /**
- * checkerror
+ * There is a task, checkerror. It is responsible for searching for error states in the validation processes and returning them
+ * to the not started state, so that the user can start the process again.
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -108,6 +110,8 @@ class checkerror extends scheduled_task {
                             if (!$response['haserror']) {
                                 $validation->set('status', certifygen_validations::STATUS_FINISHED);
                                 $validation->save();
+                                // Send notification.
+                                \mod_certifygen\certifygen::send_notification($validation);
                             } else {
                                 $validation->set('status', certifygen_validations::STATUS_NOT_STARTED);
                                 $validation->save();

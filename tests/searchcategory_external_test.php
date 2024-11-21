@@ -34,19 +34,15 @@
  */
 
 namespace mod_certifygen;
-use advanced_testcase;
-use coding_exception;
-use dml_exception;
-use invalid_parameter_exception;
+
 use mod_certifygen\external\searchcategory_external;
 use moodle_exception;
-use restricted_context_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot . '/lib/externallib.php');
+
 /**
  * Search category
  * @package    mod_certifygen
@@ -55,7 +51,7 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class searchcategory_external_test extends advanced_testcase {
+class searchcategory_external_test extends \advanced_testcase {
     /**
      * Test set up.
      */
@@ -65,7 +61,9 @@ class searchcategory_external_test extends advanced_testcase {
 
     /**
      * Test
+     *
      * @return void
+     * @covers \mod_certifygen\external\searchcategory_external::searchcategory
      */
     public function test_searchcategory_nopermission(): void {
 
@@ -94,12 +92,13 @@ class searchcategory_external_test extends advanced_testcase {
 
     /**
      * Test
-     * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws restricted_context_exception
-     * @throws moodle_exception
+     *
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \restricted_context_exception
+     * @throws \moodle_exception
+     * @covers \mod_certifygen\external\searchcategory_external::searchcategory
      */
     public function test_searchcategory(): void {
         global $DB;

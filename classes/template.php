@@ -297,48 +297,4 @@ class template extends \tool_certificate\template {
 
         return $issue->id;
     }
-
-    /**
-     * Sends a moodle notification of the certificate issued.
-     *
-     * @param stdClass $issue
-     * @param stored_file $file
-     * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     */
-    private function send_issue_notification(stdClass $issue, stored_file $file): void {
-        global $DB;
-
-        $user = core_user::get_user($issue->userid);
-        $userfullname = fullname($user, true);
-        $mycertificatesurl = new moodle_url('/admin/tool/certificate/my.php');
-        $subject = get_string('notificationsubjectcertificateissued', 'tool_certificate');
-        $fullmessage = get_string(
-            'notificationmsgcertificateissued',
-            'mod_certifygen',
-            ['fullname' => $userfullname, 'url' => $mycertificatesurl->out(false)]
-        );
-
-        $message = new message();
-        $message->courseid = $issue->courseid ?? SITEID;
-        $message->component = 'mod_certifygen';
-        $message->name = 'certificateissued';
-        $message->notification = 1;
-        $message->userfrom = core_user::get_noreply_user();
-        $message->userto = $user;
-        $message->subject = $subject;
-        $message->contexturl = $mycertificatesurl;
-        $message->contexturlname = get_string('mycertificates', 'tool_certificate');
-        $message->fullmessage = html_to_text($fullmessage);
-        $message->fullmessagehtml = $fullmessage;
-        $message->fullmessageformat = FORMAT_HTML;
-        $message->smallmessage = '';
-        $message->attachment = $file;
-        $message->attachname = $file->get_filename();
-
-        if (message_send($message)) {
-            $DB->set_field('tool_certificate_issues', 'emailed', 1, ['id' => $issue->id]);
-        }
-    }
 }
