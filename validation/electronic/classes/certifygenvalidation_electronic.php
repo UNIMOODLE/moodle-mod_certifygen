@@ -209,9 +209,11 @@ class certifygenvalidation_electronic implements ICertificateValidation {
 
     /**
      * getFile
+     *
      * @param int $courseid
      * @param int $validationid
      * @return array
+     * @throws \coding_exception
      */
     public function get_file(int $courseid, int $validationid): array {
         $result = ['error' => [], 'message' => get_string('ok', 'mod_certifygen')];
@@ -234,7 +236,7 @@ class certifygenvalidation_electronic implements ICertificateValidation {
             );
             if (!$file) {
                 $result['error']['code'] = 'file_not_found';
-                $result['error']['message'] = 'file_not_found';
+                $result['error']['message'] = get_string('file_not_found', 'mod_certifygen');
                 return $result;
             }
             $result['file'] = $file;
