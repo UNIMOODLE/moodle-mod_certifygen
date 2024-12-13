@@ -30,8 +30,6 @@ namespace certifygenvalidation_csv;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
-
-require_once($CFG->libdir . '/soaplib.php');
 require_once($CFG->libdir . '/pdflib.php');
 
 use certifygenvalidation_csv\persistents\certifygenvalidationcsv;

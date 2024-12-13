@@ -44,7 +44,7 @@ require_capability('mod/certifygen:manage', context_system::instance());
 $PAGE->set_url('/mod/certifygen/modelmanager.php');
 $context = context_system::instance();
 $PAGE->set_context($context);
-$PAGE->requires->css('/mod/certifygen/styles/modelmanager.css');
+$PAGE->requires->css('/mod/certifygen/styles.css');
 $PAGE->set_title(get_string('modelmanager', 'certifygen'));
 $view = new model_view();
 echo $OUTPUT->header();

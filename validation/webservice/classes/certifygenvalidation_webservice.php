@@ -32,7 +32,6 @@ namespace certifygenvalidation_webservice;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->libdir . '/soaplib.php');
 require_once($CFG->libdir . '/pdflib.php');
 
 use coding_exception;
