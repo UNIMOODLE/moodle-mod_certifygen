@@ -28,10 +28,6 @@
  */
 namespace certifygenvalidation_csv;
 
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-require_once($CFG->libdir . '/pdflib.php');
-
 use certifygenvalidation_csv\persistents\certifygenvalidationcsv;
 use coding_exception;
 use context_course;

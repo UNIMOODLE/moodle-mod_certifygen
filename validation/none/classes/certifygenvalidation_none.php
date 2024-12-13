@@ -28,11 +28,6 @@
  */
 namespace certifygenvalidation_none;
 
-defined('MOODLE_INTERNAL') || die();
-
-global $CFG;
-require_once($CFG->libdir . '/pdflib.php');
-
 use certifygenvalidation_none\persistents\certifygenvalidationwebservice;
 use coding_exception;
 use context_course;
