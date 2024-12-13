@@ -33,6 +33,7 @@
 // This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG, $ADMIN;
 // Enlace principal de settings.
 $ADMIN->add(
     'modsettings',
@@ -83,7 +84,7 @@ $ADMIN->add(
 $modelsmanagersettings = new admin_externalpage(
     'certifygenmodelsmanager',
     get_string('modelsmanager', 'mod_certifygen'),
-    '/mod/certifygen/modelmanager.php',
+    $CFG->wwwroot . '/mod/certifygen/modelmanager.php',
     'moodle/site:config',
     $module->is_enabled() === false
 );
@@ -92,7 +93,7 @@ $ADMIN->add('certifygencat', $modelsmanagersettings);
 $teacherrequestreportsettings = new admin_externalpage(
     'certifygenteacherrequestreport',
     get_string('certifygenteacherrequestreport', 'mod_certifygen'),
-    '/mod/certifygen/teacherrequestreport.php',
+    $CFG->wwwroot . '/mod/certifygen/teacherrequestreport.php',
     'mod/certifygen:viewcontextcertificates',
     $module->is_enabled() === false
 );
@@ -101,7 +102,7 @@ $ADMIN->add('certifygencat', $teacherrequestreportsettings);
 $searchforcerts = new admin_externalpage(
     'certifygensearchfor',
     get_string('certifygensearchfor', 'mod_certifygen'),
-    '/mod/certifygen/code.php',
+    $CFG->wwwroot . '/mod/certifygen/code.php',
     'mod/certifygen:manage',
     $module->is_enabled() === false
 );
@@ -110,7 +111,7 @@ $ADMIN->add('certifygencat', $searchforcerts);
 $errorspage = new admin_externalpage(
     'certifygenerrors',
     get_string('certifygenerrors', 'mod_certifygen'),
-    '/mod/certifygen/showerrors.php',
+    $CFG->wwwroot . '/mod/certifygen/showerrors.php',
     'mod/certifygen:manage'
 );
 $ADMIN->add('modsettingcertifygencat', $errorspage);
