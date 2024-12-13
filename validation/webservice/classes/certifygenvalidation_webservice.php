@@ -29,11 +29,6 @@
 
 namespace certifygenvalidation_webservice;
 
-defined('MOODLE_INTERNAL') || die();
-
-global $CFG;
-require_once($CFG->libdir . '/pdflib.php');
-
 use coding_exception;
 use context_course;
 use context_system;
