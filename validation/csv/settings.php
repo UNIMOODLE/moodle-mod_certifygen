@@ -53,7 +53,7 @@ if ($ADMIN->fulltree) {
         0
     ));
 
-// FirmaCatalogService?wsdl.
+    // FirmaCatalogService?wsdl.
     $settings->add(new admin_setting_configtext(
         'certifygenvalidation_csv/firmacatalogserviceurl',
         new lang_string('firmacatalogserviceurl', 'certifygenvalidation_csv'),
@@ -61,7 +61,7 @@ if ($ADMIN->fulltree) {
         ""
     ));
 
-// FirmaQueryCatalogService?wsdl.
+    // FirmaQueryCatalogService?wsdl.
     $settings->add(new admin_setting_configtext(
         'certifygenvalidation_csv/firmaquerycatalogserviceurl',
         new lang_string('firmaquerycatalogserviceurl', 'certifygenvalidation_csv'),
@@ -69,7 +69,7 @@ if ($ADMIN->fulltree) {
         ""
     ));
 
-// AppId.
+    // AppId.
     $settings->add(new admin_setting_configtext(
         'certifygenvalidation_csv/appID',
         new lang_string('appID', 'certifygenvalidation_csv'),

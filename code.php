@@ -23,7 +23,6 @@
 
 /**
  * Search for certificates view.
-
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>

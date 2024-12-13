@@ -26,7 +26,7 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+namespace certifygenvalidation_webservice;
 use certifygenvalidation_webservice\external\change_status_external;
 use core\invalid_persistent_exception;
 use mod_certifygen\external\emitteacherrequest_external;
@@ -48,7 +48,7 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class change_status_external_test extends advanced_testcase {
+class change_status_external_test extends \advanced_testcase {
     /**
      * Test set up.
      */
@@ -63,6 +63,7 @@ class change_status_external_test extends advanced_testcase {
      * @throws coding_exception
      * @throws dml_exception
      * @throws invalid_parameter_exception
+     * @covers \certifygenvalidation_webservice\external\change_status_external::change_status
      */
     public function test_1(): void {
 
@@ -153,6 +154,7 @@ class change_status_external_test extends advanced_testcase {
      * @throws invalid_persistent_exception
      * @throws dml_exception
      * @throws invalid_parameter_exception
+     * @covers \certifygenvalidation_webservice\external\change_status_external::change_status
      */
     public function test_2(): void {
 
@@ -177,11 +179,11 @@ class change_status_external_test extends advanced_testcase {
         ];
 
         $model = $modgenerator->create_model(
-                $data['type'],
-                $data['mode'],
-                $data['templateid'],
-                $data['validation'],
-                $data['report'],
+            $data['type'],
+            $data['mode'],
+            $data['templateid'],
+            $data['validation'],
+            $data['report'],
         );
         $modgenerator->assign_model_coursecontext($model->get('id'), $course->id);
 
@@ -235,6 +237,7 @@ class change_status_external_test extends advanced_testcase {
      * @return void
      * @throws coding_exception
      * @throws invalid_parameter_exception
+     * @covers \certifygenvalidation_webservice\external\change_status_external::change_status
      */
     public function test_3(): void {
 
@@ -274,11 +277,13 @@ class change_status_external_test extends advanced_testcase {
     }
     /**
      * Test 4 : userfield OK
+     *
      * @return void
      * @throws invalid_persistent_exception
      * @throws coding_exception
      * @throws dml_exception
      * @throws invalid_parameter_exception
+     * @covers \certifygenvalidation_webservice\external\change_status_external::change_status
      */
     public function test_4(): void {
 
@@ -373,8 +378,8 @@ class change_status_external_test extends advanced_testcase {
         self::assertEquals($teacherrequest->get('id'), $result['requestid']);
         self::assertEquals(certifygen_validations::STATUS_VALIDATION_OK, $result['newstatus']);
         self::assertEquals(
-                get_string('status_' . certifygen_validations::STATUS_VALIDATION_OK, 'mod_certifygen'),
-                $result['newstatusdesc']
+            get_string('status_' . certifygen_validations::STATUS_VALIDATION_OK, 'mod_certifygen'),
+            $result['newstatusdesc']
         );
     }
 }

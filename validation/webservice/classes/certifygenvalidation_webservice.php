@@ -79,9 +79,11 @@ class certifygenvalidation_webservice implements ICertificateValidation {
 
     /**
      * getFile
+     *
      * @param int $courseid
      * @param int $validationid
      * @return array
+     * @throws coding_exception
      */
     public function get_file(int $courseid, int $validationid): array {
         $result = ['error' => [], 'message' => get_string('ok', 'mod_certifygen')];

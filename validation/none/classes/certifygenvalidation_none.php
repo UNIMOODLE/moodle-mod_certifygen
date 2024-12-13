@@ -98,14 +98,9 @@ class certifygenvalidation_none implements ICertificateValidation {
      * @param int $courseid
      * @param int $validationid
      * @return array
-     * @throws coding_exception
      */
     public function get_file(int $courseid, int $validationid): array {
         $fs = get_file_storage();
-        $file = null;
-        $haserror = false;
-        $code = '';
-        $message = get_string('ok', 'mod_certifygen');
         try {
             $context = context_system::instance();
             $cv = new certifygen_validations($validationid);
@@ -129,18 +124,18 @@ class certifygenvalidation_none implements ICertificateValidation {
                 $filerecord['filepath'],
                 $filerecord['filename'],
             );
+            if (!$file) {
+                $result['error']['code'] = 'file_not_found';
+                $result['error']['message'] = get_string('file_not_found', 'mod_certifygen');
+            } else {
+                $result['error'] = [];
+                $result['file'] = $file;
+            }
         } catch (moodle_exception $e) {
-            $haserror = true;
-            $message = $e->getMessage();
-            $code = $e->getCode();
+            $result['error']['code'] = $e->getCode();
+            $result['error']['message'] = $e->getMessage();
         }
-        if ($haserror) {
-            $result['error']['code'] = $code;
-            $result['error']['message'] = $message;
-        } else {
-            $result['error'] = [];
-            $result['file'] = $file;
-        }
+
         return $result;
     }
 

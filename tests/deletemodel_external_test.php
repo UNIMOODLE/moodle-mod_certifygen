@@ -32,6 +32,7 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace mod_certifygen;
 use mod_certifygen\external\deletemodel_external;
 use mod_certifygen\persistents\certifygen_model;
 
@@ -48,8 +49,7 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class deletemodel_external_test extends advanced_testcase {
-
+class deletemodel_external_test extends \advanced_testcase {
     /**
      * Test set up.
      */
@@ -62,6 +62,7 @@ class deletemodel_external_test extends advanced_testcase {
      * @throws coding_exception
      * @throws invalid_parameter_exception
      * @throws dml_exception
+     * @covers \mod_certifygen\external\deletemodel_external::deletemodel
      */
     public function test_deletemodel(): void {
         global $DB;
@@ -110,8 +111,10 @@ class deletemodel_external_test extends advanced_testcase {
      * test
      *
      * @return void
-     * @throws coding_exception
-     * @throws invalid_parameter_exception|dml_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @covers \mod_certifygen\external\deletemodel_external::deletemodel
      */
     public function test_deletemodel2(): void {
 

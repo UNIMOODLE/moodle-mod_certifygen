@@ -19,6 +19,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ * Table Show errros
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -54,7 +55,7 @@ class showerrors_table extends table_sql {
      * Construct
      * @throws coding_exception
      */
-    function __construct() {
+    public function __construct() {
 
         $uniqueid = 'certifygen-showerrors-view';
         parent::__construct($uniqueid);
@@ -155,7 +156,7 @@ class showerrors_table extends table_sql {
                     $courseid = $certifygen->get('course');
                 }
                 $response = $subplugin->get_file($courseid, $row->validationid);
-                if (array_key_exists('file', $response)) {
+                if (array_key_exists('file', $response) && !is_null($response['file'])) {
                     $file = $response['file'];
                     $url = moodle_url::make_pluginfile_url(
                         $file->get_contextid(),

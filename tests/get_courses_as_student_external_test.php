@@ -32,6 +32,7 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace mod_certifygen;
 use mod_certifygen\external\get_courses_as_student_external;
 use mod_certifygen\persistents\certifygen_model;
 
@@ -48,7 +49,7 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_courses_as_student_external_test extends advanced_testcase {
+class get_courses_as_student_external_test extends \advanced_testcase {
     /**
      * Test set up.
      */
@@ -58,10 +59,12 @@ class get_courses_as_student_external_test extends advanced_testcase {
 
     /**
      * Test 1
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @covers \mod_certifygen\external\get_courses_as_student_external::get_courses_as_student
      */
     public function test_get_courses_as_student_nopermission(): void {
 
@@ -97,10 +100,12 @@ class get_courses_as_student_external_test extends advanced_testcase {
 
     /**
      * Test 2
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @covers \mod_certifygen\external\get_courses_as_student_external::get_courses_as_student
      */
     public function test_get_courses_as_student_with_no_certifygen(): void {
         global $DB;
@@ -141,11 +146,12 @@ class get_courses_as_student_external_test extends advanced_testcase {
 
     /**
      * Test 3
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @covers \mod_certifygen\external\get_courses_as_student_external::get_courses_as_student
      */
     public function test_get_courses_as_student(): void {
         global $DB;
@@ -221,11 +227,12 @@ class get_courses_as_student_external_test extends advanced_testcase {
 
     /**
      * Test 4
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @covers \mod_certifygen\external\get_courses_as_student_external::get_courses_as_student
      */
     public function test_get_courses_as_student_by_userfield(): void {
         global $DB;
@@ -319,11 +326,12 @@ class get_courses_as_student_external_test extends advanced_testcase {
 
     /**
      * Test 5
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @covers \mod_certifygen\external\get_courses_as_student_external::get_courses_as_student
      */
     public function test_get_courses_as_student_by_userfield_username(): void {
         global $DB;
@@ -427,11 +435,12 @@ class get_courses_as_student_external_test extends advanced_testcase {
 
     /**
      * Test 5
+     *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @covers \mod_certifygen\external\get_courses_as_student_external::get_courses_as_student
      */
     public function test_get_courses_as_student_by_lang(): void {
         global $CFG, $DB;

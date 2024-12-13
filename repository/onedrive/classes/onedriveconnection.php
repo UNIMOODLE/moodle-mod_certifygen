@@ -423,11 +423,9 @@ class onedriveconnection {
      * @throws repository_exception
      */
     protected function query($q, $path = null, $parent = null, $page = 0) {
-        global $OUTPUT;
 
         $files = [];
         $folders = [];
-        //$fields = "folder,id,lastModifiedDateTime,name,size,webUrl,thumbnails";
         $fields = "folder,id,lastModifiedDateTime,name,size,webUrl";
         $params = ['$select' => $fields, 'parent' => $parent];
 
@@ -461,10 +459,7 @@ class onedriveconnection {
                         'title' => $remotefile->name,
                         'path' => $this->build_node_path($remotefile->id, $remotefile->name, $path),
                         'date' => strtotime($remotefile->lastModifiedDateTime),
-                        //'thumbnail' => $OUTPUT->image_url(file_folder_icon(64))->out(false),
-                        //'thumbnail_height' => 64,
-                        //'thumbnail_width' => 64,
-                        'children' => []
+                        'children' => [],
                 ];
             } else {
                 // We can download all other file types.
@@ -472,63 +467,30 @@ class onedriveconnection {
                 $source = json_encode([
                         'id' => $remotefile->id,
                         'name' => $remotefile->name,
-                        'link' => $remotefile->webUrl
+                        'link' => $remotefile->webUrl,
                 ]);
-
-                $thumb = '';
-                $thumbwidth = 0;
-                $thumbheight = 0;
-                $extendedinfoerr = false;
-
-                //if (empty($remotefile->thumbnails)) {
-                //    // Try and get it directly from the item.
-                //    $params = ['fileid' => $remotefile->id, '$select' => $fields, '$expand' => 'thumbnails'];
-                //    try {
-                //        $response = $service->call('get', $params);
-                //        $remotefile = $response;
-                //    } catch (Exception $e) {
-                //        // This is not a failure condition - we just could not get extended info about the file.
-                //        $extendedinfoerr = true;
-                //    }
-                //}
-
-                //if (!empty($remotefile->thumbnails)) {
-                //    $thumbs = $remotefile->thumbnails;
-                //    if (count($thumbs)) {
-                //        $first = reset($thumbs);
-                //        if (!empty($first->medium) && !empty($first->medium->url)) {
-                //            $thumb = $first->medium->url;
-                //            $thumbwidth = min($first->medium->width, 64);
-                //            $thumbheight = min($first->medium->height, 64);
-                //        }
-                //    }
-                //}
-
                 $files[$remotefile->id] = [
                         'title' => $title,
                         'source' => $source,
                         'date' => strtotime($remotefile->lastModifiedDateTime),
                         'size' => isset($remotefile->size) ? $remotefile->size : null,
-                        //'thumbnail' => $thumb,
-                        //'thumbnail_height' => $thumbwidth,
-                        //'thumbnail_width' => $thumbheight,
                 ];
             }
         }
 
-        // Filter and order the results.
-        //$files = array_filter($files, [$this, 'filter']);
         $files = array_filter($files);
         core_collator::ksort($files, core_collator::SORT_NATURAL);
         core_collator::ksort($folders, core_collator::SORT_NATURAL);
         return array_merge(array_values($folders), array_values($files));
     }
+
     /**
      * Search throughout the OneDrive
      *
      * @param string $searchtext text to search for.
      * @param int $page search page.
      * @return array of results.
+     * @throws coding_exception
      */
     public function search($searchtext, $page = 0) {
         $path = $this->build_node_path('root', get_string('pluginname', 'repository_onedrive'));
@@ -558,7 +520,7 @@ class onedriveconnection {
         $bread = explode('/', $path);
         $crumbtrail = '';
         foreach ($bread as $crumb) {
-            list($id, $name) = $this->explode_node_path($crumb);
+            [$id, $name] = $this->explode_node_path($crumb);
             $name = empty($name) ? $id : $name;
             $breadcrumb[] = [
                 'name' => $name,
@@ -578,19 +540,19 @@ class onedriveconnection {
      */
     protected function explode_node_path($node) {
         if (strpos($node, '|') !== false) {
-            list($id, $name) = explode('|', $node, 2);
+            [$id, $name] = explode('|', $node, 2);
             $name = urldecode($name);
         } else {
             $id = $node;
             $name = '';
         }
         $id = urldecode($id);
-        return array(
+        return [
                 0 => $id,
                 1 => $name,
                 'id' => $id,
-                'name' => $name
-        );
+                'name' => $name,
+        ];
     }
     /**
      * Generates a safe path to a node.

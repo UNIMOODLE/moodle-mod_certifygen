@@ -304,7 +304,6 @@ class certifygen_validations extends persistent {
     ) {
         global $DB;
 
-
         $comparelang = $DB->sql_compare_text('ct.lang');
         $comparelangplaceholder = $DB->sql_compare_text(':lang');
         $comparecourses = $DB->sql_compare_text('ct.courses');

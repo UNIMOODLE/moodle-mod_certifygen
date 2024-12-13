@@ -19,6 +19,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ * Certifygen validation CMD
  * @package   certifygenvalidation_cmd
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -177,9 +178,11 @@ class certifygenvalidation_cmd implements ICertificateValidation {
 
     /**
      * Get File
+     *
      * @param int $courseid
      * @param int $validationid
      * @return array
+     * @throws coding_exception
      */
     public function get_file(int $courseid, int $validationid): array {
         $result = ['error' => [], 'message' => get_string('ok', 'mod_certifygen')];
@@ -199,7 +202,12 @@ class certifygenvalidation_cmd implements ICertificateValidation {
                 self::FILE_PATH,
                 $code
             );
-            $result['file'] = $file;
+            if (!$file) {
+                $result['error']['code'] = 'file_not_found';
+                $result['error']['message'] = get_string('file_not_found', 'mod_certifygen');
+            } else {
+                $result['file'] = $file;
+            }
         } catch (moodle_exception $exception) {
             $result['error']['code'] = $exception->getCode();
             $result['error']['message'] = $exception->getMessage();
