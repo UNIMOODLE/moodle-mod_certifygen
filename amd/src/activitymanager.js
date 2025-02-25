@@ -249,6 +249,7 @@ const emitCertificate = async(event) => {
                     studentsReloadTable(modelid, courseid, cmid, lang);
                 } else {
                     Notification.alert('Error', response.message, langStrings[2]);
+                    studentsReloadTable(modelid, courseid, cmid, lang);
                 }
                 identifier.find('.overlay-icon-container').remove();
             }).fail(Notification.exception);
