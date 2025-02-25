@@ -537,26 +537,45 @@ class certifygen {
 
         // Step 4: Call to validation plugin.
         $validationplugin = $certifygenmodel->get('validation');
+        /** @var ICertificateValidation $validationpluginclass */
         $validationpluginclass = $validationplugin . '\\' . $validationplugin;
-        if (get_config($validationplugin, 'enabled') === '1') {
+        if (
+            get_config($validationplugin, 'enabled') === '1'
+        ) {
             /** @var ICertificateValidation $subplugin */
             $subplugin = new $validationpluginclass();
-            $response = $subplugin->send_file($certifygenfile);
-            if ($response['haserror']) {
-                $result['message'] = $response['message'];
+            if (!$subplugin->is_enabled()) {
+                $result['result'] = false;
+                $result['message'] = get_string('validationplugin_not_enabled', 'mod_certifygen');
                 $validation->set('status', certifygen_validations::STATUS_VALIDATION_ERROR);
                 $validation->save();
                 $data = [
-                    'validationid' => $validation->get('id'),
-                    'status' => $validation->get('status'),
-                    'code' => 'validation_plugin_send_file_error',
-                    'message' => $response['message'],
-                    'usermodified' => $USER->id,
+                        'validationid' => $validation->get('id'),
+                        'status' => $validation->get('status'),
+                        'code' => 'validation_plugin_not_enabled',
+                        'message' => $result['message'],
+                        'usermodified' => $USER->id,
                 ];
                 certifygen_error::manage_certifygen_error(0, (object)$data);
-            } else if (!$subplugin->check_status()) {
-                $validation->set('status', certifygen_validations::STATUS_VALIDATION_OK);
-                $validation->save();
+            } else {
+                $response = $subplugin->send_file($certifygenfile);
+                if ($response['haserror']) {
+                    $result['result'] = false;
+                    $result['message'] = $response['message'];
+                    $validation->set('status', certifygen_validations::STATUS_VALIDATION_ERROR);
+                    $validation->save();
+                    $data = [
+                            'validationid' => $validation->get('id'),
+                            'status' => $validation->get('status'),
+                            'code' => 'validation_plugin_send_file_error',
+                            'message' => $response['message'],
+                            'usermodified' => $USER->id,
+                    ];
+                    certifygen_error::manage_certifygen_error(0, (object)$data);
+                } else if (!$subplugin->check_status()) {
+                    $validation->set('status', certifygen_validations::STATUS_VALIDATION_OK);
+                    $validation->save();
+                }
             }
         } else {
             $result['result'] = false;
@@ -736,7 +755,7 @@ class certifygen {
         global $DB;
         $selectedusers = [];
         $cmcontext = context_module::instance($cmid);
-        $sql = "SELECT u.id
+        $sql = "SELECT DISTINCT u.id
                   FROM {user} u
                   JOIN {user_enrolments} ue ON ue.userid = u.id
                   JOIN {enrol} e ON e.id = ue.enrolid

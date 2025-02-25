@@ -127,6 +127,7 @@ class emitcertificate_external extends external_api {
             'issueid' => null,
             'usermodified' => $USER->id,
         ];
+        $validation = null;
         if ($id > 0) {
             $validation  = new certifygen_validations($id);
             if (
@@ -138,9 +139,11 @@ class emitcertificate_external extends external_api {
                 return $result;
             }
         }
-        $validation = null;
+
         try {
-            $validation = certifygen_validations::manage_validation($id, (object) $data);
+            if (is_null($validation)) {
+                $validation = certifygen_validations::manage_validation($id, (object) $data);
+            }
             // Step 2: Generate issue.
             $users = user_get_users_by_id([$userid]);
             $user = reset($users);
@@ -223,7 +226,9 @@ class emitcertificate_external extends external_api {
                 $result = certifygen::start_emit_certificate_proccess($validation, $certifygenfile, $certifygenmodel);
 
                 // Step 5: event trigger.
-                certificate_issued::create_from_validation($validation)->trigger();
+                if ($result['result']) {
+                    certificate_issued::create_from_validation($validation)->trigger();
+                }
             }
         } catch (moodle_exception $e) {
             debugging(__FUNCTION__ . ' ' . ' error: ' . $e->getMessage());

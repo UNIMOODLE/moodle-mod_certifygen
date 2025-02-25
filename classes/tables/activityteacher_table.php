@@ -103,13 +103,15 @@ class activityteacher_table extends table_sql {
         $this->define_columns($columns);
         $validationplugin = $this->model->get('validation');
         $this->canrevoke = false;
-        $context = context_course::instance($courseid);
         $contextmodule = context_module::instance($cm->id);
         $this->context = $contextmodule;
         $validationpluginclass = $validationplugin . '\\' . $validationplugin;
         /** @var ICertificateValidation $subplugin */
         $subplugin = new $validationpluginclass();
-        if (has_capability('moodle/course:managegroups', $context) && !empty($validationplugin)) {
+        if (
+            has_capability('mod/certifygen:canemitotherscertificates', $contextmodule)
+            && !empty($validationplugin)
+        ) {
             $this->canrevoke = $subplugin->can_revoke($course->id);
         }
         // Messages.
@@ -175,7 +177,14 @@ class activityteacher_table extends table_sql {
         if (is_null($row->cstatus)) {
             $status = certifygen_validations::STATUS_NOT_STARTED;
         }
-        if ($status == certifygen_validations::STATUS_FINISHED) {
+        $revokestatus = [
+            certifygen_validations::STATUS_FINISHED,
+            certifygen_validations::STATUS_ERROR,
+            certifygen_validations::STATUS_VALIDATION_ERROR,
+            certifygen_validations::STATUS_STORAGE_ERROR,
+            certifygen_validations::STATUS_STUDENT_ERROR,
+        ];
+        if (in_array($status, $revokestatus)) {
             return '<span class="likelink" data-action="revoke-certificate" data-username="' . $row->firstname . ' '
                 . $row->lastname . '" data-issueid="' . $row->issueid . '" data-modelid="' . $this->modelid
                 . '" data-courseid="' . $this->courseid . '" data-userid="' . $row->userid . '" data-cmid="' . $this->cmid . '"
@@ -215,6 +224,9 @@ class activityteacher_table extends table_sql {
      */
     public function col_dateissued($row): string {
         if (empty($row->ctimecreated)) {
+            return '';
+        }
+        if (empty($row->cstatus) || $row->cstatus == certifygen_validations::STATUS_NOT_STARTED) {
             return '';
         }
         return date('d/m/y H:i:s', $row->ctimecreated);
