@@ -755,7 +755,7 @@ class certifygen {
         global $DB;
         $selectedusers = [];
         $cmcontext = context_module::instance($cmid);
-        $sql = "SELECT u.id
+        $sql = "SELECT DISTINCT u.id
                   FROM {user} u
                   JOIN {user_enrolments} ue ON ue.userid = u.id
                   JOIN {enrol} e ON e.id = ue.enrolid
