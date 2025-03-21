@@ -134,12 +134,12 @@ class onedriveconnection {
         /** @var oauth2_client $systemauth */
         $systemauth = api::get_system_oauth_client($this->issuer);
         if ($systemauth === false) {
-            $details = 'Cannot connect as system user';
+            $details = get_string('cannot_connect_as_system_user', 'mod_certifygen');
             throw new moodle_exception('errorwhilecommunicatingwith', 'repository', '', $details);
         }
         $userauth = $this->get_user_oauth_client();
         if ($userauth === false) {
-            $details = 'Cannot connect as current user';
+            $details = get_string('cannot_connect_as_current_user', 'mod_certifygen');
             throw new moodle_exception('errorwhilecommunicatingwith', 'repository', '', $details);
         }
 
@@ -219,7 +219,7 @@ class onedriveconnection {
         $params = ['fileid' => $fileid];
         $response = $client->call('create_link', $params, json_encode($updateread));
         if (empty($response->link)) {
-            $details = 'Cannot update link sharing for the document: ' . $fileid;
+            $details = get_string('cannot_update_link_sharing_for_document', 'mod_certifygen') . $fileid;
             throw new moodle_exception('errorwhilecommunicatingwith', 'repository', '', $details);
         }
         $this->url = $response->link->webUrl;
@@ -255,7 +255,7 @@ class onedriveconnection {
         $behaviour = [ 'item' => [ "@microsoft.graph.conflictBehavior" => "rename" ] ];
         $created = $service->call('create_upload', $params, json_encode($behaviour));
         if (empty($created->uploadUrl)) {
-            $details = 'Cannot begin upload session:' . $parentid;
+            $details = get_string('cannot_begin_upload_session', 'mod_certifygen') . $parentid;
             throw new moodle_exception('errorwhilecommunicatingwith', 'repository', '', $details);
         }
         $options = ['file' => $filepath];
@@ -367,7 +367,7 @@ class onedriveconnection {
         }
 
         if (empty($created->id)) {
-            $details = 'Cannot create folder:' . $foldername;
+            $details = get_string('cannot_create_folder', 'mod_certifygen') . $foldername;
             throw new moodle_exception('errorwhilecommunicatingwith', 'repository', '', $details);
         }
         return $created->id;
@@ -420,7 +420,6 @@ class onedriveconnection {
      * @param int $page page.
      * @return array of files and folders.
      * @throws Exception
-     * @throws repository_exception
      */
     protected function query($q, $path = null, $parent = null, $page = 0) {
 
@@ -444,11 +443,7 @@ class onedriveconnection {
                 $response = $service->call('list', $params);
             }
         } catch (\Exception $e) {
-            if ($e->getCode() == 403 && strpos($e->getMessage(), 'Access Not Configured') !== false) {
-                throw new repository_exception('servicenotenabled', 'repository_onedrive');
-            } else if (strpos($e->getMessage(), 'mysite not found') !== false) {
-                throw new repository_exception('mysitenotfound', 'repository_onedrive');
-            }
+            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
         }
 
         $remotefiles = isset($response->value) ? $response->value : [];
