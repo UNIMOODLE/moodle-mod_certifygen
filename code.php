@@ -79,7 +79,7 @@ echo html_writer::start_div('mt-6');
 $codeform->display();
 echo html_writer::end_div();
 if ($showresults) {
-    echo html_writer::tag('h3', 'Resultados', ['class' => 'mt-6']);
+    echo html_writer::tag('h3', get_string('results', 'mod_certifygen'), ['class' => 'mt-6']);
     echo html_writer::div($message, 'm-3');
 }
 echo $OUTPUT->footer();
