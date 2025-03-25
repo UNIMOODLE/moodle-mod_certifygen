@@ -35,3 +35,4 @@ $string['pluginnamesettings'] = 'CSV Repository Settings';
 $string['enable'] = 'Enable';
 $string['enable_help'] = 'This repository can only be used woth csv validation plugin.';
 $string['privacy:metadata'] = 'The CSV Repository plugin does not store any personal data.';
+$string['certifygenvalidationcsvnotfound'] = 'CSV Validation plugin not found';
