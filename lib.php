@@ -121,7 +121,7 @@ function certifygen_update_instance($data, $mform): bool {
 
 /**
  * Delete certifygen instance.
- * @param $id
+ * @param int $id
  * @return bool
  * @throws coding_exception
  */
