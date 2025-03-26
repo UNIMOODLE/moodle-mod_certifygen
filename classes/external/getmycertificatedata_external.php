@@ -106,7 +106,7 @@ class getmycertificatedata_external extends external_api {
             );
             $view = new activity_view($courseid, $certifygenmodel->templateid, $cm, $lang);
         } else {
-            // Creo q este caso no se usa en este serivicio. mando error para controlarlo.
+            // Send error if is used in this service
             throw new moodle_exception('cmid must be greater than 0.');
         }
         $output = $PAGE->get_renderer('mod_certifygen');

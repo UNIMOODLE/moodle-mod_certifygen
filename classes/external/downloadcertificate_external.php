@@ -74,7 +74,7 @@ class downloadcertificate_external extends external_api {
     }
 
     /**
-     * Download studetn certificate
+     * Download student certificate
      * @param int $validationid
      * @param int $instanceid
      * @param int $modelid
@@ -162,7 +162,7 @@ class downloadcertificate_external extends external_api {
             [
                 'result' => new external_value(PARAM_BOOL, 'file url created'),
                 'url' => new external_value(PARAM_RAW, 'file url'),
-                'message' => new external_value(PARAM_RAW, 'meesage'),
+                'message' => new external_value(PARAM_RAW, 'message'),
             ]
         );
     }
