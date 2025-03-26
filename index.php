@@ -27,6 +27,7 @@
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
+ * @author     IDEF21 idef21.com
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -53,6 +54,8 @@ $PAGE->set_title("$course->shortname: $strcertifygens");
 $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
 echo $OUTPUT->heading($strcertifygens, 2);
+
+\mod_certifygen\event\course_module_instance_list_viewed::create_from_course($course)->trigger();
 
 if (! $certifygens = get_all_instances_in_course("certifygen", $course)) {
     notice(
