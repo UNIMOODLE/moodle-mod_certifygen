@@ -171,6 +171,8 @@ class certifygen_context extends persistent {
     }
     /**
      * has_course_context
+     * @param int $courseid
+     * @return bool
      * @throws moodle_exception
      * @throws dml_exception
      */
@@ -238,7 +240,7 @@ class certifygen_context extends persistent {
     /**
      * get_course_context_modelids
      * @param int $courseid
-     * @return int
+     * @return array
      * @throws dml_exception
      * @throws moodle_exception
      */
