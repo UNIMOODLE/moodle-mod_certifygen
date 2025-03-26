@@ -48,7 +48,7 @@ global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
 /**
  * CMD
- * @package   certifygenvalidation_cmd
+ * @package    certifygenvalidation_cmd
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
@@ -94,17 +94,19 @@ class certifygenvalidation_cmd implements ICertificateValidation {
         // Step 2: call external endpoint.
         $data = $file->get_metadata();
         $datajson = json_encode($data);
-        // Construye el comando.
-        $command = "$path $originalfilename '$datajson'";
-
-        // Ejecuta el comando y captura la salida.
+        // Buid the command.
+        if (is_executable($path)) {
+            $command = "$path $originalfilename '$datajson'";
+        }    
+        // Execute the command and capture the output.
         $output = [];
         $returnvar = 0;
+        $command = escapeshellarg($command);
         exec($command, $output, $returnvar);
 
         $haserror = false;
         $message = get_string('ok', 'mod_certifygen');
-        // Muestra la salida del comando.
+        // Displays command output.
         if ($returnvar !== 0) {
             $haserror = true;
             $message = get_string('error_cmd_code', 'certifygenvalidation_cmd', $returnvar);
@@ -226,7 +228,7 @@ class certifygenvalidation_cmd implements ICertificateValidation {
     }
 
     /**
-     * enable
+     * Is enable
      * @return bool
      * @throws dml_exception
      */
@@ -281,7 +283,7 @@ class certifygenvalidation_cmd implements ICertificateValidation {
      * If true, the certifygen activities related with this type of validation will be part
      * of the output of get_id_instance_certificate_external ws.
      * If true, the teacher requests with models with this type of validation will be part
-     *  of the output of get_courses_as_teacher ws.
+     * of the output of get_courses_as_teacher ws.
      *
      * @return bool
      * @throws dml_exception
