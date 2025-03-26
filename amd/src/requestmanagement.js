@@ -1,6 +1,23 @@
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
+ * Provides the required functionality for request management.
+ * 
  * @module    mod_certifygen
- * @copyright  2024 Proyecto UNIMOODLE
+ * @copyright  2025 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -53,7 +70,7 @@ const downloadCertificate = async(event) => {
     let id = parseInt(event.currentTarget.getAttribute('data-id'));
     let name = event.currentTarget.getAttribute('data-name');
 
-    // Modal estas seguro que quieres enviar el certiifcado?.
+    // Modal asking for confirmation.
     const stringkeys = [
         {key: 'downloadcertificate_title', component: 'mod_certifygen'},
         {key: 'downloadcertificate_body', component: 'mod_certifygen', param: name},
@@ -124,10 +141,10 @@ const reemitCertificate = async (event) => {
                     Ajax.call([request])[0].done(function(response) {
                         identifier.html(html);
                         if (response.result == 1) {
-                            // Recargar tabla.
+                            // Reload table.
                             reloadTeacherRequestTable(userid);
                         } else {
-                            // Mostrar mensaje error.
+                            // Show error message.
                             return ModalFactory.create({
                                 title: langStrings[3],
                                 body: response.message,
@@ -185,10 +202,10 @@ const emitCertificate = async (event) => {
                     Ajax.call([request])[0].done(function(response) {
                         identifier.html(html);
                         if (response.result == 1) {
-                            // Recargar tabla.
+                            // Reload table.
                             reloadTeacherRequestTable(userid);
                         } else {
-                            // Mostrar mensaje error.
+                            // Show error message.
                             return ModalFactory.create({
                                 title: langStrings[3],
                                 body: response.message,
@@ -269,7 +286,7 @@ const deleteRequest = (event) => {
                             jQuery(event.currentTarget).parent().parent().remove();
                             identifier.find('.overlay-icon-container').remove();
                         } else {
-                            // Mostrar mensaje error.
+                            // Show error message.
                             return ModalFactory.create({
                                 title: langStrings[0],
                                 body: response.message,
@@ -313,7 +330,7 @@ const createRequest = (e) => {
     // Listen to events if you want to execute something on form submit. Event detail will contain everything the process()
     // function returned:
     modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, () => {
-        // Recargar la tabla.
+        // Reload the list table after the form is submitted.
         setTimeout(reloadTeacherRequestTable(userid), 1000);
 
     });

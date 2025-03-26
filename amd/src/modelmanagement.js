@@ -1,4 +1,21 @@
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
+ * Provides the required functionality for model management.
+ * 
  * @module    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -92,7 +109,7 @@ const EditModel = (e) => {
     });
     // Listen to events if you want to execute something on form submit. Event detail will contain everything the process().
     modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, () => {
-        // Recargar la tabla.
+        // Reload the list table after the form is submitted.
         reloadModelListTable();
 
     });
@@ -145,7 +162,7 @@ const DeleteModel = (event) => {
                         // Remove tr.
                         jQuery(event.currentTarget).parent().parent().remove();
                     } else {
-                        // Mostrar mensaje error.
+                        // Show error message.
                         return ModalFactory.create({
                             title: langStrings[0],
                             body: response.message,
