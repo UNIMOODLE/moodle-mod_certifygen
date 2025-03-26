@@ -111,6 +111,7 @@ class activity_view implements renderable, templatable {
 
     /**
      * export_for_template
+     * @return stdClass
      * @throws coding_exception
      * @throws moodle_exception
      * @throws dml_exception
