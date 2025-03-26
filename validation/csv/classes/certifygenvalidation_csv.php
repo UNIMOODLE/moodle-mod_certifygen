@@ -286,7 +286,7 @@ xmlns:fir="http://firma.ws.producto.com/">
             $teacherrequest = certifygenvalidationcsv::get_record($params);
             $haserror = true;
             if (!$teacherrequest) {
-                throw new moodle_exception('certifygenvalidationcsvnotfound', 'certifygen');
+                throw new moodle_exception('certifygenvalidationcsvnotfound', 'certifygenvalidation_csv');
             }
             $params = $this->create_params_getFileContent($code);
             $curl = curl_init();

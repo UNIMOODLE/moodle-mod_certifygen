@@ -76,7 +76,7 @@ class certifygenrepository_csv implements ICertificateRepository {
         $params = ['validationid' => $validation->get('id')];
         $teacherrequest = certifygenvalidationcsv::get_record($params);
         if (!$teacherrequest) {
-            throw new moodle_exception('certifygenvalidationcsvnotfound', 'certifygen');
+            throw new moodle_exception('certifygenvalidationcsvnotfound', 'certifygenrepository_csv');
         }
         $validationcsv = new certifygenvalidation_csv();
         $data = $validationcsv->get_file_url_from_external_service($code);

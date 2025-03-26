@@ -48,3 +48,6 @@ $string['wsoutput'] = 'Web Service Output';
 $string['wsoutput_help'] = 'If true, the certifygen activities related with this type of validation will be part of the output of
 get_id_instance_certificate_external ws. If true, the teacher requests with models with this type of validation will be part of the
 output of get_courses_as_teacher ws.';
+$string['error_cmd_code'] = 'Error in CMD code';
+$string['temp_file_not_exists'] = 'Temporary file not exists';
+$string['missing_directory_permissions'] = 'Missing directory permissions';
