@@ -309,6 +309,7 @@ class activityteacher_table extends table_sql {
      *
      * @param int $pagesize size of page for paginated displayed table.
      * @param bool $useinitialsbar do you want to use the initials bar?
+     * @return void
      * @throws dml_exception
      * @throws coding_exception
      */
