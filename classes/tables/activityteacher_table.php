@@ -342,6 +342,7 @@ class activityteacher_table extends table_sql {
         } else if ($userid && in_array($userid, $students)) {
             $students = [$userid];
         }
+        $total = 0;
         if (count($students) > 0) {
             $total = certifygen::count_issues_for_course_by_lang(
                 $params['lang'],

@@ -45,6 +45,7 @@ use dml_exception;
 use mod_certifygen\interfaces\ICertificateRepository;
 use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
+use mod_certifygen\persistents\certifygen_repository;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 
@@ -88,6 +89,20 @@ class provider implements
             'certifygen_validations',
             $validations,
             'privacy:metadata:certifygen_validations'
+        );
+        $repositories = [
+                'validationid' => 'privacy:metadata:validationid',
+                'userid' => 'privacy:metadata:userid',
+                'url' => 'privacy:metadata:url',
+                'data' => 'privacy:metadata:data',
+                'usermodified' => 'privacy:metadata:usermodified',
+                'timecreated' => 'privacy:metadata:timecreated',
+                'timemodified' => 'privacy:metadata:timemodified',
+        ];
+        $collection->add_database_table(
+                'certifygen_repository',
+                $repositories,
+                'privacy:metadata:certifygen_repository'
         );
         return $collection;
     }
@@ -186,11 +201,22 @@ class provider implements
             $fs->delete_area_files($context->id, 'mod_certifygen', 'certifygenrepository');
 
             // Delete issue records.
-            $DB->delete_records('certifygen_validations', ['certifygenid' => 0]);
+            $validations = certifygen_validations::get_records(['certifygenid' => 0]);
+            foreach ($validations as $validation) {
+                $repository = certifygen_repository::get_record(['validationid' => $validation->get('id')]);
+                if ($repository) {
+                    $repository->delete();
+                }
+                $validation->delete();
+            }
         }
         if ($context instanceof context_module) {
             $validations = certifygen_validations::get_records(['courses' => '']);
             foreach ($validations as $validation) {
+                $repository = certifygen_repository::get_record(['validationid' => $validation->get('id')]);
+                if ($repository) {
+                    $repository->delete();
+                }
                 self::remove_validation_data($validation);
             }
         }
@@ -208,10 +234,13 @@ class provider implements
         if (empty($contextlist->count())) {
             return;
         }
-        $userid = $contextlist->get_user()->id;
+        $userid = (int)$contextlist->get_user()->id;
         $validations = certifygen_validations::get_records(['userid' => $userid]);
-        $fs = get_file_storage();
         foreach ($validations as $validation) {
+            $repository = certifygen_repository::get_record(['validationid' => $validation->get('id')]);
+            if ($repository) {
+                $repository->delete();
+            }
             self::remove_validation_data($validation);
         }
     }
@@ -276,6 +305,10 @@ class provider implements
             $userinparams
         );
         foreach ($validations as $validation) {
+            $repository = certifygen_repository::get_record(['validationid' => $validation->get('id')]);
+            if ($repository) {
+                $repository->delete();
+            }
             self::remove_validation_data($validation);
         }
     }

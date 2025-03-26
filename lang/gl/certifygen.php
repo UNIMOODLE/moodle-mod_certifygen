@@ -165,6 +165,7 @@ $string['repository_help'] = 'Axuda do repositorio';
 $string['mycertificatesnotaccess'] = 'Non tes permiso para acceder a esta páxina';
 $string['teacherrequestreportnomodels'] = 'Aínda non se creou ningún modelo asociado a cursos para os certificados de profesor';
 $string['privacy:metadata:certifygen_validations'] = 'Información sobre a emisión do certificado';
+$string['privacy:metadata:certifygen_repository'] = 'Información sobre a localización do certificado';
 $string['privacy:metadata:name'] = 'Nome do certificado (só para certificados de profesor)';
 $string['privacy:metadata:courses'] = 'Os ids de curso asociados ao certificado (só para certificados de profesor)';
 $string['privacy:metadata:code'] = 'Código de certificado (só para certificados de profesor)';
