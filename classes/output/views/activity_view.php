@@ -156,10 +156,10 @@ class activity_view implements renderable, templatable {
         if (!$this->isteacher) {
             $filters->add_filter(new integer_filter('userid', filter::JOINTYPE_DEFAULT, [(int)$USER->id]));
         }
-        if ($tifirst = optional_param('tifirst', '', PARAM_RAW)) {
+        if ($tifirst = optional_param('tifirst', '', PARAM_ALPHANUMEXT)) {
             $filters->add_filter(new string_filter('tifirst', filter::JOINTYPE_DEFAULT, [$tifirst]));
         }
-        if ($tilast = optional_param('tilast', '', PARAM_RAW)) {
+        if ($tilast = optional_param('tilast', '', PARAM_ALPHANUMEXT)) {
             $filters->add_filter(new string_filter('tilast', filter::JOINTYPE_DEFAULT, [$tilast]));
         }
         $activityteachertable = new activityteacher_table($this->courseid, $this->templateid, $this->cm->instance);

@@ -66,7 +66,7 @@ class certificatestablefiltersform extends moodleform {
             $identifier = get_string('chooselang', 'mod_certifygen');
         }
         $mform->addElement('select', 'lang', $identifier, $choices);
-        $mform->setType('lang', PARAM_RAW);
+        $mform->setType('lang', PARAM_ALPHANUMEXT);
         $mform->setDefault('lang', $defaultlang);
         $this->add_action_buttons(false, get_string('filter', 'mod_certifygen'));
     }

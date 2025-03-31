@@ -57,8 +57,8 @@ class showerrors_view implements renderable, templatable {
      * @throws coding_exception
      */
     public function export_for_template(renderer_base $output) {
-        $userfullname = optional_param('userfullname', '', PARAM_RAW);
-        $modelname = optional_param('modelname', '', PARAM_RAW);
+        $userfullname = optional_param('userfullname', '', PARAM_TEXT);
+        $modelname = optional_param('modelname', '', PARAM_ALPHANUMEXT);
         $customdata = [
             'userfullname' => $userfullname,
             'modelname' => $modelname,

@@ -64,7 +64,7 @@ class codeform extends moodleform {
             get_string('code', 'mod_certifygen'),
             ['maxlength' => '255']
         );
-        $mform->setType('code', PARAM_RAW);
+        $mform->setType('code', PARAM_ALPHANUMEXT);
         $mform->addRule('code', null, 'required');
 
         $this->add_action_buttons();
