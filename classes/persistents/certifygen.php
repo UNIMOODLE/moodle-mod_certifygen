@@ -57,6 +57,10 @@ class certifygen extends persistent {
             'introformat' => [
                 'type' => PARAM_INT,
             ],
+            'completiondownload' => [
+                'type' => PARAM_INT,
+                'default' => 0,
+            ],
             'usermodified' => [
                 'type' => PARAM_INT,
             ],

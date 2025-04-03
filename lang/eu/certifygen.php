@@ -240,3 +240,5 @@ $string ['cannot_begin_upload_session'] = 'Ezin duzu igoera-saioa hasi';
 $string ['cannot_create_folder'] = 'Ezin da karpeta sortu';
 $string ['configurated_logo'] = 'Logoa konfiguratuta';
 $string ['results'] = 'Emaitzak';
+$string['completiondownload'] = 'Ziurtagiriaren deskargaren bidezko osatzea';
+$string['completiondownloaddesc'] = 'Parte-hartzaileek ziurtagiria deskargatu behar dute jarduera amaitzeko.';

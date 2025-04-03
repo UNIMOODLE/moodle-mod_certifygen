@@ -239,3 +239,5 @@ $string['cannot_begin_upload_session'] = 'Cannot begin upload session';
 $string['cannot_create_folder'] = 'Cannot create folder';
 $string['configurated_logo'] = 'Configurated logo';
 $string['results'] = 'Results';
+$string['completiondownload'] = 'Completion by certificate download';
+$string['completiondownloaddesc'] = 'Participants must download a certificate to complete the activity.';

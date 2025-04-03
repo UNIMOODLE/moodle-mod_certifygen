@@ -116,6 +116,10 @@ class certifygen_validations extends persistent {
             'status' => [
                 'type' => PARAM_INT,
             ],
+            'isdownloaded' => [
+                'type' => PARAM_INT,
+                'default' => 0,
+            ],
             'lang' => [
                 'type' => PARAM_TEXT,
             ],
@@ -145,6 +149,9 @@ class certifygen_validations extends persistent {
             $courses = explode(',', $data->courses);
             asort($courses);
             $data->courses = implode(',', $courses);
+        }
+        if (!isset($data->manage_validation)) {
+            $data->isdownloaded = 0;
         }
         if (!$id && !empty($data->courses)) {
             $data->code = self::generate_code($data->userid);

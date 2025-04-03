@@ -65,6 +65,11 @@ $event->add_record_snapshot('course_modules', $cm);
 $event->add_record_snapshot('certifygen', $certifygen);
 $event->trigger();
 
+// Update the completion.
+$completion = new completion_info($course);
+$completion->set_module_viewed($cm);
+
+
 $output = $PAGE->get_renderer('mod_certifygen');
 echo $output->header();
 echo $output->render($view);

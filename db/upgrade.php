@@ -83,6 +83,35 @@ function xmldb_certifygen_upgrade($oldversion) {
         // Certifygen savepoint reached.
         upgrade_mod_savepoint(true, 2024101100, 'certifygen');
     }
+    if ($oldversion < 2025032600) {
+
+        // Define field completiondownload to be added to certifygen.
+        $table = new xmldb_table('certifygen');
+        $field = new xmldb_field('completiondownload', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'introformat');
+
+        // Conditionally launch add field completiondownload.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Certifygen savepoint reached.
+        upgrade_mod_savepoint(true, 2025032600, 'certifygen');
+    }
+    if ($oldversion < 2025032601) {
+
+        // Define field isdownloaded to be added to certifygen_validations.
+        $table = new xmldb_table('certifygen_validations');
+        $field = new xmldb_field('isdownloaded', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'status');
+
+        // Conditionally launch add field isdownloaded.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Certifygen savepoint reached.
+        upgrade_mod_savepoint(true, 2025032601, 'certifygen');
+    }
+
 
     return true;
 }

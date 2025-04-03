@@ -54,6 +54,7 @@ function certifygen_supports(string $feature): ?bool {
         case FEATURE_MOD_INTRO:
         case FEATURE_SHOW_DESCRIPTION:
         case FEATURE_COMPLETION_TRACKS_VIEWS:
+        case FEATURE_COMPLETION_HAS_RULES:
             return true;
         default:
             return null;
@@ -79,6 +80,7 @@ function certifygen_add_instance(stdClass $data, $mform = null): int {
         'name' => $data->name,
         'intro' => $data->intro,
         'introformat' => $data->introformat,
+        'completiondownload' => $data->completiondownload,
         'usermodified' => $USER->id,
         'timecreated' => time(),
         'timemodified' => time(),
@@ -109,6 +111,7 @@ function certifygen_update_instance($data, $mform): bool {
     $certifygen->set('name', $data->name);
     $certifygen->set('intro', $data->intro);
     $certifygen->set('introformat', $data->introformat);
+    $certifygen->set('completiondownload', $data->completiondownload);
     $certifygen->set('usermodified', $USER->id);
     $certifygen->set('timemodified', time());
 
@@ -592,3 +595,82 @@ function mod_certifygen_lang_is_installed(string $langcode): bool {
     }
     return true;
 }
+/**
+ * Add a get_coursemodule_info function in case any forum type wants to add 'extra' information
+ * for the course (see resource).
+ *
+ * Given a course_module object, this function returns any "extra" information that may be needed
+ * when printing this activity in a course listing.  See get_array_of_activities() in course/lib.php.
+ *
+ * @param stdClass $coursemodule The coursemodule object (record).
+ * @return cached_cm_info An object on information that the courses
+ *                        will know about (most noticeably, an icon).
+ */
+function certifygen_get_coursemodule_info($coursemodule) {
+    $certifygen = certifygen::get_record(['id' => $coursemodule->instance]);
+    if (!$certifygen) {
+        return false;
+    }
+    $result = new cached_cm_info();
+    $result->name = $certifygen->get('name');
+    if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {
+        $result->customdata['customcompletionrules']['completiondownload'] = $certifygen->get('completiondownload');
+    }
+    return $result;
+}
+/**
+ * Obtains the automatic completion state for this certifygen based on any conditions
+ * in certifygen settings.
+ *
+ * @param object $course Course
+ * @param object $cm Course-module
+ * @param int $userid User ID
+ * @param bool $type Type of comparison (or/and; can be used as return value if no conditions)
+ * @return bool True if completed, false if not, $type if conditions not set.
+ */
+//function certifygen_get_completion_state($course, $cm, $userid, $type) {
+//
+//    // Get certifygen details
+//    $certifygen = certifygen::get_record(['id' => $cm->instance]);
+//
+//    // If completion option is enabled, evaluate it and return true/false
+//    if ($certifygen->get('completiondownload')) {
+//        $cvalidations = certifygen_validations::count_records(
+//                [
+//                    'userid' => $userid,
+//                    'certifygenid' => $cm->instance,
+//                    'isdownloaded' => 1,
+//                ]
+//        );
+//        return ($cvalidations > 1) ? true : false;
+//    } else {
+//        // Completion option is not enabled so just return $type
+//        return $type;
+//    }
+//}
+/**
+ * Callback which returns human-readable strings describing the active completion custom rules for the module instance.
+ *
+ * @param cm_info|stdClass $cm object with fields ->completion and ->customdata['customcompletionrules']
+ * @return array $descriptions the array of descriptions for the custom rules.
+ */
+//function mod_certifygen_get_completion_active_rule_descriptions($cm) {
+//    // Values will be present in cm_info, and we assume these are up to date.
+//    if (empty($cm->customdata['customcompletionrules']) || $cm->completion != COMPLETION_TRACKING_AUTOMATIC) {
+//        return [];
+//    }
+//
+//    $descriptions = [];
+//    foreach ($cm->customdata['customcompletionrules'] as $key => $val) {
+//        switch ($key) {
+//            case 'completiondownload':
+//                if (!empty($val)) {
+//                    $descriptions[] = get_string('completiondownloaddesc', 'certifygen');
+//                }
+//                break;
+//            default:
+//                break;
+//        }
+//    }
+//    return $descriptions;
+//}

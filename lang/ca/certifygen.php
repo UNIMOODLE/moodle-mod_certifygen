@@ -237,3 +237,5 @@ $string['cannot_begin_upload_session'] = 'No podeu iniciar la sessió de pujada'
 $string['cannot_create_folder'] = 'No es pot crear la carpeta';
 $string['configurated_logo'] = 'Log configurat';
 $string['results'] = 'Resultats';
+$string['completiondownload'] = 'Completació per descàrrega de certificat';
+$string['completiondownloaddesc'] = 'Els participants han de descarregar un certificat per finalitzar l’activitat.';

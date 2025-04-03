@@ -95,6 +95,9 @@ class restore_certifygen_activity_structure_step extends restore_activity_struct
         $this->oldcourseid = $data->course;
         $data->course = $this->get_courseid();
         $this->activityname = $data->name;
+        if (!isset($data->completiondownload)) {
+            $data->completiondownload = 0;
+        }
         // Insert the record.
         $newitemid = $DB->insert_record('certifygen', $data);
         $this->newcertifygenid = $newitemid;

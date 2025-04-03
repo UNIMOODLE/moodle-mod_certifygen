@@ -234,3 +234,5 @@ $string['cannot_begin_upload_session'] = 'Non de pode iniciar a sesión de subid
 $string['cannot_create_folder'] = 'Non se pode crear o cartafol';
 $string['configurated_logo'] = 'Logo configurado';
 $string['results'] = 'Resultados';
+$string['completiondownload'] = 'Completación por descarga de certificado';
+$string['completiondownloaddesc'] = 'Os participantes deben descargar un certificado para finalizar a actividade.';

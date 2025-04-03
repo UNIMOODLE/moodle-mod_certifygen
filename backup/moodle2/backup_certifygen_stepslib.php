@@ -103,6 +103,7 @@ class backup_certifygen_activity_structure_step extends backup_activity_structur
                     'name',
                     'intro',
                     'introformat',
+                    'completiondownload',
                     'usermodified',
                     'timecreated',
                     'timemodified',

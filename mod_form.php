@@ -112,4 +112,48 @@ class mod_certifygen_mod_form extends moodleform_mod {
         $mform->setType('type', PARAM_INT);
         $this->add_action_buttons();
     }
+
+    /**
+     * completiondownload element.
+     *
+     * @return array Array of string IDs of added items, empty array if none
+     * @throws coding_exception
+     */
+    public function add_completion_rules() {
+        $mform =& $this->_form;
+        $mform->addElement('checkbox',
+                'completiondownload',
+                '',
+                get_string('completiondownload', 'mod_certifygen'));
+        // Enable this completion rule by default.
+        $mform->setDefault('completiondownload', 0);
+        return ['completiondownload'];
+    }
+
+    /**
+     * completion_rule_enabled
+     * @param $data
+     * @return bool
+     */
+    public function completion_rule_enabled($data) {
+        return !empty($data['completiondownload']);
+    }
+
+    /**
+     * data_preprocessing
+     * @param $default_values
+     * @return void
+     */
+    function data_preprocessing(&$default_values) {
+        parent::data_preprocessing($default_values);
+
+        // Set up the completion checkboxes which aren't part of standard data.
+        // We also make the default value (if you turn on the checkbox) for those
+        // numbers to be 1, this will not apply unless checkbox is ticked.
+        $default_values['completiondownloadenabled'] =
+                !empty($default_values['completiondownload']) ? 1 : 0;
+        if (empty($default_values['completiondownload'])) {
+            $default_values['completiondownload'] = 0;
+        }
+    }
 }

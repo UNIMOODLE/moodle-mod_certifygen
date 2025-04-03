@@ -239,3 +239,5 @@ $string['cannot_begin_upload_session'] = 'No de puede iniciar la sesión de subi
 $string['cannot_create_folder'] = 'No se puede crear la carpeta';
 $string['configurated_logo'] = 'Logo configurado';
 $string['results'] = 'Resultados';
+$string['completiondownload'] = 'Compleción por descarga de certificado';
+$string['completiondownloaddesc'] = 'Los participantes deben descargarse un certificado para finalizar la actividad.';

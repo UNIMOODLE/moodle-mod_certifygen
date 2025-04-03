@@ -36,6 +36,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
+require_once($CFG->dirroot . '/lib/completionlib.php');
 use context_module;
 use external_api;
 use external_function_parameters;
@@ -137,8 +138,23 @@ class downloadcertificate_external extends external_api {
                     $result['result'] = false;
                     $result['message'] = get_string('empty_repository_url', 'mod_certifygen');
                 } else {
-                    // Triger event.
+                    // Trigger event.
                     certificate_downloaded::create_from_validation($validation)->trigger();
+                    // Trigger completion event.
+                    $completion = new \completion_info($course);
+                    if (
+                        $completion->is_enabled($cm)
+                        && $cm->customdata
+                        && !empty($cm->customdata)
+                        && array_key_exists('customcompletionrules', $cm->customdata)
+                        && array_key_exists('completiondownload', $cm->customdata['customcompletionrules'])
+                        && $cm->customdata['customcompletionrules']['completiondownload']
+                    ) {
+                        $validation->set('isdownloaded', 1);
+                        $validation->update();
+                        //\course_modinfo::purge_course_module_cache($courseid, $cm->id);
+                        \course_modinfo::purge_course_cache($courseid);
+                    }
                 }
             } else {
                 $result['result'] = false;
