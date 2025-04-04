@@ -265,6 +265,7 @@ class modelform extends dynamic_form {
 
     /**
      * get_context_for_dynamic_submission
+     * @return context
      * @throws dml_exception
      */
     protected function get_context_for_dynamic_submission(): context {
@@ -273,6 +274,7 @@ class modelform extends dynamic_form {
 
     /**
      * check_access_for_dynamic_submission
+     * @return void
      * @throws coding_exception
      * @throws moodle_exception
      * @throws dml_exception
@@ -295,6 +297,7 @@ class modelform extends dynamic_form {
 
     /**
      * set_data_for_dynamic_submission
+     * @return void
      * @throws coding_exception
      */
     public function set_data_for_dynamic_submission(): void {
@@ -326,8 +329,8 @@ class modelform extends dynamic_form {
 
     /**
      * Validation
-     * @param $data
-     * @param $files
+     * @param $data[]
+     * @param $files[]
      * @return array
      * @throws coding_exception
      */

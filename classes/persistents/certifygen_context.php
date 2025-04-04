@@ -148,29 +148,17 @@ class certifygen_context extends persistent {
      * @throws dml_exception
      */
     public static function can_i_see_teacherrequestlink(int $userid): bool {
-        global $DB;
-        $comparename = $DB->sql_compare_text('r.shortname');
-        $comparenameplaceholder = $DB->sql_compare_text(':shortname');
-        $select = "AND  {$comparename} = {$comparenameplaceholder}";
-
-        $sql = "SELECT COUNT(c.id) as num
-                  FROM {course} c
-                  JOIN {enrol} e ON e.courseid = c.id
-                  JOIN {user_enrolments} ue ON ue.enrolid = e.id
-                  JOIN {user} u ON ue.userid = u.id
-                  JOIN {role_assignments} ra ON ra.userid = u.id
-                  JOIN {context} con ON ( con.id = ra.contextid AND con.contextlevel = 50 AND con.instanceid = c.id)
-                  JOIN {role} r ON r.id = ra.roleid
-                 WHERE u.id = :userid $select";
-        $result = $DB->get_records_sql($sql, ['userid' => $userid, 'shortname' => 'editingteacher']);
-        $result = reset($result);
-        if ($result->num > 0) {
+        $result = get_user_capability_course('mod/certifygen:addinstance', $userid);
+        $numresult = count($result);
+        if ($numresult > 0) {
             return true;
         }
         return false;
     }
     /**
      * has_course_context
+     * @param int $courseid
+     * @return bool
      * @throws moodle_exception
      * @throws dml_exception
      */
@@ -238,7 +226,7 @@ class certifygen_context extends persistent {
     /**
      * get_course_context_modelids
      * @param int $courseid
-     * @return int
+     * @return array
      * @throws dml_exception
      * @throws moodle_exception
      */

@@ -79,6 +79,11 @@ class get_id_instance_certificate_external extends external_api {
 
     /**
      * get_id_instance_certificate
+     * @param int $userid
+     * @param string $userfield     
+     * @param string $lang
+     * @return string[]
+     * @throws coding_exception
      * @throws invalid_parameter_exception
      * @throws dml_exception
      */

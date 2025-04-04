@@ -151,7 +151,7 @@ class profile_my_certificates_table extends table_sql {
     /**
      * See courses
      * @param stdClass $row
-     * @return mixed
+     * @return string
      * @throws moodle_exception
      */
     final public function col_seecourses(stdClass $row): string {
@@ -225,6 +225,7 @@ class profile_my_certificates_table extends table_sql {
      *
      * @param int $pagesize size of page for paginated displayed table.
      * @param bool $useinitialsbar do you want to use the initials bar?
+     * @return void
      * @throws dml_exception
      */
     public function query_db($pagesize, $useinitialsbar = true): void {

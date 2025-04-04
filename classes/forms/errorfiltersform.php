@@ -53,12 +53,12 @@ class errorfiltersform extends moodleform {
 
         // User fullname.
         $mform->addElement('text', 'userfullname', get_string('fullnameuser'));
-        $mform->setType('userfullname', PARAM_RAW);
+        $mform->setType('userfullname', PARAM_TEXT);
         $mform->setDefault('userfullname', $customdata['userfullname']);
 
         // Model name.
         $mform->addElement('text', 'modelname', get_string('model', 'mod_certifygen'));
-        $mform->setType('modelname', PARAM_RAW);
+        $mform->setType('modelname', PARAM_ALPHANUMEXT);
         $mform->setDefault('userfmodelnameullname', $customdata['modelname']);
 
         $this->add_action_buttons(false, get_string('filter', 'mod_certifygen'));

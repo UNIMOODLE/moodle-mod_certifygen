@@ -60,6 +60,7 @@ class getmodellisttable_external extends external_api {
 
     /**
      * Get model list table
+     * @return array
      * @throws dml_exception
      * @throws invalid_parameter_exception
      * @throws required_capability_exception

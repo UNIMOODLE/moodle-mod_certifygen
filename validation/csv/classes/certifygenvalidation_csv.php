@@ -121,7 +121,7 @@ class certifygenvalidation_csv implements ICertificateValidation {
                     'message' => $codeerror . ' - ' . $descerror,
                 ];
             }
-            // Se obtiene idExpediente.
+            // File id is obtained.
             $idexpediente = (string) $iniciarprocesofirmaresponsechildren->idExpediente;
             $validationid = $file->get_validationid();
             $token = str_replace('.pdf', '', $file->get_file()->get_filename());
@@ -496,9 +496,9 @@ xmlns:fir="http://firma.ws.producto.com/">
     /**
      * Param for revoke
      * @param string $code
-     * @return string
+     * @return array
      */
-    private function create_params_revoke(string $code): string {
+    private function create_params_revoke(string $code) {
         return '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" 
 xmlns:fir="http://firma.ws.producto.com/">
    <soapenv:Header/>
@@ -695,7 +695,7 @@ xmlns:fir="http://firma.ws.producto.com/">
                 debugging(__FUNCTION__ . '  moodle_exception error: ' . $descerror);
                 throw new moodle_exception('getstatuserror', 'certifygenvalidation_csv', '', null, $codeerror . ' - ' . $descerror);
             }
-            // Se obtiene idExpediente.
+            // File id is obtained.
             $peticiones = $iniciarprocesofirmaresponsechildren->peticiones;
             $estado = '';
             foreach ($peticiones as $peticion) {

@@ -51,7 +51,7 @@ class certifygenrepository_localrepository implements ICertificateRepository {
     /**
      * getFile
      * @param certifygen_validations $validation
-     * @return string
+     * @return stored_file
      * @throws coding_exception
      * @throws dml_exception
      */
