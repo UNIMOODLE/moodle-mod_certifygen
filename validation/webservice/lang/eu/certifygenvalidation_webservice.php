@@ -34,10 +34,16 @@ $string['pluginname'] = 'WEBSERVICE Balioztapena';
 $string['enable'] = 'Gaitu';
 $string['enable_help'] = 'Plugin hau gaituta dagoenean, Unimoodle ziurtagiriak web zerbitzuak erabiliz balioztatzeko erabil dezakezu';
 $string['certifygenvalidation_webservice_settings'] = 'WEBSERVICE Konfigurazioa';
+$string['certificate_not_emited'] = 'Ziurtagiria ez da jaulki';
 $string['webservicenotconfigured'] = 'Certifygen WEBSERVICE ez dago konfiguraturik';
 $string['pluginnamesettings'] = 'WEBSERVICE Balioztapenaren Konfigurazioa';
 $string['privacy:metadata'] = 'WEBSERVICE Balioztapen pluginak ez du datu pertsonalik gordetzen.';
 $string['inprogress_msg'] = 'Jarraitzea ahalbidetzeko, zure unibertsitateko administrazio bulegora joan.';
+$string['request_not_found'] = 'Request not found';
+$string['request_status_not_accepted'] = 'Egoera onartua ez dago';
+$string['repositoryplugin_not_accepted'] = 'Biltegi plugina onartu ez da';
+$string['teacherrequest_pdf_error'] = 'There was a problem getting certificate';
+$string['validationplugin_not_accepted'] = 'Balioztapen plugina onartu ez da';
 $string['wsoutput'] = 'Web Zerbitzuaren irteera';
 $string['wsoutput_help'] = 'Egia bada, baliozkotze-mota honekin lotutako certifygen jarduerak irteeraren parte izango dira
 get_id_instance_certificate_external ws. Egia bada, irakasleak baliozkotze mota hau duten ereduekin egindako eskaerak parte izango dira

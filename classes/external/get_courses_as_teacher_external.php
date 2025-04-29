@@ -149,7 +149,11 @@ class get_courses_as_teacher_external extends external_api {
                 $models = certifygen_context::get_course_context_modelids($enrolment->ctxinstance);
                 $coursemodels = [];
                 foreach ($models as $modelid) {
-                    $model = new certifygen_model($modelid);
+                    try {
+                        $model = new certifygen_model($modelid);
+                    } catch (moodle_exception $e) {
+                        continue;
+                    }
                     if ($model->get('type') == certifygen_model::TYPE_ACTIVITY) {
                         continue;
                     }
@@ -219,7 +223,7 @@ class get_courses_as_teacher_external extends external_api {
                                     [
                                                     'id' => new external_value(
                                                         PARAM_INT,
-                                                        'Instance id',
+                                                        'Model id',
                                                         VALUE_OPTIONAL
                                                     ),
                                                     'idnumber' => new external_value(

@@ -13,26 +13,40 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU".
+//
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
- *
- * @package   certifygenvalidation_webservice
+ * Implementation of the privacy subsystem plugin provider for the certifygen certifygenrepository_url subplugin.
+ * @package    certifygenrepository_url
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// This line protects the file from being accessed by a URL directly.
-defined('MOODLE_INTERNAL') || die();
+namespace certifygenrepository_url\privacy;
 
-$plugin->version   = 2025042800;
-$plugin->requires  = 2022112802;
-$plugin->component = 'certifygenvalidation_webservice';
-$plugin->dependencies = [
-    'mod_certifygen' => 2024042919,
-];
+use core_privacy\local\metadata\null_provider;
+/**
+ * Implementation of the privacy subsystem plugin provider for the certifygen certifygenrepository_url subplugin.
+ * @package    certifygenrepository_url
+ * @copyright  2024 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     3IPUNT <contacte@tresipunt.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class provider implements null_provider {
+    /**
+     * Get reason
+     * @return string
+     */
+    public static function get_reason(): string {
+        return 'privacy:metadata';
+    }
+}

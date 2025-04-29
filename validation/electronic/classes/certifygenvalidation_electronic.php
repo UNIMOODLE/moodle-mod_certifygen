@@ -323,4 +323,20 @@ class certifygenvalidation_electronic implements ICertificateValidation {
     public function is_visible_in_ws(): bool {
         return (int)get_config('certifygenvalidation_electronic', 'wsoutput');
     }
+
+    /**
+     * If true, students and teachers can emit from the platfomr the certificate
+     *
+     * @return bool
+     */
+    public function show_emit_button(): bool {
+        return true;
+    }
+    /**
+     * get_consistent_validation_plugins
+     * @return array
+     */
+    public function get_consistent_repository_plugins(): array {
+        return [];
+    }
 }

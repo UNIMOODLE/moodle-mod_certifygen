@@ -63,6 +63,35 @@ class mod_certifygen_generator extends testing_module_generator {
     }
 
     /**
+     * This model is only for ws+url
+     * @param int $type
+     * @param int $mode
+     * @param int $templateid
+     * @param string $report
+     * @return certifygen_model
+     * @throws coding_exception
+     * @throws invalid_persistent_exception
+     * @throws moodle_exception
+     */
+    public function create_model_for_ws(int $type, int $mode, int $templateid, string $report = '') {
+
+        $data = [
+            'name' => 'Modelo 1',
+            'idnumber' => '',
+            'type' => $type,
+            'mode' => $mode,
+            'templateid' => $templateid,
+            'timeondemmand' => 0,
+            'langs' => 'en',
+            'validation' => 'certifygenvalidation_webservice',
+            'report' => $report,
+            'repository' => 'certifygenrepository_url',
+        ];
+        $model = new certifygen_model(0, (object)$data);
+        return $model->create();
+    }
+
+    /**
      * create_model_by_name
      * @param string $name
      * @param int $templateid

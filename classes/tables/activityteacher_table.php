@@ -76,6 +76,8 @@ class activityteacher_table extends table_sql {
     private string $langstring;
     /** @var bool $canrevoke */
     private bool $canrevoke;
+    /** @var bool $showemitbutton */
+    private bool $showemitbutton;
     /** @var array $statusmessages */
     private array $statusmessages;
 
@@ -114,6 +116,8 @@ class activityteacher_table extends table_sql {
         ) {
             $this->canrevoke = $subplugin->can_revoke($course->id);
         }
+        // Show emit button.
+        $this->showemitbutton = $subplugin->show_emit_button() ? true : false;
         // Messages.
         $this->statusmessages = $subplugin->get_status_messages();
         // Define the titles of columns to show in header.
@@ -269,7 +273,9 @@ class activityteacher_table extends table_sql {
         ) {
             return '';
         }
-
+        if (!$this->showemitbutton) {
+            return '';
+        }
         $status = $row->cstatus;
         $id = $row->validationid;
         if (is_null($row->cstatus)) {

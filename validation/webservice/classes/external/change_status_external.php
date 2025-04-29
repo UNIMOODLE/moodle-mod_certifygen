@@ -47,6 +47,7 @@ use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
 use mod_certifygen\persistents\certifygen_model;
+use mod_certifygen\persistents\certifygen_repository;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 
@@ -70,6 +71,7 @@ class change_status_external extends external_api {
                 'userid' => new external_value(PARAM_INT, 'user id'),
                 'userfield' => new external_value(PARAM_RAW, 'user field'),
                 'requestid' => new external_value(PARAM_INT, 'instance id'),
+                'url' => new external_value(PARAM_URL, 'certificate url'),
             ]
         );
     }
@@ -83,10 +85,11 @@ class change_status_external extends external_api {
      * @throws coding_exception
      * @throws invalid_parameter_exception
      */
-    public static function change_status(int $userid, string $userfield, int $requestid): array {
+    public static function change_status(int $userid, string $userfield, int $requestid, string $url): array {
+        global $USER;
         $params = self::validate_parameters(
             self::change_status_parameters(),
-            ['userid' => $userid, 'userfield' => $userfield, 'requestid' => $requestid]
+            ['userid' => $userid, 'userfield' => $userfield, 'requestid' => $requestid, 'url' => $url]
         );
         try {
             $context = context_system::instance();
@@ -126,15 +129,32 @@ class change_status_external extends external_api {
                 return $results;
             }
             // Request status.
-            if ($request->get('status') != certifygen_validations::STATUS_IN_PROGRESS) {
-                $results['error']['code'] = 'request_status_not_in_progress';
-                $results['error']['message'] = 'The status request is not in progress';
+            if ($request->get('status') != certifygen_validations::STATUS_VALIDATION_OK) {
+                $results['error']['code'] = 'request_status_not_accepted';
+                $results['error']['message'] = 'The status request is not accepted';
                 return $results;
             }
+            // Save certificate url.
+            $data  = [
+                'validationid' => $requestid,
+                'userid' => $userid,
+                'url' => $url,
+                //'usermodifed' => $USER->id,
+                //'data' => '',
+            ];
+            $rep = certifygen_repository::get_record([
+                    'validationid' => $requestid,
+                    'userid' => $userid
+            ]);
+            if (!$rep) {
+                $rep = new certifygen_repository(0, (object)$data);
+                $rep->save();
+            } else {
+                $rep->set('url', $url);
+                $rep->update();
+            }
             // Change status.
-            $ws = new certifygenvalidation_webservice();
-            $ws->save_file_moodledata($requestid);
-            $request->set('status', certifygen_validations::STATUS_VALIDATION_OK);
+            $request->set('status', certifygen_validations::STATUS_FINISHED);
             $request->save();
         } catch (moodle_exception $e) {
             return ['error' => [
@@ -145,7 +165,7 @@ class change_status_external extends external_api {
         }
         return [
             'requestid' => $params['requestid'],
-            'newstatus' => certifygen_validations::STATUS_VALIDATION_OK,
+            'newstatus' => certifygen_validations::STATUS_FINISHED,
             'newstatusdesc' => get_string('status_' . $request->get('status'), 'mod_certifygen'),
         ];
     }

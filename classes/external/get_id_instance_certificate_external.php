@@ -194,6 +194,7 @@ class get_id_instance_certificate_external extends external_api {
                     $instance['instance'] = [
                             'id' => $activity->get('id'),
                             'name' => $actvname,
+                            'modelid' => $model->get('id'),
                             'modelname' => $model->get('name'),
                             'modelidnumber' => $model->get('idnumber'),
                             'modelmode' => $model->get('mode'),
@@ -257,6 +258,11 @@ class get_id_instance_certificate_external extends external_api {
                                 'name' => new external_value(
                                     PARAM_RAW,
                                     'Instance name',
+                                    VALUE_OPTIONAL
+                                ),
+                                'modelid' => new external_value(
+                                    PARAM_INT,
+                                    'Model id',
                                     VALUE_OPTIONAL
                                 ),
                                 'modelname' => new external_value(

@@ -20,7 +20,7 @@
 
 /**
  *
- * @package   certifygenvalidation_webservice
+ * @package   certifygenrepository_url
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
@@ -30,9 +30,8 @@
 // This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2025042800;
-$plugin->requires  = 2022112802;
-$plugin->component = 'certifygenvalidation_webservice';
-$plugin->dependencies = [
-    'mod_certifygen' => 2024042919,
-];
+$string['pluginname'] = 'Certifygen Url Biltegia';
+$string['pluginnamesettings'] = 'Url Biltegiaren Konfigurazioa';
+$string['enable'] = 'Gaitu';
+$string['enable_help'] = 'Biltegi honek moodledata-n gordetzen ditu ziurtagiriak.';
+$string['privacy:metadata'] = 'Certifygen Lokala Biltegi pluginak ez du datu pertsonalik gordetzen.';

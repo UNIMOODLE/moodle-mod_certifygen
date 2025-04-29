@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+//
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
@@ -20,7 +21,7 @@
 
 /**
  *
- * @package   certifygenvalidation_webservice
+ * @package    certifygenrepository_url
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
@@ -30,9 +31,9 @@
 // This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2025042800;
+$plugin->version   = 2025040400;
 $plugin->requires  = 2022112802;
-$plugin->component = 'certifygenvalidation_webservice';
+$plugin->component = 'certifygenrepository_url';
 $plugin->dependencies = [
     'mod_certifygen' => 2024042919,
 ];

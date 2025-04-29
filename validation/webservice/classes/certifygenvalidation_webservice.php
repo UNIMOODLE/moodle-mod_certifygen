@@ -62,6 +62,7 @@ class certifygenvalidation_webservice implements ICertificateValidation {
             return [
                 'haserror' => false,
                 'message' => get_string('ok', 'mod_certifygen'),
+                'newfile' => $file->get_file(),
             ];
         } catch (moodle_exception $e) {
             return [
@@ -145,7 +146,7 @@ class certifygenvalidation_webservice implements ICertificateValidation {
      * @return bool
      */
     public function check_status(): bool {
-        return true;
+        return false;
     }
 
     /**
@@ -163,7 +164,7 @@ class certifygenvalidation_webservice implements ICertificateValidation {
      * @return bool
      */
     public function checkfile(): bool {
-        return true;
+        return false;
     }
 
     /**
@@ -228,5 +229,22 @@ class certifygenvalidation_webservice implements ICertificateValidation {
      */
     public function is_visible_in_ws(): bool {
         return (int)get_config('certifygenvalidation_webservice', 'wsoutput');
+    }
+
+    /**
+     * If true, students and teachers can emit from the platfomr the certificate
+     *
+     * @return bool
+     */
+    public function show_emit_button(): bool {
+        return false;
+    }
+
+    /**
+     * get_consistent_validation_plugins
+     * @return array
+     */
+    public function get_consistent_repository_plugins(): array {
+        return ['certifygenrepository_url'];
     }
 }

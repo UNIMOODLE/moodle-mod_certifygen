@@ -167,6 +167,14 @@ class profile_my_certificates_table extends table_sql {
      * @throws coding_exception
      */
     final public function col_emit(stdClass $row): string {
+        // Can be emitted by validationplugin.
+        $validationplugin = $row->validation;
+        $validationpluginclass = $validationplugin . '\\' . $validationplugin;
+        /** @var ICertificateValidation $subplugin */
+        $subplugin = new $validationpluginclass();
+        if (!$subplugin->show_emit_button()) {
+            return '';
+        }
         // Check if the certificate can be emitted.
         if (!certifygen::can_be_issued($row->id)) {
             return '';

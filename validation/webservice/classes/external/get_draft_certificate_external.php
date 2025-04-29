@@ -22,14 +22,14 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos..
 
 /**
- * WS get draft certificate
- * @package    mod_certifygen
+ * WS Get pdf certificate
+ * @package    certifygenvalidation_webservice
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace mod_certifygen\external;
+namespace certifygenvalidation_webservice\external;
 use context_course;
 use context_system;
 use dml_exception;
@@ -43,7 +43,6 @@ use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-use mod_certifygen\template;
 use moodle_exception;
 use required_capability_exception;
 
@@ -54,7 +53,7 @@ require_once($CFG->dirroot . '/user/lib.php');
 require_once($CFG->dirroot . '/mod/certifygen/lib.php');
 /**
  * Get studetns certificate (issue it if it is not already created)
- * @package    mod_certifygen
+ * @package    certifygenvalidation_webservice
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
@@ -73,7 +72,6 @@ class get_draft_certificate_external extends external_api {
                 'userfield' => new external_value(PARAM_RAW, 'user field'),
                 'idinstance' => new external_value(PARAM_INT, 'instance id'),
                 'lang' => new external_value(PARAM_LANG, 'lang'),
-                'customfields' => new external_value(PARAM_RAW, 'customfields'),
             ]
         );
     }
@@ -84,7 +82,6 @@ class get_draft_certificate_external extends external_api {
      * @param string $userfield
      * @param int $idinstance
      * @param string $lang
-     * @param string $customfields
      * @return array
      * @throws dml_exception
      * @throws invalid_parameter_exception
@@ -94,14 +91,12 @@ class get_draft_certificate_external extends external_api {
         int $userid,
         string $userfield,
         int $idinstance,
-        string $lang,
-        string $customfields
+        string $lang
     ): array {
 
         $params = self::validate_parameters(
             self::get_draft_certificate_parameters(),
-            ['userid' => $userid, 'userfield' => $userfield, 'idinstance' => $idinstance, 'lang' => $lang,
-                'customfields' => $customfields]
+            ['userid' => $userid, 'userfield' => $userfield, 'idinstance' => $idinstance, 'lang' => $lang]
         );
         $context = context_system::instance();
         require_capability('mod/certifygen:manage', $context);
@@ -137,16 +132,74 @@ class get_draft_certificate_external extends external_api {
 
             // Model info.
             $model = new certifygen_model(certifygen::get_modelid_from_certifygenid($params['idinstance']));
-            $template = template::instance($model->get('templateid'), (object) ['lang' => $lang]);
-            $pdfcontent = $template->generate_pdf(true, (object)['userid' => $userid], true);
-            $filecontent = base64_encode($pdfcontent);
+            if ($model->get('validation') != 'certifygenvalidation_webservice') {
+                $result['result'] = false;
+                $result['message'] = get_string('validationplugin_not_accepted', 'certifygenvalidation_webservice');
+                return $result;
+            }
+            if ($model->get('repository') != 'certifygenrepository_url') {
+                $result['result'] = false;
+                $result['message'] = get_string('repositoryplugin_not_accepted', 'certifygenvalidation_webservice');
+                return $result;
+            }
+            // Check if lang exists on model configuration.
+            $validlangs = explode(',', $model->get('langs'));
+            if (!in_array($lang, $validlangs)) {
+                $result['result'] = false;
+                unset($result['id']);
+                unset($result['message']);
+                $result['error']['code'] = 'invalid_language';
+                $result['error']['message'] = get_string('invalid_language', 'mod_certifygen');
+                return $result;
+            }
+            // Already emtited?
+            $validation = certifygen_validations::get_validation_by_lang_and_instance($lang, $idinstance, $userid);
+            if (is_null($validation)) {
+                $result['error']['code'] = 'certificate_not_emited';
+                $result['error']['message'] = get_string('certificate_not_emited', 'certifygenvalidation_webservice');
+                return $result;
+            }
+            // Check status.
+            if ((int)$validation->get('status') === certifygen_validations::STATUS_IN_PROGRESS) {
+                // Get file.
+                $code = certifygen_validations::get_certificate_code($validation);
+                $code .= '.pdf';
+                $itemid = (int) $validation->get('id');
+                $fs = get_file_storage();
+                $file = $fs->get_file(
+                    $context->id,
+                    ICertificateValidation::FILE_COMPONENT,
+                    ICertificateValidation::FILE_AREA,
+                    $itemid,
+                    ICertificateValidation::FILE_PATH,
+                    $code
+                );
+                if (!$file) {
+                    $result['error']['code'] = 'file_not_found';
+                    $result['error']['message'] = get_string('file_not_found', 'mod_certifygen');
+                    return $result;
+                }
+                $filecontent = base64_encode($file->get_content());
+                $validation->set('status', certifygen_validations::STATUS_VALIDATION_OK);
+                $validation->update();
+            } else {
+                $result['error']['code'] = 'status_not_inprogress';
+                $result['error']['message'] = get_string('statusnotinprof', 'mod_certifygen');
+                return $result;
+            }
         } catch (moodle_exception $e) {
+            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $result['error']['code'] = $e->errorcode;
             $result['error']['message'] = $e->getMessage();
             return $result;
         }
         $certificate = [
-            'file' => $filecontent,
+                'validationid' => $validation->get('id'),
+                'status' => $validation->get('status'),
+                'statusstr' => get_string('status_' . $validation->get('status'), 'mod_certifygen'),
+                'file' => $filecontent,
+                'reporttype' => $model->get('type'),
+                'reporttypestr' => get_string('type_' . $model->get('type'), 'mod_certifygen'),
         ];
 
         return ['certificate' => $certificate];
@@ -160,7 +213,12 @@ class get_draft_certificate_external extends external_api {
         return new external_single_structure([
                 'certificate' => new external_single_structure(
                     [
+                        'validationid'   => new external_value(PARAM_INT, 'Valiation id'),
+                        'status'   => new external_value(PARAM_INT, 'Teacher request status'),
+                        'statusstr'   => new external_value(PARAM_RAW, 'Teacher request status'),
                         'file' => new external_value(PARAM_RAW, 'certificate'),
+                        'reporttype' => new external_value(PARAM_INT, 'report type'),
+                        'reporttypestr' => new external_value(PARAM_RAW, 'report type'),
                     ],
                     'Certificate info',
                     VALUE_OPTIONAL

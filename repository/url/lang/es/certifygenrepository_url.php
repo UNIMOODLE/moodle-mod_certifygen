@@ -20,7 +20,7 @@
 
 /**
  *
- * @package   certifygenvalidation_webservice
+ * @package   certifygenrepository_url
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
@@ -30,9 +30,8 @@
 // This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2025042800;
-$plugin->requires  = 2022112802;
-$plugin->component = 'certifygenvalidation_webservice';
-$plugin->dependencies = [
-    'mod_certifygen' => 2024042919,
-];
+$string['pluginname'] = 'Certifygen Repositorio Url';
+$string['pluginnamesettings'] = 'Configuración del Repositorio Url';
+$string['enable'] = 'Habilitar';
+$string['enable_help'] = 'Este repositorio guarda en el moodledata los certificados.';
+$string['privacy:metadata'] = 'El plugin Certifygen Repositorio Local no almacena datos personales.';

@@ -29,6 +29,10 @@
  */
 
 use certifygenvalidation_webservice\external\change_status_external;
+use certifygenvalidation_webservice\external\start_student_certificate_external;
+use certifygenvalidation_webservice\external\get_draft_certificate_external;
+use certifygenvalidation_webservice\external\get_draft_teacher_certificate_external;
+use certifygenvalidation_webservice\external\start_teacher_certificate_external;
 use certifygenvalidation_webservice\external\get_user_requests_external;
 
 defined('MOODLE_INTERNAL') || die();
@@ -41,19 +45,45 @@ $functions = [
         'type' => 'read',
         'capabilities' => 'mod/certifygen:manage',
     ],
-    'certifygenvalidation_webservice_get_user_requests' => [
-        'classname' => get_user_requests_external::class,
-        'methodname' => 'get_user_requests',
-        'description' => 'get_user_requests',
+    'certifygenvalidation_webservice_get_draft_certificate' => [
+        'classname' => get_draft_certificate_external::class,
+        'methodname' => 'get_draft_certificate',
+        'description' => 'get_draft_certificate',
         'type' => 'read',
         'capabilities' => 'mod/certifygen:manage',
+    ],
+    'certifygenvalidation_webservice_get_draft_teacher_certificate' => [
+        'classname' => get_draft_teacher_certificate_external::class,
+        'methodname' => 'get_draft_teacher_certificate',
+        'description' => 'get_draft_teacher_certificate',
+        'type' => 'read',
+        'capabilities' => 'mod/certifygen:manage',
+    ],
+    'certifygenvalidation_webservice_start_student_certificate' => [
+        'classname' => start_student_certificate_external::class,
+        'methodname' => 'start_student_certificate',
+        'description' => 'Starts process to issue student certificate',
+        'type' => 'write',
+        'capabilities' => 'mod/certifygen:view',
+        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
+    'certifygenvalidation_webservice_start_teacher_certificate' => [
+        'classname' => start_teacher_certificate_external::class,
+        'methodname' => 'start_teacher_certificate',
+        'description' => 'Starts process to issue teacher certificate',
+        'type' => 'write',
+        'capabilities' => 'mod/certifygen:manage',
+        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
 ];
 $services = [
     'Unimoodle Certifygen - WS Validation' => [
         'functions' => [
             'certifygenvalidation_webservice_change_status',
-            'certifygenvalidation_webservice_get_user_requests',
+            'certifygenvalidation_webservice_get_draft_teacher_certificate',
+            'certifygenvalidation_webservice_get_draft_certificate',
+            'certifygenvalidation_webservice_start_student_certificate',
+            'certifygenvalidation_webservice_start_teacher_certificate',
         ],
     ],
 ];

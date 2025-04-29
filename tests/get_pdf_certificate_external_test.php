@@ -33,13 +33,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_certifygen;
-use certifygenvalidation_webservice\external\change_status_external;
 use core\invalid_persistent_exception;
 use mod_certifygen\external\emitcertificate_external;
 use mod_certifygen\external\get_pdf_certificate_external;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-use mod_certifygen\task\checkfile;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -70,7 +68,7 @@ class get_pdf_certificate_external_test extends \advanced_testcase {
      * @throws \dml_exception
      * @throws \invalid_parameter_exception
      * @throws \required_capability_exception
-     * @covers \mod_certifygen\external\get_pdf_certificate_external::get_pdf_certificate
+     * @covers \mod_certifygen\external\get_pdf_certificate_external
      */
     public function test_1(): void {
         global $DB;
@@ -150,7 +148,7 @@ class get_pdf_certificate_external_test extends \advanced_testcase {
      * @throws \moodle_exception
      * @throws \required_capability_exception
      * @throws invalid_persistent_exception
-     * @covers \mod_certifygen\external\get_pdf_certificate_external::get_pdf_certificate
+     * @covers \mod_certifygen\external\get_pdf_certificate_external
      */
     public function test_2(): void {
         global $DB;
@@ -242,7 +240,7 @@ class get_pdf_certificate_external_test extends \advanced_testcase {
      * @throws \dml_exception
      * @throws \invalid_parameter_exception
      * @throws \required_capability_exception
-     * @covers \mod_certifygen\external\get_pdf_certificate_external::get_pdf_certificate
+     * @covers \mod_certifygen\external\get_pdf_certificate_external
      */
     public function test_3(): void {
         global $DB;
@@ -274,7 +272,7 @@ class get_pdf_certificate_external_test extends \advanced_testcase {
         $student = $this->getDataGenerator()->create_user(
             ['username' => 'test_student_1', 'firstname' => 'test',
             'lastname' => 'student 1', 'email' => 'test_student_1@fake.es',
-                    'profile_field_DNI' => $dni]
+                    'idnumber' => $dni]
         );
         // Create courses.
         $course1 = self::getDataGenerator()->create_course();
@@ -338,7 +336,7 @@ class get_pdf_certificate_external_test extends \advanced_testcase {
      * @throws \dml_exception
      * @throws \invalid_parameter_exception
      * @throws \required_capability_exception
-     * @covers \mod_certifygen\external\get_pdf_certificate_external::get_pdf_certificate
+     * @covers \mod_certifygen\external\get_pdf_certificate_external
      */
     public function test_4(): void {
         global $DB;
@@ -419,7 +417,7 @@ class get_pdf_certificate_external_test extends \advanced_testcase {
      * @throws \dml_exception
      * @throws \invalid_parameter_exception
      * @throws \required_capability_exception
-     * @covers \mod_certifygen\external\get_pdf_certificate_external::get_pdf_certificate
+     * @covers \mod_certifygen\external\get_pdf_certificate_external
      */
     public function test_5(): void {
         global $DB;
@@ -480,210 +478,6 @@ class get_pdf_certificate_external_test extends \advanced_testcase {
         );
         $validation = certifygen_validations::get_record($data);
         $this->assertIsArray($result);
-        $this->assertArrayHasKey('certificate', $result);
-        $this->assertArrayHasKey('validationid', $result['certificate']);
-        $this->assertArrayHasKey('status', $result['certificate']);
-        $this->assertArrayHasKey('statusstr', $result['certificate']);
-        $this->assertArrayHasKey('file', $result['certificate']);
-        $this->assertArrayHasKey('reporttype', $result['certificate']);
-        $this->assertArrayHasKey('reporttypestr', $result['certificate']);
-
-        $this->assertEquals($validation->get('id'), $result['certificate']['validationid']);
-        $this->assertEquals($validation->get('status'), $result['certificate']['status']);
-        $this->assertEquals(certifygen_model::TYPE_ACTIVITY, $result['certificate']['reporttype']);
-    }
-
-    /**
-     * Test 6: ws error
-     *
-     * @return void
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \invalid_parameter_exception
-     * @throws \moodle_exception
-     * @throws \required_capability_exception
-     * @throws invalid_persistent_exception
-     * @covers \mod_certifygen\external\get_pdf_certificate_external::get_pdf_certificate
-     */
-    public function test_6(): void {
-        global $DB;
-        // Create template.
-        $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
-        $certificate1 = $templategenerator->create_template((object)['name' => 'Certificate 1']);
-        $templategenerator->create_page($certificate1)->get_id();
-
-        // Create model.
-        set_config('enabled', 1, 'certifygenvalidation_webservice');
-        set_config('enabled', 1, 'certifygenrepository_localrepository');
-        $modgenerator = $this->getDataGenerator()->get_plugin_generator('mod_certifygen');
-        $model = $modgenerator->create_model(
-            certifygen_model::TYPE_ACTIVITY,
-            certifygen_model::MODE_UNIQUE,
-            $certificate1->get_id(),
-            'certifygenvalidation_webservice',
-            '',
-        );
-        $langs = $model->get('langs');
-        $langs = explode(',', $langs);
-        $lang = $langs[0];
-
-        // Create course.
-        $course = self::getDataGenerator()->create_course();
-
-        // Create mod_certifygen module.
-        $datamodule = [
-                'name' => 'Test 1,',
-                'course' => $course->id,
-                'modelid' => $model->get('id'),
-        ];
-        $modcertifygen = self::getDataGenerator()->create_module('certifygen', $datamodule);
-        $cm = get_coursemodule_from_instance('certifygen', $modcertifygen->id, $course->id, false, MUST_EXIST);
-
-        // Create users.
-        $student = $this->getDataGenerator()->create_user([
-                'username' => 'test_user_1',
-                'firstname' => 'test',
-                'lastname' => 'user 1',
-                'email' => 'test_user_1@fake.es',
-        ]);
-
-        // Enrol into the course as student.
-        self::getDataGenerator()->enrol_user($student->id, $course->id, 'student');
-
-        // Login as student.
-        $this->setUser($student);
-
-        $data = [
-                'userid' => $student->id,
-                'certifygenid' => $modcertifygen->id,
-        ];
-        $validation = certifygen_validations::get_record($data);
-        self::assertFalse($validation);
-        emitcertificate_external::emitcertificate(0, $cm->instance, $model->get('id'), $lang, $student->id, $course->id);
-
-        // Obtenemos el pdf.
-        $manager = $this->getDataGenerator()->create_user();
-        $managerrole = $DB->get_record('role', ['shortname' => 'manager']);
-        $this->getDataGenerator()->role_assign($managerrole->id, $manager->id);
-        $this->setUser($manager);
-        $result = get_pdf_certificate_external::get_pdf_certificate(
-            $student->id,
-            '',
-            $modcertifygen->id,
-            $lang,
-            '',
-        );
-        // Tests.
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('error', $result);
-        $this->assertArrayHasKey('message', $result['error']);
-        $this->assertArrayHasKey('code', $result['error']);
-        $this->assertEquals(get_string('statusnotfinished', 'mod_certifygen'), $result['error']['message']);
-        $this->assertEquals('status_not_finished', $result['error']['code']);
-    }
-
-    /**
-     * Test 7: ws ok
-     *
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \invalid_parameter_exception
-     * @throws \moodle_exception
-     * @throws \required_capability_exception
-     * @throws invalid_persistent_exception
-     * @covers \mod_certifygen\external\get_pdf_certificate_external::get_pdf_certificate
-     */
-    public function test_7(): void {
-        global $DB;
-        // Create template.
-        $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
-        $certificate1 = $templategenerator->create_template((object)['name' => 'Certificate 1']);
-        $templategenerator->create_page($certificate1)->get_id();
-
-        // Create model.
-        set_config('enabled', 1, 'certifygenvalidation_webservice');
-        set_config('enabled', 1, 'certifygenrepository_localrepository');
-        $modgenerator = $this->getDataGenerator()->get_plugin_generator('mod_certifygen');
-        $model = $modgenerator->create_model(
-            certifygen_model::TYPE_ACTIVITY,
-            certifygen_model::MODE_UNIQUE,
-            $certificate1->get_id(),
-            'certifygenvalidation_webservice',
-            '',
-        );
-        $langs = $model->get('langs');
-        $langs = explode(',', $langs);
-        $lang = $langs[0];
-
-        // Create course.
-        $course = self::getDataGenerator()->create_course();
-
-        // Create mod_certifygen module.
-        $datamodule = [
-                'name' => 'Test 1,',
-                'course' => $course->id,
-                'modelid' => $model->get('id'),
-        ];
-        $modcertifygen = self::getDataGenerator()->create_module('certifygen', $datamodule);
-        $cm = get_coursemodule_from_instance('certifygen', $modcertifygen->id, $course->id, false, MUST_EXIST);
-
-        // Create users.
-        $student = $this->getDataGenerator()->create_user([
-                'username' => 'test_user_1',
-                'firstname' => 'test',
-                'lastname' => 'user 1',
-                'email' => 'test_user_1@fake.es',
-        ]);
-
-        // Enrol into the course as student.
-        self::getDataGenerator()->enrol_user($student->id, $course->id, 'student');
-
-        // Login as student.
-        $this->setUser($student);
-
-        $data = [
-                'userid' => $student->id,
-                'certifygenid' => $modcertifygen->id,
-        ];
-        $validation = certifygen_validations::get_record($data);
-        self::assertFalse($validation);
-        emitcertificate_external::emitcertificate(0, $cm->instance, $model->get('id'), $lang, $student->id, $course->id);
-
-        // Change status.
-        $manager = $this->getDataGenerator()->create_user();
-        $managerrole = $DB->get_record('role', ['shortname' => 'manager']);
-        $this->getDataGenerator()->role_assign($managerrole->id, $manager->id);
-        $this->setUser($manager);
-        $validation = certifygen_validations::get_record($data);
-        change_status_external::change_status(
-            $student->id,
-            '',
-            $validation->get('id')
-        );
-        $validation = new certifygen_validations($validation->get('id'));
-        self::assertEquals(certifygen_validations::STATUS_VALIDATION_OK, (int)$validation->get('status'));
-
-        // Execute task.
-        $removaltask = new checkfile();
-        $removaltask->execute();
-
-        // Now validation record exists.
-        $validation = new certifygen_validations($validation->get('id'));
-        self::assertEquals(certifygen_validations::STATUS_FINISHED, (int)$validation->get('status'));
-
-        // Obtenemos el pdf.
-        $result = get_pdf_certificate_external::get_pdf_certificate(
-            $student->id,
-            '',
-            $modcertifygen->id,
-            $lang,
-            '',
-        );
-
-        $this->assertIsArray($result);
-
-        // Tests.
-        self::assertIsArray($result);
         $this->assertArrayHasKey('certificate', $result);
         $this->assertArrayHasKey('validationid', $result['certificate']);
         $this->assertArrayHasKey('status', $result['certificate']);

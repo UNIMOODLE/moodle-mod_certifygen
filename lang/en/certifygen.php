@@ -241,3 +241,5 @@ $string['configurated_logo'] = 'Configurated logo';
 $string['results'] = 'Results';
 $string['completiondownload'] = 'Completion by certificate download';
 $string['completiondownloaddesc'] = 'Participants must download a certificate to complete the activity.';
+$string['invalid_language'] = 'Invalid language';
+$string['validationnotvalidwithrepositoryplugin'] = 'El plugin de validación {$a->validation} no es compatible con el de repositorio {$a->repository}.';

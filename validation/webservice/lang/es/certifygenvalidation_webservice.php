@@ -34,10 +34,16 @@ $string['pluginname'] = 'Validación WEBSERVICE';
 $string['enable'] = 'Habilitar';
 $string['enable_help'] = 'Si este plugin está habilitado, puedes usarlo para validar Certificados Unimoodle a través de servicios web';
 $string['certifygenvalidation_webservice_settings'] = 'Configuración de WEBSERVICE';
+$string['certificate_not_emited'] = 'Certificado no emitido';
 $string['webservicenotconfigured'] = 'Certifygen WEBSERVICE no configurado';
 $string['pluginnamesettings'] = 'Configuración de Validación WEBSERVICE';
 $string['privacy:metadata'] = 'El plugin de Validación WEBSERVICE no almacena ningún dato personal.';
 $string['inprogress_msg'] = 'Accede a la secretaría de tu universidad para continuar con el proceso de validación del certificado.';
+$string['request_not_found'] = 'Petición no encontrada';
+$string['request_status_not_accepted'] = 'Estado no permitido';
+$string['repositoryplugin_not_accepted'] = 'Plugin de repositorio no aceptado';
+$string['teacherrequest_pdf_error'] = 'There was a problem getting certificate';
+$string['validationplugin_not_accepted'] = 'Plugin de validación no aceptado';
 $string['wsoutput'] = 'Salida del Servicio Web';
 $string['wsoutput_help'] = 'Si es verdadero, las actividades de certifygen relacionadas con este tipo de validación serán parte de la salida del ws
 get_id_instance_certificate_external. Si es verdadero, las solicitudes de los profesores con modelos con este tipo de validación serán parte de la

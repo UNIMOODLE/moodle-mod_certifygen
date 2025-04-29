@@ -33,13 +33,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_certifygen;
-use certifygenvalidation_webservice\external\change_status_external;
+
 use core\invalid_persistent_exception;
 use mod_certifygen\external\downloadcertificate_external;
 use mod_certifygen\external\emitcertificate_external;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-use mod_certifygen\task\checkfile;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -240,114 +239,5 @@ class downloadcertificate_external_test extends \advanced_testcase {
         self::assertArrayHasKey('message', $result);
         self::assertFalse($result['result']);
         self::assertEquals(get_string('nopermissiontodownloadothercerts', 'mod_certifygen'), $result['message']);
-    }
-
-    /**
-     * Test: validation ws + localrepository.
-     *
-     * @return void
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \invalid_parameter_exception
-     * @throws \moodle_exception
-     * @throws invalid_persistent_exception
-     * @covers \mod_certifygen\external\downloadcertificate_external::downloadcertificate
-     */
-    public function test_downloadcertificate_3(): void {
-
-        // Create template.
-        $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
-        $certificate1 = $templategenerator->create_template((object)['name' => 'Certificate 1']);
-
-        // Create model.
-        set_config('enabled', 1, 'certifygenvalidation_webservice');
-        set_config('enabled', 1, 'certifygenreport_basic');
-        set_config('enabled', 1, 'certifygenrepository_localrepository');
-        $modgenerator = $this->getDataGenerator()->get_plugin_generator('mod_certifygen');
-        $model = $modgenerator->create_model(
-            certifygen_model::TYPE_ACTIVITY,
-            certifygen_model::MODE_UNIQUE,
-            $certificate1->get_id(),
-            'certifygenvalidation_webservice',
-            '',
-        );
-        $langs = $model->get('langs');
-        $langs = explode(',', $langs);
-        $lang = $langs[0];
-
-        // Create course.
-        $course = self::getDataGenerator()->create_course();
-
-        // Create mod_certifygen module.
-        $datamodule = [
-                'name' => 'Test 1,',
-                'course' => $course->id,
-                'modelid' => $model->get('id'),
-        ];
-        $modcertifygen = self::getDataGenerator()->create_module('certifygen', $datamodule);
-        $cm = get_coursemodule_from_instance('certifygen', $modcertifygen->id, $course->id, false, MUST_EXIST);
-
-        // Create users.
-        $student = $this->getDataGenerator()->create_user([
-                'username' => 'test_user_1',
-                'firstname' => 'test',
-                'lastname' => 'user 1',
-                'email' => 'test_user_1@fake.es',
-        ]);
-
-        // Enrol into the course as student.
-        self::getDataGenerator()->enrol_user($student->id, $course->id, 'student');
-
-        // Login as student.
-        $this->setUser($student);
-
-        $data = [
-                'userid' => $student->id,
-                'certifygenid' => $modcertifygen->id,
-        ];
-        $validation = certifygen_validations::get_record($data);
-        self::assertFalse($validation);
-        emitcertificate_external::emitcertificate(0, $cm->instance, $model->get('id'), $lang, $student->id, $course->id);
-
-        // Login as admin.
-        $this->setAdminUser();
-
-        // Change status.
-        $validation = certifygen_validations::get_record($data);
-        change_status_external::change_status(
-            $student->id,
-            '',
-            $validation->get('id')
-        );
-        $validation = new certifygen_validations($validation->get('id'));
-        self::assertEquals(certifygen_validations::STATUS_VALIDATION_OK, (int)$validation->get('status'));
-
-        // Execute task.
-        $removaltask = new checkfile();
-        $removaltask->execute();
-
-        $validation = new certifygen_validations($validation->get('id'));
-        self::assertEquals(certifygen_validations::STATUS_FINISHED, (int)$validation->get('status'));
-
-        // Now validation record exists.
-        $code = certifygen_validations::get_certificate_code($validation);
-        $localrepository = new \certifygenrepository_localrepository\certifygenrepository_localrepository();
-        $fileurl = $localrepository->get_file_url($validation);
-        $result = downloadcertificate_external::downloadcertificate(
-            $validation->get('id'),
-            $cm->instance,
-            $model->get('id'),
-            $code,
-            $course->id
-        );
-
-        // Tests.
-        self::assertIsArray($result);
-        self::assertArrayHasKey('result', $result);
-        self::assertArrayHasKey('url', $result);
-        self::assertArrayHasKey('message', $result);
-        self::assertTrue($result['result']);
-        self::assertEquals(get_string('ok', 'mod_certifygen'), $result['message']);
-        self::assertEquals($fileurl, $result['url']);
     }
 }

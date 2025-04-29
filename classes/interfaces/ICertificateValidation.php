@@ -115,4 +115,16 @@ interface ICertificateValidation {
      * @return bool
      */
     public function is_visible_in_ws(): bool;
+
+    /**
+     * If true, students and teachers can emit from the platfomr the certificate
+     * @return bool
+     */
+    public function show_emit_button(): bool;
+    /**
+     * Return the list of repository plugin names this validation plugin is valid with.
+     * Empty means all of them are valid.
+     * @return array
+     */
+    public function get_consistent_repository_plugins(): array;
 }

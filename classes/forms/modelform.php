@@ -43,6 +43,7 @@ use core_form\dynamic_form;
 use dml_exception;
 use html_writer;
 use mod_certifygen\interfaces\ICertificateRepository;
+use mod_certifygen\interfaces\ICertificateValidation;
 use mod_certifygen\persistents\certifygen_model;
 use moodle_exception;
 use moodle_url;
@@ -355,6 +356,21 @@ class modelform extends dynamic_form {
             $a->repository = get_string('pluginname', $repositoryplugin);
             $errors['repository'] = get_string(
                 'repositorynotvalidwithvalidationplugin',
+                'mod_certifygen',
+                $a
+            );
+        }
+        $validationplugins = $data['validation'];
+        $validationpluginclass = $validationplugins . '\\' . $validationplugins;
+        /** @var ICertificateValidation $subplugin */
+        $subplugin = new $validationpluginclass();
+        $validplugins = $subplugin->get_consistent_repository_plugins();
+        if (!empty($validplugins) && !in_array($data['repository'], $validplugins)) {
+            $a = new stdClass();
+            $a->validation = get_string('pluginname', $validationplugins);
+            $a->repository = get_string('pluginname', $data['repository']);
+            $errors['validation'] = get_string(
+                'validationnotvalidwithrepositoryplugin',
                 'mod_certifygen',
                 $a
             );

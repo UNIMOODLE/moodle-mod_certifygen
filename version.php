@@ -33,7 +33,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2025032601;
+$plugin->version = 2025040401;
 $plugin->requires = 2022112802;
 $plugin->component = 'mod_certifygen';
 $plugin->cron = 0;

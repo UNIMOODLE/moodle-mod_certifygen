@@ -64,7 +64,7 @@ class get_id_instance_certificate_external_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \invalid_parameter_exception
-     * @covers \mod_certifygen\external\get_draft_certificate_external::get_draft_certificate
+     * @covers \mod_certifygen\external\get_id_instance_certificate_external
      */
     public function test_get_id_instance_certificate_nopermission(): void {
 
@@ -105,7 +105,7 @@ class get_id_instance_certificate_external_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \invalid_parameter_exception
-     * @covers \mod_certifygen\external\get_draft_certificate_external::get_draft_certificate
+     * @covers \mod_certifygen\external\get_id_instance_certificate_external
      */
     public function test_get_id_instance_certificate(): void {
         global $DB;
@@ -213,7 +213,7 @@ class get_id_instance_certificate_external_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \invalid_parameter_exception
-     * @covers \mod_certifygen\external\get_draft_certificate_external::get_draft_certificate
+     * @covers \mod_certifygen\external\get_id_instance_certificate_external
      */
     public function test_get_id_instance_certificate_by_userfield(): void {
         global $DB;
@@ -342,7 +342,7 @@ class get_id_instance_certificate_external_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \invalid_parameter_exception
-     * @covers \mod_certifygen\external\get_draft_certificate_external::get_draft_certificate
+     * @covers \mod_certifygen\external\get_id_instance_certificate_external
      */
     public function test_get_id_instance_certificate_by_lang(): void {
         global $CFG, $DB;
@@ -477,7 +477,7 @@ class get_id_instance_certificate_external_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \invalid_parameter_exception
-     * @covers \mod_certifygen\external\get_draft_certificate_external::get_draft_certificate
+     * @covers \mod_certifygen\external\get_id_instance_certificate_external
      */
     public function test_get_id_instance_certificate_validation_not_checked(): void {
         global $DB;
