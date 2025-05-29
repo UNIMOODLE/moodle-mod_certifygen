@@ -112,14 +112,21 @@ class change_status_external extends external_api {
             $request = certifygen_validations::get_record(['id' => $requestid]);
             if (!$request) {
                 $results['error']['code'] = 'request_not_found';
-                $results['error']['message'] = 'Request not found';
+                $results['error']['message'] = get_string('request_not_found', 'certifygenvalidation_webservice');
                 return $results;
             }
             // Model must have ws validation.
             $model = new certifygen_model($request->get('modelid'));
             if ($model->get('validation') != 'certifygenvalidation_webservice') {
-                $results['error']['code'] = 'validation_not_ws';
-                $results['error']['message'] = 'validation subplugin is not webservice';
+                $results['error']['code'] = 'validationplugin_not_accepted';
+                $results['error']['message'] =
+                        get_string('validationplugin_not_accepted', 'certifygenvalidation_webservice');
+                return $results;
+            }
+            if ($model->get('repository') != 'certifygenrepository_url') {
+                $results['error']['code'] = 'repositoryplugin_not_accepted';
+                $results['error']['message'] =
+                        get_string('repositoryplugin_not_accepted', 'certifygenvalidation_webservice');
                 return $results;
             }
             // Request user.

@@ -199,6 +199,14 @@ class get_draft_teacher_certificate_external extends external_api {
             /** @var ICertificateReport $subplugin */
             $subplugin = new $reportpluginclass();
             $trequest = new certifygen_validations($id);
+            if ($trequest->get('status') != certifygen_validations::STATUS_IN_PROGRESS) {
+                $result['result'] = false;
+                unset($result['id']);
+                unset($result['message']);
+                $result['error']['code'] = 'request_status_not_accepted';
+                $result['error']['message'] = get_string('request_status_not_accepted', 'certifygenvalidation_webservice');
+                return $result;
+            }
             $result = $subplugin->create_file($trequest);
             if (get_class($result['file']) == 'stored_file') {
                 /** @var \stored_file $file */

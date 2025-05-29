@@ -41,6 +41,7 @@ $string['privacy:metadata'] = 'El complement de Validació WEBSERVICE no emmagat
 $string['inprogress_msg'] = 'Accedeix a l’administració de la teva universitat per continuar amb el procés de validació del certificat.';
 $string['request_not_found'] = 'Request not found';
 $string['request_status_not_accepted'] = 'Estat no permès';
+$string['request_user_not_matched'] = 'Aquesta no és la sol·licitud de l\'usuari';
 $string['repositoryplugin_not_accepted'] = 'Connector de repositori no acceptat';
 $string['teacherrequest_pdf_error'] = 'There was a problem getting certificate';
 $string['validationplugin_not_accepted'] = 'Connector de validació no acceptat';

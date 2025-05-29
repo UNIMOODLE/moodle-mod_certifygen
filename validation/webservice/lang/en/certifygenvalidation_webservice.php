@@ -41,6 +41,7 @@ $string['privacy:metadata'] = 'The WEBSERVICE Validation plugin does not store a
 $string['inprogress_msg'] = 'Access your university\'s administration office to continue with the certificate validation process.';
 $string['request_not_found'] = 'Request not found';
 $string['request_status_not_accepted'] = 'Status not accepted';
+$string['request_user_not_matched'] = 'This is not the user\'s request';
 $string['repositoryplugin_not_accepted'] = 'Repository plugin not accepted';
 $string['teacherrequest_pdf_error'] = 'There was a problem getting certificate';
 $string['validationplugin_not_accepted'] = 'Validation plugin not accepted';

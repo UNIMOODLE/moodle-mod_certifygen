@@ -313,19 +313,12 @@ class get_pdf_certificate_external_test extends \advanced_testcase {
             $lang,
             '',
         );
-        $validation = certifygen_validations::get_record($data);
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('certificate', $result);
-        $this->assertArrayHasKey('validationid', $result['certificate']);
-        $this->assertArrayHasKey('status', $result['certificate']);
-        $this->assertArrayHasKey('statusstr', $result['certificate']);
-        $this->assertArrayHasKey('file', $result['certificate']);
-        $this->assertArrayHasKey('reporttype', $result['certificate']);
-        $this->assertArrayHasKey('reporttypestr', $result['certificate']);
 
-        $this->assertEquals($validation->get('id'), $result['certificate']['validationid']);
-        $this->assertEquals($validation->get('status'), $result['certificate']['status']);
-        $this->assertEquals(certifygen_model::TYPE_ACTIVITY, $result['certificate']['reporttype']);
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('error', $result);
+        $this->assertArrayHasKey('code', $result['error']);
+        $this->assertArrayHasKey('message', $result['error']);
+        $this->assertEquals('user_not_found', $result['error']['code']);
     }
 
     /**

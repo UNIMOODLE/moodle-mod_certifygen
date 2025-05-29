@@ -39,11 +39,19 @@ class mod_certifygen_generator extends testing_module_generator {
      * @param int $templateid
      * @param string $validation
      * @param string $report
+     * @param string $repository
      * @return certifygen_model
      * @throws invalid_persistent_exception
      * @throws coding_exception|moodle_exception
      */
-    public function create_model(int $type, int $mode, int $templateid, string $validation, string $report) {
+    public function create_model(
+        int $type,
+        int $mode,
+        int $templateid,
+        string $validation,
+        string $report,
+        string $repository = 'certifygenrepository_localrepository'
+    ) {
 
         $this->install_language_package('es');
         $data = [
@@ -56,7 +64,7 @@ class mod_certifygen_generator extends testing_module_generator {
             'langs' => 'en,es',
             'validation' => $validation,
             'report' => $report,
-            'repository' => 'certifygenrepository_localrepository',
+            'repository' => $repository,
         ];
         $model = new certifygen_model(0, (object)$data);
         return $model->create();

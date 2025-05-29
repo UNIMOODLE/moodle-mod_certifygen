@@ -183,8 +183,10 @@ class start_teacher_certificate_external extends external_api {
             );
             if ($trequest) {
                 $trequest = new certifygen_validations($trequest->id);
-                $trequest->set('status', certifygen_validations::STATUS_IN_PROGRESS);
-                $trequest->save();
+                if ($trequest->get('status') == certifygen_validations::STATUS_NOT_STARTED) {
+                    $trequest->set('status', certifygen_validations::STATUS_IN_PROGRESS);
+                    $trequest->save();
+                }
             } else {
                 // Create teacher request.
                 $data = [

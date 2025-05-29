@@ -35,6 +35,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
+require_once($CFG->dirroot . '/mod/certifygen/lib.php');
 
 use certifygenvalidation_webservice\certifygenvalidation_webservice;
 use coding_exception;
@@ -70,45 +71,58 @@ class start_student_certificate_external extends external_api {
             [
                 'id' => new external_value(PARAM_INT, 'Validation id'),
                 'instanceid' => new external_value(PARAM_INT, 'instance id'),
-                'modelid' => new external_value(PARAM_INT, 'model id'),
                 'lang' => new external_value(PARAM_RAW, 'model lang'),
                 'userid' => new external_value(PARAM_RAW, 'user id'),
-                'courseid' => new external_value(PARAM_RAW, 'course id'),
+                'userfield' => new external_value(PARAM_RAW, 'user field'),
             ]
         );
     }
 
     /**
-     * Issue certificate
+     * start_student_certificate
      * @param int $id
      * @param int $instanceid
-     * @param int $modelid
      * @param string $lang
      * @param int $userid
-     * @param int $courseid
+     * @param string $userfield
      * @return array
+     * @throws \dml_exception
      * @throws coding_exception
      * @throws invalid_parameter_exception
-     * @throws invalid_persistent_exception|moodle_exception
+     * @throws invalid_persistent_exception
+     * @throws moodle_exception
      */
     public static function start_student_certificate(
         int $id,
         int $instanceid,
-        int $modelid,
         string $lang,
         int $userid,
-        int $courseid
+        string $userfield
     ): array {
         global $USER;
 
-        self::validate_parameters(
+        $params = self::validate_parameters(
             self::start_student_certificate_parameters(),
-            ['id' => $id, 'instanceid' => $instanceid, 'modelid' => $modelid,
-                'lang' => $lang, 'userid' => $userid, 'courseid' => $courseid]
+            [
+                'id' => $id,
+                'instanceid' => $instanceid,
+                'lang' => $lang,
+                'userid' => $userid,
+                'userfield' => $userfield,
+            ]
         );
 
         $result = ['result' => true, 'id' => 0, 'message' => get_string('ok', 'mod_certifygen')];
+        // Choose user parameter.
+        $uparam = mod_certifygen_validate_user_parameters_for_ws($params['userid'], $params['userfield']);
+        if (array_key_exists('error', $uparam)) {
+            return $uparam;
+        }
+        $userid = $uparam['userid'];
         [$course, $cm] = get_course_and_cm_from_instance($instanceid, 'certifygen');
+
+        // Get model.
+        $modelid = \mod_certifygen\persistents\certifygen::get_modelid_from_certifygenid($instanceid);
 
         // Step 1: Change status to in progress.
         $data = [
@@ -134,7 +148,6 @@ class start_student_certificate_external extends external_api {
                 }
             }
         }
-
         if (
             $validation && $validation->get('status') != certifygen_validations::STATUS_NOT_STARTED
         ) {
@@ -154,12 +167,18 @@ class start_student_certificate_external extends external_api {
             $certifygenmodel = new certifygen_model($modelid);
             if ($certifygenmodel->get('validation') != 'certifygenvalidation_webservice') {
                 $result['result'] = false;
-                $result['message'] = get_string('validationplugin_not_accepted', 'certifygenvalidation_webservice');
+                unset($result['id']);
+                unset($result['message']);
+                $result['error']['code'] = 'validationplugin_not_accepted';
+                $result['error']['message'] = get_string('validationplugin_not_accepted', 'certifygenvalidation_webservice');
                 return $result;
             }
             if ($certifygenmodel->get('repository') != 'certifygenrepository_url') {
                 $result['result'] = false;
-                $result['message'] = get_string('repositoryplugin_not_accepted', 'certifygenvalidation_webservice');
+                unset($result['id']);
+                unset($result['message']);
+                $result['error']['code'] = 'repositoryplugin_not_accepted';
+                $result['error']['message'] = get_string('repositoryplugin_not_accepted', 'certifygenvalidation_webservice');
                 return $result;
             }
             // Check if lang exists on model configuration.
@@ -190,7 +209,7 @@ class start_student_certificate_external extends external_api {
                 $existingcertificate = certifygen::get_user_certificate(
                     $instanceid,
                     $userid,
-                    $courseid,
+                    $course->id,
                     $certifygenmodel->get('templateid'),
                     $lang
                 )
@@ -207,7 +226,7 @@ class start_student_certificate_external extends external_api {
                 $instanceid,
                 $certifygenmodel->get('templateid'),
                 $userid,
-                $courseid,
+                $course->id,
                 $lang
             );
             if (is_null($file)) {
@@ -237,11 +256,11 @@ class start_student_certificate_external extends external_api {
                 }
             }
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' ' . ' error: ' . $e->getMessage());
             $result['result'] = false;
-            $result['message'] = $e->getMessage();
+            $result['error']['code'] = $e->getCode();
+            $result['error']['message'] = $e->getMessage();
             $id = 0;
-            $status = '';
+            $status = certifygen_validations::STATUS_NOT_STARTED;
             if (!is_null($validation)) {
                 $validation->set('status', certifygen_validations::STATUS_ERROR);
                 $validation->save();

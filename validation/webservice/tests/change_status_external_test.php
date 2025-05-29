@@ -524,4 +524,208 @@ class change_status_external_test extends \advanced_testcase {
             $result['newstatusdesc']
         );
     }
+
+    /**
+     * Test 6 : validation plugin not valid
+     *
+     * @return void
+     * @throws invalid_persistent_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @covers \certifygenvalidation_webservice\external\change_status_external::change_status
+     */
+    public function test_6(): void {
+        $this->setAdminUser();
+        // Create course.
+        $course = self::getDataGenerator()->create_course();
+
+        // Create template.
+        $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
+        $certificate1 = $templategenerator->create_template((object)['name' => 'Certificate 1']);
+
+        // Create model.
+        set_config('enabled', 1, 'certifygenvalidation_webservice');
+        set_config('enabled', 1, 'certifygenreport_basic');
+        set_config('enabled', 1, 'certifygenrepository_localrepository');
+        $modgenerator = $this->getDataGenerator()->get_plugin_generator('mod_certifygen');
+        $data = [
+                'type' => certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
+                'mode' => certifygen_model::MODE_UNIQUE,
+                'templateid' => $certificate1->get_id(),
+                'report' => 'certifygenreport_basic',
+        ];
+        $model = $modgenerator->create_model(
+            $data['type'],
+            $data['mode'],
+            $data['templateid'],
+            'certifygenvalidation_local',
+            $data['report']
+        );
+        $modgenerator->assign_model_coursecontext($model->get('id'), $course->id);
+
+        // Create user and enrol as teacher.
+        // Create user profile fields.
+        $category = self::getDataGenerator()->create_custom_profile_field_category(['name' => 'Category 1']);
+        $field = self::getDataGenerator()->create_custom_profile_field([
+                'shortname' => 'DNI',
+                'name' => 'DNI',
+                'categoryid' => $category->id,
+                'required' => 1,
+                'visible' => 1,
+                'locked' => 0,
+                'datatype' => 'text',
+                'defaultdata' => null,
+        ]);
+
+        // Configure the platform.
+        set_config('userfield', 'profile_' . $field->id, 'mod_certifygen');
+        $dni = '123456789P';
+        $teacher = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_1',
+                'firstname' => 'test',
+                'lastname' => 'user 1',
+                'email' => 'test_user_1@fake.es',
+                'profile_field_DNI' => $dni,
+        ]);
+        $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'editingteacher');
+        $student = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_2',
+                'firstname' => 'test',
+                'lastname' => 'user 2',
+                'email' => 'test_user_2@fake.es',
+        ]);
+        $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
+
+        // Create a validation.
+        $data = [
+            'name' => 'request_29042025_00',
+            'courses' => $course->id,
+            'code' => 'TRXXXX',
+            'userid' => $teacher->id,
+            'certifygenid' => 0,
+            'lang' => 'en',
+            'modelid' => $model->get('id'),
+            'status' => certifygen_validations::STATUS_NOT_STARTED,
+            'issueid' => null,
+            'usermodified' => $teacher->id,
+        ];
+        $validation = certifygen_validations::manage_validation(0, (object)$data);
+        // Validate.
+        $result = change_status_external::change_status(
+            $teacher->id,
+            '',
+            $validation->get('id'),
+            'http://www.google.es'
+        );
+        // Tests.
+        self::assertIsArray($result);
+        self::assertArrayHasKey('error', $result);
+        self::assertIsArray($result['error']);
+        self::assertArrayHasKey('code', $result['error']);
+        self::assertArrayHasKey('message', $result['error']);
+        self::assertEquals('validationplugin_not_accepted', $result['error']['code']);
+    }
+    /**
+     * Test 7 : repository plugin not valid
+     *
+     * @return void
+     * @throws invalid_persistent_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @covers \certifygenvalidation_webservice\external\change_status_external::change_status
+     */
+    public function test_7(): void {
+        $this->setAdminUser();
+        // Create course.
+        $course = self::getDataGenerator()->create_course();
+
+        // Create template.
+        $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');
+        $certificate1 = $templategenerator->create_template((object)['name' => 'Certificate 1']);
+
+        // Create model.
+        set_config('enabled', 1, 'certifygenvalidation_webservice');
+        set_config('enabled', 1, 'certifygenreport_basic');
+        set_config('enabled', 1, 'certifygenrepository_localrepository');
+        $modgenerator = $this->getDataGenerator()->get_plugin_generator('mod_certifygen');
+        $data = [
+                'type' => certifygen_model::TYPE_TEACHER_ALL_COURSES_USED,
+                'mode' => certifygen_model::MODE_UNIQUE,
+                'templateid' => $certificate1->get_id(),
+                'report' => 'certifygenreport_basic',
+        ];
+        $model = $modgenerator->create_model(
+            $data['type'],
+            $data['mode'],
+            $data['templateid'],
+            'certifygenvalidation_webservice',
+            $data['report']
+        );
+        $modgenerator->assign_model_coursecontext($model->get('id'), $course->id);
+
+        // Create user and enrol as teacher.
+        // Create user profile fields.
+        $category = self::getDataGenerator()->create_custom_profile_field_category(['name' => 'Category 1']);
+        $field = self::getDataGenerator()->create_custom_profile_field([
+                'shortname' => 'DNI',
+                'name' => 'DNI',
+                'categoryid' => $category->id,
+                'required' => 1,
+                'visible' => 1,
+                'locked' => 0,
+                'datatype' => 'text',
+                'defaultdata' => null,
+        ]);
+
+        // Configure the platform.
+        set_config('userfield', 'profile_' . $field->id, 'mod_certifygen');
+        $dni = '123456789P';
+        $teacher = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_1',
+                'firstname' => 'test',
+                'lastname' => 'user 1',
+                'email' => 'test_user_1@fake.es',
+                'profile_field_DNI' => $dni,
+        ]);
+        $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'editingteacher');
+        $student = $this->getDataGenerator()->create_user([
+                'username' => 'test_user_2',
+                'firstname' => 'test',
+                'lastname' => 'user 2',
+                'email' => 'test_user_2@fake.es',
+        ]);
+        $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
+
+        // Create a validation.
+        $data = [
+                'name' => 'request_29042025_00',
+                'courses' => $course->id,
+                'code' => 'TRXXXX',
+                'userid' => $teacher->id,
+                'certifygenid' => 0,
+                'lang' => 'en',
+                'modelid' => $model->get('id'),
+                'status' => certifygen_validations::STATUS_NOT_STARTED,
+                'issueid' => null,
+                'usermodified' => $teacher->id,
+        ];
+        $validation = certifygen_validations::manage_validation(0, (object)$data);
+
+        // Validate.
+        $result = change_status_external::change_status(
+            $teacher->id,
+            '',
+            $validation->get('id'),
+            'http://www.google.es'
+        );
+        // Tests.
+        self::assertIsArray($result);
+        self::assertArrayHasKey('error', $result);
+        self::assertIsArray($result['error']);
+        self::assertArrayHasKey('code', $result['error']);
+        self::assertArrayHasKey('message', $result['error']);
+        self::assertEquals('repositoryplugin_not_accepted', $result['error']['code']);
+    }
 }

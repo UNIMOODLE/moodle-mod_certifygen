@@ -41,6 +41,7 @@ $string['privacy:metadata'] = 'WEBSERVICE Balioztapen pluginak ez du datu pertso
 $string['inprogress_msg'] = 'Jarraitzea ahalbidetzeko, zure unibertsitateko administrazio bulegora joan.';
 $string['request_not_found'] = 'Request not found';
 $string['request_status_not_accepted'] = 'Egoera onartua ez dago';
+$string['request_user_not_matched'] = 'Hau ez da erabiltzailearen eskaera';
 $string['repositoryplugin_not_accepted'] = 'Biltegi plugina onartu ez da';
 $string['teacherrequest_pdf_error'] = 'There was a problem getting certificate';
 $string['validationplugin_not_accepted'] = 'Balioztapen plugina onartu ez da';
