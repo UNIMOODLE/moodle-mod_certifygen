@@ -225,8 +225,19 @@ class profile_my_certificates_table extends table_sql {
      * @throws coding_exception
      */
     final public function col_delete(stdClass $row): string {
-        return '<span class="likelink" data-action="delete-request" data-id="' . $row->id . '">' .
-            get_string('delete', 'mod_certifygen') . '</span>';
+        $validationpluginclass = $row->validation . '\\' . $row->validation;
+        /** @var ICertificateValidation $subplugin */
+        $subplugin = new $validationpluginclass();
+        $canrevoke = false;
+
+        if (!empty($subplugin)) {
+            $canrevoke = $subplugin->can_revoke(0);
+        }
+        if ($canrevoke) {
+            return '<span class="likelink" data-action="delete-request" data-id="' . $row->id . '">' .
+                    get_string('delete', 'mod_certifygen') . '</span>';
+        }
+        return '';
     }
     /**
      * Query the reader.
