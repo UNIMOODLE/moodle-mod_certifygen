@@ -119,11 +119,49 @@ class start_student_certificate_external extends external_api {
             return $uparam;
         }
         $userid = $uparam['userid'];
-        [$course, $cm] = get_course_and_cm_from_instance($instanceid, 'certifygen');
+        try {
+            [$course, $cm] = get_course_and_cm_from_instance($instanceid, 'certifygen');
+        } catch (moodle_exception $exception) {
+            $result['result'] = false;
+            unset($result['message']);
+            unset($result['id']);
+            $result['error']['code'] = 'invalidinstanceid';
+            $result['error']['message'] = get_string('invalidinstanceid', 'certifygenvalidation_webservice');
+            return $result;
+        }
 
         // Get model.
         $modelid = \mod_certifygen\persistents\certifygen::get_modelid_from_certifygenid($instanceid);
+        $certifygenmodel = new certifygen_model($modelid);
+        // Check if model validation is correct.
+        if ($certifygenmodel->get('validation') != 'certifygenvalidation_webservice') {
+            $result['result'] = false;
+            unset($result['id']);
+            unset($result['message']);
+            $result['error']['code'] = 'validationplugin_not_accepted';
+            $result['error']['message'] = get_string('validationplugin_not_accepted', 'certifygenvalidation_webservice');
+            return $result;
+        }
+        // Check if model repository is correct.
+        if ($certifygenmodel->get('repository') != 'certifygenrepository_url') {
+            $result['result'] = false;
+            unset($result['id']);
+            unset($result['message']);
+            $result['error']['code'] = 'repositoryplugin_not_accepted';
+            $result['error']['message'] = get_string('repositoryplugin_not_accepted', 'certifygenvalidation_webservice');
+            return $result;
+        }
 
+        // Check if lang exists on model configuration.
+        $validlangs = explode(',', $certifygenmodel->get('langs'));
+        if (!in_array($lang, $validlangs)) {
+            $result['result'] = false;
+            unset($result['id']);
+            unset($result['message']);
+            $result['error']['code'] = 'invalid_language';
+            $result['error']['message'] = get_string('invalid_language', 'mod_certifygen');
+            return $result;
+        }
         // Step 1: Change status to in progress.
         $data = [
             'userid' => $userid,
@@ -164,34 +202,6 @@ class start_student_certificate_external extends external_api {
             // Step 2: Generate issue.
             $users = user_get_users_by_id([$userid]);
             $user = reset($users);
-            $certifygenmodel = new certifygen_model($modelid);
-            if ($certifygenmodel->get('validation') != 'certifygenvalidation_webservice') {
-                $result['result'] = false;
-                unset($result['id']);
-                unset($result['message']);
-                $result['error']['code'] = 'validationplugin_not_accepted';
-                $result['error']['message'] = get_string('validationplugin_not_accepted', 'certifygenvalidation_webservice');
-                return $result;
-            }
-            if ($certifygenmodel->get('repository') != 'certifygenrepository_url') {
-                $result['result'] = false;
-                unset($result['id']);
-                unset($result['message']);
-                $result['error']['code'] = 'repositoryplugin_not_accepted';
-                $result['error']['message'] = get_string('repositoryplugin_not_accepted', 'certifygenvalidation_webservice');
-                return $result;
-            }
-            // Check if lang exists on model configuration.
-            $validlangs = explode(',', $certifygenmodel->get('langs'));
-            if (!in_array($lang, $validlangs)) {
-                $result['result'] = false;
-                unset($result['id']);
-                unset($result['message']);
-                $result['error']['code'] = 'invalid_language';
-                $result['error']['message'] = get_string('invalid_language', 'mod_certifygen');
-                return $result;
-            }
-
             $issueid = certifygen::issue_certificate(
                 $instanceid,
                 $user,

@@ -546,8 +546,8 @@ class start_student_certificate_external_test extends advanced_testcase {
         $this->assertIsArray($result['error']);
         $this->assertArrayHasKey('code', $result['error']);
         $this->assertArrayHasKey('message', $result['error']);
-        $this->assertEquals(0, $result['error']['code']);
-        $this->assertEquals(get_string('lang_not_exists', 'mod_certifygen', ['lang' => 'es']), $result['error']['message']);
+        $this->assertEquals('invalid_language', $result['error']['code']);
+        $this->assertEquals(get_string('invalid_language', 'mod_certifygen'), $result['error']['message']);
     }
     /**
      * Test 7

@@ -140,6 +140,36 @@ class get_draft_teacher_certificate_external extends external_api {
                         return $result;
                     }
                 }
+            } else {
+                $validation = new certifygen_validations($id);
+                // Check modelid.
+                if ($validation->get('modelid') != $params['modelid']) {
+                    $result['error']['code'] = 'invalidmodelid';
+                    $result['error']['message'] = get_string('invalidmodelid', 'mod_certifygen');
+                    return $result;
+                }
+                // Check courses.
+                $vcourses = explode(',', $validation->get('courses'));
+                $pcourses = explode(',', $params['courses']);
+                if (count($vcourses) != count($pcourses)) {
+                    $result['error']['code'] = 'invalidcourses';
+                    $result['error']['message'] = get_string('invalidcourses', 'mod_certifygen');
+                    return $result;
+                } else {
+                    foreach ($pcourses as $course) {
+                        if (!in_array($course, $vcourses)) {
+                            $result['error']['code'] = 'invalidcourses';
+                            $result['error']['message'] = get_string('invalidcourses', 'mod_certifygen');
+                            return $result;
+                        }
+                    }
+                }
+                // Check userid.
+                if ($params['userid'] != $validation->get('userid')) {
+                    $result['error']['code'] = 'invaliduser';
+                    $result['error']['message'] = get_string('invaliduser', 'mod_certifygen');
+                    return $result;
+                }
             }
             // Check model type.
             $certifygenmodel = new certifygen_model($modelid);
