@@ -27,6 +27,7 @@
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
+ * @author     Idef21 <https://idef21.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -36,6 +37,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 use context_system;
+use context_module;
 use dml_exception;
 use external_api;
 use external_function_parameters;
@@ -80,7 +82,9 @@ class deletemodel_external extends external_api {
             self::deletemodel_parameters(),
             ['id' => $id]
         );
-        $context = context_system::instance();
+        $context = context_module::instance($id);
+        self::validate_context($context);
+        require_capability('mod/certifygen:addinstance', $context);
         $result = ['result' => true, 'message' => get_string('ok', 'mod_certifygen')];
         try {
             if (!has_capability('mod/certifygen:manage', $context)) {
