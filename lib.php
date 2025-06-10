@@ -33,9 +33,9 @@
 use core\invalid_persistent_exception;
 use core_user\output\myprofile\tree;
 use mod_certifygen\forms\certificatestablefiltersform;
-use mod_certifygen\interfaces\ICertificateReport;
-use mod_certifygen\interfaces\ICertificateRepository;
-use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\interfaces\icertificatereport;
+use mod_certifygen\interfaces\icertificaterepository;
+use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_context;
 use mod_certifygen\persistents\certifygen_model;
@@ -225,7 +225,7 @@ function mod_certifygen_get_validation(): array {
     foreach (core_plugin_manager::instance()->get_plugins_of_type('certifygenvalidation') as $plugin) {
         $validationplugin = $plugin->component;
         $validationpluginclass = $validationplugin . '\\' . $validationplugin;
-        /** @var ICertificateValidation $subplugin */
+        /** @var icertificatevalidation $subplugin */
         $subplugin = new $validationpluginclass();
         if ($subplugin->is_enabled()) {
             $enabled[$plugin->component] = get_string('pluginname', $plugin->component);
@@ -250,7 +250,7 @@ function mod_certifygen_get_report(): array {
     foreach (core_plugin_manager::instance()->get_plugins_of_type('certifygenreport') as $plugin) {
         $reportplugin = $plugin->component;
         $reportpluginclass = $reportplugin . '\\' . $reportplugin;
-        /** @var ICertificateReport $subplugin */
+        /** @var icertificatereport $subplugin */
         $subplugin = new $reportpluginclass();
         if ($subplugin->is_enabled()) {
             $enabled[$plugin->component] = get_string('pluginname', $plugin->component);
@@ -269,7 +269,7 @@ function mod_certifygen_get_repositories(): array {
     foreach (core_plugin_manager::instance()->get_plugins_of_type('certifygenrepository') as $plugin) {
         $reportplugin = $plugin->component;
         $reportpluginclass = $reportplugin . '\\' . $reportplugin;
-        /** @var ICertificateRepository $subplugin */
+        /** @var icertificaterepository $subplugin */
         $subplugin = new $reportpluginclass();
         if ($subplugin->is_enabled()) {
             $enabled[$plugin->component] = get_string('pluginname', $plugin->component);
@@ -360,10 +360,10 @@ function mod_certifygen_pluginfile(
 
     // Make sure the filearea is one of those used by the plugin.
     if (
-        $filearea !== ICertificateValidation::FILE_AREA &&
-        $filearea !== ICertificateReport::FILE_AREA &&
-        $filearea !== ICertificateRepository::FILE_AREA &&
-        $filearea !== ICertificateValidation::FILE_AREA_VALIDATED &&
+        $filearea !== icertificatevalidation::FILE_AREA &&
+        $filearea !== icertificatereport::FILE_AREA &&
+        $filearea !== icertificaterepository::FILE_AREA &&
+        $filearea !== icertificatevalidation::FILE_AREA_VALIDATED &&
         $filearea !== 'issues'
     ) {
         return false;
@@ -379,7 +379,7 @@ function mod_certifygen_pluginfile(
 
     // The itemid can be used to check access to a record, and ensure that the
     // record belongs to the specifeid context. For example.
-    if ($filearea === ICertificateValidation::FILE_AREA) {
+    if ($filearea === icertificatevalidation::FILE_AREA) {
         $validation = new certifygen_validations($itemid);
         if (!$validation) {
             return false;
@@ -398,7 +398,7 @@ function mod_certifygen_pluginfile(
     $fs = get_file_storage();
     $file = $fs->get_file(
         $context->id,
-        ICertificateValidation::FILE_COMPONENT,
+        icertificatevalidation::FILE_COMPONENT,
         $filearea,
         $itemid,
         $filepath,
