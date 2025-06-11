@@ -27,19 +27,26 @@
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
+ * @author     Idef21 <https://idef21.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace mod_certifygen\external;
 
 defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
-require_once($CFG->dirroot . '/mod/certifygen/lib.php');
 use context_system;
+use context_module;
 use dml_exception;
+use external_api;
+use external_function_parameters;
+use external_single_structure;
+use external_value;
 use invalid_parameter_exception;
 use mod_certifygen\persistents\certifygen_model;
 use moodle_exception;
+require_once($CFG->dirroot . '/mod/certifygen/lib.php');
 /**
  * Delete model
  * @package    mod_certifygen
@@ -48,16 +55,16 @@ use moodle_exception;
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class deletemodel_external extends \core_external\external_api {
+class deletemodel_external extends external_api {
     /**
      * Describes the external function parameters.
      *
-     * @return \core_external\external_function_parameters
+     * @return external_function_parameters
      */
-    public static function deletemodel_parameters(): \core_external\external_function_parameters {
-        return new \core_external\external_function_parameters(
+    public static function deletemodel_parameters(): external_function_parameters {
+        return new external_function_parameters(
             [
-                'id' => new \core_external\external_value(PARAM_INT, 'model id'),
+                'id' => new external_value(PARAM_INT, 'model id'),
             ]
         );
     }
@@ -75,7 +82,9 @@ class deletemodel_external extends \core_external\external_api {
             self::deletemodel_parameters(),
             ['id' => $id]
         );
-        $context = context_system::instance();
+        $context = context_module::instance($id);
+        self::validate_context($context);
+        require_capability('mod/certifygen:addinstance', $context);
         $result = ['result' => true, 'message' => get_string('ok', 'mod_certifygen')];
         try {
             if (!has_capability('mod/certifygen:manage', $context)) {
@@ -97,13 +106,13 @@ class deletemodel_external extends \core_external\external_api {
     /**
      * Describes the data returned from the external function.
      *
-     * @return \core_external\external_single_structure
+     * @return external_single_structure
      */
-    public static function deletemodel_returns(): \core_external\external_single_structure {
-        return new \core_external\external_single_structure(
+    public static function deletemodel_returns(): external_single_structure {
+        return new external_single_structure(
             [
-                'result' => new \core_external\external_value(PARAM_BOOL, 'model deleted'),
-                'message' => new \core_external\external_value(PARAM_RAW, 'meesage'),
+                'result' => new external_value(PARAM_BOOL, 'model deleted'),
+                'message' => new external_value(PARAM_RAW, 'meesage'),
             ]
         );
     }
