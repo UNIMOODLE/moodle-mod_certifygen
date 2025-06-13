@@ -70,11 +70,10 @@ class certifygenvalidation_csv implements ICertificateValidation {
      */
     public function send_file(certifygen_file $file): array {
         global $USER;
-
         try {
             $params = $this->create_params_send_file($file);
-            $curl = curl_init();
-            curl_setopt_array($curl, [
+            $curl = new \curl();
+            $curl->setopt(array(
                 CURLOPT_URL => $this->configuration->get_wsdl(),
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
@@ -87,7 +86,8 @@ class certifygenvalidation_csv implements ICertificateValidation {
                 CURLOPT_HTTPHEADER => [
                     'Content-Type: application/xml',
                 ],
-            ]);
+                )
+            );
             $response = curl_exec($curl);
             if (curl_errno($curl)) {
                 return [
