@@ -28,8 +28,6 @@
  */
 namespace certifygenvalidation_csv;
 
-defined('MOODLE_INTERNAL') || die();
-
 use certifygenvalidation_csv\persistents\certifygenvalidationcsv;
 use coding_exception;
 use context_course;
@@ -72,11 +70,10 @@ class certifygenvalidation_csv implements ICertificateValidation {
      */
     public function send_file(certifygen_file $file): array {
         global $USER;
-
         try {
             $params = $this->create_params_send_file($file);
-            $curl = curl_init();
-            curl_setopt_array($curl, [
+            $curl = new \curl();
+            $curl->setopt(array(
                 CURLOPT_URL => $this->configuration->get_wsdl(),
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
@@ -89,7 +86,8 @@ class certifygenvalidation_csv implements ICertificateValidation {
                 CURLOPT_HTTPHEADER => [
                     'Content-Type: application/xml',
                 ],
-            ]);
+                )
+            );
             $response = curl_exec($curl);
             if (curl_errno($curl)) {
                 return [
@@ -123,7 +121,7 @@ class certifygenvalidation_csv implements ICertificateValidation {
                     'message' => $codeerror . ' - ' . $descerror,
                 ];
             }
-            // Se obtiene idExpediente.
+            // File id is obtained.
             $idexpediente = (string) $iniciarprocesofirmaresponsechildren->idExpediente;
             $validationid = $file->get_validationid();
             $token = str_replace('.pdf', '', $file->get_file()->get_filename());
@@ -288,7 +286,7 @@ xmlns:fir="http://firma.ws.producto.com/">
             $teacherrequest = certifygenvalidationcsv::get_record($params);
             $haserror = true;
             if (!$teacherrequest) {
-                throw new moodle_exception('certifygenvalidationcsvnotfound', 'certifygen');
+                throw new moodle_exception('certifygenvalidationcsvnotfound', 'certifygenvalidation_csv');
             }
             $params = $this->create_params_getFileContent($code);
             $curl = curl_init();
@@ -498,9 +496,9 @@ xmlns:fir="http://firma.ws.producto.com/">
     /**
      * Param for revoke
      * @param string $code
-     * @return string
+     * @return array
      */
-    private function create_params_revoke(string $code): string {
+    private function create_params_revoke(string $code) {
         return '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" 
 xmlns:fir="http://firma.ws.producto.com/">
    <soapenv:Header/>
@@ -679,9 +677,7 @@ xmlns:fir="http://firma.ws.producto.com/">
             ]);
 
             $response = curl_exec($curl);
-
             if (curl_errno($curl)) {
-                error_log(__FUNCTION__ . ' response: '.var_export($response, true));
                 return certifygen_validations::STATUS_VALIDATION_ERROR;
             }
             curl_close($curl);
@@ -693,17 +689,14 @@ xmlns:fir="http://firma.ws.producto.com/">
             $iniciarprocesofirmaresponse = $res->consultaEstadoPeticionResponse->children();
             $iniciarprocesofirmaresponsechildren = $iniciarprocesofirmaresponse->children();
             $resultado = (string) $iniciarprocesofirmaresponsechildren->resultado;
-            error_log(__FUNCTION__ . ' resultaod: '.var_export($resultado, true));
             if ($resultado === 'KO') {
                 $codeerror = (string) $iniciarprocesofirmaresponsechildren->error->children()->codError;
                 $descerror = (string) $iniciarprocesofirmaresponsechildren->error->children()->descError;
                 debugging(__FUNCTION__ . '  moodle_exception error: ' . $descerror);
                 throw new moodle_exception('getstatuserror', 'certifygenvalidation_csv', '', null, $codeerror . ' - ' . $descerror);
             }
-            // Se obtiene idExpediente.
+            // File id is obtained.
             $peticiones = $iniciarprocesofirmaresponsechildren->peticiones;
-            error_log(__FUNCTION__ . ' peticiones: '.var_export($peticiones, true));
-
             $estado = '';
             foreach ($peticiones as $peticion) {
                 $estado = (string) $peticion->estadoCircuito;
@@ -720,7 +713,6 @@ xmlns:fir="http://firma.ws.producto.com/">
         } catch (Exception $e) {
             debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
         }
-        error_log(__FUNCTION__ . ' el final: ');
         return certifygen_validations::STATUS_VALIDATION_ERROR;
     }
 
@@ -751,5 +743,21 @@ xmlns:fir="http://firma.ws.producto.com/">
      */
     public function is_visible_in_ws(): bool {
         return (int)get_config('certifygenvalidation_csv', 'wsoutput');
+    }
+
+    /**
+     * If true, students and teachers can emit from the platfomr the certificate
+     *
+     * @return bool
+     */
+    public function show_emit_button(): bool {
+        return true;
+    }
+    /**
+     * get_consistent_validation_plugins
+     * @return array
+     */
+    public function get_consistent_repository_plugins(): array {
+        return [];
     }
 }
