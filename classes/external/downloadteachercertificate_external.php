@@ -37,7 +37,7 @@ use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
 use mod_certifygen\event\certificate_downloaded;
-use mod_certifygen\interfaces\ICertificateRepository;
+use mod_certifygen\interfaces\icertificaterepository;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
@@ -111,7 +111,7 @@ class downloadteachercertificate_external extends external_api {
             $repositoryplugin = $certifygenmodel->get('repository');
             $repositorypluginclass = $repositoryplugin . '\\' . $repositoryplugin;
             if (get_config($repositoryplugin, 'enabled') === '1') {
-                /** @var ICertificateRepository $subplugin */
+                /** @var icertificaterepository $subplugin */
                 $subplugin = new $repositorypluginclass();
                 $result['url'] = $subplugin->get_file_url($trequest);
                 if (empty($result['url'])) {

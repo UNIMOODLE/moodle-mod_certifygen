@@ -39,7 +39,7 @@ require_once($CFG->libdir . '/tablelib.php');
 use coding_exception;
 use dml_exception;
 use mod_certifygen\certifygen;
-use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
@@ -122,7 +122,7 @@ class profile_my_certificates_table extends table_sql {
         }
         $validationplugin = $row->validation;
         $validationpluginclass = $validationplugin . '\\' . $validationplugin;
-        /** @var ICertificateValidation $subplugin */
+        /** @var icertificatevalidation $subplugin */
         $subplugin = new $validationpluginclass();
         $statusmessages = $subplugin->get_status_messages();
         if (!empty($statusmessages) && array_key_exists($row->status, $statusmessages)) {
@@ -170,7 +170,7 @@ class profile_my_certificates_table extends table_sql {
         // Can be emitted by validationplugin.
         $validationplugin = $row->validation;
         $validationpluginclass = $validationplugin . '\\' . $validationplugin;
-        /** @var ICertificateValidation $subplugin */
+        /** @var icertificatevalidation $subplugin */
         $subplugin = new $validationpluginclass();
         if (!$subplugin->show_emit_button()) {
             return '';
@@ -226,7 +226,7 @@ class profile_my_certificates_table extends table_sql {
      */
     final public function col_delete(stdClass $row): string {
         $validationpluginclass = $row->validation . '\\' . $row->validation;
-        /** @var ICertificateValidation $subplugin */
+        /** @var icertificatevalidation $subplugin */
         $subplugin = new $validationpluginclass();
         $canrevoke = false;
 

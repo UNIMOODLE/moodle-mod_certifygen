@@ -38,8 +38,8 @@ namespace mod_certifygen\task;
 use coding_exception;
 use core\invalid_persistent_exception;
 use core\task\scheduled_task;
-use mod_certifygen\interfaces\ICertificateRepository;
-use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\interfaces\icertificaterepository;
+use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_error;
 use mod_certifygen\persistents\certifygen_model;
@@ -85,7 +85,7 @@ class checkfile extends scheduled_task {
                 if (get_config($validationplugin, 'enabled') === '0') {
                     continue;
                 }
-                /** @var ICertificateValidation $subplugin */
+                /** @var icertificatevalidation $subplugin */
                 $subplugin = new $validationpluginclass();
                 if (!$subplugin->checkFile()) {
                     continue;
@@ -101,7 +101,7 @@ class checkfile extends scheduled_task {
                     $repositoryplugin = $model->get('repository');
                     if (get_config($repositoryplugin, 'enabled') === '1') {
                         $repositorypluginclass = $repositoryplugin . '\\' . $repositoryplugin;
-                        /** @var ICertificateRepository $subplugin */
+                        /** @var icertificaterepository $subplugin */
                         $subplugin = new $repositorypluginclass();
                         $response = $subplugin->save_file($newfile['file']);
                         if (!$response['haserror']) {

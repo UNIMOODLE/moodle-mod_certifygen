@@ -31,7 +31,7 @@
  */
 
 use mod_certifygen\forms\codeform;
-use mod_certifygen\interfaces\ICertificateRepository;
+use mod_certifygen\interfaces\icertificaterepository;
 use mod_certifygen\plugininfo\certifygenrepository;
 
 require_once('../../config.php');
@@ -60,7 +60,7 @@ if ($codeform->is_cancelled()) {
     foreach (core_plugin_manager::instance()->get_plugins_of_type('certifygenrepository') as $plugin) {
         $validationplugin = $plugin->component;
         $validationpluginclass = $validationplugin . '\\' . $validationplugin;
-        /** @var ICertificateRepository $subplugin */
+        /** @var icertificaterepository $subplugin */
         $subplugin = new $validationpluginclass();
         if ($subplugin->is_enabled()) {
             $url = $subplugin->get_file_by_code($fromform->code);

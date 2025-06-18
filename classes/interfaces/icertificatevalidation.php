@@ -32,14 +32,14 @@ namespace mod_certifygen\interfaces;
 
 use mod_certifygen\certifygen_file;
 /**
- * ICertificateValidation
+ * icertificatevalidation
  * @package    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-interface ICertificateValidation {
+interface icertificatevalidation {
     /** @var string FILE_COMPONENT */
     const FILE_COMPONENT = 'mod_certifygen';
     /** @var string FILE_AREA */

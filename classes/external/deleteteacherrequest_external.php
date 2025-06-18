@@ -40,7 +40,7 @@ use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
 use mod_certifygen\event\certificate_revoked;
-use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
@@ -101,7 +101,7 @@ class deleteteacherrequest_external extends external_api {
             ) {
                 $validationpluginclass = $validationplugin . '\\' . $validationplugin;
                 if (get_config($validationplugin, 'enabled') === '1') {
-                    /** @var ICertificateValidation $subplugin */
+                    /** @var icertificatevalidation $subplugin */
                     $subplugin = new $validationpluginclass();
                     if ($subplugin->can_revoke(0)) {
                         $output = $subplugin->revoke($request->get('code'));

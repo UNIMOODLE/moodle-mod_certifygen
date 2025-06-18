@@ -38,8 +38,8 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
-use mod_certifygen\interfaces\ICertificateRepository;
-use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\interfaces\icertificaterepository;
+use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
@@ -168,10 +168,10 @@ class get_draft_certificate_external extends external_api {
                 $fs = get_file_storage();
                 $file = $fs->get_file(
                     $context->id,
-                    ICertificateValidation::FILE_COMPONENT,
-                    ICertificateValidation::FILE_AREA,
+                    icertificatevalidation::FILE_COMPONENT,
+                    icertificatevalidation::FILE_AREA,
                     $itemid,
-                    ICertificateValidation::FILE_PATH,
+                    icertificatevalidation::FILE_PATH,
                     $code
                 );
                 if (!$file) {

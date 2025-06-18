@@ -35,7 +35,7 @@ use context_system;
 use dml_exception;
 use file_exception;
 use mod_certifygen\certifygen_file;
-use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
@@ -48,7 +48,7 @@ use stored_file_creation_exception;
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class certifygenvalidation_webservice implements ICertificateValidation {
+class certifygenvalidation_webservice implements icertificatevalidation {
     /**
      * sendFile
      * @param certifygen_file $file
