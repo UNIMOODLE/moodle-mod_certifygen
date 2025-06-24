@@ -38,7 +38,7 @@ use coding_exception;
 use dml_exception;
 use html_writer;
 use mod_certifygen\certifygen;
-use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen_model;
 use moodle_url;
 use table_sql;
@@ -148,7 +148,7 @@ class showerrors_table extends table_sql {
             $validationplugin = $row->modelvalidation;
             $validationpluginclass = $validationplugin . '\\' . $validationplugin;
             if (get_config($validationplugin, 'enabled') === '1') {
-                /** @var ICertificateValidation $subplugin */
+                /** @var icertificatevalidation $subplugin */
                 $subplugin = new $validationpluginclass();
                 $courseid = 0;
                 if ($row->modeltype == certifygen_model::TYPE_ACTIVITY) {

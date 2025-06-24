@@ -31,7 +31,7 @@ namespace certifygenrepository_onedrive;
 use coding_exception;
 use core\oauth2\rest_exception;
 use dml_exception;
-use mod_certifygen\interfaces\ICertificateRepository;
+use mod_certifygen\interfaces\icertificaterepository;
 use mod_certifygen\persistents\certifygen_repository;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
@@ -45,7 +45,7 @@ use stored_file;
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class certifygenrepository_onedrive implements ICertificateRepository {
+class certifygenrepository_onedrive implements icertificaterepository {
     /** @var string $url */
     private string $url = '';
     /**

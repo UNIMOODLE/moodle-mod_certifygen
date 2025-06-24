@@ -45,8 +45,8 @@ use core_course\customfield\course_handler;
 use core_user\fields;
 use dml_exception;
 use file_exception;
-use mod_certifygen\interfaces\ICertificateRepository;
-use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\interfaces\icertificaterepository;
+use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen_error;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
@@ -537,12 +537,12 @@ class certifygen {
 
         // Step 4: Call to validation plugin.
         $validationplugin = $certifygenmodel->get('validation');
-        /** @var ICertificateValidation $validationpluginclass */
+        /** @var icertificatevalidation $validationpluginclass */
         $validationpluginclass = $validationplugin . '\\' . $validationplugin;
         if (
             get_config($validationplugin, 'enabled') === '1'
         ) {
-            /** @var ICertificateValidation $subplugin */
+            /** @var icertificatevalidation $subplugin */
             $subplugin = new $validationpluginclass();
             if (!$subplugin->is_enabled()) {
                 $result['result'] = false;
@@ -596,7 +596,7 @@ class certifygen {
             // Save on repository plugin.
             $repositoryplugin = $certifygenmodel->get('repository');
             $repositorypluginclass = $repositoryplugin . '\\' . $repositoryplugin;
-            /** @var ICertificateRepository $subplugin */
+            /** @var icertificaterepository $subplugin */
             $subplugin = new $repositorypluginclass();
             $response = $subplugin->save_file($response['newfile']);
             if (!$response['haserror']) {

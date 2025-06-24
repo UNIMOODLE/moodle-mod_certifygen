@@ -42,8 +42,8 @@ use core_privacy\local\request\contextlist;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
 use dml_exception;
-use mod_certifygen\interfaces\ICertificateRepository;
-use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\interfaces\icertificaterepository;
+use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_repository;
 use mod_certifygen\persistents\certifygen_validations;
@@ -334,10 +334,10 @@ class provider implements
         switch ($status) {
             case certifygen_validations::STATUS_VALIDATION_OK:
             case certifygen_validations::STATUS_STORAGE_ERROR:
-                $filearea = ICertificateValidation::FILE_AREA_VALIDATED;
+                $filearea = icertificatevalidation::FILE_AREA_VALIDATED;
                 break;
             case certifygen_validations::STATUS_FINISHED:
-                $filearea = ICertificateRepository::FILE_AREA;
+                $filearea = icertificaterepository::FILE_AREA;
                 break;
             case certifygen_validations::STATUS_NOT_STARTED:
                 $filearea = '';

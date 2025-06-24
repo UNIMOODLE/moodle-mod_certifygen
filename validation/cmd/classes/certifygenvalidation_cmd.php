@@ -35,7 +35,7 @@ use core\session\exception;
 use dml_exception;
 use file_exception;
 use mod_certifygen\certifygen_file;
-use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
@@ -54,7 +54,7 @@ require_once($CFG->dirroot . '/user/lib.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class certifygenvalidation_cmd implements ICertificateValidation {
+class certifygenvalidation_cmd implements icertificatevalidation {
     /**
      * Send File
      * @param certifygen_file $file

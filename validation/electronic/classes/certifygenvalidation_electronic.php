@@ -32,7 +32,7 @@ use context_course;
 use context_system;
 use dml_exception;
 use mod_certifygen\certifygen_file;
-use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
@@ -56,7 +56,7 @@ require_once($CFG->dirroot . '/mod/assign/feedback/editpdf/fpdi/autoload.php');
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class certifygenvalidation_electronic implements ICertificateValidation {
+class certifygenvalidation_electronic implements icertificatevalidation {
     /**
      * add_certificate_signature
      * @param certifygen_file $file

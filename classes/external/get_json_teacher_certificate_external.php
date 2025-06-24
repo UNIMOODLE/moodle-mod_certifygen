@@ -35,7 +35,7 @@ use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
-use mod_certifygen\interfaces\ICertificateReport;
+use mod_certifygen\interfaces\icertificatereport;
 use mod_certifygen\persistents\certifygen_context;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
@@ -176,7 +176,7 @@ class get_json_teacher_certificate_external extends external_api {
             }
             $reportplugin = $model->get('report');
             $reportpluginclass = $reportplugin . '\\' . $reportplugin;
-            /** @var ICertificateReport $subplugin */
+            /** @var icertificatereport $subplugin */
             $subplugin = new $reportpluginclass();
             $celemtns = $subplugin->get_certificate_elements($validation);
             if (array_key_exists('error', $celemtns)) {

@@ -111,7 +111,7 @@ function certifygen_update_instance($data, $mform): bool {
     $certifygen->set('name', $data->name);
     $certifygen->set('intro', $data->intro);
     $certifygen->set('introformat', $data->introformat);
-    $certifygen->set('completiondownload', $data->completiondownload);
+    $certifygen->set('completiondownload', $data->completiondownload ?? 0);
     $certifygen->set('usermodified', $USER->id);
     $certifygen->set('timemodified', time());
 
