@@ -70,6 +70,8 @@ class activityteacher_table extends table_sql {
     private int $instanceid;
     /** @var int|bool|mixed|null $modelid */
     private int $modelid;
+    /** @var certifygen_model $model */
+    private certifygen_model $model;
     /** @var string $lang */
     private string $lang;
     /** @var string $langstring */
