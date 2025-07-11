@@ -134,7 +134,7 @@ class change_status_external_test extends \advanced_testcase {
             $teacher->id,
             '',
             'Requesti 1',
-            '',
+                "$course->id",
             $model->get('id'),
             'en'
         );
@@ -499,7 +499,7 @@ class change_status_external_test extends \advanced_testcase {
             $teacher->id,
             '',
             'Requesti 1',
-            '',
+            "$course->id",
             $model->get('id'),
             'en'
         );

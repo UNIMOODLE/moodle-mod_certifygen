@@ -151,13 +151,13 @@ class get_draft_teacher_certificate_external extends external_api {
                 $pcourses = explode(',', $params['courses']);
                 if (count($vcourses) != count($pcourses)) {
                     $result['error']['code'] = 'invalidcourses';
-                    $result['error']['message'] = get_string('invalidcourses', 'mod_certifygen');
+                    $result['error']['message'] = get_string('invalidcourses', 'certifygenvalidation_webservice');
                     return $result;
                 } else {
                     foreach ($pcourses as $course) {
                         if (!in_array($course, $vcourses)) {
                             $result['error']['code'] = 'invalidcourses';
-                            $result['error']['message'] = get_string('invalidcourses', 'mod_certifygen');
+                            $result['error']['message'] = get_string('invalidcourses', 'certifygenvalidation_webservice');
                             return $result;
                         }
                     }
