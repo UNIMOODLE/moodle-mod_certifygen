@@ -43,7 +43,7 @@ use context_course;
 use context_module;
 use dml_exception;
 use mod_certifygen\certifygen;
-use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
@@ -70,6 +70,8 @@ class activityteacher_table extends table_sql {
     private int $instanceid;
     /** @var int|bool|mixed|null $modelid */
     private int $modelid;
+    /** @var certifygen_model $model */
+    private certifygen_model $model;
     /** @var string $lang */
     private string $lang;
     /** @var string $langstring */
@@ -108,7 +110,7 @@ class activityteacher_table extends table_sql {
         $contextmodule = context_module::instance($cm->id);
         $this->context = $contextmodule;
         $validationpluginclass = $validationplugin . '\\' . $validationplugin;
-        /** @var ICertificateValidation $subplugin */
+        /** @var icertificatevalidation $subplugin */
         $subplugin = new $validationpluginclass();
         if (
             has_capability('mod/certifygen:canemitotherscertificates', $contextmodule)

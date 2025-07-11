@@ -42,8 +42,8 @@ use core\invalid_persistent_exception;
 use core_form\dynamic_form;
 use dml_exception;
 use html_writer;
-use mod_certifygen\interfaces\ICertificateRepository;
-use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\interfaces\icertificaterepository;
+use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen_model;
 use moodle_exception;
 use moodle_url;
@@ -347,7 +347,7 @@ class modelform extends dynamic_form {
         // Confirm validation-repository plugins selected.
         $repositoryplugin = $data['repository'];
         $repositorypluginclass = $repositoryplugin . '\\' . $repositoryplugin;
-        /** @var ICertificateRepository $subplugin */
+        /** @var icertificaterepository $subplugin */
         $subplugin = new $repositorypluginclass();
         $validplugins = $subplugin->get_consistent_validation_plugins();
         if (!empty($validplugins) && !in_array($data['validation'], $validplugins)) {
@@ -362,7 +362,7 @@ class modelform extends dynamic_form {
         }
         $validationplugins = $data['validation'];
         $validationpluginclass = $validationplugins . '\\' . $validationplugins;
-        /** @var ICertificateValidation $subplugin */
+        /** @var icertificatevalidation $subplugin */
         $subplugin = new $validationpluginclass();
         $validplugins = $subplugin->get_consistent_repository_plugins();
         if (!empty($validplugins) && !in_array($data['repository'], $validplugins)) {

@@ -38,8 +38,8 @@ namespace mod_certifygen\task;
 use coding_exception;
 use core\task\scheduled_task;
 use dml_exception;
-use mod_certifygen\interfaces\ICertificateRepository;
-use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\interfaces\icertificaterepository;
+use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
@@ -88,7 +88,7 @@ class checkerror extends scheduled_task {
                     $validationplugin = $model->get('validation');
                     $validationpluginclass = $validationplugin . '\\' . $validationplugin;
                     if (get_config($validationplugin, 'enabled') === '1') {
-                        /** @var ICertificateValidation $subplugin */
+                        /** @var icertificatevalidation $subplugin */
                         $subplugin = new $validationpluginclass();
                         $courseid = 0;
                         if ($model->get('type') == certifygen_model::TYPE_ACTIVITY) {
@@ -104,7 +104,7 @@ class checkerror extends scheduled_task {
                         $repositoryplugin = $model->get('repository');
                         if (get_config($validationplugin, 'enabled') === '1') {
                             $repositorypluginclass = $repositoryplugin . '\\' . $repositoryplugin;
-                            /** @var ICertificateRepository $subplugin */
+                            /** @var icertificaterepository $subplugin */
                             $subplugin = new $repositorypluginclass();
                             $response = $subplugin->save_file($response['file']);
                             if (!$response['haserror']) {

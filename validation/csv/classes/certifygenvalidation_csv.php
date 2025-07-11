@@ -36,7 +36,7 @@ use core\session\exception;
 use dml_exception;
 use file_exception;
 use mod_certifygen\certifygen_file;
-use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 use moodle_url;
@@ -51,7 +51,7 @@ use stored_file_creation_exception;
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class certifygenvalidation_csv implements ICertificateValidation {
+class certifygenvalidation_csv implements icertificatevalidation {
     /** @var csv_configuration $configuration */
     private csv_configuration $configuration;
 
@@ -70,11 +70,10 @@ class certifygenvalidation_csv implements ICertificateValidation {
      */
     public function send_file(certifygen_file $file): array {
         global $USER;
-
         try {
             $params = $this->create_params_send_file($file);
-            $curl = curl_init();
-            curl_setopt_array($curl, [
+            $curl = new \curl();
+            $curl->setopt(array(
                 CURLOPT_URL => $this->configuration->get_wsdl(),
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
@@ -87,7 +86,8 @@ class certifygenvalidation_csv implements ICertificateValidation {
                 CURLOPT_HTTPHEADER => [
                     'Content-Type: application/xml',
                 ],
-            ]);
+                )
+            );
             $response = curl_exec($curl);
             if (curl_errno($curl)) {
                 return [

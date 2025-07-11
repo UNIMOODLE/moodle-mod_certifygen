@@ -43,7 +43,7 @@ use invalid_parameter_exception;
 use mod_certifygen\certifygen;
 use mod_certifygen\certifygen_file;
 use mod_certifygen\event\certificate_issued;
-use mod_certifygen\interfaces\ICertificateReport;
+use mod_certifygen\interfaces\icertificatereport;
 use mod_certifygen\persistents\certifygen_error;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
@@ -125,7 +125,7 @@ class emitteacherrequest_external extends external_api {
             }
             // Step 2: Create certificate file.
             $reportpluginclass = $reportplugin . '\\' . $reportplugin;
-            /** @var ICertificateReport $subplugin */
+            /** @var icertificatereport $subplugin */
             $subplugin = new $reportpluginclass();
             $result = $subplugin->create_file($teacherrequest);
             if (!$result['result']) {

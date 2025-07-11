@@ -39,8 +39,8 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
-use mod_certifygen\interfaces\ICertificateRepository;
-use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\interfaces\icertificaterepository;
+use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
@@ -180,7 +180,7 @@ class get_pdf_teacher_certificate_external extends external_api {
                 $repositoryplugin = $certifygenmodel->get('repository');
                 $repositorypluginclass = $repositoryplugin . '\\' . $repositoryplugin;
                 if (get_config($repositoryplugin, 'enabled') === '1') {
-                    /** @var ICertificateRepository $subplugin */
+                    /** @var icertificaterepository $subplugin */
                     $subplugin = new $repositorypluginclass();
                     $filecontent = $subplugin->get_file_content($trequest);
                     $filecontent = base64_encode($filecontent);

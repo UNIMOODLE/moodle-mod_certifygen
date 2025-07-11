@@ -32,8 +32,8 @@ use coding_exception;
 use context_course;
 use context_system;
 use dml_exception;
-use mod_certifygen\interfaces\ICertificateReport;
-use mod_certifygen\interfaces\ICertificateRepository;
+use mod_certifygen\interfaces\icertificatereport;
+use mod_certifygen\interfaces\icertificaterepository;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
@@ -47,7 +47,7 @@ use stored_file;
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class certifygenrepository_localrepository implements ICertificateRepository {
+class certifygenrepository_localrepository implements icertificaterepository {
     /**
      * getFile
      * @param certifygen_validations $validation
@@ -67,10 +67,10 @@ class certifygenrepository_localrepository implements ICertificateRepository {
         $fs = get_file_storage();
         $file = $fs->get_file(
             $contextid,
-            ICertificateReport::FILE_COMPONENT,
-            ICertificateRepository::FILE_AREA,
+            icertificatereport::FILE_COMPONENT,
+            icertificaterepository::FILE_AREA,
             $itemid,
-            ICertificateRepository::FILE_PATH,
+            icertificaterepository::FILE_PATH,
             $code
         );
 
@@ -95,10 +95,10 @@ class certifygenrepository_localrepository implements ICertificateRepository {
         $fs = get_file_storage();
         $file = $fs->get_file(
             $contextid,
-            ICertificateReport::FILE_COMPONENT,
-            ICertificateRepository::FILE_AREA,
+            icertificatereport::FILE_COMPONENT,
+            icertificaterepository::FILE_AREA,
             $itemid,
-            ICertificateRepository::FILE_PATH,
+            icertificaterepository::FILE_PATH,
             $code
         );
 

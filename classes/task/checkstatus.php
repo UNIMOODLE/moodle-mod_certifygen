@@ -37,7 +37,7 @@ namespace mod_certifygen\task;
 
 use coding_exception;
 use core\task\scheduled_task;
-use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
@@ -80,7 +80,7 @@ class checkstatus extends scheduled_task {
                 if (get_config($validationplugin, 'enabled') === '0') {
                     continue;
                 }
-                /** @var ICertificateValidation $subplugin */
+                /** @var icertificatevalidation $subplugin */
                 $subplugin = new $validationpluginclass();
                 if (!$subplugin->check_status()) {
                     continue;

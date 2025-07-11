@@ -32,7 +32,7 @@ use certifygenreport_basic\output\report_view;
 use coding_exception;
 use context_system;
 use dml_exception;
-use mod_certifygen\interfaces\ICertificateReport;
+use mod_certifygen\interfaces\icertificatereport;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
 
@@ -44,7 +44,7 @@ use moodle_exception;
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class certifygenreport_basic implements ICertificateReport {
+class certifygenreport_basic implements icertificatereport {
     /**
      * is_enabled
      * @return bool

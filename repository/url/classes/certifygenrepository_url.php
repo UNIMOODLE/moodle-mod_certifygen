@@ -32,9 +32,9 @@ use coding_exception;
 use context_course;
 use context_system;
 use dml_exception;
-use mod_certifygen\interfaces\ICertificateReport;
-use mod_certifygen\interfaces\ICertificateRepository;
-use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\interfaces\icertificatereport;
+use mod_certifygen\interfaces\icertificaterepository;
+use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_repository;
 use mod_certifygen\persistents\certifygen_validations;
@@ -49,7 +49,7 @@ use stored_file;
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class certifygenrepository_url implements ICertificateRepository {
+class certifygenrepository_url implements icertificaterepository {
     /**
      * getFile
      * @param certifygen_validations $validation
@@ -69,10 +69,10 @@ class certifygenrepository_url implements ICertificateRepository {
         $fs = get_file_storage();
         $file = $fs->get_file(
             $contextid,
-            ICertificateValidation::FILE_COMPONENT,
-            ICertificateValidation::FILE_AREA,
+            icertificatevalidation::FILE_COMPONENT,
+            icertificatevalidation::FILE_AREA,
             $itemid,
-            ICertificateValidation::FILE_PATH,
+            icertificatevalidation::FILE_PATH,
             $code
         );
 

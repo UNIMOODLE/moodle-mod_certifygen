@@ -40,9 +40,9 @@ use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
 use mod_certifygen\external\emitteacherrequest_external;
-use mod_certifygen\interfaces\ICertificateReport;
-use mod_certifygen\interfaces\ICertificateRepository;
-use mod_certifygen\interfaces\ICertificateValidation;
+use mod_certifygen\interfaces\icertificatereport;
+use mod_certifygen\interfaces\icertificaterepository;
+use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
@@ -113,23 +113,21 @@ class get_draft_teacher_certificate_external extends external_api {
         $filecontent = '';
         try {
             $context = context_system::instance();
-            require_capability('mod/certifygen:manage', $context);
-            if (!$id) {
-                // Choose user parameter.
-                $uparam = mod_certifygen_validate_user_parameters_for_ws($params['userid'], $params['userfield']);
-                if (array_key_exists('error', $uparam)) {
-                    return $uparam;
-                }
-                $userid = $uparam['userid'];
-
-                // User exists.
-                $user = user_get_users_by_id([$userid]);
-                if (empty($user)) {
-                    $result['error']['code'] = 'user_not_found';
-                    $result['error']['message'] = get_string('user_not_found', 'mod_certifygen');
-                    return $result;
-                }
-
+            require_capability('mod/certifygen:manage', $context);            
+            // Choose user parameter.
+            $uparam = mod_certifygen_validate_user_parameters_for_ws($params['userid'], $params['userfield']);
+            if (array_key_exists('error', $uparam)) {
+                return $uparam;
+            }
+            $userid = $uparam['userid'];            
+            // User exists.
+            $user = user_get_users_by_id([$userid]);
+            if (empty($user)) {
+                $result['error']['code'] = 'user_not_found';
+                $result['error']['message'] = get_string('user_not_found', 'mod_certifygen');
+                return $result;
+            }            
+            if (!$id) {               
                 // Is user enrolled on this course as teacher?
                 $coursesarray = explode(',', $courses);
                 foreach ($coursesarray as $course) {
@@ -165,7 +163,7 @@ class get_draft_teacher_certificate_external extends external_api {
                     }
                 }
                 // Check userid.
-                if ($params['userid'] != $validation->get('userid')) {
+                if ($userid != $validation->get('userid')) {
                     $result['error']['code'] = 'invaliduser';
                     $result['error']['message'] = get_string('invaliduser', 'mod_certifygen');
                     return $result;
@@ -226,7 +224,7 @@ class get_draft_teacher_certificate_external extends external_api {
             }
             // Create certificate file.
             $reportpluginclass = $reportplugin . '\\' . $reportplugin;
-            /** @var ICertificateReport $subplugin */
+            /** @var icertificatereport $subplugin */
             $subplugin = new $reportpluginclass();
             $trequest = new certifygen_validations($id);
             if ($trequest->get('status') != certifygen_validations::STATUS_IN_PROGRESS) {
