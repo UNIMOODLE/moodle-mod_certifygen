@@ -82,9 +82,7 @@ class deletemodel_external extends external_api {
             self::deletemodel_parameters(),
             ['id' => $id]
         );
-        $context = context_module::instance($id);
-        self::validate_context($context);
-        require_capability('mod/certifygen:addinstance', $context);
+        $context = context_system::instance();
         $result = ['result' => true, 'message' => get_string('ok', 'mod_certifygen')];
         try {
             if (!has_capability('mod/certifygen:manage', $context)) {
