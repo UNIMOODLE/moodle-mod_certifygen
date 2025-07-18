@@ -35,7 +35,7 @@ use dml_exception;
 use external_api;
 use invalid_parameter_exception;
 use mod_certifygen\tables\modellist_table;
-use moodle_url;
+use core\url;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
@@ -75,7 +75,7 @@ class getmodellisttable_external extends external_api {
         $PAGE->set_context($context);
         require_capability('mod/certifygen:manage', $context);
         $tablelist = new modellist_table();
-        $tablelist->baseurl = new moodle_url('/mod/certifygen/modelmanager.php');
+        $tablelist->baseurl = new url('/mod/certifygen/modelmanager.php');
         ob_start();
         // Optional_params 10 and true.
         $tablelist->out(10, true);

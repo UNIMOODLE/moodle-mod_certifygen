@@ -42,7 +42,7 @@ $context = context_system::instance();
 require_capability('mod/certifygen:viewmycontextcertificates', $context);
 
 $PAGE->set_context(context_system::instance());
-$PAGE->set_url(new moodle_url('/mod/certifygen/mycertificates.php'));
+$PAGE->set_url(new url('/mod/certifygen/mycertificates.php'));
 
 echo $OUTPUT->header();
 

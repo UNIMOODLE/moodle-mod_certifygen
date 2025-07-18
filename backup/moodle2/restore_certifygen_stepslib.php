@@ -153,7 +153,7 @@ class restore_certifygen_activity_structure_step extends restore_activity_struct
             throw new moodle_exception(
                 'model_must_exists',
                 'mod_certifygen',
-                (new moodle_url('/'))->out(),
+                (new url('/'))->out(),
                 (object) $params
             );
         } else if ($existingmodel && $existingmodel->id != $data['id']) {
@@ -174,7 +174,7 @@ class restore_certifygen_activity_structure_step extends restore_activity_struct
             throw new moodle_exception(
                 'course_not_valid_for_modelid',
                 'mod_certifygen',
-                (new moodle_url('/'))->out(),
+                (new url('/'))->out(),
                 (object) $params
             );
         }

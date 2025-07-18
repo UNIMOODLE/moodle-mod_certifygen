@@ -39,7 +39,7 @@ use curl;
 use dml_exception;
 use dml_missing_record_exception;
 use moodle_exception;
-use moodle_url;
+use core\url;
 use oauth2_client;
 use repository_onedrive\rest;
 /**
@@ -94,7 +94,7 @@ class onedriveconnection {
     /**
      * Get a cached user authenticated oauth client.
      *
-     * @param moodle_url $overrideurl - Use this url instead of the repo callback.
+     * @param url $overrideurl - Use this url instead of the repo callback.
      * @return client
      */
     protected function get_user_oauth_client($overrideurl = false): ?client {
@@ -104,7 +104,7 @@ class onedriveconnection {
         if ($overrideurl) {
             $returnurl = $overrideurl;
         } else {
-            $returnurl = new moodle_url('/');
+            $returnurl = new url('/');
         }
 
         $this->client = api::get_user_oauth_client($this->issuer, $returnurl, self::SCOPES);
@@ -385,7 +385,7 @@ class onedriveconnection {
         $client = api::get_system_oauth_client($this->issuer);
         $base = 'https://graph.microsoft.com/v1.0/';
 
-        $sourceurl = new moodle_url($base . 'me/drive/items/' . $id . '/content');
+        $sourceurl = new url($base . 'me/drive/items/' . $id . '/content');
         $source = $sourceurl->out(false);
 
         // We use download_one and not the rest API because it has special timeouts etc.

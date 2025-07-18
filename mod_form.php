@@ -75,7 +75,7 @@ class mod_certifygen_mod_form extends moodleform_mod {
             $canmanagemodels = has_capability('mod/certifygen:manage', context_system::instance());
             $activitymodels = mod_certifygen_get_activity_models($this->get_course()->id);
             $templateoptions = ['' => get_string('chooseamodel', 'mod_certifygen')] + $activitymodels;
-            $manageurl = new moodle_url('/mod/certifygen/modelmanager.php');
+            $manageurl = new url('/mod/certifygen/modelmanager.php');
             $elements = [$mform->createElement('select', 'modelid', get_string('model', 'mod_certifygen'), $templateoptions)];
             $mform->setType('modelid', PARAM_INT);
             // Adding "Manage templates" link if user has capabilities to manage templates.

@@ -38,7 +38,7 @@ use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
 use moodle_exception;
-use moodle_url;
+use core\url;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -82,7 +82,7 @@ class getcoursesnames_external extends external_api {
         foreach ($coursesarray as $courseid) {
             try {
                 $course = get_course($courseid);
-                $url = new moodle_url('/course/view.php', ['id' => $courseid]);
+                $url = new url('/course/view.php', ['id' => $courseid]);
                 $list[] = [
                     'id' => $courseid,
                     'shortname' => $course->shortname,

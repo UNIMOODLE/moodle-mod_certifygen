@@ -31,6 +31,7 @@
  */
 
 use core\invalid_persistent_exception;
+use core\url;
 use core_user\output\myprofile\tree;
 use mod_certifygen\forms\certificatestablefiltersform;
 use mod_certifygen\interfaces\icertificatereport;
@@ -318,7 +319,7 @@ function mod_certifygen_myprofile_navigation(core_user\output\myprofile\tree $tr
         && certifygen_context::can_i_see_teacherrequestlink($user->id)
     ) {
             $link = get_string('mycertificates', 'mod_certifygen');
-            $url = new moodle_url('/mod/certifygen/mycertificates.php');
+            $url = new url('/mod/certifygen/mycertificates.php');
             $node = new core_user\output\myprofile\node(
                 'miscellaneous',
                 'modcertifygenmy',
@@ -440,7 +441,7 @@ function mod_certifygen_get_lang_selected(certifygen_model $model): string {
 /**
  * mod_certifygen_get_certificates_table_form
  * @param certifygen_model $model
- * @param moodle_url $url
+ * @param url $url
  * @param string $defaultlang
  * @param string $role
  * @return string
@@ -448,7 +449,7 @@ function mod_certifygen_get_lang_selected(certifygen_model $model): string {
  */
 function mod_certifygen_get_certificates_table_form(
     certifygen_model $model,
-    moodle_url $url,
+        url $url,
     string $defaultlang = '',
     string $role = 'student'
 ): string {

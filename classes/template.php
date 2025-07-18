@@ -40,7 +40,7 @@ use core\message\message;
 use core_user;
 use dml_exception;
 use file_exception;
-use moodle_url;
+use core\url;
 use pdf;
 use stdClass;
 use stored_file;
@@ -184,17 +184,18 @@ class template extends \tool_certificate\template {
 
     /**
      * Gets the stored file url for an issue. If issue file doesn't exist, new file is created first.
+     *
      * @param stdClass $issue
-     * @return moodle_url
+     * @return url
      * @throws dml_exception
      * @throws file_exception
      * @throws stored_file_creation_exception
      */
-    public function get_issue_file_url(stdClass $issue): moodle_url {
+    public function get_issue_file_url(stdClass $issue): url {
         $file = $this->get_issue_file($issue);
         // We add timemodified instead of issue id to prevent caching of changed certificate.
         // The callback tool_certificate_pluginfile() ignores the itemid and only takes the code.
-        return moodle_url::make_pluginfile_url(
+        return url::make_pluginfile_url(
             $file->get_contextid(),
             $file->get_component(),
             $file->get_filearea(),

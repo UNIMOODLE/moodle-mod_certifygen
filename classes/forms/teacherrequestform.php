@@ -45,7 +45,7 @@ use dml_exception;
 use mod_certifygen\persistents\certifygen_context;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
-use moodle_url;
+use core\url;
 use stdClass;
 
 /**
@@ -176,10 +176,10 @@ class teacherrequestform extends dynamic_form {
 
     /**
      * get_page_url_for_dynamic_submission
-     * @return moodle_url
+     * @return url
      */
-    protected function get_page_url_for_dynamic_submission(): moodle_url {
-        return new moodle_url('/mod/certifygen/mycertificates.php');
+    protected function get_page_url_for_dynamic_submission(): url {
+        return new url('/mod/certifygen/mycertificates.php');
     }
 
     /**

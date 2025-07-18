@@ -41,6 +41,7 @@ use context_course;
 use context_module;
 use core\invalid_persistent_exception;
 use core\message\message;
+use core\url;
 use core_course\customfield\course_handler;
 use core_user\fields;
 use dml_exception;
@@ -782,14 +783,13 @@ class certifygen {
      */
     public static function send_notification(certifygen_validations $validation): void {
 
-        $linkname = get_string('mycertificates', 'mod_certifygen');
-        $url = new \moodle_url('/mod/certifygen/mycertificates.php');
+        $url = new url('/mod/certifygen/mycertificates.php');
         $contexturlname = get_string('mycertificates', 'mod_certifygen');
         $courseid = SITEID;
         if ($validation->get('certifygenid') > 0) {
             [$course, $cm] = get_course_and_cm_from_instance((int)$validation->get('certifygenid'), 'certifygen');
             $modcontext = \context_module::instance($cm->id);
-            $url = new \moodle_url('/mod/certifygen/view.php', ['id' => $cm->id]);
+            $url = new url('/mod/certifygen/view.php', ['id' => $cm->id]);
             $contexturlname = format_string($cm->name, $modcontext->id);
             $courseid = $course->id;
         }

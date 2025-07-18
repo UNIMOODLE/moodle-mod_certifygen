@@ -39,7 +39,7 @@ use mod_certifygen\certifygen_file;
 use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
-use moodle_url;
+use core\url;
 use SoapFault;
 use stored_file;
 use stored_file_creation_exception;
@@ -155,7 +155,7 @@ class certifygenvalidation_csv implements icertificatevalidation {
     private function create_params_send_file(certifygen_file $file): string {
 
         $token = str_replace('.pdf', '', $file->get_file()->get_filename());
-        $avisourl = (new moodle_url('/'))->out();
+        $avisourl = (new url('/'))->out();
         $base64 = base64_encode($file->get_file()->get_content());
         $xml = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" 
 xmlns:fir="http://firma.ws.producto.com/">

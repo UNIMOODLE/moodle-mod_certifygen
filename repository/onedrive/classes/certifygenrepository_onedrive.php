@@ -35,7 +35,7 @@ use mod_certifygen\interfaces\icertificaterepository;
 use mod_certifygen\persistents\certifygen_repository;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
-use moodle_url;
+use core\url;
 use stored_file;
 /**
  * certifygenrepository_onedrive
@@ -250,7 +250,7 @@ class certifygenrepository_onedrive implements icertificaterepository {
                         AND {$comparefname} = {$comparefnameplaceholder}";
         $result = $DB->get_record_sql($sql, $params);
         if ($result) {
-            $url = moodle_url::make_pluginfile_url(
+            $url = url::make_pluginfile_url(
                 $result->contextid,
                 $result->component,
                 $result->filearea,

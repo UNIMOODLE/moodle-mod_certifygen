@@ -31,6 +31,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\url;
 use mod_certifygen\forms\searchforuserform;
 use mod_certifygen\output\views\profile_my_certificates_view;
 use mod_certifygen\persistents\certifygen_context;
@@ -45,7 +46,7 @@ $context = context_system::instance();
 require_capability('mod/certifygen:viewcontextcertificates', $context);
 
 $PAGE->set_context(context_system::instance());
-$PAGE->set_url(new moodle_url('/mod/certifygen/teacherrequestreport.php'));
+$PAGE->set_url(new url('/mod/certifygen/teacherrequestreport.php'));
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('teachercertificates', 'mod_certifygen'), 2, 'mb-5');

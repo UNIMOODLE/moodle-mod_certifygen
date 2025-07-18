@@ -40,7 +40,7 @@ global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
 use coding_exception;
 use mod_certifygen\persistents\certifygen_model;
-use moodle_url;
+use core\url;
 use stdClass;
 use stored_file;
 /**
@@ -123,7 +123,7 @@ class certifygen_file {
     public function get_file_url(): string {
         $file = $this->get_file();
         $name = $file->get_filename();
-        return moodle_url::make_pluginfile_url(
+        return url::make_pluginfile_url(
             $file->get_contextid(),
             $file->get_component(),
             $file->get_filearea(),

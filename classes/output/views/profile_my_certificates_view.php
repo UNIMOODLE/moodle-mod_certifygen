@@ -41,7 +41,7 @@ use dml_exception;
 use mod_certifygen\persistents\certifygen_context;
 use mod_certifygen\tables\profile_my_certificates_table;
 use moodle_exception;
-use moodle_url;
+use core\url;
 use renderable;
 use stdClass;
 use templatable;
@@ -87,7 +87,7 @@ class profile_my_certificates_view implements renderable, templatable {
         $data = new stdClass();
 
         $tablelist = new profile_my_certificates_table($this->userid);
-        $tablelist->baseurl = new moodle_url('/mod/certifygen/mycertificates.php');
+        $tablelist->baseurl = new url('/mod/certifygen/mycertificates.php');
         ob_start();
         // TODO: optional_params 10 and true.
         $tablelist->out($this->pagesize, false);

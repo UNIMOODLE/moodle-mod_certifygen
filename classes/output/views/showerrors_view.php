@@ -36,7 +36,7 @@ use core_table\local\filter\string_filter;
 use mod_certifygen\forms\errorfiltersform;
 use mod_certifygen\tables\errors_filterset;
 use mod_certifygen\tables\showerrors_table;
-use moodle_url;
+use core\url;
 use renderable;
 use stdClass;
 use templatable;
@@ -64,7 +64,7 @@ class showerrors_view implements renderable, templatable {
             'modelname' => $modelname,
         ];
         // Form.
-        $url = new moodle_url('/mod/certifygen/showerrors.php');
+        $url = new url('/mod/certifygen/showerrors.php');
         $mform = new errorfiltersform($url->out(), $customdata);
         $data = $mform->get_data();
 
@@ -77,7 +77,7 @@ class showerrors_view implements renderable, templatable {
         if (isset($data->modelname) && !empty($data->modelname)) {
             $filters->add_filter(new string_filter('modelname', filter::JOINTYPE_DEFAULT, [$data->modelname]));
         }
-        $tablelist->baseurl = new moodle_url('/mod/certifygen/showerrors.php');
+        $tablelist->baseurl = new url('/mod/certifygen/showerrors.php');
         $tablelist->set_filterset($filters);
         ob_start();
         $tablelist->out(10, false);

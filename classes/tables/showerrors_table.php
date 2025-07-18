@@ -40,7 +40,7 @@ use html_writer;
 use mod_certifygen\certifygen;
 use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen_model;
-use moodle_url;
+use core\url;
 use table_sql;
 /**
  * showerrors_table
@@ -158,7 +158,7 @@ class showerrors_table extends table_sql {
                 $response = $subplugin->get_file($courseid, $row->validationid);
                 if (array_key_exists('file', $response) && !is_null($response['file'])) {
                     $file = $response['file'];
-                    $url = moodle_url::make_pluginfile_url(
+                    $url = url::make_pluginfile_url(
                         $file->get_contextid(),
                         $file->get_component(),
                         $file->get_filearea(),

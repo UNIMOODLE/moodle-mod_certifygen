@@ -31,6 +31,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\url;
 
 require_once("../../config.php");
 global $DB, $PAGE, $OUTPUT, $USER;
@@ -74,9 +75,9 @@ foreach ($certifygens as $instanceid => $certifygen) {
     [$course, $cm] = get_course_and_cm_from_instance($certifygen->id, 'certifygen');
     $context = context_module::instance($cm->id);
     $class = $certifygen->visible ? null : ['class' => 'dimmed']; // Hidden modules are dimmed.
-    $link = html_writer::link(new moodle_url('view.php', ['id' => $cm->id]), format_string($certifygen->name), $class);
+    $link = html_writer::link(new url('view.php', ['id' => $cm->id]), format_string($certifygen->name), $class);
     $courselink = html_writer::link(
-        new moodle_url('/course/view.php', ['id' => $course->id]),
+        new url('/course/view.php', ['id' => $course->id]),
         format_string($course->fullname),
         $class
     );

@@ -46,7 +46,7 @@ use mod_certifygen\interfaces\icertificaterepository;
 use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen_model;
 use moodle_exception;
-use moodle_url;
+use core\url;
 use stdClass;
 use tool_certificate\permission;
 use function get_string_manager;
@@ -140,7 +140,7 @@ class modelform extends dynamic_form {
         if (!$cemited) {
             $canmanagetemplates = permission::can_manage_anywhere();
             $templateoptions = ['' => get_string('chooseatemplate', 'mod_certifygen')] + $templates;
-            $manageurl = new moodle_url('/admin/tool/certificate/manage_templates.php');
+            $manageurl = new url('/admin/tool/certificate/manage_templates.php');
             $elements = [$mform->createElement(
                 'select',
                 'templateid',
@@ -322,10 +322,10 @@ class modelform extends dynamic_form {
 
     /**
      * get_page_url_for_dynamic_submission
-     * @return moodle_url
+     * @return url
      */
-    protected function get_page_url_for_dynamic_submission(): moodle_url {
-        return new moodle_url('/mod/certifygen/modelmanager.php');
+    protected function get_page_url_for_dynamic_submission(): url {
+        return new url('/mod/certifygen/modelmanager.php');
     }
 
     /**

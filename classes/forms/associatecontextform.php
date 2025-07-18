@@ -45,7 +45,7 @@ use core_form\dynamic_form;
 use dml_exception;
 use mod_certifygen\persistents\certifygen_context;
 use moodle_exception;
-use moodle_url;
+use core\url;
 /**
  * Associate context form
  * @package    mod_certifygen
@@ -205,9 +205,9 @@ class associatecontextform extends dynamic_form {
 
     /**
      * get_page_url_for_dynamic_submission
-     * @return moodle_url
+     * @return url
      */
-    protected function get_page_url_for_dynamic_submission(): moodle_url {
-        return new moodle_url('/mod/certifygen/modelmanager.php');
+    protected function get_page_url_for_dynamic_submission(): url {
+        return new url('/mod/certifygen/modelmanager.php');
     }
 }

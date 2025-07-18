@@ -39,7 +39,7 @@ use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_repository;
 use mod_certifygen\persistents\certifygen_validations;
 use moodle_exception;
-use moodle_url;
+use core\url;
 use stored_file;
 /**
  *

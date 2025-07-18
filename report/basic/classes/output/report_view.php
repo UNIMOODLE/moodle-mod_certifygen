@@ -43,7 +43,7 @@ use context_system;
 use core_course_category;
 use dml_exception;
 use moodle_exception;
-use moodle_url;
+use core\url;
 use renderable;
 use renderer_base;
 use stdClass;
@@ -239,7 +239,7 @@ class report_view implements renderable, templatable {
     }
     /**
      * get_logo_url
-     * @return moodle_url
+     * @return url
      * @throws dml_exception
      */
     public function get_logo_url(): string {

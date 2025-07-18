@@ -46,7 +46,7 @@ use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\tables\activityteacher_table;
 use mod_certifygen\tables\certificates_filterset;
 use moodle_exception;
-use moodle_url;
+use core\url;
 use renderable;
 use stdClass;
 use templatable;
@@ -120,7 +120,7 @@ class activity_view implements renderable, templatable {
         try {
             // Check if template exists.
             \mod_certifygen\template::instance($this->certificatemodel->get('templateid'));
-            $url = new moodle_url('/mod/certifygen/view.php', ['id' => $this->cm->id]);
+            $url = new url('/mod/certifygen/view.php', ['id' => $this->cm->id]);
             $data = new stdClass();
             $data->table = $this->get_certificates_table();
             $modellangs = $this->certificatemodel->get_model_languages();
@@ -171,7 +171,7 @@ class activity_view implements renderable, templatable {
         if (!empty($tilast)) {
             $paramsurl['tilast'] = $tilast;
         }
-        $activityteachertable->baseurl = new moodle_url('/mod/certifygen/view.php', $paramsurl);
+        $activityteachertable->baseurl = new url('/mod/certifygen/view.php', $paramsurl);
         ob_start();
         $activityteachertable->out($this->pagesize, $this->isteacher);
         $out1 = ob_get_contents();
