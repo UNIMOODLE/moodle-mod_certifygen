@@ -33,5 +33,5 @@ defined('MOODLE_INTERNAL') || die();
 $string['pluginname'] = 'Repositorio Url Certifygen';
 $string['pluginnamesettings'] = 'Configuración do Repositorio Url';
 $string['enable'] = 'Habilitar';
-$string['enable_help'] = 'Este repositorio almacena os certificados en moodledata.';
+$string['enable_help'] = 'Este repositorio garda os certificados nunha ligazón externa.';
 $string['privacy:metadata'] = 'O plugin Repositorio Url Certifygen non almacena datos persoais.';

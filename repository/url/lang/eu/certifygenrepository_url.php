@@ -33,5 +33,5 @@ defined('MOODLE_INTERNAL') || die();
 $string['pluginname'] = 'Certifygen Url Biltegia';
 $string['pluginnamesettings'] = 'Url Biltegiaren Konfigurazioa';
 $string['enable'] = 'Gaitu';
-$string['enable_help'] = 'Biltegi honek moodledata-n gordetzen ditu ziurtagiriak.';
+$string['enable_help'] = 'Biltegi honek kanpo esteka batean gordetzen ditu ziurtagiriak.';
 $string['privacy:metadata'] = 'Certifygen Lokala Biltegi pluginak ez du datu pertsonalik gordetzen.';

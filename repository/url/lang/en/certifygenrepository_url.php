@@ -33,5 +33,5 @@ defined('MOODLE_INTERNAL') || die();
 $string['pluginname'] = 'Certifygen Link Repository';
 $string['pluginnamesettings'] = 'Link Repository Settings';
 $string['enable'] = 'Enable';
-$string['enable_help'] = 'This repository saves the certificates on moodledata';
+$string['enable_help'] = 'This repository saves the certificates on an external url';
 $string['privacy:metadata'] = 'The Certifygen Local Repository plugin does not store any personal data.';

@@ -73,26 +73,25 @@ class certifygenvalidation_csv implements icertificatevalidation {
         try {
             $params = $this->create_params_send_file($file);
             $curl = new \curl();
-            $curl->setopt(array(
-                CURLOPT_URL => $this->configuration->get_wsdl(),
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => $params,
-                CURLOPT_HTTPHEADER => [
-                    'Content-Type: application/xml',
-                ],
-                )
+            $curl->setopt(
+                [
+                    'returntransfer' => true,
+                    'encoding' => '',
+                    'maxredirs' => 10,
+                    'timeout' => 0,
+                    'followlocation' => true,
+                    'http_version' => CURL_HTTP_VERSION_1_1,
+                    'postfields' => $params,
+                    'httpheader' => [
+                        'Content-Type: application/xml',
+                    ],
+                ]
             );
-            $response = curl_exec($curl);
-            if (curl_errno($curl)) {
+            $response = $curl->post($this->configuration->get_wsdl(), $params);
+            if ($curl->get_errno()) {
                 return [
                     'haserror' => true,
-                    'message' => curl_error($curl),
+                    'message' => $curl->error,
                 ];
             }
             $xml = simplexml_load_string(
@@ -133,7 +132,6 @@ class certifygenvalidation_csv implements icertificatevalidation {
             ];
             $cv = new certifygenvalidationcsv(0, (object)$data);
             $cv->save();
-            curl_close($curl);
 
             return [
                 'haserror' => false,
@@ -289,25 +287,25 @@ xmlns:fir="http://firma.ws.producto.com/">
                 throw new moodle_exception('certifygenvalidationcsvnotfound', 'certifygenvalidation_csv');
             }
             $params = $this->create_params_getFileContent($code);
-            $curl = curl_init();
-            curl_setopt_array($curl, [
-                CURLOPT_URL => $this->configuration->get_querywsdl(),
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => $params,
-                CURLOPT_HTTPHEADER => [
-                    'Content-Type: application/xml',
-                ],
-            ]);
-            $response = curl_exec($curl);
-            if (curl_errno($curl)) {
+            $curl = new \curl();
+            $curl->setopt(
+                [
+                    'returntransfer' => true,
+                    'encoding' => '',
+                    'maxredirs' => 10,
+                    'timeout' => 0,
+                    'followlocation' => true,
+                    'http_version' => CURL_HTTP_VERSION_1_1,
+                    'postfields' => $params,
+                    'httpheader' => [
+                        'Content-Type: application/xml',
+                    ],
+                ]
+            );
+            $response = $curl->post($this->configuration->get_querywsdl());
+            if ($curl->get_errno()) {
                 $result['error']['code'] = '';
-                $result['error']['message'] = curl_error($curl);
+                $result['error']['message'] = $curl->error;
                 return $result;
             }
             $xml = simplexml_load_string(
@@ -356,27 +354,24 @@ xmlns:fir="http://firma.ws.producto.com/">
     public function get_file_url_from_external_service(string $code): array {
         try {
             $params = $this->create_params_get_file_url($code);
-            $curl = curl_init();
-
-            curl_setopt_array($curl, [
-                CURLOPT_URL => $this->configuration->get_querywsdl(),
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => $params,
-                CURLOPT_HTTPHEADER => [
-                    'Content-Type: application/xml',
-                ],
+            $curl = new \curl();
+            $curl->setopt([
+                    'returntransfer' => true,
+                    'encoding' => '',
+                    'maxredirs' => 10,
+                    'timeout' => 0,
+                    'followlocation' => true,
+                    'http_version' => CURL_HTTP_VERSION_1_1,
+                    'postfields' => $params,
+                    'httpheader' => [
+                            'Content-Type: application/xml',
+                    ],
             ]);
-            $response = curl_exec($curl);
-            if (curl_errno($curl)) {
+            $response = $curl->post($this->configuration->get_querywsdl());
+            if ($curl->get_errno()) {
                 return [
                     'haserror' => true,
-                    'message' => curl_error($curl),
+                    'message' => $curl->error,
                 ];
             }
             $xml = simplexml_load_string(
@@ -562,27 +557,24 @@ xmlns:fir="http://firma.ws.producto.com/">
             $message = '';
             $haserror = false;
             $params = $this->create_params_revoke($code);
-            $curl = curl_init();
-
-            curl_setopt_array($curl, [
-                CURLOPT_URL => $this->configuration->get_wsdl(),
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => $params,
-                CURLOPT_HTTPHEADER => [
-                    'Content-Type: application/xml',
-                ],
+            $curl = new \curl();
+            $curl->setopt([
+                    'returntransfer' => true,
+                    'encoding' => '',
+                    'maxredirs' => 10,
+                    'timeout' => 0,
+                    'followlocation' => true,
+                    'http_version' => CURL_HTTP_VERSION_1_1,
+                    'postfields' => $params,
+                    'httpheader' => [
+                            'Content-Type: application/xml',
+                    ],
             ]);
-            $response = curl_exec($curl);
-            if (curl_errno($curl)) {
+            $response = $curl->post($this->configuration->get_wsdl());
+            if ($curl->get_errno()) {
                 return [
                     'haserror' => true,
-                    'message' => curl_error($curl),
+                    'message' => $curl->error,
                 ];
             }
             $xml = simplexml_load_string(
@@ -650,28 +642,24 @@ xmlns:fir="http://firma.ws.producto.com/">
         }
         try {
             $params = $this->create_params_status($code);
-            $curl = curl_init();
-
-            curl_setopt_array($curl, [
-                CURLOPT_URL => $this->configuration->get_querywsdl(),
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => $params,
-                CURLOPT_HTTPHEADER => [
-                    'Content-Type: application/xml',
-                ],
+            $curl = new \curl();
+            $curl->setopt([
+                    'returntransfer' => true,
+                    'encoding' => '',
+                    'maxredirs' => 10,
+                    'timeout' => 0,
+                    'followlocation' => true,
+                    'http_version' => CURL_HTTP_VERSION_1_1,
+                    'postfields' => $params,
+                    'httpheader' => [
+                            'Content-Type: application/xml',
+                    ],
             ]);
 
-            $response = curl_exec($curl);
-            if (curl_errno($curl)) {
+            $response = $curl->post($this->configuration->get_querywsdl());
+            if ($curl->get_errno()) {
                 return certifygen_validations::STATUS_VALIDATION_ERROR;
             }
-            curl_close($curl);
 
             $xml = simplexml_load_string($response, null, 0, 'http://schemas.xmlsoap.org/soap/envelope/');
             $ns = $xml->getNamespaces(true);

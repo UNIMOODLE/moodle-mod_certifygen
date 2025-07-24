@@ -33,5 +33,5 @@ defined('MOODLE_INTERNAL') || die();
 $string['pluginname'] = 'Repositori Url';
 $string['pluginnamesettings'] = 'Configuració del Repositori Url';
 $string['enable'] = 'Habilitar';
-$string['enable_help'] = 'Aquest repositori emmagatzema els certificats a moodledata.';
+$string['enable_help'] = 'Aquest repositori guarda els certificats en un enllaç extern.';
 $string['privacy:metadata'] = 'El plugin Repositori Local Certifygen no emmagatzema dades personals.';
