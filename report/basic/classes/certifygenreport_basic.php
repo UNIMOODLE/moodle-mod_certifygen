@@ -128,7 +128,6 @@ class certifygenreport_basic implements icertificatereport {
             $result['result'] = true;
             $result['file'] = $file;
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $result['result'] = false;
             $result['message'] = $e->getMessage();
         }

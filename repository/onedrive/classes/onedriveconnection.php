@@ -323,7 +323,6 @@ class onedriveconnection {
         try {
             $response = $client->call('get_file_by_path', ['fullpath' => $fullpath, '$select' => $fields]);
         } catch (rest_exception $re) {
-            debugging(__FUNCTION__ . ' e: ' . $re->getMessage());
             return false;
         }
         return $response->id;
@@ -341,7 +340,6 @@ class onedriveconnection {
         try {
             $client->call('delete_file_by_path', ['fullpath' => $fullpath]);
         } catch (rest_exception $re) {
-            debugging(__FUNCTION__ . ' e: ' . $re->getMessage());
             return false;
         }
     }
@@ -360,12 +358,7 @@ class onedriveconnection {
     protected function create_folder_in_folder(rest $client, $foldername, $parentid) {
         $params = ['parentid' => $parentid];
         $folder = [ 'name' => $foldername, 'folder' => [ 'childCount' => 0 ]];
-        try {
-            $created = $client->call('create_folder', $params, json_encode($folder));
-        } catch (rest_exception $re) {
-            debugging(__FUNCTION__ . ' e: ' . $re->getMessage());
-        }
-
+        $created = $client->call('create_folder', $params, json_encode($folder));
         if (empty($created->id)) {
             $details = get_string('cannot_create_folder', 'mod_certifygen') . $foldername;
             throw new moodle_exception('errorwhilecommunicatingwith', 'repository', '', $details);
@@ -428,22 +421,17 @@ class onedriveconnection {
         $fields = "folder,id,lastModifiedDateTime,name,size,webUrl";
         $params = ['$select' => $fields, 'parent' => $parent];
 
-        try {
-            // Retrieving files and folders.
-            $systemauth = api::get_system_oauth_client($this->issuer);
-            $service = new rest($systemauth);
+        // Retrieving files and folders.
+        $systemauth = api::get_system_oauth_client($this->issuer);
+        $service = new rest($systemauth);
+        if (!empty($q)) {
+            $params['search'] = urlencode($q);
 
-            if (!empty($q)) {
-                $params['search'] = urlencode($q);
-
-                // MS does not return thumbnails on a search.
-                unset($params['$expand']);
-                $response = $service->call('search', $params);
-            } else {
-                $response = $service->call('list', $params);
-            }
-        } catch (\Exception $e) {
-            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
+            // MS does not return thumbnails on a search.
+            unset($params['$expand']);
+            $response = $service->call('search', $params);
+        } else {
+            $response = $service->call('list', $params);
         }
 
         $remotefiles = isset($response->value) ? $response->value : [];

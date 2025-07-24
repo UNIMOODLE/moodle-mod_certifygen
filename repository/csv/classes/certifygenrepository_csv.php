@@ -151,7 +151,7 @@ class certifygenrepository_csv implements icertificaterepository {
                 $filecontent = $file->get_content();
             }
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
+            return $filecontent;
         }
         return $filecontent;
     }

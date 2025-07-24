@@ -33,6 +33,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_certifygen;
+use coding_exception;
+use dml_exception;
+use invalid_parameter_exception;
 use mod_certifygen\external\deletemodel_external;
 use mod_certifygen\persistents\certifygen_model;
 
@@ -40,7 +43,6 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Delete model test
  * @package    mod_certifygen
@@ -111,9 +113,9 @@ class deletemodel_external_test extends \advanced_testcase {
      * test
      *
      * @return void
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \invalid_parameter_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
      * @covers \mod_certifygen\external\deletemodel_external::deletemodel
      */
     public function test_deletemodel2(): void {

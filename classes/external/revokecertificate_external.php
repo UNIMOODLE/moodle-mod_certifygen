@@ -139,7 +139,6 @@ class revokecertificate_external extends external_api {
             certificate_revoked::create($eventdata)->trigger();
             $validation->delete();
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $result['result'] = false;
             $result['message'] = $e->getMessage();
             if (!is_null($validation)) {

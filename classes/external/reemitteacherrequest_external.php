@@ -100,7 +100,6 @@ class reemitteacherrequest_external extends external_api {
             $teacherrequest = certifygen_validations::manage_validation(0, (object) $data);
             $result = emitteacherrequest_external::emitteacherrequest($teacherrequest->get('id'));
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $result['result'] = false;
             $result['message'] = $e->getMessage();
             $teacherrequest->set('status', certifygen_validations::STATUS_ERROR);

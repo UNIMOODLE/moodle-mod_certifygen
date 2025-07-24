@@ -165,7 +165,7 @@ class certifygenrepository_onedrive implements icertificaterepository {
             $id = $odata->id;
             $result = $connection->get_file($id, $reportname);
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' ERROR: ' . $e->getMessage());
+            return $result;
         }
 
         return $result;
@@ -188,7 +188,7 @@ class certifygenrepository_onedrive implements icertificaterepository {
                 $result = $this->get_file_by_code_on_onedrive($code);
             }
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' ERROR: ' . $e->getMessage());
+            return $result;
         }
 
         return $result;

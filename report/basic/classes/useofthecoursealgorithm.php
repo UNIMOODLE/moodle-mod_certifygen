@@ -225,7 +225,6 @@ class useofthecoursealgorithm {
             $this->resources = $DB->count_records_sql($sql, ['courseid' => $this->courseid]);
             $this->resourceslevel = $this->get_item_level($this->resources);
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $this->resources = 0;
             $this->resourceslevel = self::LOW;
         }
@@ -265,7 +264,6 @@ class useofthecoursealgorithm {
             $sum = $sum / $this->numstudents;
             $this->resourceviewslevel = $this->get_item_level($sum);
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $this->resourceviews = [];
             $this->resourceviewslevel = self::LOW;
         }
@@ -287,7 +285,6 @@ class useofthecoursealgorithm {
             $this->forums = $DB->count_records_sql($sql, ['courseid' => $this->courseid]);
             $this->forumslevel = $this->get_item_level($this->forums);
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $this->forums = 0;
             $this->forumslevel = self::LOW;
         }
@@ -313,7 +310,6 @@ class useofthecoursealgorithm {
                 'courseid2' => $this->courseid]);
             $this->forumnewslevel = $this->get_item_level($this->forumnews);
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $this->forumnews = 0;
             $this->forumnewslevel = self::LOW;
         }
@@ -346,7 +342,6 @@ class useofthecoursealgorithm {
             }
             $this->foruminteractionslevel = $this->get_item_level($this->foruminteractions);
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $this->foruminteractions = 0;
             $this->foruminteractionslevel = self::LOW;
         }
@@ -375,7 +370,6 @@ class useofthecoursealgorithm {
             }
             $this->assignslevel = $this->get_item_level($this->assigns);
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $this->assigns = 0;
             $this->assignslevel = self::LOW;
         }
@@ -410,7 +404,6 @@ class useofthecoursealgorithm {
             $sum = $sum / $this->numstudents;
             $this->assignsubmissionslevel = $this->get_item_level($sum);
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $this->assignsubmissions = [];
             $this->assignsubmissionslevel = self::LOW;
         }
@@ -438,7 +431,6 @@ class useofthecoursealgorithm {
             }
             $this->gradeitemslevel = $this->get_item_level($this->gradeitems);
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $this->gradeitems = 0;
             $this->gradeitemslevel = self::LOW;
         }
@@ -468,7 +460,6 @@ class useofthecoursealgorithm {
             }
             $this->gradefeedbacklevel = $this->get_item_level($this->gradefeedback);
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $this->gradefeedback = 0;
             $this->gradefeedbacklevel = self::LOW;
         }

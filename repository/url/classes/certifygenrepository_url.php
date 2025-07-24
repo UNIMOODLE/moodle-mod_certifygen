@@ -154,7 +154,7 @@ class certifygenrepository_url implements icertificaterepository {
             $file = $this->get_file($validation);
             $result = $file->get_content();
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
+            return $result;
         }
         return $result;
     }
@@ -187,7 +187,7 @@ class certifygenrepository_url implements icertificaterepository {
                 $url = $result->url;
             }
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
+            return $url;
         }
 
         return $url;

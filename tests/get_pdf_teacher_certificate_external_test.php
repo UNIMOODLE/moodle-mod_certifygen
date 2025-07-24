@@ -42,7 +42,7 @@ use mod_certifygen\persistents\certifygen_validations;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/lib/externallib.php');
+
 /**
  * Get pdf teacher certificate test
  * @package    mod_certifygen

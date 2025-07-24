@@ -140,7 +140,6 @@ class certifygen_model extends persistent {
 
             return $model->create();
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             return false;
         }
     }

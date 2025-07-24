@@ -231,7 +231,6 @@ class emitcertificate_external extends external_api {
                 }
             }
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' ' . ' error: ' . $e->getMessage());
             $result['result'] = false;
             $result['message'] = $e->getMessage();
             $id = 0;

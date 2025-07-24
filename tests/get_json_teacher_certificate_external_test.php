@@ -40,7 +40,7 @@ use mod_certifygen\persistents\certifygen_model;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/lib/externallib.php');
+
 /**
  * Get json teacher certificate test
  * @package    mod_certifygen

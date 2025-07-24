@@ -147,14 +147,12 @@ class get_courses_as_student_external extends external_api {
                 $coursefullname = strip_tags($coursefullname);
                 $courseshortname = $filter->filter($enrolment->shortname);
                 $courseshortname = strip_tags($courseshortname);
-                $completed = false;
                 try {
                     $completion = core_completion_external::get_course_completion_status($enrolment->ctxinstance, $userid);
                     $completed = $completion['completionstatus']['completed'];
                 } catch (moodle_exception $e) {
-                    // debugging(__FUNCTION__ . ' completion error: '.$e->getMessage());
+                    $completed = false;
                 }
-
                 $modellist = certifygen_context::get_course_valid_modelids($enrolment->ctxinstance);
                 $modellist = implode(',', $modellist);
                 $courses[] = [

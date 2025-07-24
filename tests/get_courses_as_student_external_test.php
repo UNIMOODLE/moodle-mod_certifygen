@@ -40,7 +40,8 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot . '/lib/externallib.php');
+require_once($CFG->dirroot . '/completion/criteria/completion_criteria_activity.php');
+
 /**
  * Get courses as student test
  * @package    mod_certifygen
@@ -168,13 +169,14 @@ class get_courses_as_student_external_test extends \advanced_testcase {
         $this->setUser($manager);
 
         // Create courses.
-        $course1 = self::getDataGenerator()->create_course();
-        $course2 = self::getDataGenerator()->create_course();
+        $course1 = self::getDataGenerator()->create_course(['enablecompletion' => 1]);
+        $course2 = self::getDataGenerator()->create_course(['enablecompletion' => 1]);
 
-        // Enrol user in course1 as editingteacher.
+        // Enrol user in course1 as student.
         self::getDataGenerator()->enrol_user($user1->id, $course1->id, 'student');
-
-        // Enrol user in course2 as student.
+        // Manager should be enrol to view students completion.
+        self::getDataGenerator()->enrol_user($manager->id, $course1->id, 'manager');
+        // Enrol user in course2 as editingteacher.
         self::getDataGenerator()->enrol_user($user1->id, $course2->id, 'editingteacher');
 
         // Create template.

@@ -188,7 +188,7 @@ class certifygenrepository_localrepository implements icertificaterepository {
             $file = $this->get_file($validation);
             $result = $file->get_content();
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
+            return $result;
         }
         return $result;
     }
@@ -233,7 +233,7 @@ class certifygenrepository_localrepository implements icertificaterepository {
                 )->out();
             }
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
+            return $url;
         }
 
         return $url;

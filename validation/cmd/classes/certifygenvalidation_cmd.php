@@ -116,7 +116,6 @@ class certifygenvalidation_cmd implements icertificatevalidation {
                     $newfile = $this->save_file_on_moodledata($validatedfilename, $file);
                     unlink($tempfile);
                 } catch (moodle_exception $e) {
-                    debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
                     $haserror = true;
                     $message = $e->getMessage();
                 }

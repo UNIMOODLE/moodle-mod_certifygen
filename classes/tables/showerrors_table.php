@@ -131,9 +131,8 @@ class showerrors_table extends table_sql {
             ];
             return $OUTPUT->user_picture((object) $data, ['size' => 35, 'includefullname' => true]);
         } catch (\moodle_exception $e) {
-            debugging('Error: ' . $e->getMessage());
+            return '';
         }
-        return '';
     }
     /**
      * Download certificate
@@ -170,7 +169,7 @@ class showerrors_table extends table_sql {
                 }
             }
         } catch (\moodle_exception $e) {
-            debugging(' Error: ' . $e->getMessage());
+            return '';
         }
 
         return '';

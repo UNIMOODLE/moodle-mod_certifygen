@@ -166,7 +166,6 @@ class emitteacherrequest_external extends external_api {
             // Step 4: event trigger.
             certificate_issued::create_from_validation($teacherrequest)->trigger();
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $result['result'] = false;
             $result['message'] = $e->getMessage();
             $teacherrequest->set('status', certifygen_validations::STATUS_ERROR);

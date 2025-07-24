@@ -183,7 +183,6 @@ class get_pdf_certificate_external extends external_api {
                 return $result;
             }
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $result['error']['code'] = $e->errorcode;
             $result['error']['message'] = $e->getMessage();
             return $result;

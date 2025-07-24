@@ -127,7 +127,6 @@ class reemitcertificate_external extends external_api {
                 $oldvalidation->delete();
             }
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $result['result'] = false;
             $result['message'] = $e->getMessage();
             $validation->set('status', certifygen_validations::STATUS_ERROR);

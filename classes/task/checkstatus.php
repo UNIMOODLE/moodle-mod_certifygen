@@ -92,7 +92,7 @@ class checkstatus extends scheduled_task {
                     $validation->save();
                 }
             } catch (moodle_exception $e) {
-                debugging(__FUNCTION__ . 'e: ' . $e->getMessage());
+                continue;
             }
         }
     }

@@ -159,9 +159,8 @@ class certifygen {
             );
             return $template->issue_certificate($user->id, $expirydate, $issuedata, 'mod_certifygen', $course->id);
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' ' . __LINE__ . ' ERROR: ' . $e->getMessage());
+            return 0;
         }
-        return 0;
     }
 
     /**

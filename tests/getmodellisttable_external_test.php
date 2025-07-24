@@ -40,7 +40,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot . '/lib/externallib.php');
+
 /**
  * Get model list table test
  * @package    mod_certifygen
@@ -100,7 +100,7 @@ class getmodellisttable_external_test extends \advanced_testcase {
         // Tests.
         self::assertIsArray($result);
         self::assertArrayHasKey('table', $result);
-        self::assertEquals('-->' . get_string('nothingtodisplay'), trim($result['table']));
+        self::assertEquals('!! ' . get_string('nothingtodisplay') . ' !!', trim($result['table']));
 
         // Create model.
         $templategenerator = $this->getDataGenerator()->get_plugin_generator('tool_certificate');

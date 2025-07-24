@@ -39,7 +39,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
 require_once($CFG->dirroot . '/mod/certifygen/tests/generator/lib.php');
-require_once($CFG->dirroot . '/lib/externallib.php');
+
 
 /**
  * change_status_external_test

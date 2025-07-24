@@ -43,7 +43,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot . '/lib/externallib.php');
+
 /**
  * Revoke certificate
  * @package    mod_certifygen

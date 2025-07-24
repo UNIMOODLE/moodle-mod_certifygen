@@ -44,7 +44,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot . '/lib/externallib.php');
+
 /**
  * Download teacher certificate test
  * @package    mod_certifygen

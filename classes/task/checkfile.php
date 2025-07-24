@@ -176,7 +176,6 @@ class checkfile extends scheduled_task {
                     certifygen_error::manage_certifygen_error(0, (object)$data);
                 }
             } catch (moodle_exception $e) {
-                debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
                 $validation->set('status', certifygen_validations::STATUS_STORAGE_ERROR);
                 $validation->save();
                 $data = [

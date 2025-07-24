@@ -206,7 +206,6 @@ class get_json_certificate_external extends external_api {
                 $result['json'] = json_encode($output);
             }
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . " error: " . $e->getMessage());
             unset($result['json']);
             $haserror = true;
             $result['error']['code'] = $e->errorcode;

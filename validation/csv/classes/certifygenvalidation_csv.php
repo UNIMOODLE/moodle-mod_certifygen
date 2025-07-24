@@ -338,10 +338,8 @@ xmlns:fir="http://firma.ws.producto.com/">
             $result['file'] = $file;
             return $result;
         } catch (SoapFault $e) {
-            debugging(__FUNCTION__ . ' SoapFault error: ' . $e->getMessage());
             $message = $e->getMessage();
         } catch (Exception $e) {
-            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             $message = $e->getMessage();
         }
         $result['error']['code'] = $message;
@@ -409,25 +407,21 @@ xmlns:fir="http://firma.ws.producto.com/">
                 'url' => $url,
             ];
         } catch (coding_exception $e) {
-            debugging(__FUNCTION__ . ' coding_exception error: ' . $e->getMessage());
             return [
                 'haserror' => true,
                 'message' => $e->getMessage(),
             ];
         } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . '  moodle_exception error: ' . $e->getMessage());
             return [
                 'haserror' => true,
                 'message' => $e->getMessage(),
             ];
         } catch (SoapFault $e) {
-            debugging(__FUNCTION__ . ' SoapFault error: ' . $e->getMessage());
             return [
                 'haserror' => true,
                 'message' => $e->getMessage(),
             ];
         } catch (Exception $e) {
-            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
             return [
                 'haserror' => true,
                 'message' => $e->getMessage(),
@@ -606,7 +600,6 @@ xmlns:fir="http://firma.ws.producto.com/">
             if ($resultado === 'KO') {
                 $codeerror = (string) $anularpeticionresponsechildren->error->children()->codError;
                 $descerror = (string) $anularpeticionresponsechildren->error->children()->descError;
-                debugging(__FUNCTION__ . '  moodle_exception error: ' . $descerror);
                 throw new moodle_exception(
                     'revokeerror',
                     'certifygenvalidation_csv',
@@ -617,10 +610,8 @@ xmlns:fir="http://firma.ws.producto.com/">
             }
         } catch (SoapFault $e) {
             $haserror = true;
-            debugging(__FUNCTION__ . '  SoapFault error: ' . $e->getMessage());
         } catch (Exception $e) {
             $haserror = true;
-            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
         }
         return [
             'haserror' => $haserror,
@@ -692,7 +683,6 @@ xmlns:fir="http://firma.ws.producto.com/">
             if ($resultado === 'KO') {
                 $codeerror = (string) $iniciarprocesofirmaresponsechildren->error->children()->codError;
                 $descerror = (string) $iniciarprocesofirmaresponsechildren->error->children()->descError;
-                debugging(__FUNCTION__ . '  moodle_exception error: ' . $descerror);
                 throw new moodle_exception('getstatuserror', 'certifygenvalidation_csv', '', null, $codeerror . ' - ' . $descerror);
             }
             // File id is obtained.
@@ -709,11 +699,10 @@ xmlns:fir="http://firma.ws.producto.com/">
             }
             return certifygen_validations::STATUS_IN_PROGRESS;
         } catch (SoapFault $e) {
-            debugging(__FUNCTION__ . '  SoapFault error: ' . $e->getMessage());
+            return certifygen_validations::STATUS_VALIDATION_ERROR;
         } catch (Exception $e) {
-            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
+            return certifygen_validations::STATUS_VALIDATION_ERROR;
         }
-        return certifygen_validations::STATUS_VALIDATION_ERROR;
     }
 
     /**

@@ -343,29 +343,24 @@ class provider implements
                 $filearea = '';
                 break;
         }
-        try {
-            if (!empty($filearea)) {
-                $fs->delete_area_files($context->id, 'mod_certifygen', $filearea, $validation->get('id'));
-            }
-            if (empty($validation->get('certifygenid'))) {
-                $fs->delete_area_files(
-                    $context->id,
-                    'mod_certifygen',
-                    'certifygenreport',
-                    $validation->get('id')
-                );
-            } else {
-                $fs->delete_area_files(
-                    context_system::instance()->id,
-                    'mod_certifygen',
-                    'issues',
-                    $validation->get('id')
-                );
-            }
-        } catch (moodle_exception $e) {
-            debugging(__FUNCTION__ . ' e: ' . $e->getMessage());
+        if (!empty($filearea)) {
+            $fs->delete_area_files($context->id, 'mod_certifygen', $filearea, $validation->get('id'));
         }
-
+        if (empty($validation->get('certifygenid'))) {
+            $fs->delete_area_files(
+                $context->id,
+                'mod_certifygen',
+                'certifygenreport',
+                $validation->get('id')
+            );
+        } else {
+            $fs->delete_area_files(
+                context_system::instance()->id,
+                'mod_certifygen',
+                'issues',
+                $validation->get('id')
+            );
+        }
         // Delete issue records.
         $validation->delete();
     }
