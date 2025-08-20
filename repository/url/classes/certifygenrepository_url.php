@@ -28,7 +28,7 @@
  */
 namespace certifygenrepository_url;
 
-use coding_exception;
+use \core\exception\coding_exception;
 use context_course;
 use context_system;
 use dml_exception;
@@ -38,7 +38,7 @@ use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_repository;
 use mod_certifygen\persistents\certifygen_validations;
-use moodle_exception;
+use \core\exception\moodle_exception;
 use core\url;
 use stored_file;
 /**

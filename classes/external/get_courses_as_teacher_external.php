@@ -37,14 +37,14 @@ use dml_exception;
 use \core_external\external_api;
 use \core_external\external_function_parameters;
 use \core_external\external_single_structure;
-use external_multiple_structure;
+use \core_external\external_multiple_structure;
 use \core_external\external_value;
-use invalid_parameter_exception;
+use \core\exception\invalid_parameter_exception;
 use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen_context;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-use moodle_exception;
+use \core\exception\moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 

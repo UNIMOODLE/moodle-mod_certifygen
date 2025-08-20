@@ -28,13 +28,13 @@
 
 namespace certifygenrepository_onedrive;
 
-use coding_exception;
+use \core\exception\coding_exception;
 use core\oauth2\rest_exception;
 use dml_exception;
 use mod_certifygen\interfaces\icertificaterepository;
 use mod_certifygen\persistents\certifygen_repository;
 use mod_certifygen\persistents\certifygen_validations;
-use moodle_exception;
+use \core\exception\moodle_exception;
 use core\url;
 use stored_file;
 /**

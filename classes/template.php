@@ -33,7 +33,7 @@
 
 namespace mod_certifygen;
 
-use coding_exception;
+use \core\exception\coding_exception;
 use context_system;
 use core\lock\lock;
 use core\message\message;

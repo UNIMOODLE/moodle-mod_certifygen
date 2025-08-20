@@ -31,7 +31,7 @@
  */
 namespace mod_certifygen\persistents;
 
-use coding_exception;
+use \core\exception\coding_exception;
 use core\invalid_persistent_exception;
 use core\persistent;
 use stdClass;

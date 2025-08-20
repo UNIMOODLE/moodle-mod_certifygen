@@ -32,7 +32,7 @@
 
 namespace certifygenrepository_onedrive\privacy;
 
-use coding_exception;
+use \core\exception\coding_exception;
 use context;
 use context_module;
 use context_system;
@@ -45,7 +45,7 @@ use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
 use dml_exception;
 use mod_certifygen\persistents\certifygen_validations;
-use moodle_exception;
+use \core\exception\moodle_exception;
 
 /**
  * Implementation of the privacy subsystem plugin provider for the certifygen certifygenrepository_onedrive subplugin.

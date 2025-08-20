@@ -29,20 +29,20 @@
  */
 namespace mod_certifygen\external;
 
-use coding_exception;
+use \core\exception\coding_exception;
 use context_system;
 use core_course_category;
 use dml_exception;
 use \core_external\external_api;
-use external_description;
+use \core_external\external_description;
 use \core_external\external_function_parameters;
-use external_multiple_structure;
+use \core_external\external_multiple_structure;
 use \core_external\external_single_structure;
 use \core_external\external_value;
-use invalid_parameter_exception;
+use \core\exception\invalid_parameter_exception;
 use mod_certifygen\persistents\certifygen_context;
-use moodle_exception;
-use restricted_context_exception;
+use \core\exception\moodle_exception;
+use \core_external\restricted_context_exception;
 
 /**
  * Search my courses ws class

@@ -34,7 +34,7 @@ global $CFG;
 require_once("$CFG->libdir/tablelib.php");
 require_once("$CFG->libdir/moodlelib.php");
 
-use coding_exception;
+use \core\exception\coding_exception;
 use dml_exception;
 use html_writer;
 use mod_certifygen\certifygen;

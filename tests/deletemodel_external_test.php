@@ -33,9 +33,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_certifygen;
-use coding_exception;
+use \core\exception\coding_exception;
 use dml_exception;
-use invalid_parameter_exception;
+use \core\exception\invalid_parameter_exception;
 use mod_certifygen\external\deletemodel_external;
 use mod_certifygen\persistents\certifygen_model;
 

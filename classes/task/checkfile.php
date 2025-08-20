@@ -35,7 +35,7 @@
 
 namespace mod_certifygen\task;
 
-use coding_exception;
+use \core\exception\coding_exception;
 use core\invalid_persistent_exception;
 use core\task\scheduled_task;
 use mod_certifygen\interfaces\icertificaterepository;
@@ -45,7 +45,7 @@ use mod_certifygen\persistents\certifygen_error;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_repository;
 use mod_certifygen\persistents\certifygen_validations;
-use moodle_exception;
+use \core\exception\moodle_exception;
 
 /**
  * There is a task, checkfile, that is recomended to enable it when the validation subplugin used does not receive inmediately

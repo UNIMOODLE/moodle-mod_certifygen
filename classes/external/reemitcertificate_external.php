@@ -32,15 +32,15 @@
 
 namespace mod_certifygen\external;
 
-use coding_exception;
+use \core\exception\coding_exception;
 use context_module;
 use \core_external\external_api;
 use \core_external\external_function_parameters;
 use \core_external\external_single_structure;
 use \core_external\external_value;
-use invalid_parameter_exception;
+use \core\exception\invalid_parameter_exception;
 use mod_certifygen\persistents\certifygen_validations;
-use moodle_exception;
+use \core\exception\moodle_exception;
 use tool_certificate\external\issues;
 
 defined('MOODLE_INTERNAL') || die();

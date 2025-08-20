@@ -31,7 +31,7 @@
  */
 namespace mod_certifygen\output\views;
 use dml_exception;
-use invalid_parameter_exception;
+use \core\exception\invalid_parameter_exception;
 use mod_certifygen\external\getmodellisttable_external;
 use renderable;
 use required_capability_exception;

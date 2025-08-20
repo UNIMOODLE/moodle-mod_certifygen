@@ -38,7 +38,7 @@ global $CFG;
 require_once($CFG->libdir . '/tablelib.php');
 
 use cm_info;
-use coding_exception;
+use \core\exception\coding_exception;
 use context_course;
 use context_module;
 use dml_exception;
@@ -46,7 +46,7 @@ use mod_certifygen\certifygen;
 use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-use moodle_exception;
+use \core\exception\moodle_exception;
 use stdClass;
 use table_sql;
 /**

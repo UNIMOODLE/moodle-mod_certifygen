@@ -37,12 +37,12 @@ global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
 
 use certifygenreport_basic\useofthecoursealgorithm;
-use coding_exception;
+use \core\exception\coding_exception;
 use context_course;
 use context_system;
 use core_course_category;
 use dml_exception;
-use moodle_exception;
+use \core\exception\moodle_exception;
 use core\url;
 use renderable;
 use renderer_base;

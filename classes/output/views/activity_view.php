@@ -36,7 +36,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/mod/certifygen/lib.php');
-use coding_exception;
+use \core\exception\coding_exception;
 use context_module;
 use core_table\local\filter\filter;
 use core_table\local\filter\integer_filter;
@@ -45,7 +45,7 @@ use dml_exception;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\tables\activityteacher_table;
 use mod_certifygen\tables\certificates_filterset;
-use moodle_exception;
+use \core\exception\moodle_exception;
 use core\url;
 use renderable;
 use stdClass;

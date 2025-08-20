@@ -29,7 +29,7 @@
 namespace certifygenvalidation_csv;
 
 use certifygenvalidation_csv\persistents\certifygenvalidationcsv;
-use coding_exception;
+use \core\exception\coding_exception;
 use context_course;
 use context_system;
 use core\session\exception;
@@ -38,7 +38,7 @@ use file_exception;
 use mod_certifygen\certifygen_file;
 use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen_validations;
-use moodle_exception;
+use \core\exception\moodle_exception;
 use core\url;
 use SoapFault;
 use stored_file;

@@ -31,10 +31,10 @@
  */
 
 namespace certifygenreport_basic\output;
-use coding_exception;
+use \core\exception\coding_exception;
 use dml_exception;
 use plugin_renderer_base;
-use moodle_exception;
+use \core\exception\moodle_exception;
 /**
  * Renderer
  * @package    certifygenreport_basic

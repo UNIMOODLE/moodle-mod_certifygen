@@ -31,13 +31,13 @@
  */
 
 namespace mod_certifygen\event;
-use coding_exception;
+use \core\exception\coding_exception;
 use context_module;
 use context_system;
 use core\event\base;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-use moodle_exception;
+use \core\exception\moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 

@@ -30,14 +30,14 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_certifygen\output;
-use coding_exception;
+use \core\exception\coding_exception;
 use dml_exception;
 use mod_certifygen\output\views\activity_view;
 use mod_certifygen\output\views\model_view;
 use mod_certifygen\output\views\profile_my_certificates_view;
 use mod_certifygen\output\views\showerrors_view;
 use mod_certifygen\output\views\associatemodelcontexts_view;
-use moodle_exception;
+use \core\exception\moodle_exception;
 use plugin_renderer_base;
 /**
  * Renderer

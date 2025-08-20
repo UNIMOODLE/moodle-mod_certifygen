@@ -28,7 +28,7 @@
  */
 namespace certifygenrepository_onedrive;
 
-use coding_exception;
+use \core\exception\coding_exception;
 use core\oauth2\api;
 use core\oauth2\client;
 use core\oauth2\issuer;
@@ -38,7 +38,7 @@ use core_filetypes;
 use curl;
 use dml_exception;
 use dml_missing_record_exception;
-use moodle_exception;
+use \core\exception\moodle_exception;
 use core\url;
 use oauth2_client;
 use repository_onedrive\rest;

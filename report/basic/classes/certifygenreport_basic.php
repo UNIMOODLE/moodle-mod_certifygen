@@ -29,12 +29,12 @@
  */
 namespace certifygenreport_basic;
 use certifygenreport_basic\output\report_view;
-use coding_exception;
+use \core\exception\coding_exception;
 use context_system;
 use dml_exception;
 use mod_certifygen\interfaces\icertificatereport;
 use mod_certifygen\persistents\certifygen_validations;
-use moodle_exception;
+use \core\exception\moodle_exception;
 
 /**
  * certifygenreport_basic

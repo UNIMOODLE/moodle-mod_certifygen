@@ -38,7 +38,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
-use coding_exception;
+use \core\exception\coding_exception;
 use mod_certifygen\persistents\certifygen_model;
 use core\url;
 use stdClass;

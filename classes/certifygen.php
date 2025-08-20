@@ -35,7 +35,7 @@
 
 namespace mod_certifygen;
 
-use coding_exception;
+use \core\exception\coding_exception;
 use context;
 use context_course;
 use context_module;
@@ -51,7 +51,7 @@ use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen_error;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-use moodle_exception;
+use \core\exception\moodle_exception;
 use stdClass;
 use stored_file;
 use stored_file_creation_exception;

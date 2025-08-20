@@ -35,7 +35,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once("$CFG->dirroot/mod/certifygen/lib.php");
-use coding_exception;
+use \core\exception\coding_exception;
 use context;
 use context_system;
 use core\invalid_persistent_exception;
@@ -45,7 +45,7 @@ use html_writer;
 use mod_certifygen\interfaces\icertificaterepository;
 use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen_model;
-use moodle_exception;
+use \core\exception\moodle_exception;
 use core\url;
 use stdClass;
 use tool_certificate\permission;

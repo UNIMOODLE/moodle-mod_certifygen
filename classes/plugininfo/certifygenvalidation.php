@@ -33,7 +33,7 @@ namespace mod_certifygen\plugininfo;
 use admin_settingpage;
 use core\plugininfo\base;
 use core_plugin_manager;
-use moodle_exception;
+use \core\exception\moodle_exception;
 use core\url;
 use part_of_admin_tree;
 

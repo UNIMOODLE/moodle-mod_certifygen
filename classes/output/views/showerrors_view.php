@@ -30,7 +30,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_certifygen\output\views;
-use coding_exception;
+use \core\exception\coding_exception;
 use core_table\local\filter\filter;
 use core_table\local\filter\string_filter;
 use mod_certifygen\forms\errorfiltersform;

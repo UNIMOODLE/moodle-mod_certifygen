@@ -36,7 +36,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/mod/certifygen/lib.php');
-use coding_exception;
+use \core\exception\coding_exception;
 use context;
 use context_system;
 use core\invalid_persistent_exception;
@@ -44,7 +44,7 @@ use core_course_category;
 use core_form\dynamic_form;
 use dml_exception;
 use mod_certifygen\persistents\certifygen_context;
-use moodle_exception;
+use \core\exception\moodle_exception;
 use core\url;
 /**
  * Associate context form

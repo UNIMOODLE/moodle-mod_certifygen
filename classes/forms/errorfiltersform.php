@@ -31,7 +31,7 @@
  */
 namespace mod_certifygen\forms;
 
-use coding_exception;
+use \core\exception\coding_exception;
 use core\url;
 use moodleform;
 /**

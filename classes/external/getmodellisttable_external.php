@@ -33,7 +33,7 @@ namespace mod_certifygen\external;
 use context_system;
 use dml_exception;
 use \core_external\external_api;
-use invalid_parameter_exception;
+use \core\exception\invalid_parameter_exception;
 use mod_certifygen\tables\modellist_table;
 use core\url;
 use \core_external\external_function_parameters;
