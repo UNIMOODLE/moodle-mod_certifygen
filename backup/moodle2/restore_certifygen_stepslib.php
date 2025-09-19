@@ -220,7 +220,7 @@ class restore_certifygen_activity_structure_step extends restore_activity_struct
         $fs = get_file_storage();
         // Files from mod_certifygen.
         $validationsfiles = $fs->get_area_files(
-            context_course::instance($this->oldcourseid)->id,
+            course::instance($this->oldcourseid)->id,
             'mod_certifygen',
             'certifygenvalidationvalidated',
             $oldid
@@ -230,7 +230,7 @@ class restore_certifygen_activity_structure_step extends restore_activity_struct
                 continue;
             }
             $filerecord = [
-                    'contextid' => context_course::instance($this->get_courseid())->id,
+                    'contextid' => course::instance($this->get_courseid())->id,
                     'component' => $file->get_component(),
                     'filearea' => $file->get_filearea(),
                     'itemid' => $newvalidationid,
@@ -241,7 +241,7 @@ class restore_certifygen_activity_structure_step extends restore_activity_struct
         }
         // Files from mod_certifygen.
         $repositoryfiles = $fs->get_area_files(
-            context_course::instance($this->oldcourseid)->id,
+            course::instance($this->oldcourseid)->id,
             'mod_certifygen',
             'certifygenrepository',
             $oldid
@@ -251,7 +251,7 @@ class restore_certifygen_activity_structure_step extends restore_activity_struct
                 continue;
             }
             $filerecord = [
-                    'contextid' => context_course::instance($this->get_courseid())->id,
+                    'contextid' => course::instance($this->get_courseid())->id,
                     'component' => $file->get_component(),
                     'filearea' => $file->get_filearea(),
                     'itemid' => $newvalidationid,
@@ -332,7 +332,7 @@ class restore_certifygen_activity_structure_step extends restore_activity_struct
                     continue;
                 }
                 $filerecord = [
-                        'contextid' => context_system::instance()->id,
+                        'contextid' => system::instance()->id,
                         'component' => $file->get_component(),
                         'filearea' => $file->get_filearea(),
                         'itemid' => $newitemid,

@@ -29,12 +29,12 @@
  */
 namespace certifygenreport_basic;
 use certifygenreport_basic\output\report_view;
-use \core\exception\coding_exception;
-use context_system;
+use core\exception\coding_exception;
+use core\context\system;
 use dml_exception;
 use mod_certifygen\interfaces\icertificatereport;
 use mod_certifygen\persistents\certifygen_validations;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 
 /**
  * certifygenreport_basic
@@ -105,7 +105,7 @@ class certifygenreport_basic implements icertificatereport {
             }
             $res = $doc->Output($teacherrequest->get('code') . '_' . time() . '.pdf', 'S');
             $fs = get_file_storage();
-            $context = context_system::instance();
+            $context = system::instance();
             $filerecord = [
                 'contextid' => $context->id,
                 'component' => self::FILE_COMPONENT,

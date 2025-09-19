@@ -28,16 +28,15 @@
  */
 namespace certifygenvalidation_none;
 
-use certifygenvalidation_none\persistents\certifygenvalidationwebservice;
-use \core\exception\coding_exception;
-use context_course;
-use context_system;
+use core\exception\coding_exception;
+use core\context\course;
+use core\context\system;
 use dml_exception;
 use mod_certifygen\certifygen_file;
 use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_validations;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 /**
  * None
  * @package   certifygenvalidation_none
@@ -56,11 +55,11 @@ class certifygenvalidation_none implements icertificatevalidation {
         try {
             // Change context.
             $fs = get_file_storage();
-            $context = context_system::instance();
+            $context = system::instance();
             $cv = new certifygen_validations($file->get_validationid());
             if (!empty($cv->get('certifygenid'))) {
                 $cert = new certifygen($cv->get('certifygenid'));
-                $context = context_course::instance($cert->get('course'));
+                $context = course::instance($cert->get('course'));
             }
             $filerecord = [
                 'contextid' => $context->id,
@@ -96,10 +95,10 @@ class certifygenvalidation_none implements icertificatevalidation {
     public function get_file(int $courseid, int $validationid): array {
         $fs = get_file_storage();
         try {
-            $context = context_system::instance();
+            $context = system::instance();
             $cv = new certifygen_validations($validationid);
             if (!empty($cv->get('certifygenid'))) {
-                $context = context_course::instance($courseid);
+                $context = course::instance($courseid);
             }
             $code = certifygen_validations::get_certificate_code($cv);
             $filerecord = [
@@ -141,7 +140,7 @@ class certifygenvalidation_none implements icertificatevalidation {
      */
     public function can_revoke(int $courseid): bool {
         if ($courseid) {
-            return has_capability('tool/certificate:issue', context_course::instance($courseid));
+            return has_capability('tool/certificate:issue', course::instance($courseid));
         } else {
             return true;
         }

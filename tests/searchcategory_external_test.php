@@ -34,12 +34,12 @@
  */
 
 namespace mod_certifygen;
-use \core\exception\coding_exception;
+use core\exception\coding_exception;
 use dml_exception;
-use \core\exception\invalid_parameter_exception;
+use core\exception\invalid_parameter_exception;
 use mod_certifygen\external\searchcategory_external;
-use \core\exception\moodle_exception;
-use \core_external\restricted_context_exception;
+use core\exception\moodle_exception;
+use core_external\restricted_context_exception;
 
 defined('MOODLE_INTERNAL') || die();
 

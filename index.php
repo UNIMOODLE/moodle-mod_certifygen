@@ -73,7 +73,7 @@ $table->align = ["left", "center"];
 
 foreach ($certifygens as $instanceid => $certifygen) {
     [$course, $cm] = get_course_and_cm_from_instance($certifygen->id, 'certifygen');
-    $context = context_module::instance($cm->id);
+    $context = module::instance($cm->id);
     $class = $certifygen->visible ? null : ['class' => 'dimmed']; // Hidden modules are dimmed.
     $link = html_writer::link(new url('view.php', ['id' => $cm->id]), format_string($certifygen->name), $class);
     $courselink = html_writer::link(

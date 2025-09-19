@@ -30,16 +30,16 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_certifygen\external;
-use context_system;
-use \core_external\external_api;
-use \core_external\external_function_parameters;
-use \core_external\external_single_structure;
-use \core_external\external_value;
+use core\context\system;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_value;
 use mod_certifygen\interfaces\icertificatereport;
 use mod_certifygen\persistents\certifygen_context;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -98,7 +98,7 @@ class get_json_teacher_certificate_external extends external_api {
                 'modelid' => $modelid,
             ]
         );
-        $context = context_system::instance();
+        $context = system::instance();
         $results = ['error' => []];
         try {
             if (!has_capability('mod/certifygen:manage', $context)) {

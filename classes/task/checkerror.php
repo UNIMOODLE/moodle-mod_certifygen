@@ -35,7 +35,7 @@
 
 namespace mod_certifygen\task;
 
-use \core\exception\coding_exception;
+use core\exception\coding_exception;
 use core\task\scheduled_task;
 use dml_exception;
 use mod_certifygen\interfaces\icertificaterepository;
@@ -43,7 +43,7 @@ use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 
 /**
  * There is a task, checkerror. It is responsible for searching for error states in the validation processes and returning them

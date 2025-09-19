@@ -31,22 +31,18 @@
  */
 namespace certifygenvalidation_webservice\external;
 
-use \core\exception\coding_exception;
-use context_course;
-use context_system;
-use \core_external\external_api;
-use \core_external\external_function_parameters;
-use \core_external\external_single_structure;
-use \core_external\external_value;
-use \core\exception\invalid_parameter_exception;
-use mod_certifygen\external\emitteacherrequest_external;
+use core\exception\coding_exception;
+use core\context\course;
+use core\context\system;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_value;
+use core\exception\invalid_parameter_exception;
 use mod_certifygen\interfaces\icertificatereport;
-use mod_certifygen\interfaces\icertificaterepository;
-use mod_certifygen\interfaces\icertificatevalidation;
-use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -112,7 +108,7 @@ class get_draft_teacher_certificate_external extends external_api {
 
         $filecontent = '';
         try {
-            $context = context_system::instance();
+            $context = system::instance();
             require_capability('mod/certifygen:manage', $context);            
             // Choose user parameter.
             $uparam = mod_certifygen_validate_user_parameters_for_ws($params['userid'], $params['userfield']);
@@ -131,7 +127,7 @@ class get_draft_teacher_certificate_external extends external_api {
                 // Is user enrolled on this course as teacher?
                 $coursesarray = explode(',', $courses);
                 foreach ($coursesarray as $course) {
-                    $context = context_course::instance($course);
+                    $context = course::instance($course);
                     if (!has_capability('moodle/course:managegroups', $context, $userid)) {
                         $result['error']['code'] = 'user_not_enrolled_as_teacher';
                         $result['error']['message'] = get_string('teacher_not_enrolled', 'mod_certifygen', $course);

@@ -32,6 +32,7 @@
 
 use mod_certifygen\event\course_module_viewed;
 use mod_certifygen\output\views\activity_view;
+use core\context\module;
 
 require_once('../../config.php');
 require_once('lib.php');
@@ -48,7 +49,7 @@ $certifygenmodel = $DB->get_record('certifygen_model', ['id' => $cmodel->modelid
 
 $PAGE->set_url('/mod/certifygen/view.php', ['id' => $id]);
 require_login($course, false, $cm);
-$cmcontext = context_module::instance($cm->id);
+$cmcontext = module::instance($cm->id);
 require_capability('mod/certifygen:view', $cmcontext);
 
 $PAGE->set_heading($course->fullname);

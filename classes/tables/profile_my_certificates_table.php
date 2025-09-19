@@ -36,13 +36,13 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->libdir . '/tablelib.php');
 
-use \core\exception\coding_exception;
+use core\exception\coding_exception;
 use dml_exception;
 use mod_certifygen\certifygen;
 use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 use stdClass;
 use table_sql;
 /**

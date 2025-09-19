@@ -37,17 +37,17 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
 require_once($CFG->dirroot . '/lib/completionlib.php');
-use context_module;
-use \core_external\external_api;
-use \core_external\external_function_parameters;
-use \core_external\external_single_structure;
-use \core_external\external_value;
-use \core\exception\invalid_parameter_exception;
+use core\context\module;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_value;
+use core\exception\invalid_parameter_exception;
 use mod_certifygen\event\certificate_downloaded;
 use mod_certifygen\interfaces\icertificaterepository;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 /**
  * Download student certificate
  * @package    mod_certifygen
@@ -103,7 +103,7 @@ class downloadcertificate_external extends external_api {
             // Step 1: verified status finished.
             $validation = new certifygen_validations($validationid);
             [$course, $cm] = get_course_and_cm_from_instance($instanceid, 'certifygen');
-            $context = context_module::instance($cm->id);
+            $context = module::instance($cm->id);
             if (
                 $USER->id != $validation->get('userid')
                 && !has_capability('mod/certifygen:canemitotherscertificates', $context)
@@ -152,7 +152,6 @@ class downloadcertificate_external extends external_api {
                     ) {
                         $validation->set('isdownloaded', 1);
                         $validation->update();
-                        //\course_modinfo::purge_course_module_cache($courseid, $cm->id);
                         \course_modinfo::purge_course_cache($courseid);
                     }
                 }

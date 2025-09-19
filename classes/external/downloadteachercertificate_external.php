@@ -30,17 +30,17 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_certifygen\external;
-use context_system;
-use \core_external\external_api;
-use \core_external\external_function_parameters;
-use \core_external\external_single_structure;
-use \core_external\external_value;
-use \core\exception\invalid_parameter_exception;
+use core\context\system;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_value;
+use core\exception\invalid_parameter_exception;
 use mod_certifygen\event\certificate_downloaded;
 use mod_certifygen\interfaces\icertificaterepository;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 
 /**
  * Download teacher certificate
@@ -82,7 +82,7 @@ class downloadteachercertificate_external extends external_api {
         try {
             // Step 1: verified status finished.
             $trequest = new certifygen_validations($id);
-            $context = context_system::instance();
+            $context = system::instance();
             if (
                 $USER->id != $trequest->get('userid')
                 && !has_capability('mod/certifygen:canemitotherscertificates', $context)

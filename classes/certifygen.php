@@ -35,10 +35,10 @@
 
 namespace mod_certifygen;
 
-use \core\exception\coding_exception;
-use context;
-use context_course;
-use context_module;
+use core\exception\coding_exception;
+use core\context;
+use core\context\course;
+use core\context\module;
 use core\invalid_persistent_exception;
 use core\message\message;
 use core\url;
@@ -51,7 +51,7 @@ use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen_error;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 use stdClass;
 use stored_file;
 use stored_file_creation_exception;
@@ -255,7 +255,7 @@ class certifygen {
         // Get user certificate.
         if ($existingcertificate = self::get_user_certificate($instanceid, $userid, $course->id, $templateid, $lang)) {
             $issue = template::get_issue_from_code($existingcertificate->code);
-            $context = context_course::instance($issue->courseid, IGNORE_MISSING) ?: null;
+            $context = course::instance($issue->courseid, IGNORE_MISSING) ?: null;
             $template = $issue ? template::instance($issue->templateid, (object) ['lang' => $lang]) : null;
             if (
                 $template && (permission::can_verify() ||
@@ -297,7 +297,7 @@ class certifygen {
         self::issue_certificate($instanceid, $user, $templateid, $course, $lang);
         if ($existingcertificate = self::get_user_certificate($instanceid, $userid, $course->id, $templateid, $lang)) {
             $issue = template::get_issue_from_code($existingcertificate->code);
-            $context = context_course::instance($issue->courseid, IGNORE_MISSING) ?: null;
+            $context = course::instance($issue->courseid, IGNORE_MISSING) ?: null;
             $template = $issue ? template::instance($issue->templateid, (object) ['lang' => $lang]) : null;
             if (
                 $template && (permission::can_verify() ||
@@ -754,7 +754,7 @@ class certifygen {
     public static function get_students(int $cmid, int $courseid): array {
         global $DB;
         $selectedusers = [];
-        $cmcontext = context_module::instance($cmid);
+        $cmcontext = module::instance($cmid);
         $sql = "SELECT DISTINCT u.id
                   FROM {user} u
                   JOIN {user_enrolments} ue ON ue.userid = u.id
@@ -787,7 +787,7 @@ class certifygen {
         $courseid = SITEID;
         if ($validation->get('certifygenid') > 0) {
             [$course, $cm] = get_course_and_cm_from_instance((int)$validation->get('certifygenid'), 'certifygen');
-            $modcontext = \context_module::instance($cm->id);
+            $modcontext = module::instance($cm->id);
             $url = new url('/mod/certifygen/view.php', ['id' => $cm->id]);
             $contexturlname = format_string($cm->name, $modcontext->id);
             $courseid = $course->id;

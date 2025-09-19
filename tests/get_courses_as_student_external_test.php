@@ -40,7 +40,6 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/certificate/tests/generator/lib.php');
-require_once($CFG->dirroot . '/completion/criteria/completion_criteria_activity.php');
 
 /**
  * Get courses as student test

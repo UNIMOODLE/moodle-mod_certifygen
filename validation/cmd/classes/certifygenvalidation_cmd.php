@@ -28,9 +28,9 @@
  */
 namespace certifygenvalidation_cmd;
 
-use \core\exception\coding_exception;
-use context_course;
-use context_system;
+use core\exception\coding_exception;
+use core\context\course;
+use core\context\system;
 use core\session\exception;
 use dml_exception;
 use file_exception;
@@ -38,7 +38,7 @@ use mod_certifygen\certifygen_file;
 use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_validations;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 use stored_file;
 use stored_file_creation_exception;
 
@@ -144,11 +144,11 @@ class certifygenvalidation_cmd implements icertificatevalidation {
 
         // Save pdf on moodledata.
         $fs = get_file_storage();
-        $context = context_system::instance();
+        $context = system::instance();
         $cv = new certifygen_validations($file->get_validationid());
         if (!empty($cv->get('certifygenid'))) {
             $cert = new certifygen($cv->get('certifygenid'));
-            $context = context_course::instance($cert->get('course'));
+            $context = course::instance($cert->get('course'));
         }
         $filerecord = self::get_filerecord_array(
             $context->id,
@@ -191,9 +191,9 @@ class certifygenvalidation_cmd implements icertificatevalidation {
             $validation = new certifygen_validations($validationid);
             $code = certifygen_validations::get_certificate_code($validation);
             $fs = get_file_storage();
-            $contextid = context_system::instance()->id;
+            $contextid = system::instance()->id;
             if (!empty($courseid)) {
-                $contextid = context_course::instance($courseid)->id;
+                $contextid = course::instance($courseid)->id;
             }
             $file = $fs->get_file(
                 $contextid,

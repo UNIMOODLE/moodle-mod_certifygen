@@ -30,9 +30,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_certifygen\persistents;
-use \core\exception\coding_exception;
+use core\exception\coding_exception;
 use core\persistent;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 
 /**
  * certifygen_model

@@ -32,20 +32,20 @@
 
 namespace mod_certifygen\external;
 use cm_info;
-use context_course;
-use context_system;
+use core\context\course;
+use core\context\system;
 use dml_exception;
-use \core_external\external_api;
-use \core_external\external_function_parameters;
-use \core_external\external_multiple_structure;
-use \core_external\external_single_structure;
-use \core_external\external_value;
-use \core\exception\invalid_parameter_exception;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_multiple_structure;
+use core_external\external_single_structure;
+use core_external\external_value;
+use core\exception\invalid_parameter_exception;
 use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
 use certifygenfilter;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -94,7 +94,7 @@ class get_id_instance_certificate_external extends external_api {
             ['userid' => $userid, 'userfield' => $userfield,
                 'lang' => $lang]
         );
-        $context = context_system::instance();
+        $context = system::instance();
         $results = ['error' => []];
         $haserror = false;
         $instances = [];
@@ -129,7 +129,7 @@ class get_id_instance_certificate_external extends external_api {
             }
 
             // Filter to return course names in $lang language.
-            $filter = new certifygenfilter(context_system::instance(), [], $lang);
+            $filter = new certifygenfilter(system::instance(), [], $lang);
 
             // Get all mod_certifygen activities.
             $allactivities = certifygen::get_records();
@@ -143,7 +143,7 @@ class get_id_instance_certificate_external extends external_api {
                 if (!in_array($enrolment->ctxinstance, $courseids)) {
                     continue;
                 }
-                $coursecontext = context_course::instance($enrolment->ctxinstance);
+                $coursecontext = course::instance($enrolment->ctxinstance);
                 if (
                     !has_capability(
                         'mod/certifygen:emitmyactivitycertificate',

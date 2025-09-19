@@ -36,8 +36,8 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/mod/certifygen/lib.php');
-use \core\exception\coding_exception;
-use context_module;
+use core\exception\coding_exception;
+use core\context\module;
 use core_table\local\filter\filter;
 use core_table\local\filter\integer_filter;
 use core_table\local\filter\string_filter;
@@ -45,7 +45,7 @@ use dml_exception;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\tables\activityteacher_table;
 use mod_certifygen\tables\certificates_filterset;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 use core\url;
 use renderable;
 use stdClass;
@@ -92,7 +92,7 @@ class activity_view implements renderable, templatable {
     public function __construct(int $courseid, int $templateid, stdClass $cm, string $lang = "", int $pagesize = 10) {
         global $DB, $USER;
 
-        $ccontext = context_module::instance($cm->id);
+        $ccontext = module::instance($cm->id);
         $this->isteacher = is_siteadmin($USER->id) || !has_capability('mod/certifygen:emitmyactivitycertificate', $ccontext);
         $this->courseid = $courseid;
         $this->templateid = $templateid;

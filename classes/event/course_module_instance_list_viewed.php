@@ -26,6 +26,7 @@
 namespace mod_certifygen\event;
 defined('MOODLE_INTERNAL') || die();
 
+use core\context\course;
 /**
  * The mod_certifygen instance list viewed event class.
  *
@@ -45,7 +46,7 @@ class course_module_instance_list_viewed extends \core\event\course_module_insta
      */
     public static function create_from_course(\stdClass $course) {
         $params = array(
-            'context' => \context_course::instance($course->id)
+            'context' => course::instance($course->id)
         );
         $event = \mod_certifygen\event\course_module_instance_list_viewed::create($params);
         $event->add_record_snapshot('course', $course);

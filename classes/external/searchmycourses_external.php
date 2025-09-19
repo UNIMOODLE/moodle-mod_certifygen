@@ -29,20 +29,20 @@
  */
 namespace mod_certifygen\external;
 
-use \core\exception\coding_exception;
-use context_system;
+use core\exception\coding_exception;
+use core\context\system;
 use core_course_category;
 use dml_exception;
-use \core_external\external_api;
-use \core_external\external_description;
-use \core_external\external_function_parameters;
-use \core_external\external_multiple_structure;
-use \core_external\external_single_structure;
-use \core_external\external_value;
-use \core\exception\invalid_parameter_exception;
+use core_external\external_api;
+use core_external\external_description;
+use core_external\external_function_parameters;
+use core_external\external_multiple_structure;
+use core_external\external_single_structure;
+use core_external\external_value;
+use core\exception\invalid_parameter_exception;
 use mod_certifygen\persistents\certifygen_context;
-use \core\exception\moodle_exception;
-use \core_external\restricted_context_exception;
+use core\exception\moodle_exception;
+use core_external\restricted_context_exception;
 
 /**
  * Search my courses ws class
@@ -88,7 +88,7 @@ class searchmycourses_external extends external_api {
         ]);
         $query = clean_param($params['query'], PARAM_TEXT);
         // Validate context.
-        $context = context_system::instance();
+        $context = system::instance();
         self::validate_context($context);
         $params = [
             'fullname' => '%' . $query . '%',

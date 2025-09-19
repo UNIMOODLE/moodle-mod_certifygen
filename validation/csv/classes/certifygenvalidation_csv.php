@@ -29,16 +29,16 @@
 namespace certifygenvalidation_csv;
 
 use certifygenvalidation_csv\persistents\certifygenvalidationcsv;
-use \core\exception\coding_exception;
-use context_course;
-use context_system;
+use core\exception\coding_exception;
+use core\context\course;
+use core\context\system;
 use core\session\exception;
 use dml_exception;
 use file_exception;
 use mod_certifygen\certifygen_file;
 use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen_validations;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 use core\url;
 use SoapFault;
 use stored_file;
@@ -442,9 +442,9 @@ xmlns:fir="http://firma.ws.producto.com/">
     public function create_file_from_content(string $content, int $validationid, string $code, $courseid) {
 
         // Get pdf content.
-        $context = context_system::instance();
+        $context = system::instance();
         if (!empty($courseid)) {
-            $context = context_course::instance($courseid);
+            $context = course::instance($courseid);
         }
 
         // Save pdf on moodledata.

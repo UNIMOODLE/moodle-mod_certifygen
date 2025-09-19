@@ -30,11 +30,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_certifygen\privacy;
-use \core\exception\coding_exception;
-use context;
-use context_course;
-use context_module;
-use context_system;
+use core\exception\coding_exception;
+use core\context;
+use core\context\course;
+use core\context\module;
+use core\context\system;
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\approved_userlist;
@@ -47,7 +47,7 @@ use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_repository;
 use mod_certifygen\persistents\certifygen_validations;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -150,14 +150,14 @@ class provider implements
         $user = $contextlist->get_user();
         $validations = certifygen_validations::get_records(['userid' => $user->id]);
         foreach ($validations as $validation) {
-            $context = context_system::instance();
+            $context = system::instance();
             $code = certifygen_validations::get_certificate_code($validation);
             if (!empty($validation->get('certifygenid'))) {
                 [$course, $cm] = get_course_and_cm_from_instance(
                     (int)$validation->get('certifygenid'),
                     'certifygen'
                 );
-                $context = context_module::instance($cm->id);
+                $context = module::instance($cm->id);
             }
             $certifygenmodel = new certifygen_model($validation->get('modelid'));
             $repositoryplugin = $certifygenmodel->get('repository');
@@ -196,7 +196,7 @@ class provider implements
         global $DB;
 
         $fs = get_file_storage();
-        if ($context instanceof context_system) {
+        if ($context instanceof system) {
             // Delete issue files.
             $fs->delete_area_files($context->id, 'mod_certifygen', 'certifygenrepository');
 
@@ -210,7 +210,7 @@ class provider implements
                 $validation->delete();
             }
         }
-        if ($context instanceof context_module) {
+        if ($context instanceof module) {
             $validations = certifygen_validations::get_records(['courses' => '']);
             foreach ($validations as $validation) {
                 $repository = certifygen_repository::get_record(['validationid' => $validation->get('id')]);
@@ -251,7 +251,7 @@ class provider implements
      */
     public static function get_users_in_context(userlist $userlist) {
         $context = $userlist->get_context();
-        if ($context instanceof context_module) {
+        if ($context instanceof module) {
             // Students.
             $params = [
                 'instanceid'    => $context->instanceid,
@@ -266,7 +266,7 @@ class provider implements
                       JOIN {certifygen_validations} cv ON cv.certifygenid = a.id
                      WHERE cm.id = :instanceid";
             $userlist->add_from_sql('userid', $sql, $params);
-        } else if ($context instanceof context_system) {
+        } else if ($context instanceof system) {
             // Teachers.
             $params = [
                 'certifygenid'    => 0,
@@ -292,8 +292,8 @@ class provider implements
 
         $context = $userlist->get_context();
         if (
-            !$context instanceof context_system
-            && !$context instanceof context_module
+            !$context instanceof system
+            && !$context instanceof module
         ) {
             return;
         }
@@ -324,10 +324,10 @@ class provider implements
     private static function remove_validation_data(certifygen_validations $validation): void {
         $fs = get_file_storage();
         // Delete issue files.
-        $context = context_system::instance();
+        $context = system::instance();
         if (empty($validation->get('certifygenid'))) {
             [$course, $cm] = get_course_and_cm_from_instance($validation->get('certifygenid'), 'certifygen');
-            $context = context_course::instance($course->id);
+            $context = course::instance($course->id);
         }
         $filearea = '';
         $status = $validation->get('status');
@@ -355,7 +355,7 @@ class provider implements
             );
         } else {
             $fs->delete_area_files(
-                context_system::instance()->id,
+                system::instance()->id,
                 'mod_certifygen',
                 'issues',
                 $validation->get('id')

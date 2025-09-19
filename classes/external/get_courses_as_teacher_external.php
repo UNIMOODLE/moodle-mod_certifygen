@@ -31,20 +31,19 @@
  */
 namespace mod_certifygen\external;
 use certifygenfilter;
-use context_course;
-use context_system;
+use core\context\course;
+use core\context\system;
 use dml_exception;
-use \core_external\external_api;
-use \core_external\external_function_parameters;
-use \core_external\external_single_structure;
-use \core_external\external_multiple_structure;
-use \core_external\external_value;
-use \core\exception\invalid_parameter_exception;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_multiple_structure;
+use core_external\external_value;
+use core\exception\invalid_parameter_exception;
 use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen_context;
 use mod_certifygen\persistents\certifygen_model;
-use mod_certifygen\persistents\certifygen_validations;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -91,7 +90,7 @@ class get_courses_as_teacher_external extends external_api {
             self::get_courses_as_teacher_parameters(),
             ['userid' => $userid, 'userfield' => $userfield, 'lang' => $lang]
         );
-        $context = context_system::instance();
+        $context = system::instance();
         $results = ['courses' => [], 'teacher' => [], 'error' => []];
         $haserror = false;
         $courses = [];
@@ -134,11 +133,11 @@ class get_courses_as_teacher_external extends external_api {
                 return $results;
             }
             // Filter to return course names in $lang language.
-            $filter = new certifygenfilter(context_system::instance(), [], $lang);
+            $filter = new certifygenfilter(system::instance(), [], $lang);
             // Get courses with a certifygen_model asociated where the user is editingteacher.
             $enrolments = enrol_get_all_users_courses($userid, true);
             foreach ($enrolments as $enrolment) {
-                $coursecontext = context_course::instance($enrolment->ctxinstance);
+                $coursecontext = course::instance($enrolment->ctxinstance);
                 if (!has_capability('moodle/course:managegroups', $coursecontext, $userid)) {
                     continue;
                 }

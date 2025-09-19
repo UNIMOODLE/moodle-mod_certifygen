@@ -31,13 +31,13 @@
  */
 
 namespace mod_certifygen\event;
-use \core\exception\coding_exception;
-use context_module;
-use context_system;
+use core\exception\coding_exception;
+use core\context\module;
+use core\context\system;
 use core\event\base;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -76,10 +76,10 @@ class certificate_issued extends base {
      * @throws moodle_exception
      */
     public static function create_from_validation(certifygen_validations $validation) {
-        $context = context_system::instance();
+        $context = system::instance();
         if (!empty($validation->get('certifygenid'))) {
             [$course, $cm] = get_course_and_cm_from_instance((int)$validation->get('certifygenid'), 'certifygen');
-            $context = context_module::instance($cm->id);
+            $context = module::instance($cm->id);
         }
         $model = new certifygen_model($validation->get('modelid'));
         $data = [

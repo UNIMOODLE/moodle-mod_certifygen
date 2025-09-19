@@ -35,21 +35,21 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
-use \core\exception\coding_exception;
-use context_module;
+use core\exception\coding_exception;
+use core\context\module;
 use core\invalid_persistent_exception;
-use \core_external\external_api;
-use \core_external\external_function_parameters;
-use \core_external\external_single_structure;
-use \core_external\external_value;
-use \core\exception\invalid_parameter_exception;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_value;
+use core\exception\invalid_parameter_exception;
 use mod_certifygen\certifygen;
 use mod_certifygen\certifygen_file;
 use mod_certifygen\event\certificate_issued;
 use mod_certifygen\persistents\certifygen_error;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 /**
  * Issue student certificate
  * @package    mod_certifygen
@@ -108,7 +108,7 @@ class emitcertificate_external extends external_api {
 
         $result = ['result' => true, 'message' => get_string('ok', 'mod_certifygen')];
         [$course, $cm] = get_course_and_cm_from_instance($instanceid, 'certifygen');
-        $context = context_module::instance($cm->id);
+        $context = module::instance($cm->id);
         $PAGE->set_context($context);
         if ($USER->id != $userid) {
             if (!has_capability('mod/certifygen:canemitotherscertificates', $context)) {

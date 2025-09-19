@@ -35,6 +35,7 @@
 namespace mod_certifygen;
 use mod_certifygen\external\getteacherrequestviewdata_external;
 use mod_certifygen\persistents\certifygen_model;
+use core\context\system;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -98,7 +99,7 @@ class getteacherrequestviewdata_external_test extends \advanced_testcase {
                 'lastname' => 'user 2',
                 'email' => 'test_user_2@fake.es',
                 ]);
-        $context = \context_system::instance();
+        $context = system::instance();
         $this->getDataGenerator()->role_assign('manager', $manager->id, $context->id);
 
         // Login as teacher.
@@ -179,7 +180,7 @@ class getteacherrequestviewdata_external_test extends \advanced_testcase {
                 'lastname' => 'user 2',
                 'email' => 'test_user_2@fake.es',
                 ]);
-        $context = \context_system::instance();
+        $context = system::instance();
         $this->getDataGenerator()->role_assign('manager', $manager->id, $context->id);
 
         // Login as teacher.

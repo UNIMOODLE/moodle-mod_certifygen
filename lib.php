@@ -31,6 +31,7 @@
  */
 
 use core\invalid_persistent_exception;
+use core\context\system;
 use core\url;
 use core_user\output\myprofile\tree;
 use mod_certifygen\forms\certificatestablefiltersform;
@@ -287,9 +288,9 @@ function mod_certifygen_get_repositories(): array {
  * @throws dml_exception
  */
 function mod_certifygen_get_templates(int $courseid = 0): array {
-    $context = context_system::instance();
+    $context = system::instance();
     if ($courseid > 0) {
-        $context = context_course::instance($courseid);
+        $context = course::instance($courseid);
     }
 
     $templates = [];

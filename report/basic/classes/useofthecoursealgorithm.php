@@ -31,7 +31,7 @@
 namespace certifygenreport_basic;
 
 use dml_exception;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 use stdClass;
 /**
  * useofthecoursealgorithm

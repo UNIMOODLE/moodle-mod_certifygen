@@ -37,12 +37,12 @@ global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
 
 use certifygenreport_basic\useofthecoursealgorithm;
-use \core\exception\coding_exception;
-use context_course;
-use context_system;
+use core\exception\coding_exception;
+use core\context\course;
+use core\context\system;
 use core_course_category;
 use dml_exception;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 use core\url;
 use renderable;
 use renderer_base;
@@ -179,7 +179,7 @@ class report_view implements renderable, templatable {
      * @return array
      */
     private function get_course_teachers(int $courseid): array {
-        $context = context_course::instance($courseid);
+        $context = course::instance($courseid);
         return get_enrolled_users($context, 'moodle/course:managegroups');
     }
 
@@ -191,7 +191,7 @@ class report_view implements renderable, templatable {
      */
     private function get_course_students_number(int $courseid): int {
         $students = 0;
-        $context = context_course::instance($courseid);
+        $context = course::instance($courseid);
         $participants = get_enrolled_users($context);
         foreach ($participants as $participant) {
             if (!has_capability('mod/certifygen:emitmyactivitycertificate', $context, $participant)) {
@@ -244,7 +244,7 @@ class report_view implements renderable, templatable {
      */
     public function get_logo_url(): string {
         $fs = get_file_storage();
-        $context = context_system::instance();
+        $context = system::instance();
         $filename = get_config('certifygenreport_basic', 'logo');
         $logo = $fs->get_file(
             $context->id,

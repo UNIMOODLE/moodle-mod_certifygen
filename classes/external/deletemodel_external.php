@@ -36,15 +36,15 @@ namespace mod_certifygen\external;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-use context_module;
+use core\context\system;
 use dml_exception;
-use \core_external\external_api;
-use \core_external\external_function_parameters;
-use \core_external\external_single_structure;
-use \core_external\external_value;
-use \core\exception\invalid_parameter_exception;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_value;
+use core\exception\invalid_parameter_exception;
 use mod_certifygen\persistents\certifygen_model;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 require_once($CFG->dirroot . '/mod/certifygen/lib.php');
 /**
  * Delete model
@@ -81,7 +81,7 @@ class deletemodel_external extends external_api {
             self::deletemodel_parameters(),
             ['id' => $id]
         );
-        $context = \context_system::instance();
+        $context = system::instance();
         $result = ['result' => true, 'message' => get_string('ok', 'mod_certifygen')];
         try {
             if (!has_capability('mod/certifygen:manage', $context)) {

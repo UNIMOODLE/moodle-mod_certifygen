@@ -30,15 +30,15 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_certifygen\external;
-use context_system;
+use core\context\system;
 use dml_exception;
-use \core_external\external_api;
-use \core\exception\invalid_parameter_exception;
+use core_external\external_api;
+use core\exception\invalid_parameter_exception;
 use mod_certifygen\tables\modellist_table;
 use core\url;
-use \core_external\external_function_parameters;
-use \core_external\external_single_structure;
-use \core_external\external_value;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_value;
 use required_capability_exception;
 /**
  * Get model list table
@@ -71,7 +71,7 @@ class getmodellisttable_external extends external_api {
             self::getmodellisttable_parameters(),
             []
         );
-        $context = context_system::instance();
+        $context = system::instance();
         $PAGE->set_context($context);
         require_capability('mod/certifygen:manage', $context);
         $tablelist = new modellist_table();

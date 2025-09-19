@@ -30,20 +30,19 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace certifygenvalidation_webservice\external;
-use context_course;
-use context_system;
+use core\context\course;
+use core\context\system;
 use dml_exception;
-use \core_external\external_api;
-use \core_external\external_function_parameters;
-use \core_external\external_single_structure;
-use \core_external\external_value;
-use \core\exception\invalid_parameter_exception;
-use mod_certifygen\interfaces\icertificaterepository;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_value;
+use core\exception\invalid_parameter_exception;
 use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 use required_capability_exception;
 
 defined('MOODLE_INTERNAL') || die();
@@ -98,7 +97,7 @@ class get_draft_certificate_external extends external_api {
             self::get_draft_certificate_parameters(),
             ['userid' => $userid, 'userfield' => $userfield, 'idinstance' => $idinstance, 'lang' => $lang]
         );
-        $context = context_system::instance();
+        $context = system::instance();
         require_capability('mod/certifygen:manage', $context);
         try {
             // Choose user parameter.
@@ -119,7 +118,7 @@ class get_draft_certificate_external extends external_api {
             $certifygen = new certifygen($params['idinstance']);
 
             // Is user enrolled on this course as student?
-            $context = context_course::instance($certifygen->get('course'));
+            $context = course::instance($certifygen->get('course'));
             if (!has_capability('mod/certifygen:emitmyactivitycertificate', $context, $userid)) {
                 $result['error']['code'] = 'user_not_enrolled_on_idinstance_course_as_student';
                 $result['error']['message'] = get_string(

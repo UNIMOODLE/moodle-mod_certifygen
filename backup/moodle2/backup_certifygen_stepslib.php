@@ -274,18 +274,18 @@ class backup_certifygen_activity_structure_step extends backup_activity_structur
         // Define file annotations.
         $certifygen->annotate_files('mod_certifygen', 'intro', null); // This file area hasn't itemid.
         if ($this->get_setting_value('userinfo')) {
-            $issue->annotate_files('tool_certificate', 'issues', 'id', context_system::instance()->id);
+            $issue->annotate_files('tool_certificate', 'issues', 'id', system::instance()->id);
             $certifygen->annotate_files(
                 'mod_certifygen',
                 'certifygenrepository',
                 'id',
-                context_course::instance($this->get_courseid())->id
+                course::instance($this->get_courseid())->id
             );
             $certifygen->annotate_files(
                 'mod_certifygen',
                 'certifygenvalidationvalidated',
                 'id',
-                context_course::instance($this->get_courseid())->id
+                course::instance($this->get_courseid())->id
             );
         }
         return $this->prepare_activity_structure($certifygen);

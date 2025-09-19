@@ -30,12 +30,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_certifygen\persistents;
-use \core\exception\coding_exception;
+use core\exception\coding_exception;
 use core\invalid_persistent_exception;
 use core\persistent;
 use core_course_category;
 use dml_exception;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 use stdClass;
 
 /**

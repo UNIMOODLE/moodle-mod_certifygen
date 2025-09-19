@@ -31,7 +31,7 @@
  */
 
 namespace mod_certifygen\forms;
-use \core\exception\coding_exception;
+use core\exception\coding_exception;
 use moodleform;
 
 defined('MOODLE_INTERNAL') || die;

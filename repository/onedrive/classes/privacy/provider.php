@@ -32,10 +32,10 @@
 
 namespace certifygenrepository_onedrive\privacy;
 
-use \core\exception\coding_exception;
-use context;
-use context_module;
-use context_system;
+use core\exception\coding_exception;
+use core\context;
+use core\context\module;
+use core\context\system;
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\approved_userlist;
@@ -45,7 +45,7 @@ use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
 use dml_exception;
 use mod_certifygen\persistents\certifygen_validations;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 
 /**
  * Implementation of the privacy subsystem plugin provider for the certifygen certifygenrepository_onedrive subplugin.
@@ -114,14 +114,14 @@ class provider implements
         global $DB;
         $userlinks = $DB->get_records('certifygen_repository', ['userid' => $user->id]);
         foreach ($userlinks as $userlink) {
-            $context = context_system::instance();
+            $context = system::instance();
             $validation = new certifygen_validations($userlinks->validationid);
             if (!empty($validation->get('certifygenid'))) {
                 [$course, $cm] = get_course_and_cm_from_instance(
                     (int)$validation->get('certifygenid'),
                     'certifygen'
                 );
-                $context = context_module::instance($cm->id);
+                $context = module::instance($cm->id);
             }
             $data = [
                     'url' => $userlink->url,

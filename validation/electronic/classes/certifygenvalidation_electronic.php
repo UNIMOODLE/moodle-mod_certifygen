@@ -28,14 +28,14 @@
  */
 namespace certifygenvalidation_electronic;
 
-use context_course;
-use context_system;
+use core\context\course;
+use core\context\system;
 use dml_exception;
 use mod_certifygen\certifygen_file;
 use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_validations;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 use setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException;
 use setasign\Fpdi\PdfParser\Filter\FilterException;
 use setasign\Fpdi\PdfParser\PdfParserException;
@@ -178,11 +178,11 @@ class certifygenvalidation_electronic implements icertificatevalidation {
         $message = get_string('ok', 'mod_certifygen');
         try {
             $fs = get_file_storage();
-            $context = context_system::instance();
+            $context = system::instance();
             $cv = new certifygen_validations($file->get_validationid());
             if (!empty($cv->get('certifygenid'))) {
                 $cert = new certifygen($cv->get('certifygenid'));
-                $context = context_course::instance($cert->get('course'));
+                $context = course::instance($cert->get('course'));
             }
             $filerecord = [
                 'contextid' => $context->id,
@@ -221,10 +221,10 @@ class certifygenvalidation_electronic implements icertificatevalidation {
             $validation = new certifygen_validations($validationid);
             $code = certifygen_validations::get_certificate_code($validation);
             $fs = get_file_storage();
-            $context = context_system::instance();
+            $context = system::instance();
             if (!empty($validation->get('certifygenid'))) {
                 $cert = new certifygen($validation->get('certifygenid'));
-                $context = context_course::instance($cert->get('course'));
+                $context = course::instance($cert->get('course'));
             }
             $file = $fs->get_file(
                 $context->id,

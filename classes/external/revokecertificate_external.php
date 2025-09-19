@@ -36,17 +36,17 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
-use \core\exception\coding_exception;
-use context_course;
-use \core_external\external_api;
-use \core_external\external_function_parameters;
-use \core_external\external_single_structure;
-use \core_external\external_value;
-use \core\exception\invalid_parameter_exception;
+use core\exception\coding_exception;
+use core\context\course;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_value;
+use core\exception\invalid_parameter_exception;
 use mod_certifygen\event\certificate_revoked;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 use required_capability_exception;
 use tool_certificate\template;
 
@@ -109,7 +109,7 @@ class revokecertificate_external extends external_api {
             $issue = $DB->get_record('tool_certificate_issues', ['id' => $issueid], '*', MUST_EXIST);
             $template = template::instance($issue->templateid);
             // Make sure the user has the required capabilities.
-            $context = context_course::instance($issue->courseid, IGNORE_MISSING) ?: $template->get_context();
+            $context = course::instance($issue->courseid, IGNORE_MISSING) ?: $template->get_context();
             self::validate_context($context);
             if (!$template->can_revoke($issue->userid, $context)) {
                 throw new required_capability_exception(

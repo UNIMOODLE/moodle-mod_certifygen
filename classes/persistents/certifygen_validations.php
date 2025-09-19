@@ -28,12 +28,12 @@
  */
 namespace mod_certifygen\persistents;
 
-use \core\exception\coding_exception;
+use core\exception\coding_exception;
 use core\invalid_persistent_exception;
 use core\persistent;
 use core_text;
 use dml_exception;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();

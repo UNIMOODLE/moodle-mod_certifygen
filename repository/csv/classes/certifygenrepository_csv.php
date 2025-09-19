@@ -32,12 +32,12 @@ namespace certifygenrepository_csv;
 use certifygenvalidation_csv\certifygenvalidation_csv;
 use certifygenvalidation_csv\csv_configuration;
 use certifygenvalidation_csv\persistents\certifygenvalidationcsv;
-use \core\exception\coding_exception;
+use core\exception\coding_exception;
 use dml_exception;
 use mod_certifygen\interfaces\icertificaterepository;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_validations;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 use stored_file;
 /**
  * certifygenrepository_csv

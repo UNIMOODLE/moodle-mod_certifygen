@@ -32,8 +32,8 @@
 
 namespace mod_certifygen\forms;
 
-use \core\exception\coding_exception;
-use context_system;
+use core\exception\coding_exception;
+use core\context\system;
 use dml_exception;
 use moodleform;
 use core_user;
@@ -54,7 +54,7 @@ class searchforuserform extends moodleform {
      */
     protected function definition() {
         $mform =& $this->_form;
-        $context = context_system::instance();
+        $context = system::instance();
         $options = [
             'ajax' => 'core_user/form_user_selector',
             'multiple' => false,

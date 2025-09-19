@@ -38,15 +38,14 @@ global $CFG;
 require_once($CFG->libdir . '/tablelib.php');
 
 use cm_info;
-use \core\exception\coding_exception;
-use context_course;
-use context_module;
+use core\exception\coding_exception;
+use core\context\module;
 use dml_exception;
 use mod_certifygen\certifygen;
 use mod_certifygen\interfaces\icertificatevalidation;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 use stdClass;
 use table_sql;
 /**
@@ -60,8 +59,8 @@ use table_sql;
 class activityteacher_table extends table_sql {
     /** @var int $courseid */
     private int $courseid;
-    /** @var context_module $context */
-    private context_module $context;
+    /** @var module $context */
+    private module $context;
     /** @var int $templateid */
     private int $templateid;
     /** @var int $cmid */
@@ -107,7 +106,7 @@ class activityteacher_table extends table_sql {
         $this->define_columns($columns);
         $validationplugin = $this->model->get('validation');
         $this->canrevoke = false;
-        $contextmodule = context_module::instance($cm->id);
+        $contextmodule = module::instance($cm->id);
         $this->context = $contextmodule;
         $validationpluginclass = $validationplugin . '\\' . $validationplugin;
         /** @var icertificatevalidation $subplugin */

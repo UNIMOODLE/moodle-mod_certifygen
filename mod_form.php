@@ -29,8 +29,7 @@
  * @author     3IPUNT <contacte@tresipunt.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-use mod_certifygen\forms\modelform;
+use core\context\system;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
 
@@ -72,7 +71,7 @@ class mod_certifygen_mod_form extends moodleform_mod {
             $mform->addElement('hidden', 'modelid', $modelid);
             $mform->setType('modelid', PARAM_INT);
         } else {
-            $canmanagemodels = has_capability('mod/certifygen:manage', context_system::instance());
+            $canmanagemodels = has_capability('mod/certifygen:manage', system::instance());
             $activitymodels = mod_certifygen_get_activity_models($this->get_course()->id);
             $templateoptions = ['' => get_string('chooseamodel', 'mod_certifygen')] + $activitymodels;
             $manageurl = new \core\url('/mod/certifygen/modelmanager.php');

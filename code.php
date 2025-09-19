@@ -40,8 +40,8 @@ global $PAGE, $OUTPUT;
 $code = optional_param('code', '', PARAM_RAW);
 
 require_login();
-require_capability('mod/certifygen:manage', context_system::instance());
-$PAGE->set_context(context_system::instance());
+require_capability('mod/certifygen:manage', system::instance());
+$PAGE->set_context(system::instance());
 $PAGE->set_url('/mod/certifygen/code.php');
 
 $PAGE->set_title(get_string('codeview', 'certifygen'));

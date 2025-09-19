@@ -33,16 +33,17 @@
 
 use mod_certifygen\output\views\profile_my_certificates_view;
 use mod_certifygen\persistents\certifygen_context;
+use core\context\system;
 
 require_once('../../config.php');
 require_once('lib.php');
 global $PAGE, $OUTPUT, $USER;
 require_login();
-$context = context_system::instance();
+$context = system::instance();
 require_capability('mod/certifygen:viewmycontextcertificates', $context);
 
-$PAGE->set_context(context_system::instance());
-$PAGE->set_url(new url('/mod/certifygen/mycertificates.php'));
+$PAGE->set_context(system::instance());
+$PAGE->set_url(new core\url('/mod/certifygen/mycertificates.php'));
 
 echo $OUTPUT->header();
 

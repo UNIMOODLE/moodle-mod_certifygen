@@ -36,11 +36,11 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
 
-use \core\exception\coding_exception;
+use core\exception\coding_exception;
 use dml_exception;
 use mod_certifygen\persistents\certifygen_context;
 use mod_certifygen\tables\profile_my_certificates_table;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 use core\url;
 use renderable;
 use stdClass;

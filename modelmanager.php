@@ -31,6 +31,7 @@
  */
 
 use mod_certifygen\output\views\model_view;
+use core\context\system;
 
 require_once('../../config.php');
 require_once('lib.php');
@@ -39,10 +40,10 @@ global $CFG, $PAGE, $DB, $COURSE, $USER, $OUTPUT;
 
 require_login();
 
-require_capability('mod/certifygen:manage', context_system::instance());
+require_capability('mod/certifygen:manage', system::instance());
 
 $PAGE->set_url('/mod/certifygen/modelmanager.php');
-$context = context_system::instance();
+$context = system::instance();
 $PAGE->set_context($context);
 $PAGE->requires->css('/mod/certifygen/styles.css');
 $PAGE->set_title(get_string('modelmanager', 'certifygen'));

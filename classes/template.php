@@ -33,10 +33,9 @@
 
 namespace mod_certifygen;
 
-use \core\exception\coding_exception;
-use context_system;
+use core\exception\coding_exception;
+use core\context\system;
 use core\lock\lock;
-use core\message\message;
 use core_user;
 use dml_exception;
 use file_exception;
@@ -168,7 +167,7 @@ class template extends \tool_certificate\template {
     public function get_issue_file(stdClass $issue): stored_file {
         $fs = get_file_storage();
         $file = $fs->get_file(
-            context_system::instance()->id,
+            system::instance()->id,
             'mod_certifygen',
             'issues',
             $issue->id,
@@ -220,7 +219,7 @@ class template extends \tool_certificate\template {
         $filecontents = $this->generate_pdf(false, $issue, true);
         // Create a file instance.
         $file = (object) [
-            'contextid' => context_system::instance()->id,
+            'contextid' => system::instance()->id,
             'component' => 'mod_certifygen',
             'filearea'  => 'issues',
             'itemid'    => $issue->id,

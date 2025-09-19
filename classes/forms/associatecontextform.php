@@ -36,15 +36,15 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/mod/certifygen/lib.php');
-use \core\exception\coding_exception;
-use context;
-use context_system;
+use core\exception\coding_exception;
+use core\context;
+use core\context\system;
 use core\invalid_persistent_exception;
 use core_course_category;
 use core_form\dynamic_form;
 use dml_exception;
 use mod_certifygen\persistents\certifygen_context;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 use core\url;
 /**
  * Associate context form
@@ -131,7 +131,7 @@ class associatecontextform extends dynamic_form {
      * @throws dml_exception
      */
     protected function get_context_for_dynamic_submission(): context {
-        return context_system::instance();
+        return system::instance();
     }
 
     /**

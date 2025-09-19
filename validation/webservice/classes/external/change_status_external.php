@@ -38,18 +38,17 @@ require_once($CFG->dirroot . '/user/lib.php');
 require_once($CFG->dirroot . '/mod/certifygen/classes/filters/certifygenfilter.php');
 require_once($CFG->dirroot . '/mod/certifygen/lib.php');
 
-use certifygenvalidation_webservice\certifygenvalidation_webservice;
-use \core\exception\coding_exception;
-use context_system;
-use \core_external\external_api;
-use \core_external\external_function_parameters;
-use \core_external\external_single_structure;
-use \core_external\external_value;
-use \core\exception\invalid_parameter_exception;
+use core\exception\coding_exception;
+use core\context\system;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_value;
+use core\exception\invalid_parameter_exception;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_repository;
 use mod_certifygen\persistents\certifygen_validations;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 
 /**
  * Change status
@@ -92,7 +91,7 @@ class change_status_external extends external_api {
             ['userid' => $userid, 'userfield' => $userfield, 'requestid' => $requestid, 'url' => $url]
         );
         try {
-            $context = context_system::instance();
+            $context = system::instance();
             require_capability('mod/certifygen:manage', $context);
             $results = [];
             // Choose user parameter.

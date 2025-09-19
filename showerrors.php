@@ -37,12 +37,12 @@ require_once('lib.php');
 global $PAGE, $OUTPUT;
 
 require_login();
-$context = context_system::instance();
+$context = system::instance();
 $PAGE->set_context($context);
 require_capability('mod/certifygen:manage', $context);
 
 $PAGE->set_url('/mod/certifygen/modelmanager.php');
-$context = context_system::instance();
+$context = system::instance();
 $PAGE->set_context($context);
 $PAGE->set_title(get_string('certifygenerrors', 'certifygen'));
 $view = new showerrors_view();

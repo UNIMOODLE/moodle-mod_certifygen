@@ -28,15 +28,15 @@
  */
 namespace certifygenrepository_localrepository;
 
-use \core\exception\coding_exception;
-use context_course;
-use context_system;
+use core\exception\coding_exception;
+use core\context\course;
+use core\context\system;
 use dml_exception;
 use mod_certifygen\interfaces\icertificatereport;
 use mod_certifygen\interfaces\icertificaterepository;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_validations;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 use core\url;
 use stored_file;
 /**
@@ -58,10 +58,10 @@ class certifygenrepository_localrepository implements icertificaterepository {
     protected function get_file(certifygen_validations $validation): stored_file {
         $code = certifygen_validations::get_certificate_code($validation);
         $code .= '.pdf';
-        $contextid = context_system::instance()->id;
+        $contextid = system::instance()->id;
         if (!empty($validation->get('certifygenid'))) {
             $cert = new certifygen($validation->get('certifygenid'));
-            $contextid = context_course::instance($cert->get('course'))->id;
+            $contextid = course::instance($cert->get('course'))->id;
         }
         $itemid = (int) $validation->get('id');
         $fs = get_file_storage();
@@ -86,10 +86,10 @@ class certifygenrepository_localrepository implements icertificaterepository {
     public function get_file_url(certifygen_validations $validation): string {
         $code = certifygen_validations::get_certificate_code($validation);
         $code .= '.pdf';
-        $contextid = context_system::instance()->id;
+        $contextid = system::instance()->id;
         if (!empty($validation->get('certifygenid'))) {
             $cert = new certifygen($validation->get('certifygenid'));
-            $contextid = context_course::instance($cert->get('course'))->id;
+            $contextid = course::instance($cert->get('course'))->id;
         }
         $itemid = (int) $validation->get('id');
         $fs = get_file_storage();

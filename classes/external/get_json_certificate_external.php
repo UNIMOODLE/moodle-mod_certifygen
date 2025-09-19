@@ -30,20 +30,20 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_certifygen\external;
-use \core\exception\coding_exception;
-use context_course;
-use context_system;
+use core\exception\coding_exception;
+use core\context\course;
+use core\context\system;
 use dml_exception;
-use \core_external\external_api;
-use \core_external\external_function_parameters;
-use \core_external\external_single_structure;
-use \core_external\external_value;
-use \core\exception\invalid_parameter_exception;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_value;
+use core\exception\invalid_parameter_exception;
 use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
 use mod_certifygen\persistents\certifygen_validations;
 use certifygenfilter;
-use \core\exception\moodle_exception;
+use core\exception\moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -105,7 +105,7 @@ class get_json_certificate_external extends external_api {
         );
 
         if ($USER->id != $userid) {
-            $context = context_system::instance();
+            $context = system::instance();
             if (!has_capability('mod/certifygen:manage', $context)) {
                 $result['result'] = false;
                 $result['message'] = get_string('nopermissiontoemitothercerts', 'mod_certifygen');
@@ -134,7 +134,7 @@ class get_json_certificate_external extends external_api {
             $certifygen = new certifygen($params['idinstance']);
 
             // Is user enrolled on this course as student?
-            $context = context_course::instance($certifygen->get('course'));
+            $context = course::instance($certifygen->get('course'));
             if (!has_capability('mod/certifygen:emitmyactivitycertificate', $context, $userid)) {
                 unset($result['json']);
                 $result['error']['code'] = 'student_not_enrolled';
@@ -184,7 +184,7 @@ class get_json_certificate_external extends external_api {
             } else {
                 // Filter multilang course name.
                 // Filter to return course names in $lang language.
-                $filter = new certifygenfilter(context_system::instance(), [], $lang);
+                $filter = new certifygenfilter(system::instance(), [], $lang);
                 // Static data.
                 $json = json_decode($issue->data);
                 $json->courseshortname = $filter->filter($json->courseshortname);
