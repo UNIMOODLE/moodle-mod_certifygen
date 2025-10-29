@@ -33,12 +33,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2025040401;
-$plugin->requires = 2022112802;
+$plugin->version = 2025102900;
+$plugin->requires = 2025041400;
 $plugin->component = 'mod_certifygen';
 $plugin->cron = 0;
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = 'v0.0.1';
+$plugin->release = 'v1.0.0';
 $plugin->dependencies = [
     'tool_certificate' => 2024042300,
 ];

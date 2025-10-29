@@ -2,13 +2,32 @@
 
 #  Certifygen Custom Course Certificate Mod #
 
-Generation of PDF certificates with connection to digital signature systems and modular storage
+Generation of PDF certificates with connection to digital signature systems and modular storage.
+## Plugin Capabilities ##
+
+This plugin defines an activity that can be added to a course and controlled by availability restrictions. Users can request their certificates directly, while academic management systems can invoke web services (WS) to verify conditions and generate certificates externally. The plugin leverages the template editor provided by the `tool_certificate` plugin.
+
+### Validation Subplugins ###
+The plugin supports signing certificates using the following validation subplugins:
+* **certifygenvalidation_none**: No signature is applied.
+* **certifygenvalidation_cmd**: Certificates are signed locally using a command.
+* **certifygenvalidation_csv**: Certificates are signed using an external Web Service that generates a PDF with a secure verification code and validation URL printed on a PDF. This kind of signature is commonly used in academic institutions for easy validation in paper formats.
+* **certifygenvalidation_electronic**: Certificates are signed locally with a private-key installed in the server.
+
+### Repository Subplugins ###
+Certificates are stored in repositories that can be managed using the following repository subplugins:
+* **certifygenrepository_localrepository**: Certificates are stored locally within the Moodle instance.
+* **certifygenrepository_csv**: Certificates are stored in an external certification repository that resolves the URLs of the CSV PDFs.
+* **certifygenrepository_onedrive**: Certificates are stored in a OneDrive repository for cloud-based access.
+
+This modular design allows for flexible integration with external systems and customizable storage options.
 
 ## Compatibility ##
 
 The plugin has been tested on the following versions:
 
 * Moodle 4.1.1 (Build: 20230116) - 2022112801.00
+* Moodle 4.5.0 (Build: 20240419) - 2024041900.00
 
 ## Requirements ##
 
@@ -50,16 +69,16 @@ to complete the installation from the command line.
 ## Subplugins ##
 
 ### Certifygen validation ###
-* certifygenvalidation_cmd 
+* certifygenvalidation_cmd
 * certifygenvalidation_csv
 * certifygenvalidation_electronic
 * certifygenvalidation_none
 ### Certifygen report ###
-* certifygenreport_basic 
+* certifygenreport_basic
 ### Certifygen repository ###
 * certifygenrepository_csv
-* certifygenrepository_localrepository 
-* certifygenrepository_onedrive 
+* certifygenrepository_localrepository
+* certifygenrepository_onedrive
 
 
 ### Tasks ###
@@ -78,33 +97,33 @@ This task get the certificate from the external aplication used by the validatio
 php {your/moodle/dirroot}/admin/cli/scheduled_task.php --execute=\mod_certifygen\task\checkfile
 ```
 ## Check error ##
-There is a task, checkerror. It is responsible for searching for error states in the validation processes and returning them to the not started state, so that the user can start the process again. 
+There is a task, checkerror. It is responsible for searching for error states in the validation processes and returning them to the not started state, so that the user can start the process again.
 ```
 php {your/moodle/dirroot}/admin/cli/scheduled_task.php --execute=\mod_certifygen\task\checkerror
 ```
 ## Database Tables ##
 
 * __certifygen__
-  
+
 Contains definitions about certifygens
 * __certifygen_model__
-  
+
 Contains information about stores each certifygen models
 * __certifygen_context__
-  
+
 Contains information about stores each context of a certifygen
 * __certifygen_validations__
 
-Contains information about stores each validation of a certifygen 
+Contains information about stores each validation of a certifygen
 
 * __certifygen_repository__
-  
+
 Contains information about sotores certificate url
 
 * __certifygen__error__
-  
+
 Contains information about stores certificate errors
-  
+
 
 ## Unit Test ##
 
