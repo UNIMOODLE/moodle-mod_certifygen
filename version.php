@@ -33,12 +33,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2025102900;
+$plugin->version = 2025110400;
 $plugin->requires = 2024100700; // Moodle 4.5
 $plugin->component = 'mod_certifygen';
 $plugin->cron = 0;
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = 'v1.0.1';
+$plugin->release = 'v1.0.2';
 $plugin->dependencies = [
     'tool_certificate' => 2024042300,
 ];
