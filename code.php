@@ -33,6 +33,7 @@
 use mod_certifygen\forms\codeform;
 use mod_certifygen\interfaces\icertificaterepository;
 use mod_certifygen\plugininfo\certifygenrepository;
+use core\context\system;
 
 require_once('../../config.php');
 global $PAGE, $OUTPUT;

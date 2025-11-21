@@ -30,25 +30,25 @@
 // This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Validació WEBSERVICE';
+$string['certificate_not_emited'] = 'Certificat no emès';
+$string['certifygenvalidation_webservice_settings'] = 'Configuració de WEBSERVICE';
 $string['enable'] = 'Habilitar';
 $string['enable_help'] = 'Si aquest complement està habilitat, pots utilitzar-lo per validar Certificats Unimoodle mitjançant serveis web';
-$string['certifygenvalidation_webservice_settings'] = 'Configuració de WEBSERVICE';
-$string['certificate_not_emited'] = 'Certificat no emès';
-$string['webservicenotconfigured'] = 'Certifygen WEBSERVICE no configurat';
-$string['pluginnamesettings'] = 'Configuració de Validació WEBSERVICE';
-$string['privacy:metadata'] = 'El complement de Validació WEBSERVICE no emmagatzema cap dada personal.';
 $string['inprogress_msg'] = 'Accedeix a l’administració de la teva universitat per continuar amb el procés de validació del certificat.';
 $string['invalidcourses'] = 'Instància no vàlida';
 $string['invalidinstanceid'] = 'Instància no vàlida';
 $string['invalidmodelid'] = 'Model no vàlid';
 $string['invaliduser'] = 'Usuari no vàlid';
-$string['request_not_found'] = 'Request not found';
+$string['pluginname'] = 'Validació WEBSERVICE';
+$string['pluginnamesettings'] = 'Configuració de Validació WEBSERVICE';
+$string['privacy:metadata'] = 'El complement de Validació WEBSERVICE no emmagatzema cap dada personal.';
+$string['repositoryplugin_not_accepted'] = 'Connector de repositori no acceptat';
+$string['request_not_found'] = 'Sol·licitud no trobada';
 $string['request_status_not_accepted'] = 'Estat no permès';
 $string['request_user_not_matched'] = 'Aquesta no és la sol·licitud de l\'usuari';
-$string['repositoryplugin_not_accepted'] = 'Connector de repositori no acceptat';
-$string['teacherrequest_pdf_error'] = 'There was a problem getting certificate';
+$string['teacherrequest_pdf_error'] = 'Hi ha hagut un problema en obtenir el certificat';
 $string['validationplugin_not_accepted'] = 'Connector de validació no acceptat';
+$string['webservicenotconfigured'] = 'Certifygen WEBSERVICE no configurat';
 $string['wsoutput'] = 'Sortida del servei web';
 $string['wsoutput_help'] = 'Si és cert, les activitats de certificació relacionades amb aquest tipus de validació formaran part de la sortida de
 get_id_instance_certificate_external ws. Si és cert, les sol·licituds del professor amb models amb aquest tipus de validació formaran part de la

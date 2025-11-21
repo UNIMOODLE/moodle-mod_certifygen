@@ -67,6 +67,6 @@ class codeform extends moodleform {
         $mform->setType('code', PARAM_ALPHANUMEXT);
         $mform->addRule('code', null, 'required');
 
-        $this->add_action_buttons();
+        $this->add_action_buttons(false, get_string('search'));
     }
 }

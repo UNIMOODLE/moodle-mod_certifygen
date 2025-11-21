@@ -31,6 +31,7 @@
  */
 
 use mod_certifygen\output\views\showerrors_view;
+use core\context\system;
 
 require_once('../../config.php');
 require_once('lib.php');

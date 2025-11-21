@@ -32,7 +32,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Certifygen Sin Validación';
 $string['enable'] = 'Habilitar';
-$string['enable_help'] = 'Si este plugin está habilitado, puedes usarlo para validar Certificados Unimoodle a través de servicios web';
+$string['enable_help'] = 'Si este plugin está habilitado, puedes usarlo en la fase de validación de Certificados Unimoodle y a través de servicios web';
 $string['certifygenvalidation_none_settings'] = 'Configuración de Certifygen Sin Validación';
 $string['pluginnamesettings'] = 'Configuración de Certifygen Sin Validación';
 $string['privacy:metadata'] = 'El plugin Certifygen Sin Validación no almacena ningún dato personal.';

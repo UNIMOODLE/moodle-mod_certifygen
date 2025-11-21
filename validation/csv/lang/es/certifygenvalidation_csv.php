@@ -30,21 +30,21 @@
 // This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Validación CSV';
+$string['appID'] = 'ID de Aplicación';
+$string['appID_help'] = 'Este es el identificador de la aplicación. <span class="bold">Es requerido en todas las solicitudes.</span>';
+$string['certifygenvalidation_csv_settings'] = 'Configuración de CSV';
+$string['csv_result_not_expected'] = 'Resultado del endpoint no esperado';
+$string['csvnotconfigured'] = 'CSV no configurado';
 $string['enable'] = 'Habilitar';
 $string['enable_help'] = 'Si este plugin está habilitado, puedes usarlo para validar Certificados Unimoodle';
 $string['firmacatalogserviceurl'] = 'FirmaCatalogService Url';
 $string['firmacatalogserviceurl_help'] = 'Esta es la URL de FirmaCatalogService. <span class="bold">Es requerida en todas las solicitudes.</span>';
 $string['firmaquerycatalogserviceurl'] = 'FirmaQueryCatalogService Url';
 $string['firmaquerycatalogserviceurl_help'] = 'Esta es la URL de FirmaQueryCatalogService. <span class="bold">Es requerida en todas las solicitudes.</span>';
-$string['appID'] = 'ID de Aplicación';
-$string['appID_help'] = 'Este es el identificador de la aplicación. <span class="bold">Es requerido en todas las solicitudes.</span>';
-$string['certifygenvalidation_csv_settings'] = 'Configuración de CSV';
-$string['csvnotconfigured'] = 'CSV no configurado';
+$string['pluginname'] = 'Validación CSV';
 $string['pluginnamesettings'] = 'Configuración de la Validación CSV';
-$string['csv_result_not_expected'] = 'Resultado del endpoint no esperado';
 $string['privacy:metadata'] = 'El plugin de Validación CSV no almacena ningún dato personal.';
 $string['wsoutput'] = 'Salida del Servicio Web';
-$string['wsoutput_help'] = 'Si es verdadero, las actividades de certifygen relacionadas con este tipo de validación serán parte de la salida del ws
+$string['wsoutput_help'] = 'Si se marca, las actividades de certifygen relacionadas con este tipo de validación serán parte de la salida del ws
 get_id_instance_certificate_external. Si es verdadero, las solicitudes de los profesores con modelos con este tipo de validación serán parte de la
 salida del ws get_courses_as_teacher.';

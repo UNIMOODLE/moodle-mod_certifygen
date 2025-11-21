@@ -30,25 +30,25 @@
 // This line protects the file from being accessed by a URL directly.
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'WEBSERVICE Validation';
+$string['certificate_not_emited'] = 'Certificate not issued';
+$string['certifygenvalidation_webservice_settings'] = 'WEBSERVICE settings';
 $string['enable'] = 'Enable';
 $string['enable_help'] = 'If this plugin is enabled, you can use it to validate Unimoodle Certificates via web services';
-$string['certifygenvalidation_webservice_settings'] = 'WEBSERVICE settings';
-$string['certificate_not_emited'] = 'Certificate not issued';
-$string['webservicenotconfigured'] = 'Certifygen WEBSERVICE not configured';
-$string['pluginnamesettings'] = 'WEBSERVICE Validation Configuration';
-$string['privacy:metadata'] = 'The WEBSERVICE Validation plugin does not store any personal data.';
 $string['inprogress_msg'] = 'Access your university\'s administration office to continue with the certificate validation process.';
 $string['invalidcourses'] = 'invalidcourses';
 $string['invalidinstanceid'] = 'Invalid instanceid';
 $string['invalidmodelid'] = 'Invalid model id';
 $string['invaliduser'] = 'Invalid user';
+$string['pluginname'] = 'WEBSERVICE Validation';
+$string['pluginnamesettings'] = 'WEBSERVICE Validation Configuration';
+$string['privacy:metadata'] = 'The WEBSERVICE Validation plugin does not store any personal data.';
+$string['repositoryplugin_not_accepted'] = 'Repository plugin not accepted';
 $string['request_not_found'] = 'Request not found';
 $string['request_status_not_accepted'] = 'Status not accepted';
 $string['request_user_not_matched'] = 'This is not the user\'s request';
-$string['repositoryplugin_not_accepted'] = 'Repository plugin not accepted';
 $string['teacherrequest_pdf_error'] = 'There was a problem getting certificate';
 $string['validationplugin_not_accepted'] = 'Validation plugin not accepted';
+$string['webservicenotconfigured'] = 'Certifygen WEBSERVICE not configured';
 $string['wsoutput'] = 'Web Service Output';
 $string['wsoutput_help'] = 'If true, the certifygen activities related with this type of validation will be part of the output of
 get_id_instance_certificate_external ws. If true, the teacher requests with models with this type of validation will be part of the

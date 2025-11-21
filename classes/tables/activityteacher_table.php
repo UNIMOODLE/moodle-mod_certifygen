@@ -209,7 +209,8 @@ class activityteacher_table extends table_sql {
         if (empty($row->cstatus)) {
             return get_string('status_1', 'mod_certifygen');
         }
-        $status = get_string('status_' . $row->cstatus, 'mod_certifygen');
+        // Pass row data to allow dynamic status messages.
+        $status = get_string('status_' . $row->cstatus, 'mod_certifygen', $row);
         if (!empty($this->statusmessages) && array_key_exists($row->cstatus, $this->statusmessages)) {
             $tooltip = $this->statusmessages[$row->cstatus];
             $status = get_string('status_' . $row->cstatus, 'mod_certifygen') . '</button>';
