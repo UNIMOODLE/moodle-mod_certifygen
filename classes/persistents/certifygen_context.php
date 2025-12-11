@@ -149,7 +149,11 @@ class certifygen_context extends persistent {
      */
     public static function can_i_see_teacherrequestlink(int $userid): bool {
         $result = get_user_capability_course('mod/certifygen:addinstance', $userid);
-        if ($result && count($result) > 0) {
+        if (!$result) {
+            return false;
+        }
+        $numresult = count($result);
+        if ($numresult > 0) {
             return true;
         }
         return false;
