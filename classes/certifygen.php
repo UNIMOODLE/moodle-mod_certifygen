@@ -246,8 +246,9 @@ class certifygen {
         int $courseid,
         string $lang
     ): string {
+        global $DB;
         // Get user.
-        $users = user_get_users_by_id([$userid]);
+        $users = $DB->get_records_list('user', 'id', [$userid]);
         $user = reset($users);
         $course = get_course($courseid);
         self::issue_certificate($instanceid, $user, $templateid, $course, $lang);
@@ -291,7 +292,8 @@ class certifygen {
         int $courseid,
         string $lang
     ) {
-        $users = user_get_users_by_id([$userid]);
+        global $DB;
+        $users = $DB->get_records_list('user', 'id', [$userid]);
         $user = reset($users);
         $course = get_course($courseid);
         self::issue_certificate($instanceid, $user, $templateid, $course, $lang);

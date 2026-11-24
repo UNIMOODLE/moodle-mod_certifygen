@@ -208,12 +208,14 @@ class template extends \tool_certificate\template {
      * Creates stored file for an issue.
      * @param stdClass $issue
      * @param bool $regenerate
+     * @param bool $sendnotification Unused: mod_certifygen sends its own notifications. Declared for
+     *                               compatibility with tool_certificate 5.0.12+, which added it to the parent.
      * @return stored_file
      * @throws file_exception
      * @throws stored_file_creation_exception
      * @throws dml_exception
      */
-    public function create_issue_file(stdClass $issue, bool $regenerate = false): stored_file {
+    public function create_issue_file(stdClass $issue, bool $regenerate = false, bool $sendnotification = false): stored_file {
 
         // Generate issue pdf contents.
         $filecontents = $this->generate_pdf(false, $issue, true);

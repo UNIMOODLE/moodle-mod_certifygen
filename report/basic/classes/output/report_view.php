@@ -94,7 +94,8 @@ class report_view implements renderable, templatable {
      * @throws moodle_exception
      */
     public function export_for_template(renderer_base $output): stdClass {
-        $user = user_get_users_by_id([$this->userid]);
+        global $DB;
+        $user = $DB->get_records_list('user', 'id', [$this->userid]);
         $user = reset($user);
         $name = fullname($user);
         $data = new stdClass();

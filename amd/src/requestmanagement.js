@@ -15,7 +15,7 @@
 
 /**
  * Provides the required functionality for request management.
- * 
+ *
  * @module    mod_certifygen
  * @copyright  2025 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -28,7 +28,9 @@ import jQuery from 'jquery';
 import {get_string as getString, get_strings as getStrings} from 'core/str';
 import Ajax from 'core/ajax';
 import Templates from 'core/templates';
-import ModalFactory from 'core/modal_factory';
+import ModalSaveCancel from 'core/modal_save_cancel';
+import ModalCancel from 'core/modal_cancel';
+import Modal from 'core/modal';
 import ModalEvents from 'core/modal_events';
 import Notification from 'core/notification';
 import ModalForm from 'core_form/modalform';
@@ -79,10 +81,9 @@ const downloadCertificate = async(event) => {
     ];
     let langStrings = await getStrings(stringkeys);
 
-    let modal = await ModalFactory.create({
+    let modal = await ModalSaveCancel.create({
         title: langStrings[0],
         body: langStrings[1],
-        type: ModalFactory.types.SAVE_CANCEL
     });
     modal.setSaveButtonText(langStrings[2]);
     modal.getRoot().on(ModalEvents.save, () => {
@@ -120,10 +121,9 @@ const reemitCertificate = async (event) => {
         let identifier = jQuery(REGION.ROOT);
         identifier.append(html);
         getStrings(stringkeys).then((langStrings) => {
-            return ModalFactory.create({
+            return ModalSaveCancel.create({
                 title: langStrings[0],
                 body: langStrings[1],
-                type: ModalFactory.types.SAVE_CANCEL
             }).then(modal => {
                 modal.getRoot().on(ModalEvents.hidden, () => {
                     identifier.find('.overlay-icon-container').remove();
@@ -145,10 +145,9 @@ const reemitCertificate = async (event) => {
                             reloadTeacherRequestTable(userid);
                         } else {
                             // Show error message.
-                            return ModalFactory.create({
+                            return ModalCancel.create({
                                 title: langStrings[3],
                                 body: response.message,
-                                type: ModalFactory.types.CANCEL
                             }).then(modal => {
                                 modal.getRoot().on(ModalEvents.hidden, () => {
                                     identifier.find('.overlay-icon-container').remove();
@@ -181,10 +180,9 @@ const emitCertificate = async (event) => {
         let identifier = jQuery(REGION.ROOT);
         identifier.append(html);
         getStrings(stringkeys).then((langStrings) => {
-            return ModalFactory.create({
+            return ModalSaveCancel.create({
                 title: langStrings[0],
                 body: langStrings[1],
-                type: ModalFactory.types.SAVE_CANCEL
             }).then(modal => {
                 modal.getRoot().on(ModalEvents.hidden, () => {
                     identifier.find('.overlay-icon-container').remove();
@@ -206,10 +204,9 @@ const emitCertificate = async (event) => {
                             reloadTeacherRequestTable(userid);
                         } else {
                             // Show error message.
-                            return ModalFactory.create({
+                            return ModalCancel.create({
                                 title: langStrings[3],
                                 body: response.message,
-                                type: ModalFactory.types.CANCEL
                             }).then(modal => {
                                 modal.getRoot().on(ModalEvents.hidden, () => {
                                     identifier.find('.overlay-icon-container').remove();
@@ -243,10 +240,9 @@ const seeCourses = async (event) => {
     let courseshtml = await Templates.render(TEMPLATES.COURSE_LIST_REQUEST, coursesdata).done(function(html) {
         return html;
     });
-    await ModalFactory.create({
+    await Modal.create({
             title: langStrings[0],
             body: courseshtml,
-            type: ModalFactory.types.DEFAULT,
         }).then(modal => {
             modal.show();
             modal.getRoot().on(ModalEvents.hidden, () => {
@@ -266,10 +262,9 @@ const deleteRequest = (event) => {
         let identifier = jQuery(REGION.ROOT);
         identifier.append(html);
         getStrings(stringkeys).then((langStrings) => {
-            return ModalFactory.create({
+            return ModalSaveCancel.create({
                 title: langStrings[0],
                 body: langStrings[1],
-                type: ModalFactory.types.SAVE_CANCEL
             }).then(modal => {
                 modal.getRoot().on(ModalEvents.hidden, () => {
                     identifier.find('.overlay-icon-container').remove();
@@ -287,10 +282,9 @@ const deleteRequest = (event) => {
                             identifier.find('.overlay-icon-container').remove();
                         } else {
                             // Show error message.
-                            return ModalFactory.create({
+                            return ModalCancel.create({
                                 title: langStrings[0],
                                 body: response.message,
-                                type: ModalFactory.types.CANCEL
                             }).then(modal => {
                                 modal.show();
                                 modal.getRoot().on(ModalEvents.hidden, () => {

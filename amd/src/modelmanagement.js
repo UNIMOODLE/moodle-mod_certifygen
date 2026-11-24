@@ -15,7 +15,7 @@
 
 /**
  * Provides the required functionality for model management.
- * 
+ *
  * @module    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -28,7 +28,8 @@ import jQuery from 'jquery';
 import {get_strings as getStrings, get_string as getString} from 'core/str';
 import Ajax from 'core/ajax';
 import Templates from 'core/templates';
-import ModalFactory from 'core/modal_factory';
+import ModalSaveCancel from 'core/modal_save_cancel';
+import ModalCancel from 'core/modal_cancel';
 import ModalEvents from 'core/modal_events';
 import Notification from 'core/notification';
 import ModalForm from 'core_form/modalform';
@@ -142,10 +143,9 @@ const DeleteModel = (event) => {
         {key: 'errortitle', component: 'mod_certifygen'},
     ];
     getStrings(stringkeys).then((langStrings) => {
-        return ModalFactory.create({
+        return ModalSaveCancel.create({
             title: langStrings[0],
             body: langStrings[1],
-            type: ModalFactory.types.SAVE_CANCEL
         }).then(modal => {
             modal.getRoot().on(ModalEvents.hidden, () => {
                 modal.destroy();
@@ -163,10 +163,9 @@ const DeleteModel = (event) => {
                         jQuery(event.currentTarget).parent().parent().remove();
                     } else {
                         // Show error message.
-                        return ModalFactory.create({
+                        return ModalCancel.create({
                             title: langStrings[0],
                             body: response.message,
-                            type: ModalFactory.types.CANCEL
                         }).then(modal => {
                             modal.show();
                             modal.getRoot().on(ModalEvents.hidden, () => {

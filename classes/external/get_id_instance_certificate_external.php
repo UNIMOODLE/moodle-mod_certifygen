@@ -114,7 +114,7 @@ class get_id_instance_certificate_external extends external_api {
             $userid = $uparam['userid'];
 
             // User exists.
-            $user = user_get_users_by_id([$userid]);
+            $user = $DB->get_records_list('user', 'id', [$userid]);
             if (empty($user)) {
                 $results['error']['code'] = 'user_not_found';
                 $results['error']['message'] = get_string('user_not_found', 'mod_certifygen');

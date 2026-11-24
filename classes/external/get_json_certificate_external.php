@@ -123,7 +123,7 @@ class get_json_certificate_external extends external_api {
             $userid = $uparam['userid'];
 
             // User exists.
-            $user = user_get_users_by_id([$userid]);
+            $user = $DB->get_records_list('user', 'id', [$userid]);
             if (empty($user)) {
                 unset($result['json']);
                 $result['error']['code'] = 'user_not_found';

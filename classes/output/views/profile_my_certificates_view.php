@@ -83,7 +83,7 @@ class profile_my_certificates_view implements renderable, templatable {
      * @throws moodle_exception
      */
     public function export_for_template(renderer_base $output): stdClass {
-        global $USER;
+        global $USER, $DB;
         $data = new stdClass();
 
         $tablelist = new profile_my_certificates_table($this->userid);
@@ -102,7 +102,7 @@ class profile_my_certificates_view implements renderable, templatable {
         if ($this->userid == $USER->id) {
             $data->mycertificates = true;
         } else {
-            $user = user_get_users_by_id([$this->userid]);
+            $user = $DB->get_records_list('user', 'id', [$this->userid]);
             $user = reset($user);
             $data->title = get_string('othercertificates', 'mod_certifygen', fullname($user));
         }

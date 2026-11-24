@@ -47,7 +47,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/lib/tcpdf/tcpdf.php');
-require_once($CFG->dirroot . '/mod/assign/feedback/editpdf/fpdi/autoload.php');
+require_once($CFG->dirroot . '/mod/assign/feedback/editpdf/fpdi/src/autoload.php');
 /**
  * Certifygen Validation Electronic
  * @package   certifygenvalidation_electronic

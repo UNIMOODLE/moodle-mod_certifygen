@@ -38,13 +38,18 @@ global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
 use core\exception\coding_exception;
 use core\context\course;
+use core\context\system;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_single_structure;
 use core_external\external_value;
 use core\exception\invalid_parameter_exception;
 use mod_certifygen\event\certificate_revoked;
+use mod_certifygen\interfaces\icertificaterepository;
+use mod_certifygen\interfaces\icertificatevalidation;
+use mod_certifygen\persistents\certifygen;
 use mod_certifygen\persistents\certifygen_model;
+use mod_certifygen\persistents\certifygen_repository;
 use mod_certifygen\persistents\certifygen_validations;
 use core\exception\moodle_exception;
 use required_capability_exception;
@@ -137,6 +142,7 @@ class revokecertificate_external extends external_api {
                 ],
             ];
             certificate_revoked::create($eventdata)->trigger();
+            self::delete_certificate_files($issueid, $validation);
             $validation->delete();
         } catch (moodle_exception $e) {
             $result['result'] = false;
@@ -161,5 +167,38 @@ class revokecertificate_external extends external_api {
                 'message' => new external_value(PARAM_RAW, 'meesage'),
             ]
         );
+    }
+
+    /**
+     * Deletes the files mod_certifygen keeps for a revoked certificate.
+     *
+     * tool_certificate::revoke_issue() only removes the files of its own component, so the copies
+     * this plugin stores (the issued PDF and the validated and archived ones) would be left behind.
+     * Files in external repositories (OneDrive, URL) are not reachable from here.
+     *
+     * @param int $issueid
+     * @param certifygen_validations $validation
+     */
+    private static function delete_certificate_files(int $issueid, certifygen_validations $validation): void {
+        $fs = get_file_storage();
+        $fs->delete_area_files(system::instance()->id, 'mod_certifygen', 'issues', $issueid);
+
+        $validationid = $validation->get('id');
+        if (!empty($validation->get('certifygenid'))) {
+            $certifygen = new certifygen($validation->get('certifygenid'));
+            $contextid = course::instance($certifygen->get('course'))->id;
+            $fileareas = [
+                icertificatevalidation::FILE_AREA,
+                icertificatevalidation::FILE_AREA_VALIDATED,
+                icertificaterepository::FILE_AREA,
+            ];
+            foreach ($fileareas as $filearea) {
+                $fs->delete_area_files($contextid, 'mod_certifygen', $filearea, $validationid);
+            }
+        }
+        $repository = certifygen_repository::get_record(['validationid' => $validationid]);
+        if ($repository) {
+            $repository->delete();
+        }
     }
 }

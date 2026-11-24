@@ -98,7 +98,7 @@ class start_student_certificate_external extends external_api {
         int $userid,
         string $userfield
     ): array {
-        global $USER;
+        global $USER, $DB;
 
         $params = self::validate_parameters(
             self::start_student_certificate_parameters(),
@@ -199,7 +199,7 @@ class start_student_certificate_external extends external_api {
                 $validation = certifygen_validations::manage_validation($id, (object) $data);
             }
             // Step 2: Generate issue.
-            $users = user_get_users_by_id([$userid]);
+            $users = $DB->get_records_list('user', 'id', [$userid]);
             $user = reset($users);
             $issueid = certifygen::issue_certificate(
                 $instanceid,

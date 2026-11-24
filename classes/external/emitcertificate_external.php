@@ -98,7 +98,7 @@ class emitcertificate_external extends external_api {
         int $userid,
         int $courseid
     ): array {
-        global $USER, $PAGE;
+        global $USER, $PAGE, $DB;
 
         self::validate_parameters(
             self::emitcertificate_parameters(),
@@ -145,7 +145,7 @@ class emitcertificate_external extends external_api {
                 $validation = certifygen_validations::manage_validation($id, (object) $data);
             }
             // Step 2: Generate issue.
-            $users = user_get_users_by_id([$userid]);
+            $users = $DB->get_records_list('user', 'id', [$userid]);
             $user = reset($users);
             $certifygenmodel = new certifygen_model($modelid);
             $issueid = certifygen::issue_certificate(

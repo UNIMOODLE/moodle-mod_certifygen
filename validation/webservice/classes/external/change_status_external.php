@@ -85,7 +85,7 @@ class change_status_external extends external_api {
      * @throws invalid_parameter_exception
      */
     public static function change_status(int $userid, string $userfield, int $requestid, string $url): array {
-        global $USER;
+        global $USER, $DB;
         $params = self::validate_parameters(
             self::change_status_parameters(),
             ['userid' => $userid, 'userfield' => $userfield, 'requestid' => $requestid, 'url' => $url]
@@ -101,7 +101,7 @@ class change_status_external extends external_api {
             }
             $userid = $uparam['userid'];
             // User exists.
-            $users = user_get_users_by_id([$userid]);
+            $users = $DB->get_records_list('user', 'id', [$userid]);
             if (empty($users)) {
                 $results['error']['code'] = 'user_not_found';
                 $results['error']['message'] = get_string('user_not_found', 'mod_certifygen');

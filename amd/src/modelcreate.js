@@ -15,7 +15,7 @@
 
 /**
  * Provides the required functionality for creating a model.
- * 
+ *
  * @module    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -47,7 +47,7 @@ let TEMPLATES = {
 };
 const InitModelCreate = () => {
     jQuery(ACTION.CREATE_MODEL).on('click', CreateModel);
-    jQuery('body').on('change', '.custom-select', function (event) {
+    jQuery('body').on('change', '.form-select', function (event) {
         if (event.target && event.target.name === 'type' && event.target.value == '2') {
             addTemplateidValue();
         } else if (event.target && event.target.name === 'type' && event.target.value == '1'

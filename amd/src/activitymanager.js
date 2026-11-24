@@ -15,7 +15,7 @@
 
 /**
  * Provides the required functionality for an activity manager.
- * 
+ *
  * @module    mod_certifygen
  * @copyright  2024 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -28,7 +28,8 @@ import jQuery from 'jquery';
 import {get_strings as getStrings} from 'core/str';
 import Ajax from 'core/ajax';
 import Templates from 'core/templates';
-import ModalFactory from 'core/modal_factory';
+import ModalSaveCancel from 'core/modal_save_cancel';
+import ModalCancel from 'core/modal_cancel';
 import ModalEvents from 'core/modal_events';
 import Notification from 'core/notification';
 
@@ -76,10 +77,9 @@ const reemitCertificate = async (event) => {
         let identifier = jQuery('[data-region="mainpage"]');
         identifier.append(html);
         getStrings(stringkeys).then((langStrings) => {
-            return ModalFactory.create({
+            return ModalSaveCancel.create({
                 title: langStrings[0],
                 body: langStrings[1],
-                type: ModalFactory.types.SAVE_CANCEL
             }).then(modal => {
                 modal.getRoot().on(ModalEvents.hidden, () => {
                     identifier.find('.overlay-icon-container').remove();
@@ -101,10 +101,9 @@ const reemitCertificate = async (event) => {
                             studentsReloadTable(modelid, courseid, cmid, lang);
                         } else {
                             // Mostrar mensaje error.
-                            return ModalFactory.create({
+                            return ModalCancel.create({
                                 title: langStrings[3],
                                 body: response.message,
-                                type: ModalFactory.types.CANCEL
                             }).then(modal => {
                                 modal.getRoot().on(ModalEvents.hidden, () => {
                                     identifier.find('.overlay-icon-container').remove();
@@ -140,10 +139,9 @@ const downloadCertificate = async(event) => {
     ];
     let langStrings = await getStrings(stringkeys);
 
-    let modal = await ModalFactory.create({
+    let modal = await ModalSaveCancel.create({
         title: langStrings[0],
         body: langStrings[1],
-        type: ModalFactory.types.SAVE_CANCEL
     });
     modal.setSaveButtonText(langStrings[2]);
     modal.getRoot().on(ModalEvents.save, () => {
@@ -189,10 +187,9 @@ const revokeCertificate = async(event) => {
     ];
     let langStrings = await getStrings(stringkeys);
 
-    let modal = await ModalFactory.create({
+    let modal = await ModalSaveCancel.create({
         title: langStrings[0],
         body: langStrings[1],
-        type: ModalFactory.types.SAVE_CANCEL
     });
     modal.setSaveButtonText(langStrings[2]);
     modal.getRoot().on(ModalEvents.save, () => {
@@ -239,10 +236,9 @@ const emitCertificate = async(event) => {
         identifier.append(html);
         identifier.find('.overlay-icon-container').css('position', 'fixed');
         let langStrings = await getStrings(stringkeys);
-        let modal = await ModalFactory.create({
+        let modal = await ModalSaveCancel.create({
             title: langStrings[0],
             body: langStrings[1],
-            type: ModalFactory.types.SAVE_CANCEL
         });
         let waitingforrequest = false;
         modal.setSaveButtonText(langStrings[2]);

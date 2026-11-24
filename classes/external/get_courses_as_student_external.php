@@ -85,6 +85,7 @@ class get_courses_as_student_external extends external_api {
      * @throws invalid_parameter_exception
      */
     public static function get_courses_as_student(int $userid, string $userfield, string $lang): array {
+        global $DB;
 
         $params = self::validate_parameters(
             self::get_courses_as_student_parameters(),
@@ -111,7 +112,7 @@ class get_courses_as_student_external extends external_api {
             $userid = $uparam['userid'];
 
             // User exists.
-            $users = user_get_users_by_id([$userid]);
+            $users = $DB->get_records_list('user', 'id', [$userid]);
             if (empty($users)) {
                 unset($results['courses']);
                 unset($results['student']);

@@ -60,6 +60,8 @@ class onedriveconnection {
     private $client = null;
     /** @var null $url */
     private $url = null;
+    /** @var string|null $link Sharing link of the last uploaded file. */
+    private $link = null;
     /** @var bool $enabled */
     private $enabled;
     /** @var string SCOPES */

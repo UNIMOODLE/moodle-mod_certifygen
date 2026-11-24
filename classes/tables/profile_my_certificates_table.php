@@ -129,7 +129,7 @@ class profile_my_certificates_table extends table_sql {
             $tooltip = $statusmessages[$row->status];
             $status = get_string('status_' . $row->status, 'mod_certifygen')
                     . '  '
-                . '<button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="'
+                . '<button type="button" class="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" title="'
                 . $tooltip . '"> '
                 . '<i class="icon fa fa-exclamation-triangle"></i>'
                 . '</button>';

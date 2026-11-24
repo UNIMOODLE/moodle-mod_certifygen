@@ -96,7 +96,8 @@ class certifygen_file {
      * @return stdClass
      */
     public function get_user(): stdClass {
-        $users = user_get_users_by_id([$this->userid]);
+        global $DB;
+        $users = $DB->get_records_list('user', 'id', [$this->userid]);
         return reset($users);
     }
 

@@ -87,6 +87,7 @@ class get_json_teacher_certificate_external extends external_api {
         string $lang,
         int $modelid
     ): array {
+        global $DB;
 
         $params = self::validate_parameters(
             self::get_json_teacher_certificate_parameters(),
@@ -114,7 +115,7 @@ class get_json_teacher_certificate_external extends external_api {
             $userid = $uparam['userid'];
 
             // User exists.
-            $user = user_get_users_by_id([$userid]);
+            $user = $DB->get_records_list('user', 'id', [$userid]);
             if (empty($user)) {
                 $results['error']['code'] = 'user_not_found';
                 $results['error']['message'] = get_string('user_not_found', 'mod_certifygen');

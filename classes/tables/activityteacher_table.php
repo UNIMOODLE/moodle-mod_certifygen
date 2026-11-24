@@ -126,12 +126,19 @@ class activityteacher_table extends table_sql {
             get_string('fullname'),
             get_string('status', 'mod_certifygen'),
             get_string('date'),
-            '',
-            '',
-            '',
+            // Action columns: a null header hides their show/hide icon, which has no label to show.
+            null,
+            null,
+            null,
         ];
 
         $this->define_headers($headers);
+        // Action columns are computed per row, not fields of the query: they cannot be sorted.
+        $this->no_sorting('emit');
+        $this->no_sorting('download');
+        $this->no_sorting('revoke');
+        // Text cells and button cells have different heights: centre them vertically.
+        $this->set_attribute('class', 'table generaltable align-middle');
     }
 
     /**
@@ -215,7 +222,7 @@ class activityteacher_table extends table_sql {
             $tooltip = $this->statusmessages[$row->cstatus];
             $status = get_string('status_' . $row->cstatus, 'mod_certifygen') . '</button>';
             $status .= ' ';
-            $status .= '<button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="'
+            $status .= '<button type="button" class="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" title="'
                     . $tooltip . '">'
                     . '<i class="icon fa fa-exclamation-triangle"></i>'
                     . '</button>';

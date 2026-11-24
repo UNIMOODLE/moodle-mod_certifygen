@@ -32,6 +32,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\context\course;
+use core\context\system;
+use mod_certifygen\interfaces\icertificaterepository;
+use mod_certifygen\interfaces\icertificatevalidation;
+use mod_certifygen\template;
+
 /**
  * CLass defines the structure step to restore one mod_certifygen activity.
  *
@@ -43,6 +49,21 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_certifygen_activity_structure_step extends restore_activity_structure_step {
+    /** @var int Course id the activity had in the backup. */
+    protected $oldcourseid;
+    /** @var string Name of the restored activity. */
+    protected $activityname;
+    /** @var int Id of the restored certifygen instance. */
+    protected $newcertifygenid;
+    /** @var int Id of the last validation processed, in the backup. */
+    protected $oldvalidationid;
+    /** @var int Id of the last validation processed, once restored. */
+    protected $newvalidationid;
+    /** @var int|null Certificate issue id the last validation processed had in the backup. */
+    protected $oldissueid;
+    /** @var int[] Ids of the restored validations whose certificate has been restored too. */
+    protected $validationswithissue = [];
+
     /**
      * Defines the structure to be restored.
      *
@@ -215,6 +236,12 @@ class restore_certifygen_activity_structure_step extends restore_activity_struct
         $this->set_mapping('validationid', $oldid, $newvalidationid, true, $this->task->get_old_contextid());
         $this->oldvalidationid = $oldid;
         $this->newvalidationid = $newvalidationid;
+        $this->oldissueid = empty($data['issueid']) ? null : (int) $data['issueid'];
+
+        // The files are copied from the original course, so they only exist when restoring on the same site.
+        if (!$this->task->is_samesite()) {
+            return;
+        }
 
         // Files.
         $fs = get_file_storage();
@@ -263,7 +290,13 @@ class restore_certifygen_activity_structure_step extends restore_activity_struct
     }
 
     /**
-     * Handles restoring a tool_certificate issue.
+     * Restores a tool_certificate issue as a copy that belongs to the restored activity.
+     *
+     * Issues are only restored on the same site: certificate templates are not part of the backup.
+     * The issue code is unique site-wide, so when the original issue still exists the copy gets a new
+     * code, and its PDF is regenerated so that the printed code and QR match it. That is only possible
+     * when the model neither signs nor validates the PDF nor stores it outside Moodle.
+     * Validations whose certificate is not restored are discarded in after_execute().
      *
      * @param array $data Parsed element data.
      * @throws base_step_exception
@@ -283,67 +316,136 @@ class restore_certifygen_activity_structure_step extends restore_activity_struct
         if (!$DB->get_manager()->table_exists('tool_certificate_templates')) {
             throw new \dml_exception('tool_certificate_templates table does not exists');
         }
-        // Check issueid - oldvalidationid.
-        $userid = $DB->get_field(
-            'certifygen_validations',
-            'userid',
-            [
-                'id' => $this->newvalidationid,
-            ]
-        );
-        if ($userid != $data['userid']) {
+        // Every validation in the backup carries all the issues of the activity: keep only its own.
+        if (empty($this->oldissueid) || (int) $data['id'] !== $this->oldissueid) {
             return;
         }
         $data = (object) $data;
+        if (!$this->task->is_samesite() || !$DB->record_exists('tool_certificate_templates', ['id' => $data->templateid])) {
+            return;
+        }
 
-        $codefound = $DB->record_exists('tool_certificate_issues', ['code' => $data->code]);
-        $templatefound = $DB->record_exists('tool_certificate_templates', ['id' => $data->templateid]);
+        $oldid = $data->id;
+        unset($data->id);
+        $data->courseid = $this->get_courseid();
+        $data->userid = $this->get_mappingid('user', $data->userid);
+        $codetaken = $DB->record_exists('tool_certificate_issues', ['code' => $data->code]);
+        // With the code free, the original PDFs are reused if they still exist (they don't once revoked).
+        $regenerate = $codetaken || !$this->original_files_exist((int) $oldid);
+        if ($regenerate && !$this->can_regenerate_certificate()) {
+            return;
+        }
+        if ($codetaken) {
+            $data->code = \tool_certificate\certificate::generate_code($data->userid);
+        }
+        $newitemid = $DB->insert_record('tool_certificate_issues', $data);
+        $this->set_mapping('tool_certificate_issue', $oldid, $newitemid, true, $this->task->get_old_system_contextid());
+        $DB->set_field('certifygen_validations', 'issueid', $newitemid, ['id' => $this->newvalidationid]);
+        $this->validationswithissue[] = $this->newvalidationid;
 
-        // For now, we only restore issues if is same site, template exists and same issue code does not exist.
-        if ($this->task->is_samesite() && $templatefound && !$codefound) {
-            $oldid = $data->id;
-            $data->courseid = $this->get_courseid();
-            $data->userid = $this->get_mappingid('user', $data->userid);
-            $newitemid = $DB->insert_record('tool_certificate_issues', $data);
-            $this->set_mapping('tool_certificate_issue', $oldid, $newitemid, true, $this->task->get_old_system_contextid());
-
-            // Update issueid in certifygen_validations table.
-            $validation = $DB->get_record(
-                'certifygen_validations',
-                [
-                    'certifygenid' => $this->get_new_parentid('certifygen'),
-                    'issueid' => $oldid,
-                    'userid' => $data->userid,
-                ]
+        $fs = get_file_storage();
+        if ($regenerate) {
+            $issue = $DB->get_record('tool_certificate_issues', ['id' => $newitemid], '*', MUST_EXIST);
+            $issuefile = template::instance($issue->templateid)->create_issue_file($issue, true);
+            // The archived copy restored from the original course carries the original code: replace it.
+            $coursecontextid = course::instance($this->get_courseid())->id;
+            $fs->delete_area_files(
+                $coursecontextid,
+                icertificaterepository::FILE_COMPONENT,
+                icertificaterepository::FILE_AREA,
+                $this->newvalidationid
             );
-            $validation->issueid = $newitemid;
-            $DB->insert_record('certifygen_validations', (object)$validation);
+            $fs->create_file_from_storedfile([
+                'contextid' => $coursecontextid,
+                'component' => icertificaterepository::FILE_COMPONENT,
+                'filearea' => icertificaterepository::FILE_AREA,
+                'itemid' => $this->newvalidationid,
+                'filepath' => icertificaterepository::FILE_PATH,
+                'filename' => $issue->code . '.pdf',
+            ], $issuefile);
+            return;
+        }
 
-            // Files from tool_certificate.
-            $fs = get_file_storage();
-            $issuesfiles = $fs->get_area_files(
-                $this->task->get_old_system_contextid(),
-                'mod_certifygen',
-                'issues',
-                $oldid
-            );
-            foreach ($issuesfiles as $file) {
-                if ($file->get_filename() == '.') {
-                    continue;
-                }
-                $filerecord = [
-                        'contextid' => system::instance()->id,
-                        'component' => $file->get_component(),
-                        'filearea' => $file->get_filearea(),
-                        'itemid' => $newitemid,
-                        'filepath' => $file->get_filepath(),
-                        'filename' => $file->get_filename(),
-                ];
-                $fs->create_file_from_storedfile($filerecord, $file);
+        // Same code: the original PDF is still valid for the copy.
+        $issuesfiles = $fs->get_area_files(system::instance()->id, 'mod_certifygen', 'issues', $oldid);
+        foreach ($issuesfiles as $file) {
+            if ($file->get_filename() == '.') {
+                continue;
             }
+            $fs->create_file_from_storedfile([
+                'contextid' => system::instance()->id,
+                'component' => $file->get_component(),
+                'filearea' => $file->get_filearea(),
+                'itemid' => $newitemid,
+                'filepath' => $file->get_filepath(),
+                'filename' => $file->get_filename(),
+            ], $file);
         }
     }
 
+    /**
+     * Whether the PDFs of the original certificate are still there to be copied.
+     *
+     * @param int $oldissueid
+     * @return bool
+     */
+    protected function original_files_exist(int $oldissueid): bool {
+        $fs = get_file_storage();
+        $issuefiles = $fs->get_area_files(system::instance()->id, 'mod_certifygen', 'issues', $oldissueid, 'id', false);
+        $repositoryfiles = $fs->get_area_files(
+            course::instance($this->get_courseid())->id,
+            icertificaterepository::FILE_COMPONENT,
+            icertificaterepository::FILE_AREA,
+            $this->newvalidationid,
+            'id',
+            false
+        );
+        return !empty($issuefiles) && !empty($repositoryfiles);
+    }
+
+    /**
+     * Whether the certificate of the validation being restored can be regenerated.
+     *
+     * A regenerated PDF is a plain one: it would lose the signature or seal added by any validation
+     * other than "none", and it can only be archived again in the local repository.
+     *
+     * @return bool
+     * @throws dml_exception
+     */
+    protected function can_regenerate_certificate(): bool {
+        global $DB;
+        $modelid = $DB->get_field('certifygen_validations', 'modelid', ['id' => $this->newvalidationid]);
+        $model = $DB->get_record('certifygen_model', ['id' => $modelid], 'validation, repository');
+        return $model
+            && $model->validation === 'certifygenvalidation_none'
+            && $model->repository === 'certifygenrepository_localrepository';
+    }
+
+    /**
+     * Deletes a restored validation whose certificate could not be restored, with its records and files.
+     *
+     * Kept, it would point to the certificate of the original course, or to none on another site.
+     *
+     * @param int $validationid
+     * @throws dml_exception
+     */
+    protected function discard_validation(int $validationid): void {
+        global $DB;
+        $fs = get_file_storage();
+        $coursecontextid = course::instance($this->get_courseid())->id;
+        $fileareas = [
+            icertificatevalidation::FILE_AREA,
+            icertificatevalidation::FILE_AREA_VALIDATED,
+            icertificaterepository::FILE_AREA,
+        ];
+        foreach ($fileareas as $filearea) {
+            $fs->delete_area_files($coursecontextid, 'mod_certifygen', $filearea, $validationid);
+        }
+        $DB->delete_records('certifygen_repository', ['validationid' => $validationid]);
+        $DB->delete_records('certifygen_error', ['validationid' => $validationid]);
+        $DB->delete_records('certifygen_validationcsv', ['validationid' => $validationid]);
+        $DB->delete_records('certifygen_validations', ['id' => $validationid]);
+    }
     /**
      * Handles restoring a tool_certificate issue.
      *
@@ -397,7 +499,22 @@ class restore_certifygen_activity_structure_step extends restore_activity_struct
      * Defines post-execution actions.
      */
     protected function after_execute(): void {
+        global $DB;
 
         $this->add_related_files('mod_certifygen', 'intro', null);
+
+        // A validation that had a certificate keeps it only if the certificate was restored for this activity.
+        $validations = $DB->get_records_select(
+            'certifygen_validations',
+            'certifygenid = :certifygenid AND issueid IS NOT NULL AND issueid <> 0',
+            ['certifygenid' => $this->newcertifygenid],
+            '',
+            'id'
+        );
+        foreach (array_keys($validations) as $validationid) {
+            if (!in_array($validationid, $this->validationswithissue)) {
+                $this->discard_validation($validationid);
+            }
+        }
     }
 }
